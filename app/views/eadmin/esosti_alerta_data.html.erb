@@ -1,0 +1,48 @@
+<h2>Alerta e-Sosti</h2>
+
+<p>
+	<strong>Data/hora da atualização: </strong><%= Time.now.strftime("%m/%d/%Y %H:%M:%S") %>
+</p>
+
+<p>
+	<strong>Resultado do login: </strong><%= @loginResult ? 'Ok' : 'Falhou' %>
+</p>
+
+
+<% if @solicitacoes != nil %>
+<p>
+	<strong>Nº de solicitações: </strong><%= @solicitacoes.length.to_s %>
+</p>
+
+<p>
+	<strong>Nova solicitação: </strong><%= @novaSolicitacao ? 'Sim' : 'Não' %>
+</p>
+<table class="list">
+	<thead>
+		<tr>
+			<th>Número</th>
+			<th>Solicitante</th>
+			<th>Serviço Atual</th>
+			<th>Atendente</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% if @solicitacoes.length == 0 %>
+		<tr>
+			<td><em>Sem solicitações no momento</em></td>
+		</tr>
+		<% else %>
+		<% for s in @solicitacoes %>
+		<tr class="<%= cycle("odd", "even") %>" >
+			<td><%= s[:numero]%></td>
+			<td><%= s[:solicitante]%></td>
+			<td><%= s[:servico_atual]%></td>
+			<td><%= s[:atendente]%></td>
+		</tr>
+		<% end %>
+		<% end %>
+	</tbody>
+
+</table>
+
+<% end %>

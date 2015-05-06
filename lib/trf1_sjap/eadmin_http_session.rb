@@ -37,6 +37,10 @@ module Trf1Sjap
       return CaixaAtendimentoSecao.new(pageContent).solicitacoesData
     end
 
+    def caixaAtendimentoSecaoSolicitacoes
+      return parseCaixaSecaoAtendimento caixaAtendimentoSecao
+    end
+
   end
 
   class CaixaAtendimentoSecao
