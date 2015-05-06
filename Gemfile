@@ -79,7 +79,6 @@ group :test do
   gem "shoulda", "~> 3.3.2"
   gem "mocha", "~> 0.13.3"
   gem 'capybara', '~> 2.0.0'
-  gem 'nokogiri', '< 1.6.0'
   gem 'selenium-webdriver', '2.35.1'
 end
 
@@ -94,3 +93,8 @@ Dir.glob File.expand_path("../plugins/*/Gemfile", __FILE__) do |file|
   puts "Loading #{file} ..." if $DEBUG # `ruby -d` or `bundle -v`
   instance_eval File.read(file)
 end
+
+# Customização do TRF1
+gem "httpclient"
+gem 'nokogiri' , '< 1.6.0'
+gem 'highline'
