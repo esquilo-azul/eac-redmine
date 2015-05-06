@@ -51,10 +51,10 @@ module Trf1Sjap
       solicitacoes = caixa.solicitacoesData
       log "Solicitações: " + solicitacoes.length.to_s
       for s in solicitacoes
-        log "\t* " + s["numero"].to_s
+        log "\t* " + s[:numero].to_s
         s.each do |key, value|
-          if key != 'numero'
-            log "\t\t* " + key + ": " + value
+          if key != :numero
+            log "\t\t* " + key.to_s + ": " + value
           end
        end    
       end

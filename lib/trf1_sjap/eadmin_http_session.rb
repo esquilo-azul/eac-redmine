@@ -48,10 +48,10 @@ module Trf1Sjap
       data = []
       for node in @doc.xpath("id('container_pagination')/table/tbody/tr")
         data.append({
-          'numero' => node.at_xpath('td[2]/a/text()').text.strip,
-          'solicitante' => node.at_xpath('td[4]/text()').text.strip,
-          'servico_atual' => node.at_xpath('td[5]/text()').text.strip,
-          'atendente' => __parseAtendente(node.at_xpath('td[6]/text()').text)
+          :numero => node.at_xpath('td[2]/a/text()').text.strip,
+          :solicitante => node.at_xpath('td[4]/text()').text.strip,
+          :servico_atual => node.at_xpath('td[5]/text()').text.strip,
+          :atendente => __parseAtendente(node.at_xpath('td[6]/text()').text)
         })
       end
       return data
@@ -68,7 +68,7 @@ module Trf1Sjap
 
     def novaSolicitacao?
       for s in solicitacoesData
-        if s['atendente'] == ''
+        if s[:atendente] == ''
         return true
         end
       end
