@@ -17,7 +17,16 @@ module Trf1Sjap
         'Conectar' => 'Conectar',
         :follow_redirect => true
       }
-      return loggedUser?(@httpClient.post_content(uri, body)) != ''
+      html = @httpClient.post_content(uri, body)
+      if loggedUser?(html) != ''
+        return true
+      end
+      doc = Nokogiri::HTML(html)
+      errorNode = doc.at_xpath("id('conteudoLogin')/div[1]/text()")
+      if errorNode != nil
+      	return errorNode.text
+      end
+      return 'Erro desconhecido'
     end
 
     def loggedUser?(pageContent)

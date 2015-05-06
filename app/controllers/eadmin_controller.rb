@@ -15,7 +15,8 @@ class EadminController < ApplicationController
       )
     @loginResult = session.login
     @solicitacoes = nil
-    if @loginResult
+    if @loginResult === true
+      @loginResult = 'Ok'
       caixa = Trf1Sjap::CaixaAtendimentoSecao.new(session.caixaAtendimentoSecao)
       @solicitacoes = caixa.solicitacoesData
       @novaSolicitacao = caixa.novaSolicitacao?

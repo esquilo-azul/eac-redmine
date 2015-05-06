@@ -34,7 +34,7 @@ module Trf1Sjap
       log "Logging..."
       loginResult = @session.login
       log "Login: " + loginResult.to_s
-      return !loginResult
+      return loginResult !== true
     end
 
     def savePage
