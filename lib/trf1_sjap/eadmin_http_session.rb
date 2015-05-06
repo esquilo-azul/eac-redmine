@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'nokogiri'
 
 module Trf1Sjap
@@ -38,16 +40,11 @@ module Trf1Sjap
     end
 
     def caixaAtendimentoSecao
-      uri = 'http://sistemas.trf1.jus.br/app/e-Admin/sosti/atendimentosecoes/atendimentousuario'
-      return @httpClient.get_content(uri)
-    end
-
-    def parseCaixaSecaoAtendimento(pageContent)
-      return CaixaAtendimentoSecao.new(pageContent).solicitacoesData
-    end
-
-    def caixaAtendimentoSecaoSolicitacoes
-      return parseCaixaSecaoAtendimento caixaAtendimentoSecao
+      pageContent = @httpClient.get_content('http://sistemas.trf1.jus.br/app/e-Admin/sosti/atendimentosecoes/atendimentousuario')
+      if !loggedUser?(pageContent) 
+        raise "Usuário não está logado"
+      end
+      return CaixaAtendimentoSecao.new(pageContent)
     end
 
   end
@@ -57,7 +54,7 @@ module Trf1Sjap
       @doc = Nokogiri::HTML(pageContent)
     end
 
-    def solicitacoesData
+    def solicitacoes
       data = []
       for node in @doc.xpath("id('container_pagination')/table/tbody/tr")
         data.append({
@@ -80,7 +77,7 @@ module Trf1Sjap
     end
 
     def novaSolicitacao?
-      for s in solicitacoesData
+      for s in solicitacoes
         if s[:atendente] == ''
         return true
         end
