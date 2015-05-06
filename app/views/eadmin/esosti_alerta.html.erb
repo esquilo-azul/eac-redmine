@@ -2,23 +2,31 @@
 
 <table>
 	<tr>
-		<td align="right"><label for="matricula">Matrícula:</label></td>
-		<td align="left"><%= text_field_tag 'matricula', params[:matricula], :tabindex => '1' %></td>
-	</tr>
-	<tr>
-		<td align="right"><label for="senha">Senha do e-Admin:</label></td>
-		<td align="left"><%= password_field_tag 'senha', nil, :tabindex => '2' %></td>
-	</tr>
-	<tr>
-		<td align="right"><label for="banco">Banco:</label></td>
-		<td align="left"><%= text_field_tag 'banco', params[:banco], :tabindex => '3' %></td>
-	</tr>
-	<tr>
-		<td align="left"> &nbsp; </td>
-		<td align="right">
-		<button onclick="updateContent()" tabindex="4">
-			Atualizar &#187;
-		</button></td>
+		<td>
+			<table>
+				<tr>
+					<td align="right"><label for="matricula">Matrícula:</label></td>
+					<td align="left"><%= text_field_tag 'matricula', params[:matricula], :tabindex => '1' %></td>
+				</tr>
+				<tr>
+					<td align="right"><label for="senha">Senha do e-Admin:</label></td>
+					<td align="left"><%= password_field_tag 'senha', nil, :tabindex => '2' %></td>
+				</tr>
+				<tr>
+					<td align="right"><label for="banco">Banco:</label></td>
+					<td align="left"><%= text_field_tag 'banco', params[:banco], :tabindex => '3' %></td>
+				</tr>
+				<tr>
+					<td align="left"> &nbsp; </td>
+					<td align="right">
+						<button onclick="updateContent()" tabindex="4">
+							Atualizar &#187;
+						</button>
+					</td>	
+				</tr>
+			</table>
+		</td>
+		<td id="resultContainer">&nbsp;</td>
 	</tr>
 </table>
 
@@ -31,7 +39,3 @@
 	});
 	}
 </script>
-
-<div id="resultContainer">
-	Not set
-</div>

@@ -70,7 +70,7 @@ module Trf1Sjap
     end
     
     def playAlarm
-      file = File.dirname(__FILE__) + "/fire-alarm.ogg"
+      file = RAILS_ROOT + "/public/audios/fire-alarm.ogg"
       system 'paplay',file
     end
 

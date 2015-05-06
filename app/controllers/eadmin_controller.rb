@@ -16,10 +16,13 @@ class EadminController < ApplicationController
     @loginResult = session.login
     @solicitacoes = nil
     if @loginResult === true
-      @loginResult = 'Ok'
+      @loginMessage = 'Ok'
       caixa = Trf1Sjap::CaixaAtendimentoSecao.new(session.caixaAtendimentoSecao)
       @solicitacoes = caixa.solicitacoesData
       @novaSolicitacao = caixa.novaSolicitacao?
+    else
+      @loginMessage = @loginResult
+      @loginResult = false
     end
     render(:layout => false) if request.xhr?
   end

@@ -1,11 +1,9 @@
-<h2>Alerta e-Sosti</h2>
-
 <p>
 	<strong>Data/hora da atualização: </strong><%= Time.now.strftime("%m/%d/%Y %H:%M:%S") %>
 </p>
 
 <p>
-	<strong>Resultado do login: </strong><%= @loginResult %>
+	<strong>Resultado do login: </strong><%= @loginMessage %>
 </p>
 
 
@@ -17,6 +15,13 @@
 <p>
 	<strong>Nova solicitação: </strong><%= @novaSolicitacao ? 'Sim' : 'Não' %>
 </p>
+
+<% if @novaSolicitacao %>
+	<p>
+		<%= audio_tag('fire-alarm.ogg', autoplay: true) %>
+	<p>
+<% end %>
+
 <table class="list">
 	<thead>
 		<tr>
