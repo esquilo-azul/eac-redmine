@@ -2,7 +2,7 @@
 
 <table>
 	<tr>
-		<td>
+		<td rowspan="2">
 			<table>
 				<tr>
 					<td align="right"><label for="matricula">Matrícula:</label></td>
@@ -16,26 +16,18 @@
 					<td align="right"><label for="banco">Banco:</label></td>
 					<td align="left"><%= text_field_tag 'banco', params[:banco], :tabindex => '3' %></td>
 				</tr>
-				<tr>
-					<td align="left"> &nbsp; </td>
-					<td align="right">
-						<button onclick="updateContent()" tabindex="4">
-							Atualizar &#187;
-						</button>
-					</td>	
-				</tr>
 			</table>
 		</td>
+		<td id="updateStatus"></td>
+	</tr>
+	<tr>
 		<td id="resultContainer">&nbsp;</td>
 	</tr>
 </table>
 
+<%= javascript_include_tag('esosti_alerta') %>
+
 <script type="text/javascript">
-	function updateContent() {
-	$.post( '<%= esosti_alerta_data_path %>', {
-	matricula:$('#matricula').val(),senha:$('#senha').val(),banco:$('#banco').val(),
-	}).done(function(data) {
-		$('#resultContainer').html(data);
-	});
-	}
+	EsostiAlerta.ESOSTI_ALERTA_DATA_PATH = '<%= esosti_alerta_data_path %>';
+	EsostiAlerta.start();
 </script>

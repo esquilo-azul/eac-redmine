@@ -1,10 +1,8 @@
 class EadminController < ApplicationController
   layout 'base'
-
-  helper :sort
-  include SortHelper
   def esosti_alerta
     request.params[:banco] = 'JFAP'
+    request.params[:intervalo] = 15
   end
 
   def esosti_alerta_data
