@@ -12,6 +12,8 @@ EsostiAlerta.start = function() {
 		$('#resultContainer').html(data);
 	}).always(function(data) {
 		EsostiAlerta.__countdownTime = 15;
+	}).always(function(data) {
+		EsostiAlerta.__countdownTime = $('#intervalo').val();
 		EsostiAlerta.__countdown();
 	});
 };

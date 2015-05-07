@@ -16,6 +16,10 @@
 					<td align="right"><label for="banco">Banco:</label></td>
 					<td align="left"><%= text_field_tag 'banco', params[:banco], :tabindex => '3' %></td>
 				</tr>
+				<tr>
+					<td align="right"><label for="intervalo">Intervalo de atualização:</label></td>
+					<td align="left"><%= number_field_tag 'intervalo', params[:intervalo], :tabindex => '4', :min => 1 %></td>	
+				</tr>
 			</table>
 		</td>
 		<td id="updateStatus"></td>
