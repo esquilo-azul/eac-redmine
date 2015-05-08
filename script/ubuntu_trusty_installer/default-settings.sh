@@ -1,0 +1,3 @@
+postgresql_database=redmine
+postgresql_user=redmine
+postgresql_password=redmine
