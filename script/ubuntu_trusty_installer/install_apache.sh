@@ -26,7 +26,7 @@ passengerPath() {
 echo "PASSENGER: instalando pacotes Debian..."
 "$DIR/apt_get_assert_packages.sh" libcurl4-openssl-dev libssl-dev apache2-dev libapr1-dev libaprutil1-dev libxslt1-dev ruby apache2
 echo 'PASSENGER: instalando gem "passenger"...'
-sudo gem install -V --conservative passenger
+"$DIR/ruby_assert_gems.sh" passenger
 
 if [ -z $(passengerPath) ]; then
 	echo "PASSENGER: módulo não existe. Criando..."

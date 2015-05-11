@@ -12,7 +12,7 @@ bundleInstalled() {
 }
 
 "$DIR/apt_get_assert_packages.sh" ruby ruby-dev libmagickwand-dev
-sudo gem install -V --conservative bundler
+"$DIR/ruby_assert_gems.sh" bundler
 	
 if bundleInstalled; then
 	echo "Bundle completo"
