@@ -3,35 +3,62 @@
 set -u
 set -e
 
+printHelp() {
+	echo "Uso:"
+	echo ""
+	echo "    $0 [OPCOES] [ARQUIVO]"
+	echo ""
+	echo "Opções:"
+	echo ""
+	echo "    -h, --help: mostra este texto."
+	echo ""
+	echo "Argumentos:"
+	echo ""
+	echo "    ARQUIVO: arquivo com parâmetros de instalação."
+	echo ""
+	echo "Os seguintes arquivos são lidos na ordem que seguem caso existam:"
+	echo "    \"$SAMPLE_SETTINGS\""
+	echo "    \"$DEFAULT_SETTINGS\""
+	echo "    [ARQUIVO]"
+	echo ""
+}
+
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 REDMINE_ROOT=$(dirname $(dirname "$DIR"))
+SAMPLE_SETTINGS="$DIR/default-settings.sh"
 DEFAULT_SETTINGS="$REDMINE_ROOT/config/install-settings.sh"
 
 if [ $# -ge 1 ]; then
 	SETTINGS_FILE=$1
 else
-	SETTINGS_FILE=$DEFAULT_SETTINGS
+	SETTINGS_FILE=''
 fi
 
-if [ ! -f "$SETTINGS_FILE" ]; then
-	echo "Uso:"
-	echo ""
-	echo "    $0 [ARQUIVO_PARAMETROS]"
-	echo ""	
-	echo "Se não especificado, ARQUIVO_PARAMETROS utiliza a localização padrão abaixo:"
-	echo ""
-	echo "    $DEFAULT_SETTINGS"
-	echo ""
-	echo "O arquivo \"$SETTINGS_FILE\" não existe. Para corrigir..."
-	echo ""
-	echo "    cp '$DEFAULT_SETTINGS' '$SETTINGS_FILE'"
-	echo ""
-	echo "... E edite '$SETTINGS_FILE' de acordo com seu ambiente."
-	echo ""
+if [ "$SETTINGS_FILE" == '--help' -o "$SETTINGS_FILE" == '-h' ]; then
+	printHelp
 	exit
 fi
 
-source "$SETTINGS_FILE"
+SETTINGS=("$SAMPLE_SETTINGS")
+
+if [ -f "$DEFAULT_SETTINGS" ]; then
+	SETTINGS+=("$DEFAULT_SETTINGS")
+fi
+
+if [ $# -ge 1 ]; then
+	if [ -f "$SETTINGS_FILE" ]; then
+		SETTINGS+=("$SETTINGS_FILE")
+	else
+		echo "\"$SETTINGS_FILE\" não existe."
+		exit 1	
+	fi
+fi
+
+for S in "${SETTINGS[@]}"
+do
+	source "$S"
+done
+
 export postgresql_database
 export gitolite_user
 export gitolite_user_home
