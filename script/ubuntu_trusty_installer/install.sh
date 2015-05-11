@@ -34,4 +34,4 @@ fi
 source "$SETTINGS_FILE"
 $DIR/install_postgresql.sh "$postgresql_database" "$postgresql_user" "$postgresql_password"
 $DIR/install_redmine_bundle.sh
-$DIR/install_redmine.sh
+$DIR/install_apache.sh
