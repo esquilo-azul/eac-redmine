@@ -32,7 +32,11 @@ if [ ! -f "$SETTINGS_FILE" ]; then
 fi
 
 source "$SETTINGS_FILE"
+export postgresql_database
+export gitolite_user
+export gitolite_user_home
 $DIR/install_postgresql.sh "$postgresql_database" "$postgresql_user" "$postgresql_password"
 $DIR/install_redmine_bundle.sh
 $DIR/install_redmine_database.sh
+$DIR/install_gitolite.sh "$($DIR/rails_user.sh)" "$gitolite_user" "$gitolite_user_home" 'redmine_git_hosting_id'
 $DIR/install_apache.sh

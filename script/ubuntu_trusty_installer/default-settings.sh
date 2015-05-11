@@ -1,3 +1,5 @@
 postgresql_database=redmine
 postgresql_user=redmine
 postgresql_password=redmine
+gitolite_user=git
+gitolite_user_home=/var/lib/git

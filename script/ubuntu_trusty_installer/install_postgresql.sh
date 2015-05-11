@@ -43,26 +43,27 @@ changeDatabaseOwner() {
 	sudo -u postgres psql -c "ALTER DATABASE $1 OWNER TO $2;" > /dev/null
 }
 
-echo "Instalando pacotes Debian..."
+echo "POSTGRESQL: Instalando pacotes Debian..."
 "$DIR/apt_get_assert_packages.sh" postgresql
+echo "POSTGRESQL: pacotes debian instalados"
 
 if userExists $USER; then
-	echo "Usuário PostgreSQL \"$USER\" já existe. Alterando senha..."
+	echo "POSTGRESQL: Usuário PostgreSQL \"$USER\" já existe. Alterando senha..."
 	alterPassword $USER $PASSWORD	
 else
-	echo "Usuário PostgreSQL \"$USER\" não existe. Criando..."
+	echo "POSTGRESQL: Usuário PostgreSQL \"$USER\" não existe. Criando..."
 	createUser $USER $PASSWORD
 fi
 
 if databaseExists $DATABASE; then
-	echo "Banco PostgreSQL \"$DATABASE\" já existe. Alterando proprietário..."
+	echo "POSTGRESQL: Banco PostgreSQL \"$DATABASE\" já existe. Alterando proprietário..."
 	changeDatabaseOwner $DATABASE $USER
 else
-	echo "Banco PostgreSQL \"$DATABASE\" não existe. Criando..."
+	echo "POSTGRESQL: Banco PostgreSQL \"$DATABASE\" não existe. Criando..."
 	createDatabase $DATABASE $USER
 fi
 
-echo "Aplicando parâmetros de conexão da base de dados PostgreSQL ao Redmine..."
+echo "POSTGRESQL: Aplicando parâmetros de conexão da base de dados PostgreSQL ao Redmine..."
 DATABASE_CONFIG_FILE=$(dirname $(dirname "$DIR"))'/config/database.yml'
 cat <<HERE > "$DATABASE_CONFIG_FILE"
 production:
@@ -73,7 +74,7 @@ production:
   password: $PASSWORD
   encoding: utf8
 
-test:
+development:
   adapter: postgresql
   database: $DATABASE
   host: localhost
