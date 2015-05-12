@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -27,71 +27,35 @@ class Redmine::ApiTest::NewsTest < Redmine::ApiTest::Base
            :enabled_modules,
            :news
 
-  def setup
-    Setting.rest_api_enabled = '1'
+  test "GET /news.xml should return news" do
+    get '/news.xml'
+
+    assert_select 'news[type=array] news id', :text => '2'
   end
 
-  context "GET /news" do
-    context ".xml" do
-      should "return news" do
-        get '/news.xml'
+  test "GET /news.json should return news" do
+    get '/news.json'
 
-        assert_tag :tag => 'news',
-          :attributes => {:type => 'array'},
-          :child => {
-            :tag => 'news',
-            :child => {
-              :tag => 'id',
-              :content => '2'
-            }
-          }
-      end
-    end
-
-    context ".json" do
-      should "return news" do
-        get '/news.json'
-
-        json = ActiveSupport::JSON.decode(response.body)
-        assert_kind_of Hash, json
-        assert_kind_of Array, json['news']
-        assert_kind_of Hash, json['news'].first
-        assert_equal 2, json['news'].first['id']
-      end
-    end
+    json = ActiveSupport::JSON.decode(response.body)
+    assert_kind_of Hash, json
+    assert_kind_of Array, json['news']
+    assert_kind_of Hash, json['news'].first
+    assert_equal 2, json['news'].first['id']
   end
 
-  context "GET /projects/:project_id/news" do
-    context ".xml" do
-      should_allow_api_authentication(:get, "/projects/onlinestore/news.xml")
+  test "GET /projects/:project_id/news.xml should return news" do
+    get '/projects/ecookbook/news.xml'
 
-      should "return news" do
-        get '/projects/ecookbook/news.xml'
+    assert_select 'news[type=array] news id', :text => '2'
+  end
 
-        assert_tag :tag => 'news',
-          :attributes => {:type => 'array'},
-          :child => {
-            :tag => 'news',
-            :child => {
-              :tag => 'id',
-              :content => '2'
-            }
-          }
-      end
-    end
+  test "GET /projects/:project_id/news.json should return news" do
+    get '/projects/ecookbook/news.json'
 
-    context ".json" do
-      should_allow_api_authentication(:get, "/projects/onlinestore/news.json")
-
-      should "return news" do
-        get '/projects/ecookbook/news.json'
-
-        json = ActiveSupport::JSON.decode(response.body)
-        assert_kind_of Hash, json
-        assert_kind_of Array, json['news']
-        assert_kind_of Hash, json['news'].first
-        assert_equal 2, json['news'].first['id']
-      end
-    end
+    json = ActiveSupport::JSON.decode(response.body)
+    assert_kind_of Hash, json
+    assert_kind_of Array, json['news']
+    assert_kind_of Hash, json['news'].first
+    assert_equal 2, json['news'].first['id']
   end
 end

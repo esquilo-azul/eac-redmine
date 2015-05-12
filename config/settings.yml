@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -36,6 +36,10 @@ unsubscribe:
 password_min_length:
   format: int
   default: 8
+# Maximum number of additional email addresses per user
+max_additional_emails:
+  format: int
+  default: 5
 # Maximum lifetime of user sessions in minutes
 session_lifetime:
   format: int
@@ -55,6 +59,8 @@ activity_days_default:
   default: 30
 per_page_options:
   default: '25,50,100'
+search_results_per_page:
+  default: 10
 mail_from:
   default: redmine@example.net
 bcc_recipients:
@@ -69,6 +75,10 @@ wiki_compression:
   default: ""
 default_language:
   default: en
+force_default_language_for_anonymous:
+  default: 0
+force_default_language_for_loggedin:
+  default: 0
 host_name:
   default: localhost:3000
 protocol:
@@ -106,13 +116,9 @@ commit_cross_project_ref:
   default: 0
 commit_ref_keywords:
   default: 'refs,references,IssueID'
-commit_fix_keywords:
-  default: 'fixes,closes'
-commit_fix_status_id:
-  format: int
-  default: 0
-commit_fix_done_ratio:
-  default: 100
+commit_update_keywords:
+  serialized: true
+  default: []
 commit_logtime_enabled:
   default: 0
 commit_logtime_activity_id:
@@ -136,6 +142,8 @@ cross_project_issue_relations:
 # Enables subtasks to be in other projects
 cross_project_subtasks:
   default: 'tree'
+link_copied_issue:
+  default: 'ask'
 issue_group_assignment:
   default: 0
 default_issue_start_date_to_creation_date:
@@ -146,6 +154,8 @@ notified_events:
   - issue_added
   - issue_updated
 mail_handler_body_delimiters:
+  default: ''
+mail_handler_excluded_filenames:
   default: ''
 mail_handler_api_enabled:
   default: 0

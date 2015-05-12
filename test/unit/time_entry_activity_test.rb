@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,7 +18,14 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 class TimeEntryActivityTest < ActiveSupport::TestCase
-  fixtures :enumerations, :time_entries, :custom_fields
+  fixtures :enumerations, :time_entries, :custom_fields,
+           :issues, :projects, :users,
+           :members, :roles, :member_roles,
+           :trackers, :issue_statuses,
+           :projects_trackers,
+           :issue_categories,
+           :groups_users,
+           :enabled_modules
 
   include Redmine::I18n
 
@@ -52,7 +59,7 @@ class TimeEntryActivityTest < ActiveSupport::TestCase
 
     e = TimeEntryActivity.new(:name => 'Custom Data')
     assert !e.save
-    assert_equal ["Billable can't be blank"], e.errors.full_messages
+    assert_equal ["Billable cannot be blank"], e.errors.full_messages
   end
 
   def test_create_with_required_custom_field_should_succeed
@@ -76,7 +83,7 @@ class TimeEntryActivityTest < ActiveSupport::TestCase
     # Blanking custom field, save should fail
     e.custom_field_values = {field.id => ""}
     assert !e.save
-    assert_equal ["Billable can't be blank"], e.errors.full_messages
+    assert_equal ["Billable cannot be blank"], e.errors.full_messages
 
     # Update custom field to valid value, save should succeed
     e.custom_field_values = {field.id => "0"}

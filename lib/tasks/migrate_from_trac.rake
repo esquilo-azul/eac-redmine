@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,7 +16,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 require 'active_record'
-require 'iconv' if RUBY_VERSION < '1.9'
 require 'pp'
 
 namespace :redmine do
@@ -26,12 +25,12 @@ namespace :redmine do
     module TracMigrate
         TICKET_MAP = []
 
-        DEFAULT_STATUS = IssueStatus.default
+        new_status = IssueStatus.find_by_position(1)
         assigned_status = IssueStatus.find_by_position(2)
         resolved_status = IssueStatus.find_by_position(3)
         feedback_status = IssueStatus.find_by_position(4)
         closed_status = IssueStatus.where(:is_closed => true).first
-        STATUS_MAPPING = {'new' => DEFAULT_STATUS,
+        STATUS_MAPPING = {'new' => new_status,
                           'reopened' => feedback_status,
                           'assigned' => assigned_status,
                           'closed' => closed_status
@@ -153,7 +152,11 @@ namespace :redmine do
       private
         def trac_fullpath
           attachment_type = read_attribute(:type)
-          trac_file = filename.gsub( /[^a-zA-Z0-9\-_\.!~*']/n ) {|x| sprintf('%%%02x', x[0]) }
+          #replace exotic characters with their hex representation to avoid invalid filenames
+          trac_file = filename.gsub( /[^a-zA-Z0-9\-_\.!~*']/n ) do |x|
+            codepoint = x.codepoints.to_a[0]
+            sprintf('%%%02x', codepoint)
+          end
           "#{TracMigrate.trac_attachments_directory}/#{attachment_type}/#{id}/#{trac_file}"
         end
       end
@@ -259,7 +262,7 @@ namespace :redmine do
           # finally, a default user is used if the new user is not valid
           u = User.first unless u.save
         end
-        # Make sure he is a member of the project
+        # Make sure user is a member of the project
         if project_member && !u.member_of?(@target_project)
           role = DEFAULT_ROLE
           if u.admin
@@ -323,9 +326,9 @@ namespace :redmine do
         # We would like to convert the Code highlighting too
         # This will go into the next line.
         shebang_line = false
-        # Reguar expression for start of code
+        # Regular expression for start of code
         pre_re = /\{\{\{/
-        # Code hightlighing...
+        # Code highlighting...
         shebang_re = /^\#\!([a-z]+)/
         # Regular expression for end of code
         pre_end_re = /\}\}\}/
@@ -473,8 +476,8 @@ namespace :redmine do
           i.author = find_or_create_user(ticket.reporter)
           i.category = issues_category_map[ticket.component] unless ticket.component.blank?
           i.fixed_version = version_map[ticket.milestone] unless ticket.milestone.blank?
-          i.status = STATUS_MAPPING[ticket.status] || DEFAULT_STATUS
           i.tracker = TRACKER_MAPPING[ticket.ticket_type] || DEFAULT_TRACKER
+          i.status = STATUS_MAPPING[ticket.status] || i.default_status
           i.id = ticket.id unless Issue.exists?(ticket.id)
           next unless Time.fake(ticket.changetime) { i.save }
           TICKET_MAP[ticket.id] = i.id
@@ -711,12 +714,7 @@ namespace :redmine do
       end
 
       def self.encode(text)
-        if RUBY_VERSION < '1.9'
-          @ic ||= Iconv.new('UTF-8', @charset)
-          @ic.iconv text
-        else
-          text.to_s.force_encoding(@charset).encode('UTF-8')
-        end
+        text.to_s.force_encoding(@charset).encode('UTF-8')
       end
     end
 
@@ -777,4 +775,3 @@ namespace :redmine do
     end
   end
 end
-

@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@ require File.expand_path('../../../../test_helper', __FILE__)
 class Redmine::Hook::ManagerTest < ActionView::TestCase
   fixtures :projects, :users, :members, :member_roles, :roles,
            :groups_users,
+           :email_addresses,
            :trackers, :projects_trackers,
            :enabled_modules,
            :versions,
@@ -66,6 +67,7 @@ class Redmine::Hook::ManagerTest < ActionView::TestCase
 
   def setup
     @hook_module = Redmine::Hook
+    @hook_module.clear_listeners
   end
 
   def teardown
@@ -112,6 +114,15 @@ class Redmine::Hook::ManagerTest < ActionView::TestCase
     assert_equal ['<a href="/issues">Issues</a>'], hook_helper.call_hook(:view_layouts_base_html_head)
   end
 
+  def test_view_hook_should_generate_links_with_relative_url_root
+    Redmine::Utils.relative_url_root = '/foo'
+    @hook_module.add_listener(TestLinkToHook)
+
+    assert_equal ['<a href="/foo/issues">Issues</a>'], hook_helper.call_hook(:view_layouts_base_html_head)
+  ensure
+    Redmine::Utils.relative_url_root = ''
+  end
+
   # Context: Redmine::Hook::Helper.call_hook
   def test_call_hook_with_project_added_to_context
     @hook_module.add_listener(TestHook3)
@@ -154,14 +165,14 @@ class Redmine::Hook::ManagerTest < ActionView::TestCase
     issue = Issue.find(1)
 
     ActionMailer::Base.deliveries.clear
-    Mailer.issue_add(issue).deliver
+    Mailer.deliver_issue_add(issue)
     mail = ActionMailer::Base.deliveries.last
 
     @hook_module.add_listener(TestLinkToHook)
     hook_helper.call_hook(:view_layouts_base_html_head)
 
     ActionMailer::Base.deliveries.clear
-    Mailer.issue_add(issue).deliver
+    Mailer.deliver_issue_add(issue)
     mail2 = ActionMailer::Base.deliveries.last
 
     assert_equal mail_body(mail), mail_body(mail2)
