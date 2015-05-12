@@ -1,13 +1,15 @@
 <div class="contextual">
   &#171;
   <% unless @changeset.previous.nil? -%>
-    <%= link_to_revision(@changeset.previous, @repository, :text => l(:label_previous)) %>
+    <%= link_to_revision(@changeset.previous, @repository,
+      :text => l(:label_previous), :accesskey => accesskey(:previous)) %>
   <% else -%>
     <%= l(:label_previous) %>
   <% end -%>
 |
   <% unless @changeset.next.nil? -%>
-    <%= link_to_revision(@changeset.next, @repository, :text => l(:label_next)) %>
+    <%= link_to_revision(@changeset.next, @repository,
+      :text => l(:label_next), :accesskey => accesskey(:next)) %>
   <% else -%>
     <%= l(:label_next) %>
   <% end -%>
@@ -94,4 +96,8 @@
 <%= stylesheet_link_tag "scm" %>
 <% end %>
 
-<% html_title("#{l(:label_revision)} #{format_revision(@changeset)}") -%>
+<%
+  title = "#{l(:label_revision)} #{format_revision(@changeset)}"
+  title << " - #{@changeset.comments.truncate(80)}"
+  html_title(title)
+ -%>

@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -31,7 +31,7 @@ class VersionsController < ApplicationController
   def index
     respond_to do |format|
       format.html {
-        @trackers = @project.trackers.sorted.all
+        @trackers = @project.trackers.sorted.to_a
         retrieve_selected_tracker_ids(@trackers, @trackers.select {|t| t.is_in_roadmap?})
         @with_subprojects = params[:with_subprojects].nil? ? Setting.display_subprojects_issues? : (params[:with_subprojects] == '1')
         project_ids = @with_subprojects ? @project.self_and_descendants.collect(&:id) : [@project.id]
@@ -46,17 +46,17 @@ class VersionsController < ApplicationController
 
         @issues_by_version = {}
         if @selected_tracker_ids.any? && @versions.any?
-          issues = Issue.visible.all(
-            :include => [:project, :status, :tracker, :priority, :fixed_version],
-            :conditions => {:tracker_id => @selected_tracker_ids, :project_id => project_ids, :fixed_version_id => @versions.map(&:id)},
-            :order => "#{Project.table_name}.lft, #{Tracker.table_name}.position, #{Issue.table_name}.id"
-          )
+          issues = Issue.visible.
+            includes(:project, :tracker).
+            preload(:status, :priority, :fixed_version).
+            where(:tracker_id => @selected_tracker_ids, :project_id => project_ids, :fixed_version_id => @versions.map(&:id)).
+            order("#{Project.table_name}.lft, #{Tracker.table_name}.position, #{Issue.table_name}.id")
           @issues_by_version = issues.group_by(&:fixed_version)
         end
         @versions.reject! {|version| !project_ids.include?(version.project_id) && @issues_by_version[version].blank?}
       }
       format.api {
-        @versions = @project.shared_versions.all
+        @versions = @project.shared_versions.to_a
       }
     end
   end
@@ -67,7 +67,7 @@ class VersionsController < ApplicationController
         @issues = @version.fixed_issues.visible.
           includes(:status, :tracker, :priority).
           reorder("#{Tracker.table_name}.position, #{Issue.table_name}.id").
-          all
+          to_a
       }
       format.api
     end
@@ -117,7 +117,7 @@ class VersionsController < ApplicationController
   end
 
   def update
-    if request.put? && params[:version]
+    if params[:version]
       attributes = params[:version].dup
       attributes.delete('sharing') unless @version.allowed_sharings.include?(attributes['sharing'])
       @version.safe_attributes = attributes

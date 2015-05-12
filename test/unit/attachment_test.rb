@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,10 +22,10 @@ require File.expand_path('../../test_helper', __FILE__)
 class AttachmentTest < ActiveSupport::TestCase
   fixtures :users, :projects, :roles, :members, :member_roles,
            :enabled_modules, :issues, :trackers, :attachments
-  
+
   class MockFile
     attr_reader :original_filename, :content_type, :content, :size
-    
+
     def initialize(attributes)
       @original_filename = attributes[:original_filename]
       @content_type = attributes[:content_type]
@@ -40,6 +40,13 @@ class AttachmentTest < ActiveSupport::TestCase
 
   def test_container_for_new_attachment_should_be_nil
     assert_nil Attachment.new.container
+  end
+
+  def test_filename_should_remove_eols
+    assert_equal "line_feed", Attachment.new(:filename => "line\nfeed").filename
+    assert_equal "line_feed", Attachment.new(:filename => "some\npath/line\nfeed").filename
+    assert_equal "carriage_return", Attachment.new(:filename => "carriage\rreturn").filename
+    assert_equal "carriage_return", Attachment.new(:filename => "some\rpath/carriage\rreturn").filename
   end
 
   def test_create
@@ -58,6 +65,16 @@ class AttachmentTest < ActiveSupport::TestCase
 
     assert File.exist?(a.diskfile)
     assert_equal 59, File.size(a.diskfile)
+  end
+
+  def test_create_should_clear_content_type_if_too_long
+    a = Attachment.new(:container => Issue.find(1),
+                       :file => uploaded_test_file("testfile.txt", "text/plain"),
+                       :author => User.find(1),
+                       :content_type => 'a'*300)
+    assert a.save
+    a.reload
+    assert_nil a.content_type
   end
 
   def test_copy_should_preserve_attributes
@@ -146,12 +163,12 @@ class AttachmentTest < ActiveSupport::TestCase
                             :author => User.find(1))
     assert a1.disk_filename != a2.disk_filename
   end
-  
+
   def test_filename_should_be_basenamed
     a = Attachment.new(:file => MockFile.new(:original_filename => "path/to/the/file"))
     assert_equal 'file', a.filename
   end
-  
+
   def test_filename_should_be_sanitized
     a = Attachment.new(:file => MockFile.new(:original_filename => "valid:[] invalid:?%*|\"'<>chars"))
     assert_equal 'valid_[] invalid_chars', a.filename
@@ -171,6 +188,12 @@ class AttachmentTest < ActiveSupport::TestCase
 
     a = Attachment.new(:filename => "test.png", :description => "Cool image")
     assert_equal "test.png (Cool image)", a.title
+  end
+
+  def test_new_attachment_should_be_editable_by_authot
+    user = User.find(1)
+    a = Attachment.new(:author => user)
+    assert_equal true, a.editable?(user)
   end
 
   def test_prune_should_destroy_old_unattached_attachments
@@ -207,8 +230,7 @@ class AttachmentTest < ActiveSupport::TestCase
           'description' => 'test'
         })
     end
-
-    attachment = Attachment.first(:order => 'id DESC')
+    attachment = Attachment.order('id DESC').first
     assert_equal issue, attachment.container
     assert_equal 'testfile.txt', attachment.filename
     assert_equal 59, attachment.filesize
@@ -233,6 +255,54 @@ class AttachmentTest < ActiveSupport::TestCase
       assert response[:unsaved].second.new_record?
       assert_equal response[:unsaved], @project.unsaved_attachments
     end
+  end
+
+  test "Attachment.attach_files should preserve the content_type of attachments added by token" do
+    @project = Project.find(1)
+    attachment = Attachment.create!(:file => uploaded_test_file("testfile.txt", ""), :author_id => 1, :created_on => 2.days.ago)
+    assert_equal 'text/plain', attachment.content_type
+    Attachment.attach_files(@project, { '1' => {'token' => attachment.token } })
+    attachment.reload
+    assert_equal 'text/plain', attachment.content_type
+  end
+
+  def test_update_attachments
+    attachments = Attachment.where(:id => [2, 3]).to_a
+
+    assert Attachment.update_attachments(attachments, {
+      '2' => {:filename => 'newname.txt', :description => 'New description'},
+      3 => {:filename => 'othername.txt'}
+    })
+
+    attachment = Attachment.find(2)
+    assert_equal 'newname.txt', attachment.filename
+    assert_equal 'New description', attachment.description
+
+    attachment = Attachment.find(3)
+    assert_equal 'othername.txt', attachment.filename
+  end
+
+  def test_update_attachments_with_failure
+    attachments = Attachment.where(:id => [2, 3]).to_a
+
+    assert !Attachment.update_attachments(attachments, {
+      '2' => {:filename => '', :description => 'New description'},
+      3 => {:filename => 'othername.txt'}
+    })
+
+    attachment = Attachment.find(3)
+    assert_equal 'logo.gif', attachment.filename
+  end
+
+  def test_update_attachments_should_sanitize_filename
+    attachments = Attachment.where(:id => 2).to_a
+
+    assert Attachment.update_attachments(attachments, {
+      2 => {:filename => 'newname?.txt'},
+    })
+
+    attachment = Attachment.find(2)
+    assert_equal 'newname_.txt', attachment.filename
   end
 
   def test_latest_attach
@@ -276,6 +346,13 @@ class AttachmentTest < ActiveSupport::TestCase
         assert_equal "16_8e0294de2441577c529f170b6fb8f638_100.thumb", File.basename(thumbnail)
         assert File.exists?(thumbnail)
       end
+    end
+
+    def test_thumbnail_should_return_nil_if_generation_fails
+      Redmine::Thumbnail.expects(:generate).raises(SystemCallError, 'Something went wrong')
+      set_fixtures_attachments_directory
+      attachment = Attachment.find(16)
+      assert_nil attachment.thumbnail
     end
   else
     puts '(ImageMagick convert not available)'

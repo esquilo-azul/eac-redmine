@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,12 +19,13 @@ class Member < ActiveRecord::Base
   belongs_to :user
   belongs_to :principal, :foreign_key => 'user_id'
   has_many :member_roles, :dependent => :destroy
-  has_many :roles, :through => :member_roles
+  has_many :roles, lambda {uniq}, :through => :member_roles
   belongs_to :project
 
   validates_presence_of :principal, :project
   validates_uniqueness_of :user_id, :scope => :project_id
   validate :validate_role
+  attr_protected :id
 
   before_destroy :set_issue_category_nil
 
@@ -46,7 +47,7 @@ class Member < ActiveRecord::Base
 
     new_role_ids = ids - role_ids
     # Add new roles
-    new_role_ids.each {|id| member_roles << MemberRole.new(:role_id => id) }
+    new_role_ids.each {|id| member_roles << MemberRole.new(:role_id => id, :member => self) }
     # Remove roles (Rails' #role_ids= will not trigger MemberRole#on_destroy)
     member_roles_to_destroy = member_roles.select {|mr| !ids.include?(mr.role_id)}
     if member_roles_to_destroy.any?
@@ -73,6 +74,18 @@ class Member < ActiveRecord::Base
     member_roles.detect {|mr| mr.inherited_from}.nil?
   end
 
+  def destroy
+    if member_roles.reload.present?
+      # destroying the last role will destroy another instance
+      # of the same Member record, #super would then trigger callbacks twice
+      member_roles.destroy_all
+      @destroyed = true
+      freeze
+    else
+      super
+    end
+  end
+
   def include?(user)
     if principal.is_a?(Group)
       !user.nil? && user.groups.include?(principal)
@@ -82,17 +95,30 @@ class Member < ActiveRecord::Base
   end
 
   def set_issue_category_nil
-    if user
+    if user_id && project_id
       # remove category based auto assignments for this member
-      IssueCategory.update_all "assigned_to_id = NULL", ["project_id = ? AND assigned_to_id = ?", project.id, user.id]
+      IssueCategory.where(["project_id = ? AND assigned_to_id = ?", project_id, user_id]).
+        update_all("assigned_to_id = NULL")
     end
   end
 
-  # Find or initilize a Member with an id, attributes, and for a Principal
-  def self.edit_membership(id, new_attributes, principal=nil)
-    @membership = id.present? ? Member.find(id) : Member.new(:principal => principal)
-    @membership.attributes = new_attributes
-    @membership
+  # Creates memberships for principal with the attributes
+  # * project_ids : one or more project ids
+  # * role_ids : ids of the roles to give to each membership
+  #
+  # Example:
+  #   Member.create_principal_memberships(user, :project_ids => [2, 5], :role_ids => [1, 3]
+  def self.create_principal_memberships(principal, attributes)
+    members = []
+    if attributes
+      project_ids = Array.wrap(attributes[:project_ids] || attributes[:project_id])
+      role_ids = attributes[:role_ids]
+      project_ids.each do |project_id|
+        members << Member.new(:principal => principal, :role_ids => role_ids, :project_id => project_id)
+      end
+      principal.members << members
+    end
+    members
   end
 
   # Finds or initilizes a Member for the given project and principal

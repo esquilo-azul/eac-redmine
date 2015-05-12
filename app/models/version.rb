@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@ class Version < ActiveRecord::Base
   has_many :fixed_issues, :class_name => 'Issue', :foreign_key => 'fixed_version_id', :dependent => :nullify
   acts_as_customizable
   acts_as_attachable :view_permission => :view_files,
+                     :edit_permission => :manage_files,
                      :delete_permission => :manage_files
 
   VERSION_STATUSES = %w(open locked closed)
@@ -33,14 +34,16 @@ class Version < ActiveRecord::Base
   validates :effective_date, :date => true
   validates_inclusion_of :status, :in => VERSION_STATUSES
   validates_inclusion_of :sharing, :in => VERSION_SHARINGS
+  attr_protected :id
 
   scope :named, lambda {|arg| where("LOWER(#{table_name}.name) = LOWER(?)", arg.to_s.strip)}
   scope :open, lambda { where(:status => 'open') }
   scope :visible, lambda {|*args|
-    includes(:project).where(Project.allowed_to_condition(args.first || User.current, :view_issues))
+    joins(:project).
+    where(Project.allowed_to_condition(args.first || User.current, :view_issues))
   }
 
-  safe_attributes 'name', 
+  safe_attributes 'name',
     'description',
     'effective_date',
     'due_date',
@@ -58,6 +61,10 @@ class Version < ActiveRecord::Base
   # Version files have same visibility as project files
   def attachments_visible?(*args)
     project.present? && project.attachments_visible?(*args)
+  end
+
+  def attachments_deletable?(usr=User.current)
+    project.present? && project.attachments_deletable?(usr)
   end
 
   def start_date
@@ -119,12 +126,6 @@ class Version < ActiveRecord::Base
     end
   end
 
-  # TODO: remove in Redmine 3.0
-  def completed_pourcent
-    ActiveSupport::Deprecation.warn "Version#completed_pourcent is deprecated and will be removed in Redmine 3.0. Please use #completed_percent instead."
-    completed_percent
-  end
-
   # Returns the percentage of issues that have been marked as 'closed'.
   def closed_percent
     if issues_count == 0
@@ -132,12 +133,6 @@ class Version < ActiveRecord::Base
     else
       issues_progress(false)
     end
-  end
-
-  # TODO: remove in Redmine 3.0
-  def closed_pourcent
-    ActiveSupport::Deprecation.warn "Version#closed_pourcent is deprecated and will be removed in Redmine 3.0. Please use #closed_percent instead."
-    closed_percent
   end
 
   # Returns true if the version is overdue: due date reached and some open issues
@@ -203,7 +198,7 @@ class Version < ActiveRecord::Base
     ["(CASE WHEN #{table}.effective_date IS NULL THEN 1 ELSE 0 END)", "#{table}.effective_date", "#{table}.name", "#{table}.id"]
   end
 
-  scope :sorted, order(fields_for_order_statement)
+  scope :sorted, lambda { order(fields_for_order_statement) }
 
   # Returns the sharings that +user+ can set the version to
   def allowed_sharings(user = User.current)
@@ -226,13 +221,18 @@ class Version < ActiveRecord::Base
     end
   end
 
+  # Returns true if the version is shared, otherwise false
+  def shared?
+    sharing != 'none'
+  end
+
   private
 
   def load_issue_counts
     unless @issue_count
       @open_issues_count = 0
       @closed_issues_count = 0
-      fixed_issues.count(:all, :group => :status).each do |status, count|
+      fixed_issues.group(:status).count.each do |status, count|
         if status.is_closed?
           @closed_issues_count += count
         else
@@ -256,7 +256,7 @@ class Version < ActiveRecord::Base
 
   # Returns the average estimated time of assigned issues
   # or 1 if no issue has an estimated time
-  # Used to weigth unestimated issues in progress calculation
+  # Used to weight unestimated issues in progress calculation
   def estimated_average
     if @estimated_average.nil?
       average = fixed_issues.average(:estimated_hours).to_f

@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -21,16 +21,16 @@ class RoleTest < ActiveSupport::TestCase
   fixtures :roles, :workflows, :trackers
 
   def test_sorted_scope
-    assert_equal Role.all.sort, Role.sorted.all
+    assert_equal Role.all.sort, Role.sorted.to_a
   end
 
   def test_givable_scope
-    assert_equal Role.all.reject(&:builtin?).sort, Role.givable.all
+    assert_equal Role.all.reject(&:builtin?).sort, Role.givable.to_a
   end
 
   def test_builtin_scope
-    assert_equal Role.all.select(&:builtin?).sort, Role.builtin(true).all.sort
-    assert_equal Role.all.reject(&:builtin?).sort, Role.builtin(false).all.sort
+    assert_equal Role.all.select(&:builtin?).sort, Role.builtin(true).to_a.sort
+    assert_equal Role.all.reject(&:builtin?).sort, Role.builtin(false).to_a.sort
   end
 
   def test_copy_from
@@ -57,8 +57,9 @@ class RoleTest < ActiveSupport::TestCase
   end
 
   def test_permissions_should_be_unserialized_with_its_coder
-    Role::PermissionsAttributeCoder.expects(:load).once
-    Role.find(1).permissions
+    Role::PermissionsAttributeCoder.stubs(:load).returns([:foo, :bar])
+    role = Role.find(1)
+    assert_equal [:foo, :bar], role.permissions
   end
 
   def test_add_permission
@@ -80,6 +81,17 @@ class RoleTest < ActiveSupport::TestCase
     assert_equal size - 2, role.permissions.size
   end
 
+  def test_has_permission
+    role = Role.create!(:name => 'Test', :permissions => [:view_issues, :edit_issues])
+    assert_equal true, role.has_permission?(:view_issues)
+    assert_equal false, role.has_permission?(:delete_issues)
+  end
+
+  def test_has_permission_without_permissions
+    role = Role.create!(:name => 'Test')
+    assert_equal false, role.has_permission?(:delete_issues)
+  end
+
   def test_name
     I18n.locale = 'fr'
     assert_equal 'Manager', Role.find(1).name
@@ -91,55 +103,39 @@ class RoleTest < ActiveSupport::TestCase
     assert_equal Role.all.reject(&:builtin?).sort, Role.find_all_givable
   end
 
-  context "#anonymous" do
-    should "return the anonymous role" do
+  def test_anonymous_should_return_the_anonymous_role
+    assert_no_difference('Role.count') do
       role = Role.anonymous
       assert role.builtin?
       assert_equal Role::BUILTIN_ANONYMOUS, role.builtin
     end
+  end
 
-    context "with a missing anonymous role" do
-      setup do
-        Role.delete_all("builtin = #{Role::BUILTIN_ANONYMOUS}")
-      end
+  def test_anonymous_with_a_missing_anonymous_role_should_return_the_anonymous_role
+    Role.where(:builtin => Role::BUILTIN_ANONYMOUS).delete_all
 
-      should "create a new anonymous role" do
-        assert_difference('Role.count') do
-          Role.anonymous
-        end
-      end
-
-      should "return the anonymous role" do
-        role = Role.anonymous
-        assert role.builtin?
-        assert_equal Role::BUILTIN_ANONYMOUS, role.builtin
-      end
+    assert_difference('Role.count') do
+      role = Role.anonymous
+      assert role.builtin?
+      assert_equal Role::BUILTIN_ANONYMOUS, role.builtin
     end
   end
 
-  context "#non_member" do
-    should "return the non-member role" do
+  def test_non_member_should_return_the_non_member_role
+    assert_no_difference('Role.count') do
       role = Role.non_member
       assert role.builtin?
       assert_equal Role::BUILTIN_NON_MEMBER, role.builtin
     end
+  end
 
-    context "with a missing non-member role" do
-      setup do
-        Role.delete_all("builtin = #{Role::BUILTIN_NON_MEMBER}")
-      end
+  def test_non_member_with_a_missing_non_member_role_should_return_the_non_member_role
+    Role.where(:builtin => Role::BUILTIN_NON_MEMBER).delete_all
 
-      should "create a new non-member role" do
-        assert_difference('Role.count') do
-          Role.non_member
-        end
-      end
-
-      should "return the non-member role" do
-        role = Role.non_member
-        assert role.builtin?
-        assert_equal Role::BUILTIN_NON_MEMBER, role.builtin
-      end
+    assert_difference('Role.count') do
+      role = Role.non_member
+      assert role.builtin?
+      assert_equal Role::BUILTIN_NON_MEMBER, role.builtin
     end
   end
 end

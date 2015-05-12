@@ -1,7 +1,7 @@
 # Swedish translation for Ruby on Rails
 # by Johan Lundström (johanlunds@gmail.com),
 # with parts taken from http://github.com/daniel/swe_rails
-
+# Update based on Redmine 2.6.0 by Khedron Wilk (khedron.wilk@gmail.com) 6th Dec 2014
 sv:
   number:
     # Used in number_with_delimiter()
@@ -134,6 +134,7 @@ sv:
         not_same_project: "tillhör inte samma projekt"
         circular_dependency: "Denna relation skulle skapa ett cirkulärt beroende"
         cant_link_an_issue_with_a_descendant: "Ett ärende kan inte länkas till ett av dess underärenden"
+        earlier_than_minimum_start_date: "kan inte vara tidigare än% {datum} på grund av föregående ärenden"        
 
   direction: ltr
   date:
@@ -178,11 +179,11 @@ sv:
   general_text_Yes: 'Ja'
   general_text_no: 'nej'
   general_text_yes: 'ja'
-  general_lang_name: 'Svenska'
+  general_lang_name: 'Swedish (Svenska)'
   general_csv_separator: ','
   general_csv_decimal_separator: '.'
   general_csv_encoding: ISO-8859-1
-  general_pdf_encoding: UTF-8
+  general_pdf_fontname: freesans
   general_first_day_of_week: '1'
 
   notice_account_updated: Kontot har uppdaterats
@@ -204,7 +205,7 @@ sv:
   notice_not_authorized_archived_project: Projektet du försöker komma åt har arkiverats.
   notice_email_sent: "Ett mail skickades till %{value}"
   notice_email_error: "Ett fel inträffade när mail skickades (%{value})"
-  notice_feeds_access_key_reseted: Din RSS-nyckel återställdes.
+  notice_feeds_access_key_reseted: Din Atom-nyckel återställdes.
   notice_api_access_key_reseted: Din API-nyckel återställdes.
   notice_failed_to_save_issues: "Misslyckades med att spara %{count} ärende(n) på %{total} valda: %{ids}."
   notice_failed_to_save_time_entries: "Misslyckades med att spara %{count} tidloggning(ar) på %{total} valda: %{ids}."
@@ -374,6 +375,7 @@ sv:
   field_board_parent: Förälderforum
   field_private_notes: Privata anteckningar
   field_inherit_members: Ärv medlemmar
+  field_generate_password: Generera lösenord
 
   setting_app_title: Applikationsrubrik
   setting_app_subtitle: Applikationsunderrubrik
@@ -674,7 +676,6 @@ sv:
   label_used_by: Använd av
   label_details: Detaljer
   label_add_note: Lägg till anteckning
-  label_per_page: Per sida
   label_calendar: Kalender
   label_months_from: månader från
   label_gantt: Gantt
@@ -829,9 +830,9 @@ sv:
   label_language_based: Språkbaserad
   label_sort_by: "Sortera på %{value}"
   label_send_test_email: Skicka testmail
-  label_feeds_access_key: RSS-nyckel
-  label_missing_feeds_access_key: Saknar en RSS-nyckel
-  label_feeds_access_key_created_on: "RSS-nyckel skapad för %{value} sedan"
+  label_feeds_access_key: Atom-nyckel
+  label_missing_feeds_access_key: Saknar en Atom-nyckel
+  label_feeds_access_key_created_on: "Atom-nyckel skapad för %{value} sedan"
   label_module_plural: Moduler
   label_added_time_by: "Tillagd av %{author} för %{age} sedan"
   label_updated_time_by: "Uppdaterad av %{author} för %{age} sedan"
@@ -1125,3 +1126,51 @@ sv:
   description_date_from: Ange startdatum
   description_date_to: Ange slutdatum
   text_repository_identifier_info: 'Endast gemener (a-z), siffror, streck och understreck är tillåtna.<br />När identifieraren sparats kan den inte ändras.'
+  notice_account_not_activated_yet: Du har inte aktiverat ditt konto än. Om du vill få ett nytt aktiveringsbrev, <a href="%{url}"> klicka på denna länk </a>.
+  notice_account_locked: Ditt konto är låst.
+  label_hidden: Dold
+  label_visibility_private: endast för mig
+  label_visibility_roles: endast för dessa roller
+  label_visibility_public: för alla användare
+  field_must_change_passwd: Måste byta lösenord vid nästa inloggning.
+  notice_new_password_must_be_different: Det nya lösenordet måste skilja sig från det nuvarande lösenordet
+  setting_mail_handler_excluded_filenames: Uteslut bilagor med namn
+  text_convert_available: ImageMagick-konvertering tillgänglig (valbart)
+  label_link: Länk
+  label_only: endast
+  label_drop_down_list: droppmeny
+  label_checkboxes: kryssrutor
+  label_link_values_to: Länka värden till URL
+  setting_force_default_language_for_anonymous: Lås till förvalt språk för anonyma användare
+  setting_force_default_language_for_loggedin: Lås till förvalt språk för inloggade användare
+  label_custom_field_select_type: Väljd den typ av objekt som det anpassade fältet skall användas för
+  label_issue_assigned_to_updated: Tilldelad har uppdaterats
+  label_check_for_updates: Leta efter uppdateringar
+  label_latest_compatible_version: Senaste kompatibla version
+  label_unknown_plugin: Okänt tillägg
+  label_radio_buttons: alternativknappar
+  label_group_anonymous: Anonyma användare
+  label_group_non_member: Icke-medlemsanvändare
+  label_add_projects: Add projects
+  field_default_status: Default status
+  text_subversion_repository_note: 'Examples: file:///, http://, https://, svn://, svn+[tunnelscheme]://'
+  field_users_visibility: Users visibility
+  label_users_visibility_all: All active users
+  label_users_visibility_members_of_visible_projects: Members of visible projects
+  label_edit_attachments: Edit attached files
+  setting_link_copied_issue: Link issues on copy
+  label_link_copied_issue: Link copied issue
+  label_ask: Ask
+  label_search_attachments_yes: Search attachment filenames and descriptions
+  label_search_attachments_no: Do not search attachments
+  label_search_attachments_only: Search attachments only
+  label_search_open_issues_only: Open issues only
+  field_address: Mail
+  setting_max_additional_emails: Maximum number of additional email addresses
+  label_email_address_plural: Emails
+  label_email_address_add: Add email address
+  label_enable_notifications: Enable notifications
+  label_disable_notifications: Disable notifications
+  setting_search_results_per_page: Search results per page
+  label_blank_value: blank
+  permission_copy_issues: Copy issues

@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -279,7 +279,7 @@ module Redmine
 
     def line_to_html(line, offsets)
       html = line_to_html_raw(line, offsets)
-      html.force_encoding('UTF-8') if html.respond_to?(:force_encoding)
+      html.force_encoding('UTF-8')
       html
     end
 

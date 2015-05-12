@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -45,9 +45,26 @@ class IssueQuery < Query
   scope :visible, lambda {|*args|
     user = args.shift || User.current
     base = Project.allowed_to_condition(user, :view_issues, *args)
-    user_id = user.logged? ? user.id : 0
+    scope = joins("LEFT OUTER JOIN #{Project.table_name} ON #{table_name}.project_id = #{Project.table_name}.id").
+      where("#{table_name}.project_id IS NULL OR (#{base})")
 
-    includes(:project).where("(#{table_name}.project_id IS NULL OR (#{base})) AND (#{table_name}.is_public = ? OR #{table_name}.user_id = ?)", true, user_id)
+    if user.admin?
+      scope.where("#{table_name}.visibility <> ? OR #{table_name}.user_id = ?", VISIBILITY_PRIVATE, user.id)
+    elsif user.memberships.any?
+      scope.where("#{table_name}.visibility = ?" +
+        " OR (#{table_name}.visibility = ? AND #{table_name}.id IN (" +
+          "SELECT DISTINCT q.id FROM #{table_name} q" +
+          " INNER JOIN #{table_name_prefix}queries_roles#{table_name_suffix} qr on qr.query_id = q.id" +
+          " INNER JOIN #{MemberRole.table_name} mr ON mr.role_id = qr.role_id" +
+          " INNER JOIN #{Member.table_name} m ON m.id = mr.member_id AND m.user_id = ?" +
+          " WHERE q.project_id IS NULL OR q.project_id = m.project_id))" +
+        " OR #{table_name}.user_id = ?",
+        VISIBILITY_PUBLIC, VISIBILITY_ROLES, user.id, user.id)
+    elsif user.logged?
+      scope.where("#{table_name}.visibility = ? OR #{table_name}.user_id = ?", VISIBILITY_PUBLIC, user.id)
+    else
+      scope.where("#{table_name}.visibility = ?", VISIBILITY_PUBLIC)
+    end
   }
 
   def initialize(attributes=nil, *args)
@@ -57,7 +74,53 @@ class IssueQuery < Query
 
   # Returns true if the query is visible to +user+ or the current user.
   def visible?(user=User.current)
-    (project.nil? || user.allowed_to?(:view_issues, project)) && (self.is_public? || self.user_id == user.id)
+    return true if user.admin?
+    return false unless project.nil? || user.allowed_to?(:view_issues, project)
+    case visibility
+    when VISIBILITY_PUBLIC
+      true
+    when VISIBILITY_ROLES
+      if project
+        (user.roles_for_project(project) & roles).any?
+      else
+        Member.where(:user_id => user.id).joins(:roles).where(:member_roles => {:role_id => roles.map(&:id)}).any?
+      end
+    else
+      user == self.user
+    end
+  end
+
+  def is_private?
+    visibility == VISIBILITY_PRIVATE
+  end
+
+  def is_public?
+    !is_private?
+  end
+
+  def draw_relations
+    r = options[:draw_relations]
+    r.nil? || r == '1'
+  end
+
+  def draw_relations=(arg)
+    options[:draw_relations] = (arg == '0' ? '0' : nil)
+  end
+
+  def draw_progress_line
+    r = options[:draw_progress_line]
+    r == '1'
+  end
+
+  def draw_progress_line=(arg)
+    options[:draw_progress_line] = (arg == '1' ? '1' : nil)
+  end
+
+  def build_from_params(params)
+    super
+    self.draw_relations = params[:draw_relations] || (params[:query] && params[:query][:draw_relations])
+    self.draw_progress_line = params[:draw_progress_line] || (params[:query] && params[:query][:draw_progress_line])
+    self
   end
 
   def initialize_available_filters
@@ -66,30 +129,30 @@ class IssueQuery < Query
     versions = []
     categories = []
     issue_custom_fields = []
-    
+
     if project
-      principals += project.principals.sort
+      principals += project.principals.visible
       unless project.leaf?
-        subprojects = project.descendants.visible.all
-        principals += Principal.member_of(subprojects)
+        subprojects = project.descendants.visible.to_a
+        principals += Principal.member_of(subprojects).visible
       end
-      versions = project.shared_versions.all
-      categories = project.issue_categories.all
+      versions = project.shared_versions.to_a
+      categories = project.issue_categories.to_a
       issue_custom_fields = project.all_issue_custom_fields
     else
       if all_projects.any?
-        principals += Principal.member_of(all_projects)
+        principals += Principal.member_of(all_projects).visible
       end
-      versions = Version.visible.find_all_by_sharing('system')
-      issue_custom_fields = IssueCustomField.where(:is_filter => true, :is_for_all => true).all
+      versions = Version.visible.where(:sharing => 'system').to_a
+      issue_custom_fields = IssueCustomField.where(:is_for_all => true)
     end
     principals.uniq!
     principals.sort!
+    principals.reject! {|p| p.is_a?(GroupBuiltin)}
     users = principals.select {|p| p.is_a?(User)}
 
-
     add_available_filter "status_id",
-      :type => :list_status, :values => IssueStatus.sorted.all.collect{|s| [s.name, s.id.to_s] }
+      :type => :list_status, :values => IssueStatus.sorted.collect{|s| [s.name, s.id.to_s] }
 
     if project.nil?
       project_values = []
@@ -122,7 +185,7 @@ class IssueQuery < Query
       :type => :list_optional, :values => assigned_to_values
     ) unless assigned_to_values.empty?
 
-    group_values = Group.all.collect {|g| [g.name, g.id.to_s] }
+    group_values = Group.givable.visible.collect {|g| [g.name, g.id.to_s] }
     add_available_filter("member_of_group",
       :type => :list_optional, :values => group_values
     ) unless group_values.empty?
@@ -189,8 +252,8 @@ class IssueQuery < Query
     @available_columns = self.class.available_columns.dup
     @available_columns += (project ?
                             project.all_issue_custom_fields :
-                            IssueCustomField.all
-                           ).collect {|cf| QueryCustomFieldColumn.new(cf) }
+                            IssueCustomField
+                           ).visible.collect {|cf| QueryCustomFieldColumn.new(cf) }
 
     if User.current.allowed_to?(:view_time_entries, project, :global => true)
       index = nil
@@ -227,7 +290,7 @@ class IssueQuery < Query
 
   # Returns the issue count
   def issue_count
-    Issue.visible.count(:include => [:status, :project], :conditions => statement)
+    Issue.visible.joins(:status, :project).where(statement).count
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
@@ -238,7 +301,12 @@ class IssueQuery < Query
     if grouped?
       begin
         # Rails3 will raise an (unexpected) RecordNotFound if there's only a nil group value
-        r = Issue.visible.count(:joins => joins_for_order_statement(group_by_statement), :group => group_by_statement, :include => [:status, :project], :conditions => statement)
+        r = Issue.visible.
+          joins(:status, :project).
+          where(statement).
+          joins(joins_for_order_statement(group_by_statement)).
+          group(group_by_statement).
+          count
       rescue ActiveRecord::RecordNotFound
         r = {nil => issue_count}
       end
@@ -257,14 +325,22 @@ class IssueQuery < Query
   def issues(options={})
     order_option = [group_by_sort_order, options[:order]].flatten.reject(&:blank?)
 
-    issues = Issue.visible.where(options[:conditions]).all(
-      :include => ([:status, :project] + (options[:include] || [])).uniq,
-      :conditions => statement,
-      :order => order_option,
-      :joins => joins_for_order_statement(order_option.join(',')),
-      :limit  => options[:limit],
-      :offset => options[:offset]
-    )
+    scope = Issue.visible.
+      joins(:status, :project).
+      where(statement).
+      includes(([:status, :project] + (options[:include] || [])).uniq).
+      where(options[:conditions]).
+      order(order_option).
+      joins(joins_for_order_statement(order_option.join(','))).
+      limit(options[:limit]).
+      offset(options[:offset])
+
+    scope = scope.preload(:custom_values)
+    if has_column?(:author)
+      scope = scope.preload(:author)
+    end
+
+    issues = scope.to_a
 
     if has_column?(:spent_hours)
       Issue.load_visible_spent_hours(issues)
@@ -281,12 +357,17 @@ class IssueQuery < Query
   def issue_ids(options={})
     order_option = [group_by_sort_order, options[:order]].flatten.reject(&:blank?)
 
-    Issue.visible.scoped(:conditions => options[:conditions]).scoped(:include => ([:status, :project] + (options[:include] || [])).uniq,
-                     :conditions => statement,
-                     :order => order_option,
-                     :joins => joins_for_order_statement(order_option.join(',')),
-                     :limit  => options[:limit],
-                     :offset => options[:offset]).find_ids
+    Issue.visible.
+      joins(:status, :project).
+      where(statement).
+      includes(([:status, :project] + (options[:include] || [])).uniq).
+      references(([:status, :project] + (options[:include] || [])).uniq).
+      where(options[:conditions]).
+      order(order_option).
+      joins(joins_for_order_statement(order_option.join(','))).
+      limit(options[:limit]).
+      offset(options[:offset]).
+      pluck(:id)
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
@@ -294,13 +375,14 @@ class IssueQuery < Query
   # Returns the journals
   # Valid options are :order, :offset, :limit
   def journals(options={})
-    Journal.visible.all(
-      :include => [:details, :user, {:issue => [:project, :author, :tracker, :status]}],
-      :conditions => statement,
-      :order => options[:order],
-      :limit => options[:limit],
-      :offset => options[:offset]
-    )
+    Journal.visible.
+      joins(:issue => [:project, :status]).
+      where(statement).
+      order(options[:order]).
+      limit(options[:limit]).
+      offset(options[:offset]).
+      preload(:details, :user, {:issue => [:project, :author, :tracker, :status]}).
+      to_a
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
@@ -308,10 +390,12 @@ class IssueQuery < Query
   # Returns the versions
   # Valid options are :conditions
   def versions(options={})
-    Version.visible.where(options[:conditions]).all(
-      :include => :project,
-      :conditions => project_statement
-    )
+    Version.visible.
+      where(project_statement).
+      where(options[:conditions]).
+      includes(:project).
+      references(:project).
+      to_a
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
@@ -324,13 +408,13 @@ class IssueQuery < Query
 
   def sql_for_member_of_group_field(field, operator, value)
     if operator == '*' # Any group
-      groups = Group.all
+      groups = Group.givable
       operator = '=' # Override the operator since we want to find by assigned_to
     elsif operator == "!*"
-      groups = Group.all
+      groups = Group.givable
       operator = '!' # Override the operator since we want to find by assigned_to
     else
-      groups = Group.find_all_by_id(value)
+      groups = Group.where(:id => value).to_a
     end
     groups ||= []
 
@@ -350,7 +434,7 @@ class IssueQuery < Query
         " WHERE #{Member.table_name}.project_id = #{Issue.table_name}.project_id))"
     when "=", "!"
       role_cond = value.any? ?
-        "#{MemberRole.table_name}.role_id IN (" + value.collect{|val| "'#{connection.quote_string(val)}'"}.join(",") + ")" :
+        "#{MemberRole.table_name}.role_id IN (" + value.collect{|val| "'#{self.class.connection.quote_string(val)}'"}.join(",") + ")" :
         "1=0"
 
       sw = operator == "!" ? 'NOT' : ''
@@ -362,7 +446,7 @@ class IssueQuery < Query
 
   def sql_for_is_private_field(field, operator, value)
     op = (operator == "=" ? 'IN' : 'NOT IN')
-    va = value.map {|v| v == '0' ? connection.quoted_false : connection.quoted_true}.uniq.join(',')
+    va = value.map {|v| v == '0' ? self.class.connection.quoted_false : self.class.connection.quoted_true}.uniq.join(',')
 
     "#{Issue.table_name}.is_private #{op} (#{va})"
   end
@@ -381,14 +465,14 @@ class IssueQuery < Query
     sql = case operator
       when "*", "!*"
         op = (operator == "*" ? 'IN' : 'NOT IN')
-        "#{Issue.table_name}.id #{op} (SELECT DISTINCT #{IssueRelation.table_name}.#{join_column} FROM #{IssueRelation.table_name} WHERE #{IssueRelation.table_name}.relation_type = '#{connection.quote_string(relation_type)}')"
+        "#{Issue.table_name}.id #{op} (SELECT DISTINCT #{IssueRelation.table_name}.#{join_column} FROM #{IssueRelation.table_name} WHERE #{IssueRelation.table_name}.relation_type = '#{self.class.connection.quote_string(relation_type)}')"
       when "=", "!"
         op = (operator == "=" ? 'IN' : 'NOT IN')
-        "#{Issue.table_name}.id #{op} (SELECT DISTINCT #{IssueRelation.table_name}.#{join_column} FROM #{IssueRelation.table_name} WHERE #{IssueRelation.table_name}.relation_type = '#{connection.quote_string(relation_type)}' AND #{IssueRelation.table_name}.#{target_join_column} = #{value.first.to_i})"
+        "#{Issue.table_name}.id #{op} (SELECT DISTINCT #{IssueRelation.table_name}.#{join_column} FROM #{IssueRelation.table_name} WHERE #{IssueRelation.table_name}.relation_type = '#{self.class.connection.quote_string(relation_type)}' AND #{IssueRelation.table_name}.#{target_join_column} = #{value.first.to_i})"
       when "=p", "=!p", "!p"
         op = (operator == "!p" ? 'NOT IN' : 'IN')
         comp = (operator == "=!p" ? '<>' : '=')
-        "#{Issue.table_name}.id #{op} (SELECT DISTINCT #{IssueRelation.table_name}.#{join_column} FROM #{IssueRelation.table_name}, #{Issue.table_name} relissues WHERE #{IssueRelation.table_name}.relation_type = '#{connection.quote_string(relation_type)}' AND #{IssueRelation.table_name}.#{target_join_column} = relissues.id AND relissues.project_id #{comp} #{value.first.to_i})"
+        "#{Issue.table_name}.id #{op} (SELECT DISTINCT #{IssueRelation.table_name}.#{join_column} FROM #{IssueRelation.table_name}, #{Issue.table_name} relissues WHERE #{IssueRelation.table_name}.relation_type = '#{self.class.connection.quote_string(relation_type)}' AND #{IssueRelation.table_name}.#{target_join_column} = relissues.id AND relissues.project_id #{comp} #{value.first.to_i})"
       end
 
     if relation_options[:sym] == field && !options[:reverse]

@@ -14,7 +14,7 @@ module ObjectHelpers
 
   def User.add_to_project(user, project, roles=nil)
     roles = Role.find(1) if roles.nil?
-    roles = [roles] unless roles.is_a?(Array)
+    roles = [roles] if roles.is_a?(Role)
     Member.create!(:principal => user, :project => project, :roles => roles)
   end
 
@@ -40,9 +40,21 @@ module ObjectHelpers
   end
 
   def Project.generate_with_parent!(parent, attributes={})
-    project = Project.generate!(attributes)
-    project.set_parent!(parent)
+    project = Project.generate!(attributes) do |p|
+      p.parent = parent
+    end
+    parent.reload if parent
     project
+  end
+
+  def IssueStatus.generate!(attributes={})
+    @generated_status_name ||= 'Status 0'
+    @generated_status_name.succ!
+    status = IssueStatus.new(attributes)
+    status.name = @generated_status_name.dup if status.name.blank?
+    yield status if block_given?
+    status.save!
+    status
   end
 
   def Tracker.generate!(attributes={})
@@ -50,6 +62,7 @@ module ObjectHelpers
     @generated_tracker_name.succ!
     tracker = Tracker.new(attributes)
     tracker.name = @generated_tracker_name.dup if tracker.name.blank?
+    tracker.default_status ||= IssueStatus.order('position').first || IssueStatus.generate!
     yield tracker if block_given?
     tracker.save!
     tracker
@@ -65,13 +78,20 @@ module ObjectHelpers
     role
   end
 
-  def Issue.generate!(attributes={})
+  # Generates an unsaved Issue
+  def Issue.generate(attributes={})
     issue = Issue.new(attributes)
     issue.project ||= Project.find(1)
     issue.tracker ||= issue.project.trackers.first
     issue.subject = 'Generated' if issue.subject.blank?
     issue.author ||= User.find(2)
     yield issue if block_given?
+    issue
+  end
+
+  # Generates a saved Issue
+  def Issue.generate!(attributes={}, &block)
+    issue = Issue.generate(attributes, &block)
     issue.save!
     issue
   end
@@ -159,4 +179,57 @@ module ObjectHelpers
     field.save!
     field
   end
+
+  def Changeset.generate!(attributes={})
+    @generated_changeset_rev ||= '123456'
+    @generated_changeset_rev.succ!
+    changeset = new(attributes)
+    changeset.repository ||= Project.find(1).repository
+    changeset.revision ||= @generated_changeset_rev
+    changeset.committed_on ||= Time.now
+    yield changeset if block_given?
+    changeset.save!
+    changeset
+  end
+
+  def Query.generate!(attributes={})
+    query = new(attributes)
+    query.name = "Generated query" if query.name.blank?
+    query.user ||= User.find(1)
+    query.save!
+    query
+  end
 end
+
+module TrackerObjectHelpers
+  def generate_transitions!(*args)
+    options = args.last.is_a?(Hash) ? args.pop : {}
+    if args.size == 1
+      args << args.first
+    end
+    if options[:clear]
+      WorkflowTransition.where(:tracker_id => id).delete_all
+    end
+    args.each_cons(2) do |old_status_id, new_status_id|
+      WorkflowTransition.create!(
+        :tracker => self,
+        :role_id => (options[:role_id] || 1),
+        :old_status_id => old_status_id,
+        :new_status_id => new_status_id
+      )
+    end
+  end
+end
+Tracker.send :include, TrackerObjectHelpers
+
+module IssueObjectHelpers
+  def close!
+    self.status = IssueStatus.where(:is_closed => true).first
+    save!
+  end
+
+  def generate_child!(attributes={})
+    Issue.generate!(attributes.merge(:parent_issue_id => self.id))
+  end
+end
+Issue.send :include, IssueObjectHelpers

@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,7 +18,8 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 class ProjectMembersInheritanceTest < ActiveSupport::TestCase
-  fixtures :roles, :users
+  fixtures :roles, :users,
+           :projects, :trackers, :issue_statuses
 
   def setup
     @parent = Project.generate!
@@ -105,6 +106,7 @@ class ProjectMembersInheritanceTest < ActiveSupport::TestCase
   def test_moving_a_subproject_to_another_parent_should_change_inherited_members
     other_parent = Project.generate!
     other_member = Member.create!(:principal => User.find(4), :project => other_parent, :role_ids => [3])
+    other_member.reload
 
     Project.generate_with_parent!(@parent, :inherit_members => true)
     project = Project.order('id desc').first
@@ -157,6 +159,7 @@ class ProjectMembersInheritanceTest < ActiveSupport::TestCase
 
     assert_difference 'Member.count', 2 do
       member = Member.create!(:principal => User.find(4), :project => @parent, :role_ids => [1, 3])
+      member.reload
 
       inherited_member = project.memberships.order('id desc').first
       assert_equal member.principal, inherited_member.principal
@@ -195,11 +198,12 @@ class ProjectMembersInheritanceTest < ActiveSupport::TestCase
       assert_difference 'MemberRole.count', 8 do
         member = Member.create!(:principal => group, :project => @parent, :role_ids => [1, 3])
         project.reload
-  
+        member.reload
+
         inherited_group_member = project.memberships.detect {|m| m.principal == group}
         assert_not_nil inherited_group_member
         assert_equal member.roles.sort, inherited_group_member.roles.sort
-  
+
         inherited_user_member = project.memberships.detect {|m| m.principal == user}
         assert_not_nil inherited_user_member
         assert_equal member.roles.sort, inherited_user_member.roles.sort
@@ -218,10 +222,10 @@ class ProjectMembersInheritanceTest < ActiveSupport::TestCase
       assert_difference 'MemberRole.count', -8 do
         member.destroy
         project.reload
-  
+
         inherited_group_member = project.memberships.detect {|m| m.principal == group}
         assert_nil inherited_group_member
-  
+
         inherited_user_member = project.memberships.detect {|m| m.principal == user}
         assert_nil inherited_user_member
       end

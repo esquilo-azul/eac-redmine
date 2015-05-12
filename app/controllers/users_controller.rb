@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2013  Jean-Philippe Lang
+# Copyright (C) 2006-2015  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,17 +19,18 @@ class UsersController < ApplicationController
   layout 'admin'
 
   before_filter :require_admin, :except => :show
-  before_filter :find_user, :only => [:show, :edit, :update, :destroy, :edit_membership, :destroy_membership]
+  before_filter :find_user, :only => [:show, :edit, :update, :destroy]
   accept_api_auth :index, :show, :create, :update, :destroy
 
   helper :sort
   include SortHelper
   helper :custom_fields
   include CustomFieldsHelper
+  helper :principal_memberships
 
   def index
     sort_init 'login', 'asc'
-    sort_update %w(login firstname lastname mail admin created_on last_login_on)
+    sort_update %w(login firstname lastname admin created_on last_login_on)
 
     case params[:format]
     when 'xml', 'json'
@@ -40,14 +41,14 @@ class UsersController < ApplicationController
 
     @status = params[:status] || 1
 
-    scope = User.logged.status(@status)
+    scope = User.logged.status(@status).preload(:email_address)
     scope = scope.like(params[:name]) if params[:name].present?
     scope = scope.in_group(params[:group_id]) if params[:group_id].present?
 
     @user_count = scope.count
     @user_pages = Paginator.new @user_count, @limit, params['page']
     @offset ||= @user_pages.offset
-    @users =  scope.order(sort_clause).limit(@limit).offset(@offset).all
+    @users =  scope.order(sort_clause).limit(@limit).offset(@offset).to_a
 
     respond_to do |format|
       format.html {
@@ -59,27 +60,27 @@ class UsersController < ApplicationController
   end
 
   def show
-    # show projects based on current user visibility
-    @memberships = @user.memberships.all(:conditions => Project.visible_condition(User.current))
-
-    events = Redmine::Activity::Fetcher.new(User.current, :author => @user).events(nil, nil, :limit => 10)
-    @events_by_day = events.group_by(&:event_date)
-
-    unless User.current.admin?
-      if !@user.active? || (@user != User.current  && @memberships.empty? && events.empty?)
-        render_404
-        return
-      end
+    unless @user.visible?
+      render_404
+      return
     end
 
+    # show projects based on current user visibility
+    @memberships = @user.memberships.where(Project.visible_condition(User.current)).to_a
+
     respond_to do |format|
-      format.html { render :layout => 'base' }
+      format.html {
+        events = Redmine::Activity::Fetcher.new(User.current, :author => @user).events(nil, nil, :limit => 10)
+        @events_by_day = events.group_by(&:event_date)
+        render :layout => 'base'
+      }
       format.api
     end
   end
 
   def new
     @user = User.new(:language => Setting.default_language, :mail_notification => Setting.default_notification_option)
+    @user.safe_attributes = params[:user]
     @auth_sources = AuthSource.all
   end
 
@@ -89,19 +90,17 @@ class UsersController < ApplicationController
     @user.admin = params[:user][:admin] || false
     @user.login = params[:user][:login]
     @user.password, @user.password_confirmation = params[:user][:password], params[:user][:password_confirmation] unless @user.auth_source_id
+    @user.pref.attributes = params[:pref] if params[:pref]
 
     if @user.save
-      @user.pref.attributes = params[:pref]
-      @user.pref.save
-      @user.notified_project_ids = (@user.mail_notification == 'selected' ? params[:notified_project_ids] : [])
-
-      Mailer.account_information(@user, params[:user][:password]).deliver if params[:send_information]
+      Mailer.account_information(@user, @user.password).deliver if params[:send_information]
 
       respond_to do |format|
         format.html {
           flash[:notice] = l(:notice_user_successful_create, :id => view_context.link_to(@user.login, user_path(@user)))
           if params[:continue]
-            redirect_to new_user_path
+            attrs = params[:user].slice(:generate_password)
+            redirect_to new_user_path(:user => attrs)
           else
             redirect_to edit_user_path(@user)
           end
@@ -135,16 +134,15 @@ class UsersController < ApplicationController
     # Was the account actived ? (do it before User#save clears the change)
     was_activated = (@user.status_change == [User::STATUS_REGISTERED, User::STATUS_ACTIVE])
     # TODO: Similar to My#account
-    @user.pref.attributes = params[:pref]
+    @user.pref.attributes = params[:pref] if params[:pref]
 
     if @user.save
       @user.pref.save
-      @user.notified_project_ids = (@user.mail_notification == 'selected' ? params[:notified_project_ids] : [])
 
       if was_activated
         Mailer.account_activated(@user).deliver
-      elsif @user.active? && params[:send_information] && !params[:user][:password].blank? && @user.auth_source_id.nil?
-        Mailer.account_information(@user, params[:user][:password]).deliver
+      elsif @user.active? && params[:send_information] && @user.password.present? && @user.auth_source_id.nil?
+        Mailer.account_information(@user, @user.password).deliver
       end
 
       respond_to do |format|
@@ -172,26 +170,6 @@ class UsersController < ApplicationController
     respond_to do |format|
       format.html { redirect_back_or_default(users_path) }
       format.api  { render_api_ok }
-    end
-  end
-
-  def edit_membership
-    @membership = Member.edit_membership(params[:membership_id], params[:membership], @user)
-    @membership.save
-    respond_to do |format|
-      format.html { redirect_to edit_user_path(@user, :tab => 'memberships') }
-      format.js
-    end
-  end
-
-  def destroy_membership
-    @membership = Member.find(params[:membership_id])
-    if @membership.deletable?
-      @membership.destroy
-    end
-    respond_to do |format|
-      format.html { redirect_to edit_user_path(@user, :tab => 'memberships') }
-      format.js
     end
   end
 
