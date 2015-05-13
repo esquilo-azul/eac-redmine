@@ -6,5 +6,4 @@ set -e
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 REDMINE_ROOT=$(dirname $(dirname "$DIR"))
 
-(cd $REDMINE_ROOT; bundle exec rake db:migrate)
-(cd $REDMINE_ROOT; bundle exec rake redmine:plugins:migrate)
+(cd $REDMINE_ROOT; bundle exec rake secret)

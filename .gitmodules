@@ -1,3 +1,6 @@
 [submodule "plugins/redmine_git_hosting"]
 	path = plugins/redmine_git_hosting
 	url = https://github.com/eduardobogoni/redmine_git_hosting.git
+[submodule "plugins/redmine_bootstrap_kit"]
+	path = plugins/redmine_bootstrap_kit
+	url = https://github.com/jbox-web/redmine_bootstrap_kit.git

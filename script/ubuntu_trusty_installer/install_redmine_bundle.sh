@@ -11,7 +11,7 @@ bundleInstalled() {
 	return $?
 }
 
-"$DIR/apt_get_assert_packages.sh" ruby ruby-dev libmagickwand-dev
+"$DIR/apt_get_assert_packages.sh" ruby ruby-dev libmagickwand-dev cmake
 "$DIR/ruby_assert_gems.sh" bundler
 	
 if bundleInstalled; then
@@ -19,4 +19,23 @@ if bundleInstalled; then
 else
 	echo "Bundle incompleto"
 	(cd "$REDMINE_ROOT"; bundle install --without development test)
+fi
+
+SECRETS_FILE="$REDMINE_ROOT/config/secrets.yml"
+
+if [ ! -f "$SECRETS_FILE" ]; then
+	echo "Arquivo de tokens não existe. Criando..."
+	SECRET_TOKEN=$("$DIR/generate_secret.sh")
+	cat <<EOF > "$SECRETS_FILE"
+development:
+  secret_key_base: $SECRET_TOKEN
+
+test:
+  secret_key_base: $SECRET_TOKEN
+
+production:
+  secret_key_base: $SECRET_TOKEN
+
+EOF
+
 fi

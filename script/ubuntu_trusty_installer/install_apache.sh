@@ -55,7 +55,7 @@ echo $(readlink "$LINK")
 echo "$PUBLIC_DIR"
 if [ -e "$LINK" -a $(readlink "$LINK") != "$PUBLIC_DIR" ]; then
 	echo "Caminho \"$LINK\" já existe, mas não aponta para \"$PUBLIC_DIR\". Removendo..."
-	rm "$LINK"
+	sudo rm "$LINK"
 fi
 	
 if [ -e "$LINK" ]; then
