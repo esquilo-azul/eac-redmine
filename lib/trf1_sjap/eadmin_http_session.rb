@@ -19,7 +19,11 @@ module Trf1Sjap
         'Conectar' => 'Conectar',
         :follow_redirect => true
       }
-      html = @httpClient.post_content(uri, body)
+      begin
+        html = @httpClient.post_content(uri, body)
+      rescue HTTPClient::BadResponseError => ex
+        return 'HTTPClient::BadResponseError: ' + ex.message
+      end
       if loggedUser?(html) != ''
         return true
       end

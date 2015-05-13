@@ -20,6 +20,22 @@ class Trf1SjapController < ApplicationController
     end
   end
   
+  def eadmin_test_login
+    trf1_sjap_project = current_trf1_sjap_project
+    session = Trf1Sjap::EadminHttpSession.new(
+        trf1_sjap_project.eadmin_matricula,
+        trf1_sjap_project.eadmin_senha,
+        trf1_sjap_project.eadmin_banco
+      )
+    loginResult = session.login    
+    if loginResult === true
+      flash[:notice] = 'Login ok'
+    else
+      flash[:error] = 'Login falhou com a seguinte mensagem "' + loginResult + '"'
+    end
+    redirect_to url_for(:action => 'settings', 'project_id' => @project.id)
+  end
+  
   private
   
   def current_trf1_sjap_project
