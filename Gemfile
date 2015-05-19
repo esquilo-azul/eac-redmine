@@ -98,3 +98,4 @@ end
 gem "httpclient"
 gem 'nokogiri' , '< 1.6.0'
 gem 'highline'
+gem "daemons-rails"

@@ -4,8 +4,7 @@ class Trf1SjapProject < ActiveRecord::Base
   validates_presence_of :project_id, :eadmin_matricula, :eadmin_senha, :eadmin_banco
   
   def to_s
-    return 'UNDEFINED'
-    
+    return project.to_s
   end
   
 end
