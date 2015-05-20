@@ -2,12 +2,9 @@
 
 require File.expand_path('../../../../test_helper', __FILE__)
 
-class Trf1Sjap::EsostiHttpSessionTest < ActiveSupport::TestCase
+class Trf1Sjap::CaixaAtendimentoSecaoTest < ActiveSupport::TestCase
   def test_parse_caixa_atendimento_secao
-    session = Trf1Sjap::EadminHttpSession.new('ap123456','123456')
-    page = File.read(File.dirname(__FILE__) + "/caixa-2015-05-06_08-23-55.html")
-    result = session.parseCaixaSecaoAtendimento(page)
-    expected = [
+    file_test('caixa-2015-05-06_08-23-55.html', [
       {
         :numero => '2015/AP/SEINF/71',
         :solicitante => 'AP20199 - EDUARDO HENRIQUE BOGONI',
@@ -29,8 +26,29 @@ class Trf1Sjap::EsostiHttpSessionTest < ActiveSupport::TestCase
         :servico_atual => 'JEF VIRTUAL - DOCUMENTOS',
         :atendente => 'AP58PS - ANAIDE CONCEICAO DOS SANTOS'
       }
-    ]
-    assert_equal expected, result
+    ])
+    file_test('caixa-2015-05-20-12-00-00.html', [
+      {
+        :numero => '2015/AP/SEPCE/25',
+        :solicitante => 'AP7903 - GRACIETE LOBATO VIDAL',
+        :servico_atual => 'IMPRESSORA',
+        :atendente => 'RONALDO DIAS CARDOSO JUNIOR'
+      },{
+        :numero => '2015/AP/SESUD-6ª VARA/12',
+        :solicitante => 'AP20121 - CARLOS HAILTON GOMES DOS SANTOS',
+        :servico_atual => 'INSTALAÇÃO DE PROGRAMAS E APLICATIVOS',
+        :atendente => 'RONALDO DIAS CARDOSO JUNIOR'
+      }
+    ])
+  end
+  
+  private
+  
+  def file_test(file_name, expected_result)
+    page = File.read(File.dirname(__FILE__) + "/" + file_name)
+    caixa = Trf1Sjap::CaixaAtendimentoSecao.new(page)
+    result = caixa.solicitacoes    
+    assert_equal expected_result, result
   end
 
 end
