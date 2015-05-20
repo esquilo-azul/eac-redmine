@@ -49,42 +49,4 @@ module Trf1Sjap
 
   end
 
-  class CaixaAtendimentoSecao
-    def initialize(pageContent)
-      @doc = Nokogiri::HTML(pageContent)
-    end
-
-    def solicitacoes
-      data = []
-      for node in @doc.xpath("id('container_pagination')/table/tbody/tr")
-        data.append({
-          :numero => node.at_xpath('td[2]/a/text()').text.strip,
-          :solicitante => node.at_xpath('td[4]/text()').text.strip,
-          :servico_atual => node.at_xpath('td[5]/text()').text.strip,
-          :atendente => __parseAtendente(node.at_xpath('td[6]/text()').text)
-        })
-      end
-      return data
-    end
-
-    def __parseAtendente(text)
-      text = text.strip
-      if text == '-'
-        return ''
-      else
-      return text
-      end
-    end
-
-    def novaSolicitacao?
-      for s in solicitacoes
-        if s[:atendente] == ''
-        return true
-        end
-      end
-      return false
-    end
-
-  end
-
 end
