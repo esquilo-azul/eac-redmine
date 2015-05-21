@@ -40,6 +40,39 @@ class Trf1Sjap::CaixaAtendimentoSecaoTest < ActiveSupport::TestCase
         :atendente => 'RONALDO DIAS CARDOSO JUNIOR'
       }
     ])
+    file_test('caixa-2015-05-20_16-18-00.html', [
+      {
+        :numero => '2015/AP/SEINF/83',
+        :solicitante => 'AP20199 - EDUARDO HENRIQUE BOGONI',
+        :servico_atual => 'ACESSO REMOTO - TS',
+        :atendente => ''
+      },{
+        :numero => '2015/AP/GAJUS-2ª VARA/22',
+        :solicitante => 'AP20129 - TIAGO FELIPE MENEZES SOARES',
+        :servico_atual => 'CONFIGURAÇÃO INTERNET',
+        :atendente => 'RONALDO DIAS CARDOSO JUNIOR'
+      },{
+        :numero => '2015/AP/SEDAJ/42',
+        :solicitante => 'AP20066 - LEONARDO GOMES DOS REIS',
+        :servico_atual => 'SUBSTITUIÇÃO DE CARTUCHO',
+        :atendente => 'RONALDO DIAS CARDOSO JUNIOR'
+      },{
+        :numero => '2015/AP/SECVA-2ª VARA/21',
+        :solicitante => 'AP20145 - TERCIO FEITOZA DE ARAUJO',
+        :servico_atual => 'INSTALAÇÃO DE PROGRAMAS E APLICATIVOS',
+        :atendente => 'RONALDO DIAS CARDOSO JUNIOR'
+      },{
+        :numero => '2015/AP/SECVA-2ª VARA/20',
+        :solicitante => 'AP20145 - TERCIO FEITOZA DE ARAUJO',
+        :servico_atual => 'INSTALAÇÃO DE PROGRAMAS E APLICATIVOS',
+        :atendente => 'RONALDO DIAS CARDOSO JUNIOR'
+      },{
+        :numero => '2015/AP/SEXEC-1ª VARA/8',
+        :solicitante => 'AP17003 - ROGÉRIO BEZERRA DA COSTA',
+        :servico_atual => 'CONFIGURAÇÃO INTERNET',
+        :atendente => 'RONALDO DIAS CARDOSO JUNIOR'
+      }
+    ])
   end
   
   private
