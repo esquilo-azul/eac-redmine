@@ -1,6 +1,7 @@
 # encoding: UTF-8
 
 require 'nokogiri'
+require 'unicode_utils/titlecase'
 
 module Trf1Sjap
   class EsostiProjectSync
@@ -39,8 +40,28 @@ module Trf1Sjap
         end
       end
     end
+    
+    # Converte um identificador de usuário do e-Admin
+    # em campos para o model User do Redmine.
+    # 
+    # "AP20199 EDUARDO HENRIQUE BOGONI" => login: "ap20199", firstname: "Eduardo", lastname: "Henrique Bogoni"
+    #
+    #
+    def self.parse_solicitacao_user(esosti_solicitante)
+      parts = /\s*([0-9a-zA-Z]+)\s*\-\s*(\S+(?:\s+\S+)*)\s*/.match(esosti_solicitante)      
+      names = parts[2].scan(/\S+/)
+      return {
+        :login => parts[1].downcase, 
+        :firstname => capitalize_name([names[0]], 30), 
+        :lastname => capitalize_name(names[1..names.size], 255)
+      }
+    end
 
     private
+    
+    def self.capitalize_name(names, limit)
+      names.map{|name| name.length <= 2 ? UnicodeUtils.downcase(name, :pt) : UnicodeUtils.titlecase(name, :pt)}.join(' ').truncate(limit)
+    end
 
     def check_solicitacao solicitacao
       Rails.logger.info "Solicitação na caixa de atendimento do e-Sosti: #{solicitacao[:numero]}"
@@ -64,7 +85,7 @@ module Trf1Sjap
     end
 
     def get_solicitacao_user_id(solicitacao)
-      solicitacao_user = parse_solicitacao_user(solicitacao[:solicitante])
+      solicitacao_user = EsostiProjectSync.parse_solicitacao_user(solicitacao[:solicitante])
       user = User.find_by_login(solicitacao_user[:login])
       if ! user
         user = User.new
@@ -75,15 +96,6 @@ module Trf1Sjap
         try_save user
       end
       return user.id
-    end
-
-    def parse_solicitacao_user esosti_solicitante
-      parts = /\s*([0-9a-zA-Z]+)\s*\-\s*(\S+(?:\s+\S+)*)\s*/.match(esosti_solicitante)
-      login = parts[1].downcase
-      names = parts[2].scan(/\S+/)
-      firstname = names[0].capitalize
-      lastname = names[1..names.size].map{|name| name.length <= 2 ? name.downcase : name.capitalize}.join(' ')
-      return {:login => login, :firstname => firstname, :lastname => lastname}
     end
 
     def get_tracker_id
