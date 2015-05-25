@@ -21,8 +21,8 @@ module Trf1Sjap
       }
       begin
         html = @httpClient.post_content(uri, body)
-      rescue HTTPClient::BadResponseError => ex
-        return 'HTTPClient::BadResponseError: ' + ex.message
+      rescue SocketError, HTTPClient::BadResponseError => ex
+        return ex.class.name + ': ' + ex.message
       end
       if loggedUser?(html) != ''
         return true
