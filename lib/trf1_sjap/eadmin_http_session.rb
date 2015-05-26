@@ -50,6 +50,12 @@ module Trf1Sjap
       end
       return CaixaAtendimentoSecao.new(pageContent)
     end
+    
+    def solicitacao_detalhes(solicitacao_id)
+      uri = 'http://sistemas.trf1.jus.br/app/e-Admin/sosti/detalhesolicitacao/detalhesol'
+      body = '{"SSOL_ID_DOCUMENTO":"' + solicitacao_id.to_s + '"}'
+      html = @httpClient.post_content(uri, body)
+    end
 
   end
 
