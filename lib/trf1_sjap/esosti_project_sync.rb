@@ -65,7 +65,7 @@ module Trf1Sjap
 
     def check_solicitacao solicitacao
       Rails.logger.info "Solicitação na caixa de atendimento do e-Sosti: #{solicitacao[:numero]}"
-      issue = Issue.find_by_esosti_numero(solicitacao[:numero])
+      issue = Issue.find_by_esosti_id(solicitacao[:id])
       if ! issue
         Rails.logger.info "Solicitação e-Sosti nº #{solicitacao[:numero]} não existe no Redmine. Criando..."
         create_issue(solicitacao)
@@ -79,7 +79,7 @@ module Trf1Sjap
       issue.description = solicitacao.to_s
       issue.author_id = get_solicitacao_user_id(solicitacao)
       issue.tracker_id = get_tracker_id
-      issue.esosti_numero = solicitacao[:numero]
+      issue.esosti_id = solicitacao[:id]
       try_save(issue)
       return issue
     end
