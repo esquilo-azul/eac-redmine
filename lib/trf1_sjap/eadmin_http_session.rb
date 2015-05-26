@@ -30,7 +30,7 @@ module Trf1Sjap
       doc = Nokogiri::HTML(html)
       errorNode = doc.at_xpath("id('conteudoLogin')/div[1]/text()")
       if errorNode != nil
-      	return errorNode.text
+      	return errorNode.text.strip
       end
       return 'Erro desconhecido'
     end
