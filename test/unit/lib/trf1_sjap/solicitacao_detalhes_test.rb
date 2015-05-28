@@ -3,8 +3,19 @@
 require File.expand_path('../../../../test_helper', __FILE__)
 
 class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
+  def test_descricao
+    file_test(:descricao,
+      'solicitacao-detalhes_817986_2015-05-25_12-50-00.html',
+      'Não consigo enviar mensagens com anexo'
+    )
+    file_test(:descricao,
+      'solicitacao-detalhes_815452.html',
+      'Problemas na impressão'
+    )
+  end
+
   def test_parse_raw_data
-    parse_raw_data_test('solicitacao-detalhes_817986_2015-05-25_12-50-00.html', [{
+    file_test(:parse_raw_data, 'solicitacao-detalhes_817986_2015-05-25_12-50-00.html', [{
         'Fase' => 'ENCAMINHAMENTO DE SOLICITAÇÃO DE TI PARA CAIXA PESSOAL 25/05/2015 12:45:05 0D 0h 0m 51s',
         'Por' => 'AP23PS - ADERVAN FRANS GUIMARAES MIRA JUNIOR',
         'Descrição' => '+ em atendimento'
@@ -18,8 +29,8 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
       },{
         'Descrição da Solicitação' => '+ Não consigo enviar mensagens com anexo'      
       }
-    ])    
-    parse_raw_data_test('solicitacao-detalhes_815452.html', [{
+    ])
+    file_test(:parse_raw_data, 'solicitacao-detalhes_815452.html', [{
         'Fase' => 'AVALIAÇÃO DE SERVIÇO DE TI 22/05/2015 11:13:18 2D 0h 11m 49s',
         'Avaliação' => 'ÓTIMO',
         'Por' => 'AP7903 - GRACIETE LOBATO VIDAL'
@@ -48,10 +59,10 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
   
   private
   
-  def parse_raw_data_test(file_name, expected_result)
+  def file_test(method, file_name, expected_result)
     page = File.read(File.dirname(__FILE__) + "/" + file_name)
     detalhes = Trf1Sjap::SolicitacaoDetalhes.new(page)
-    result = detalhes.parse_raw_data    
+    result = detalhes.send(method)
     assert_equal expected_result, result
   end
 

@@ -8,6 +8,10 @@ module Trf1Sjap
       @doc = Nokogiri::HTML(pageContent)
     end
 
+    def descricao
+      return sanitize_descricao(parse_raw_data()[-1].first[1])
+    end
+
     def parse_raw_data
       data = []
       for container in updates_containers()
@@ -40,6 +44,12 @@ module Trf1Sjap
           update_data(child, update_consumer)
         end
       end
+    end
+    
+    def sanitize_descricao(string)
+      a = string.clone
+      a.slice!('+')
+      return a.strip
     end
 
   end
