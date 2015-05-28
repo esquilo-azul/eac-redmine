@@ -8,7 +8,7 @@ module Trf1Sjap
       @doc = Nokogiri::HTML(pageContent)
     end
 
-    def updates
+    def parse_raw_data
       data = []
       for container in updates_containers()
         update_consumer = UpdateConsumer.new

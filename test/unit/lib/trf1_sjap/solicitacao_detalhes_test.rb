@@ -3,8 +3,8 @@
 require File.expand_path('../../../../test_helper', __FILE__)
 
 class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
-  def test_updates
-    file_test('solicitacao-detalhes_817986_2015-05-25_12-50-00.html', [{
+  def test_parse_raw_data
+    parse_raw_data_test('solicitacao-detalhes_817986_2015-05-25_12-50-00.html', [{
         'Fase' => 'ENCAMINHAMENTO DE SOLICITAÇÃO DE TI PARA CAIXA PESSOAL 25/05/2015 12:45:05 0D 0h 0m 51s',
         'Por' => 'AP23PS - ADERVAN FRANS GUIMARAES MIRA JUNIOR',
         'Descrição' => '+ em atendimento'
@@ -19,7 +19,7 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
         'Descrição da Solicitação' => '+ Não consigo enviar mensagens com anexo'      
       }
     ])    
-    file_test('solicitacao-detalhes_815452.html', [{
+    parse_raw_data_test('solicitacao-detalhes_815452.html', [{
         'Fase' => 'AVALIAÇÃO DE SERVIÇO DE TI 22/05/2015 11:13:18 2D 0h 11m 49s',
         'Avaliação' => 'ÓTIMO',
         'Por' => 'AP7903 - GRACIETE LOBATO VIDAL'
@@ -48,10 +48,10 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
   
   private
   
-  def file_test(file_name, expected_result)
+  def parse_raw_data_test(file_name, expected_result)
     page = File.read(File.dirname(__FILE__) + "/" + file_name)
     detalhes = Trf1Sjap::SolicitacaoDetalhes.new(page)
-    result = detalhes.updates    
+    result = detalhes.parse_raw_data    
     assert_equal expected_result, result
   end
 
