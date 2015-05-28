@@ -19,6 +19,31 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
         'Descrição da Solicitação' => '+ Não consigo enviar mensagens com anexo'      
       }
     ])    
+    file_test('solicitacao-detalhes_815452.html', [{
+        'Fase' => 'AVALIAÇÃO DE SERVIÇO DE TI 22/05/2015 11:13:18 2D 0h 11m 49s',
+        'Avaliação' => 'ÓTIMO',
+        'Por' => 'AP7903 - GRACIETE LOBATO VIDAL'
+      },{ 
+        'Fase' => 'BAIXA SOLICITAÇÃO TI 20/05/2015 15:52:27 0D 4h 50m 57s',
+        'Por' => 'AP29PS - RONALDO DIAS CARDOSO JUNIOR',
+        'Tombo' => '7436 - IMPRESSORA SAMSUNG ML-3750-ND.',
+        'Descrição' => '+ serviço concluido.'
+      },{
+        'Fase' => 'ENCAMINHAMENTO DE SOLICITAÇÃO DE TI PARA CAIXA PESSOAL 20/05/2015 11:01:58 0D 0h 0m 29s',
+        'Por' => 'AP29PS - RONALDO DIAS CARDOSO JUNIOR',
+        'Tombo' => '7436 - IMPRESSORA SAMSUNG ML-3750-ND.',
+        'Descrição' => '+ Em atendimento.'
+      },{
+        'Fase' => 'CADASTRO SOLICITAÇÃO TI 20/05/2015 11:01:29 0D 0h 0m 0s',
+        'Caixa destino' => 'CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DO AMAPÁ - 5 - AP',
+        'Serviço' => 'IMPRESSORA',
+        'Nível destino' => '2 - SERVIÇOS DE ATENDIMENTO TÉCNICO PRESENCIAL',
+        'Por' => 'AP7903 - GRACIETE LOBATO VIDAL',
+        'Tombo' => '7436 - IMPRESSORA SAMSUNG ML-3750-ND.',
+        'Descrição' => '+ Cadastro da Solicitação.'
+      },{
+        'Descrição da Solicitação' => '+ Problemas na impressão'
+      }])
   end
   
   private

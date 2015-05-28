@@ -1,0 +1,923 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>e-Sosti - Sistema de Atendimento a Solicitações de TI - </title>
+                <link href="/app/e-Admin/css/blueprint/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/css/blueprint/print.css" media="print" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/img/trf1.ico" rel="shortcut icon" type="image/x-icon" />
+<link href="/app/e-Admin/js/jquery-ui-1.8.14/css/custom-theme/jquery-ui-1.8.14.custom.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/css/layout.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/js/tooltipster-1.2/css/tooltipster.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/css/form.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/js/wijmo-open/development-bundle/themes/wijmo/jquery.wijmo.wijsuperpanel.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/js/wijmo-open/development-bundle/themes/wijmo/jquery.wijmo.wijmenu.css" media="screen, projection" rel="stylesheet" type="text/css" />	<script type="text/javascript">
+    //<![CDATA[
+
+			var base_url = "/app/e-Admin",
+                         timeout = "1432656352",
+			 time_render = "1432652752";
+		    //]]>
+</script>
+<script type="text/javascript" src="/app/e-Admin/js/jquery-ui-1.8.14/js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/jquery-ui-1.8.14/js/jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/wijmo-open/development-bundle/external/jquery.bgiframe-2.1.3-pre.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/wijmo-open/development-bundle/wijmo/jquery.wijmo.wijutil.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/wijmo-open/development-bundle/wijmo/jquery.wijmo.wijmenu.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/wmenu/jquery.wmenu.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/notificacaoGeral.js"></script>       <style type="text/css" media="screen">
+
+            .ui-state-default a:hover {
+                color: #ffffff;
+
+            }
+
+        </style>
+        <script type="text/javascript">
+            
+            var msg_ajuda_by_id; 
+            var botao_ajuda_by_id;
+            var flashMessages_by_id;
+            var botao_ajuda_recolhe_by_id;
+            var msg_informacao_by_id;
+            var botao_informacao_by_id;
+
+            $(document)
+            .ajaxStart(function(){
+                $('div#loading').show();
+            })
+            .ajaxStop(function (){
+                window.setTimeout(function () {
+                    $('div#loading').hide('slow');
+                }, '10');
+            });
+            
+            $(function() {
+                $( "#accordion" ).accordion();
+                $( "#tabs" ).tabs();
+                $( "#datepicker" ).datepicker();
+                $( "#dialog" ).dialog({
+                  resizable: true,
+                    // height:140,
+                    //modal: true,
+                    buttons: {
+                        "Delete all items": function() {
+                            $( this ).dialog( "close" );
+                        },
+                        Cancel: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
+                $( ".sair" ).button({
+                    icons: {
+                        primary: "ui-icon-power"
+                    }
+                });
+                $( ".novo" ).button({
+                    icons: {
+                        primary: "ui-icon-document"
+                    }
+                });
+                $( ".editar" ).button({
+                    icons: {
+                        primary: "ui-icon-pencil"
+                    }
+                });
+                $( ".excluir" ).button({
+                    icons: {
+                        primary: "ui-icon-trash"
+                    }
+                });
+                $( ".adicionar" ).button({
+                    icons: {
+                        primary: "ui-icon-plusthick"
+                    }
+                });
+                $( ".ordemDESC" ).button({
+                    icons: {
+                        primary: "ui-icon-triangle-1-s"
+                    }
+                });
+                $( ".ordemASC" ).button({
+                    icons: {
+                        primary: "ui-icon-triangle-1-n"
+                    }
+                });
+                $( ".listar" ).button({
+                    icons: {
+                        primary: "ui-icon-arrowthickstop-1-s"
+                    }
+                });
+
+                $( ".submitComum" ).button();
+                
+                $( ".painel" ).buttonset();
+
+                $( "button, input:submit, a", ".dema" ).button();
+                $( "a", ".paginationControl" ).button();
+                $( "span.disabled", ".paginationControl" ).button({disabled:true});
+                $( "a", ".dema" ).click(function() {
+                    location.href = this.href;
+                    return false;
+                });
+
+                $(".navigation").wijmenu();
+                $("input:text").addClass("x-form-text");
+//                $("input:text").addClass("x-form-text");
+
+                $("select").addClass("x-form-text");
+                $("input.datepicker").datepicker($.datepicker.regional["pt_BR"]);
+                $("textarea").addClass("x-form-field");
+
+                $(".grid").addClass("ui-widget ui-widget-content");
+                $("thead tr",".grid").addClass("ui-widget-header");
+                $('a.icoAdminlink').wmenu({
+                    itemShowid :'#mudarUsuario',
+                    selectedClass :'icoAdminlink_click'
+                });
+                
+                /*AJUDA DO PROGRAMA*/
+                $( "#botao_ajuda" ).button({
+                    icons: {
+                        primary: "ui-icon-help"
+                    }
+                }).attr('style','position: absolute; right: 0px; width: 28px; height: 16px; display: none;');
+                $( "#botao_ajuda_recolhe" ).button({
+                    icons: {
+                        primary: "ui-icon-arrowstop-1-n"
+                    }
+                }).attr('style','position: relative; left: 350px; bottom: -10px; width: 28px; height: 16px;')
+                .attr('title','Recolher ajuda');
+                
+                flashMessages_by_id = $('#flashMessages');
+                msg_ajuda_by_id =  $('#msg_ajuda');
+                botao_ajuda_by_id =  $('#botao_ajuda');
+                botao_ajuda_recolhe_by_id =  $('#botao_ajuda_recolhe');
+                botao_ajuda_by_id.click(
+                    function(){
+                        if(msg_ajuda_by_id.css('display') == 'block'){
+                            msg_ajuda_by_id.hide("blind");
+                        }else{
+                            msg_ajuda_by_id.show("blind");
+                        }
+                    }
+                );
+                botao_ajuda_recolhe_by_id.click(
+                    function(){
+                            msg_ajuda_by_id.hide("blind");
+                    }
+                );
+                /*AJUDA DO PROGRAMA************/
+                
+                /*INFORMAÇÃO DO PROGRAMA*/
+                msg_informacao_by_id =  $('#msg_informacao');
+                botao_informacao_by_id =  $('#botao_informacao');
+                botao_informacao_by_id.click(
+                    function(){
+                        if(msg_informacao_by_id.css('display') == 'block'){
+                            msg_informacao_by_id.hide("blind");
+                        }else{
+                            msg_informacao_by_id.show("blind");
+                        }
+                    }
+                );
+                $( "#botao_informacao" ).button({
+                    icons: {
+                        primary: "ui-icon-notice"
+                    }
+                }).attr('style','position: absolute; right: 30px; width: 28px; height: 16px; display: none; ');
+                /*INFORMAÇÃO DO PROGRAMA************/
+                
+            });
+        </script>
+    </head>
+    <body>
+        <div id="geral">
+            <div id="topo">
+                    <div class="span-4" id="loading" style="z-index: 5000; position: absolute; top:90px; left: 350px; display: none; ">
+                        <div style="margin: 1px 0 0 30px;" class="span-1 last"><img src="/app/e-Admin/img/ajax-loader_1.gif"/></div><div class="span-2"><strong>Aguarde...</strong></div>
+                    </div>
+                <a href="/app/e-Admin/admin"><h1><abbr title="Sistema de Atendimento a Solicitações de TI">e-Sosti</abbr></h1></a>
+                <div id="tools">
+                    <div id="user">
+                        <div class="span-10 last first" id="tools-usuario" style="float:right;">
+                            <div id="user-name" class="span-10 last">
+                                                                <div id="icoAdmin"><a href="#" class="icoAdminlink" rel="mudarUsuario"></a></div>
+                                <div id="nome">
+                                        <!--                                    <br/>-->
+                                    SEINF - SEÇÃO DE TECNOLOGIA DA INFORMACAO - 269                                    <br/>
+                                    AP20199 - EDUARDO HENRIQUE BOGONI                                </div>
+                                <div id="mudarUsuario">
+                                    <ul>
+                                        <li><a href="#">administrar</a></li>
+                                        <li><a href="#">outro</a></li>
+                                        <!--<li><a href="#" class="sair">sair</a></li>-->
+                                        <a href="/app/e-Admin/login/logout" class="sair">sair</a>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div><!--user-->
+                </div><!--administrativa-->
+            </div><!--topo-->
+            <div id="menu">
+                 <ul class="navigation">
+    <li>
+        <a href="/app/e-Admin/guardiao">Guardião</a>
+        <ul>
+            <li>
+                <a href="/app/e-Admin/guardiao/unidadeperfil/form">Perfil Unidade</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/guardiao/perfilpessoa/form">Perfil Pessoa</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/guardiao/perfilpessoaadm/form">Perfil Pessoa ADM</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/app/e-Admin/sisad">Sisad</a>
+        <ul>
+            <li>
+                <a href="/app/e-Admin/sisad/pesquisadcmto">Pesquisar</a>
+            </li>
+            <li>
+                <a href="#">Cadastros</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/documento/cadastrar">Documento</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/cadastrodcmtoext/orgaoendereco">Pessoas / Orgãos</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/cadastrodcmtoext/cadastrotipodoc">Tipo de Documento</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sisad/caixapessoal/rascunhos">Caixa Pessoal</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixapessoal/entrada">Caixa de Entrada</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixapessoal/arquivadospessoal">Documentos Arquivados</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixapessoal/encaminhados">Documentos Encaminhados</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/admin/notificacoes/minhasnotificacoes">Minhas Notificações</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaminuta/minutas">Minutas</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sisad/caixaminuta/minutas">Entrada</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/caixaminuta/minutasfinalizadas">Finalizadas</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixapessoal/rascunhos">Rascunhos</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sisad/caixaaviso/entrada">Caixa Avisos</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaaviso/entrada">Pessoal</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaaviso/entradaunidade">Unidade</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sisad/caixaunidade/rascunhos">Caixa Unidade</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/arquivadosunidade">Arquivados</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/entrada">Caixa de Entrada</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/etiqueta/criar">Criar Etiqueta</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/documentosdaunidade">Documentos da Unidade</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/encaminhados">Documentos Encaminhados</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/guardiao/perfilpessoa/form">Permissões de Acesso</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/processosdaunidade">Processos da Unidade</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/protocolar">Protocolar Documentos</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/solicitacoesdaunidade">Solicitações da Unidade</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/trocarcaixa">Trocar Caixa</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sisad/cadastrodcmto/form">Formulários</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formularioaviso/form">Aviso</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formulariocircular/form">Circular</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formularioinformacao/form">Informação</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formulariomemorando/form">Memorando</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formulariominuta/form">Minuta</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formulariooficio/form">Ofício</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/solicitacao/form">Sosti - Solicitação à Informática</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sosti/minhassolicitacoes/atendimento">Minhas Solicitações de TI</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/pesquisarsolicitacoes">Pesquisar Solicitações</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/emacompanhamento">Acompanhamento</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/avaliadas">Avaliadas</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/solicitacao/form">Cadastrar e-Sosti</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/atendimento">Em Atendimento</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/baixadas">Histórico de Baixadas</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/avaliacao">Para Avaliação</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/homologacao">Para Homologar</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/pedidoinformacao">Pedido de Informação</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/relatoriossolicitacoes/solicitacoesperiodo">Relatórios</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/relatoriossolicitacoes/solicitacoesperiodo">Solicitações por Período</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sisad/relatorioprocesso/autuadosunidade">Relatórios</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/relatorioprocesso/autuadosunidade">Processos</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/apensadosanexados">Apensados / Anexados / Vinculados</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/arquivadosunidade">Arquivados na Unidade</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/autuadosassunto">Autuados por Assunto e Período</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/autuadosunidade">Autuados por Unidade e Período</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/distribuidosredistribuidos">Distribuídos / Redistribuídos</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/encaminhadosunidade">Encaminhados pela Unidade</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/paradosnaunidade">Parados na Unidade</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/orgaojulgador">Por Órgão Julgador</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/processosrelator">Por Relator</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/sigilosos">Sigilosos</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/naunidade">Na Unidade por Período</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/app/e-Admin/sosti">Sosti</a>
+        <ul>
+            <li>
+                <a href="/app/e-Admin/sosti/pesquisarsolicitacoes">Pesquisar Solicitações</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sosti/helpdesk/atendimentointerno">Atendimento aos Usuários</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sosti/solicitacao/form">Cadastrar Solicitações</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/solicitacaousertisecoes/form">Grupos de Serviços Seções</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/solicitacaouserti/form">Grupos de Serviços TRF1</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/solicitacao/form">Solicitações Locais</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Caixas</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/atendimentosecoes/atendimentousuario">Atendimento das Seções</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/atendimentosecoes/atendimentousuario">Entrada</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral">Caixa de Atendimento Centralizado</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sosti/atendimentosecoes/encaminhadasparatrf1">Solicitações Encaminhadas ao TRF1</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/caixapessoal/entrada">Caixa Pessoal</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/caixapessoal/entrada">Entrada</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sosti/minhassolicitacoes/minhassolicitacoesperiodo">Solicitações Baixadas</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/helpdesk">Helpdesk</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/helpdesk/primeironivel">1º Nível - SAT</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sosti/gruposervico">Manutenção</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/gruposervico">Técnico</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/gruposervico">Grupos de Serviços</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sosti/servicoadm">Serviços ADM</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/gruposervico">Gestor</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/servico">Serviços</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Relatórios</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/relatoriossolicitacoes/solicitacoesunidadeperiodo">Solicitações por Unidade e Período</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/Minhassolicitacoes/avaliacaoautomatica">Avaliação Automática</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/relatoriossolicitacoes/solicitacoesporservico">Relatório de Solicitações por Serviço</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Relatórios SLA</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/slasecoes/triagem">Indicadores Nível Mínimo Serviço Seções</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/relatorioshelpdesk/solicitacoesperiodo">Solicitações Atendidas por Período</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/relatorioshelpdesk/primeiroatendimentosolicitacoes">Primeiro Atendimento das Solicitações</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/guardiao/perfilpessoaadm/form">Permissão Pessoa</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/app/e-Admin/transporte">Transporte</a>
+        <ul>
+            <li>
+                <a href="/app/e-Admin/transporte/acidente">Acidente</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/transporte/motorista">Motorista</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/transporte/multa">Multa</a>
+            </li>
+        </ul>
+    </li>
+</ul>            </div><!--menu-->
+            <div id="container">
+                <!--	<div id="menuEsquerdo"></div>--><!--menuEsquerdo-->
+                <div id="conteudo" >
+                    <div id="tools_aux">
+                        <span title="Tempo até que a sessão expire" id="contador" style="right: 0; top: 20px; float: right; position: relative; z-index: 0; color: #999999;"></span>
+                        <a title="Informações sobre está página" id='botao_informacao' class="botao_informacao_icon"></a>
+                        <a href="#" title="Ajuda desta página" id='botao_ajuda' class="ajuda_icon"></a>
+                                                <div id="dialog_time_out"></div>
+                    </div>
+                    <h2></h2>
+                    <div id="flashMessages"></div>
+                    
+<script type="text/javascript">
+    $(function() {
+        $( "#tabs" ).tabs();
+//        $( "#tabs" ).tabs("select",GLOBAL_indice_abas);
+//        $( "#tabs" ).tabs({
+//            select: function(event, ui) {
+//                GLOBAL_indice_abas = ui.index;
+//            }
+//        });
+        $( "#buttonsetmanifestacao" ).buttonset();
+        $( ".abrirAnexo" ).button({
+            icons: {
+                primary: "ui-icon-folder-open"
+            }
+        }).attr('style','width: 40px; height: 16px;');
+        $( ".alertaButton" ).button({
+            icons: {
+                primary: "ui-icon-alert"
+            }
+        }).attr('style','width: 40px; height: 16px;');
+        $( ".botao_icon_bolinha" ).button({
+            icons: {
+                primary: "ui-icon-radio-on"
+            }
+        });
+        
+        /* ABRIR DETALHE DE ALGUMA SOLICITAÇÃO */
+        var xhr_abrir_detalhe_solicitacao;
+        var dialog_detalhe_solicitacao = '';
+        
+        $(".detalhe_solicitacao").click(function(){
+            var this_a = this;
+            if(dialog_detalhe_solicitacao != ''){
+                //dialog_detalhe_solicitacao.html(' ');
+                dialog_detalhe_solicitacao.remove();
+            }
+            
+            $("#dialog_solicitacao_container").html("<div id='dialog_detalhe_solicitacao'></div>");
+            
+            dialog_detalhe_solicitacao = $("#dialog_detalhe_solicitacao");
+            dialog_detalhe_solicitacao.dialog({
+                title    : 'Detalhe Solicitação',
+                autoOpen : false,
+                modal    : false,
+                show: 'fold',
+                hide: 'fold',
+                resizable: true,
+                width: 800,
+                height: 600,
+                position: [300,140,0,0],
+                buttons : {
+                    Ok: function() {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+            abrir = true;
+            if (xhr_abrir_detalhe_solicitacao) {
+                xhr_abrir_detalhe_solicitacao.abort();
+                abrir = false;
+            }
+            if(abrir){
+                url = base_url + '/sosti/detalhesolicitacao/detalhesol';
+                xhr_abrir_detalhe_solicitacao = $.ajax({
+                    url: url,
+                    dataType: 'html',
+                    type: 'POST',
+                    data: $(this).attr('value'),
+                    contentType: 'application/json',
+                    processData: false, 
+                    beforeSend:function() {
+                        dialog_detalhe_solicitacao.html('');
+                    },
+                    success: function(data) {
+                        dialog_detalhe_solicitacao.html(data);
+                        
+                        obj = dialog_detalhe_solicitacao.find("div#tabs")
+                        
+                        $(obj).addClass('pro_docs_tabs');
+                        $(".pro_docs_tabs" ).tabs();
+                        
+                        dialog_detalhe_solicitacao.dialog("open");
+                        
+                        $(this_a).addClass("ui-state-highlight");
+                        $(this_a).button({
+                            icons: {
+                                primary: "ui-icon-check"
+                            }
+                        });
+                        
+                    },
+                    complete: function(){
+                        
+                    },
+                    error : function(){
+                        
+                    }
+                });
+            }
+        });
+    });
+</script>
+    <div id="tabs">
+       <ul>
+		<li><a href="#tabs-1">Documento</a></li>
+                <li><a href="#tabs-2">Histórico</a></li>
+                                                                                                                <!--CHECKLIST-->
+                                                
+                
+                
+	</ul>
+          
+        <div id="tabs-1">
+            <table  style="font-size: 12px;" class="" style=" cursor: default;/*border: 1px solid red; border-collapse: separate; border-bottom: 1px solid red;*/" >
+				                <tr style="font-size: 12px; font-weight: bold;">
+       
+                        <td title="Número do documento">
+                            Solicitação Nº:<br />
+                            2015310000249002490160000025                        </td>
+                        <td title="Data e hora de cadastro">
+                                Data da Solicitação:<br />
+                                20/05/2015 11:01:29                        </td>
+                                            </tr>
+                                        <tr>
+                        <th >Unidade Solicitante:</th>
+                        <td colspan="3">SEPCE - SECAO  DE PROTOCOLO E CERTIDOES - 249 - AP - /SEPCE/NUCJU/SJAP</td>
+                    </tr>
+                    <tr>
+                        <th>Nome do Solicitante:</th>
+                        <td colspan="1">GRACIETE LOBATO VIDAL</td>
+                        <th>Matricula:</th>
+                        <td colspan="1">AP7903</td>
+                    </tr>
+                                        <tr>
+                        <th>E-mail do Solicitante </th>
+                        <td colspan="1">AP7903@trf1.jus.br</td>
+                    </tr>
+                                        <tr>
+                        <th >Telefone:</th>
+                        <td colspan="3">9691130865</td>
+                    </tr>
+                    <tr>
+                        <th >Local de Atendimento:</th>
+                        <td colspan="3">- SEPCE</td>
+                    </tr>
+<!--                    <tr>
+                        <th >Unidade Solicitante:</th>
+                        <td colspan="3"> - </td>
+                    </tr>-->
+                    <tr>
+                        <th >Serviço Atual:</th>
+                        <td colspan="3">IMPRESSORA</td>
+                    </tr>
+					                                        <tr>
+                        <th >Tombo:</th>
+                        <td colspan="3">
+                            7436 
+                            - IMPRESSORA SAMSUNG ML-3750-ND.                        </td>
+                    </tr>
+                                                            <tr>
+                        <th colspan="4">Descrição:</th>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 12px; padding-left: 20px; " colspan="4">
+                             Problemas na impressão                        </td>
+                    </tr>
+                                                            <tr>
+                        <th colspan="4">Encaminhado para:</th>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 12px; padding-left: 20px;" colspan="4">
+                             -                         </td>
+                    </tr>
+                                        <tr>
+                        <th >
+                            <a title="Gerar um pdf da solicitação" href="/app/e-Admin/sosti/solicitacao/solicitacaopdf/solic/815452">Guia para Atendimento Presencial</a>&emsp;
+                        </th>
+                    </tr>
+            </table>
+        </div>
+        <div id="tabs-2">
+                        <form method="POST" action="anexoerro" id="815452-22/05/2015 11:13:18-1477669" enctype="multipart/form-data" >
+            <input type="hidden" value="815452-22/05/2015 11:13:18-1477669" name="identificacao"/>
+            <input type="hidden" value="" name="controller"/>
+            <input type="hidden" value="" name="caixa"/>
+            <fieldset style="border: 1px solid #A6C9E2; margin-right: 15px;">
+               <div style="margin-left: 10px; margin-top: 4px; font-size: 12px; ">
+                    <b>Fase:</b>
+                    AVALIAÇÃO DE SERVIÇO DE TI                    22/05/2015 11:13:18                                                            
+                    <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2D 0h 11m 49s 
+                                                                
+                     
+                        <br/>
+                        <b>Avaliação: </b>ÓTIMO                                                
+                                            
+                                        <br/><b>Por:</b>
+                    AP7903 - GRACIETE LOBATO VIDAL&emsp;
+                                                    </fieldset>
+                </form>
+                        <form method="POST" action="anexoerro" id="815452-20/05/2015 15:52:27-1477669" enctype="multipart/form-data" >
+            <input type="hidden" value="815452-20/05/2015 15:52:27-1477669" name="identificacao"/>
+            <input type="hidden" value="" name="controller"/>
+            <input type="hidden" value="" name="caixa"/>
+            <fieldset style="border: 1px solid #A6C9E2; margin-right: 15px;">
+               <div style="margin-left: 10px; margin-top: 4px; font-size: 12px; ">
+                    <b>Fase:</b>
+                    BAIXA SOLICITAÇÃO TI                    20/05/2015 15:52:27                                                            
+                    <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0D 4h 50m 57s 
+                                                                
+                                            
+                                            
+                                        <br/><b>Por:</b>
+                    AP29PS - RONALDO DIAS CARDOSO JUNIOR&emsp;
+                                                
+                    <br/><b>Tombo:</b>
+                    7436 - IMPRESSORA SAMSUNG ML-3750-ND.                    <br/><b>Descrição:</b>
+                    <div style="margin-right: 10px;">
+                    +  serviço concluido. 
+                    </div>
+                                                    </fieldset>
+                </form>
+                        <form method="POST" action="anexoerro" id="815452-20/05/2015 11:01:58-1477669" enctype="multipart/form-data" >
+            <input type="hidden" value="815452-20/05/2015 11:01:58-1477669" name="identificacao"/>
+            <input type="hidden" value="" name="controller"/>
+            <input type="hidden" value="" name="caixa"/>
+            <fieldset style="border: 1px solid #A6C9E2; margin-right: 15px;">
+               <div style="margin-left: 10px; margin-top: 4px; font-size: 12px; ">
+                    <b>Fase:</b>
+                    ENCAMINHAMENTO DE SOLICITAÇÃO DE TI PARA CAIXA PESSOAL                    20/05/2015 11:01:58                                                            
+                    <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0D 0h 0m 29s 
+                                                                
+                                            
+                                            
+                                        <br/><b>Por:</b>
+                    AP29PS - RONALDO DIAS CARDOSO JUNIOR&emsp;
+                                                
+                    <br/><b>Tombo:</b>
+                    7436 - IMPRESSORA SAMSUNG ML-3750-ND.                    <br/><b>Descrição:</b>
+                    <div style="margin-right: 10px;">
+                    +  Em atendimento. 
+                    </div>
+                                                    </fieldset>
+                </form>
+                        <form method="POST" action="anexoerro" id="815452-20/05/2015 11:01:29-1477669" enctype="multipart/form-data" >
+            <input type="hidden" value="815452-20/05/2015 11:01:29-1477669" name="identificacao"/>
+            <input type="hidden" value="" name="controller"/>
+            <input type="hidden" value="" name="caixa"/>
+            <fieldset style="border: 1px solid #A6C9E2; margin-right: 15px;">
+               <div style="margin-left: 10px; margin-top: 4px; font-size: 12px; ">
+                    <b>Fase:</b>
+                    CADASTRO SOLICITAÇÃO TI                    20/05/2015 11:01:29                                                            
+                    <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0D 0h 0m 0s 
+                     
+                        <br/>
+                        <b>Caixa destino: </b>CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DO AMAPÁ - 5 - AP                        <br/>
+                        <b>Serviço: </b>IMPRESSORA                                             
+                        <br/>
+                        <b>Nível destino: </b>2 - SERVIÇOS DE ATENDIMENTO TÉCNICO PRESENCIAL                                                
+                                            
+                                            
+                                        <br/><b>Por:</b>
+                    AP7903 - GRACIETE LOBATO VIDAL&emsp;
+                                                
+                    <br/><b>Tombo:</b>
+                    7436 - IMPRESSORA SAMSUNG ML-3750-ND.                    <br/><b>Descrição:</b>
+                    <div style="margin-right: 10px;">
+                    +  Cadastro da Solicitação. 
+                    </div>
+                                                    </fieldset>
+                </form>
+                         <fieldset style="border: 1px solid #A6C9E2; margin-right: 15px;">
+                 <div style="margin-left: 10px; margin-top: 4px; font-size: 12px; ">
+                 <b>Descrição da Solicitação:</b>
+                 <br>
+                  + Problemas na impressão                 </div>
+             </fieldset>
+            </div>
+            <!--        SOLICITAÇÕES VINCULADAS             -->
+            <!--        FIM SOLICITAÇÕES VINCULADAS            -->
+<!--        NÃO CONFORMIDADE             -->
+                        <!--        INÍCIO CONTROLE QUALIDADE            -->
+            <div id="tabs-6">
+                        </div>
+			<!--        FIM    CONTROLE QUALIDADE            -->
+ <!--        ACOMPANHANTES DA SOLICITAÇÃO            -->
+                        <!--       FIM DOS ACOMPANHANTES DA SOLICITAÇÃO    -->
+            
+            <!--        GARANTIA DESENVOLVIMENTO            -->
+                        <!--     FIM GARANTIA DESENVOLVIMENTO    -->
+             <!--        ANALISE DE PONTO DE FUNAÇÃO            -->
+                        <!--     FIM ANALISE DE PONTO DE FUNAÇÃO    -->
+            
+            
+            
+            
+            <!-- Checklist - Laboratorio -->
+                        <!-- FIM do Checklist - Laboratorio -->
+            
+            
+		</div>
+ <div id="dialog_solicitacao_container">
+ 
+ </div>                </div><!--conteudo-->
+                <!--<div id="filtro"></div>filtro-->
+            </div><!--container-->
+        </div><!-- geral -->
+        <div id="rodape">
+            <div id="rodapeDados">
+                <h3>Informa&ccedil;&otilde;es:</h3>
+                                                <ul>
+                                            <li >Com a entrada em produção do sistema SEI, a partir de 08.09.2014, o sistema e-Sisad terá os módulos de Cadastro de Documentos e Autuação de processos indisponível para o TRF1 e SJDF, para as demais seccionais, a mudança ocorrerá a partir do mês de outubro de 2014.</li>
+                                            <li >Com a entrada em produção do sistema SEI, o sistema de processos da Corregedoria Regional, terá bloqueada a AUTUAÇÃO de novos processos fisicos a partir do dia 08.09.2014.</li>
+                                            <li >Com a entrada em produção do sistema SEI, o sistema SISPRA será bloqueado para autuação de novos processos a partir do dia 08.09.2014 no TRF1 e SJDF.</li>
+                                    </ul>
+           </div><!--rodapeDados-->
+           <div id="rodapeinfo">
+               SJAP - SECAO JUDICIARIA DO AMAPA - 3100               <br/>
+               MACAPA - AP - CENTRO - CEP: 68906430 
+               <br/>
+               SEINF - SEÇÃO DE TECNOLOGIA DA INFORMACAO - 269               <br/>
+                - SEINF  
+                
+               <p style="margin-top: 4px;">&copy;2015 Tribunal Regional Federal da 1&ordf; Regi&atilde;o - SECIN/DISAD</p>
+               <div style="color: #0F1D29;">172.16.1.129 </div>
+               
+               <p>Consulta respondida em 1.215 segundos.</p>
+           </div>
+       </div><!--rodape-->
+       <script type="text/javascript" src="/app/e-Admin/js/contadorsessao.js"></script>    </body>
+</html>
