@@ -50,6 +50,32 @@ namespace :trf1_sjap do
     end
 
   end
+  
+  task :nokogiri_parse, :input_file, :xpath  do |t, args|
+    doc = Nokogiri::HTML(File.read(args.input_file))
+    if args.xpath == nil
+      nodes = [doc.root]
+    else
+      puts "XPATH: " + args.xpath
+      nodes = doc.xpath(args.xpath)
+      
+    end
+    puts "NODES FOUND: " + nodes.length.to_s
+    for node in nodes
+      puts '==========================================='
+      print_node(node, 0)
+    end
+  end
+  
+  def print_node(node,level)
+    if node.kind_of?(Nokogiri::XML::Element) 
+      puts "  " * level + node.name
+      for child in node.children
+        print_node(child, level + 1)
+      end
+    end
+  end
+  
 
 end
 
