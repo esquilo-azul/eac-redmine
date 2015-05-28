@@ -9,7 +9,7 @@ module Trf1Sjap
     end
 
     def descricao
-      return sanitize_descricao(parse_raw_data()[-1].first[1])
+      return sanitize_descricao(parse_raw_data()[0].first[1])
     end
 
     def parse_raw_data
@@ -19,7 +19,7 @@ module Trf1Sjap
         update_data(container, update_consumer)
         data << update_consumer.to_hash
       end
-      return data
+      return data.reverse
     end
 
     private
