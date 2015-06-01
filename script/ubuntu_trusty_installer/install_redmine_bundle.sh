@@ -11,7 +11,7 @@ bundleInstalled() {
 	return $?
 }
 
-"$DIR/apt_get_assert_packages.sh" ruby ruby-dev libmagickwand-dev
+"$DIR/apt_get_assert_packages.sh" ruby ruby-dev libmagickwand-dev libxslt1-dev
 "$DIR/ruby_assert_gems.sh" bundler
 	
 if bundleInstalled; then
