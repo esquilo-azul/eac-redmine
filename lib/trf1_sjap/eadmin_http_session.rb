@@ -46,7 +46,7 @@ module Trf1Sjap
     def caixaAtendimentoSecao
       pageContent = @httpClient.get_content('http://sistemas.trf1.jus.br/app/e-Admin/sosti/atendimentosecoes/atendimentousuario')
       if !loggedUser?(pageContent) 
-        raise "Usuário não está logado"
+        raise UserNotLogged.new
       end
       return CaixaAtendimentoSecao.new(pageContent)
     end
@@ -55,6 +55,13 @@ module Trf1Sjap
       uri = 'http://sistemas.trf1.jus.br/app/e-Admin/sosti/detalhesolicitacao/detalhesol'
       body = '{"SSOL_ID_DOCUMENTO":"' + solicitacao_id.to_s + '"}'
       html = @httpClient.post_content(uri, body)
+      if !loggedUser?(html)
+        raise UserNotLogged.new
+      end
+      return SolicitacaoDetalhes.new(html)
+    end
+
+    class UserNotLogged < Exception
     end
 
   end

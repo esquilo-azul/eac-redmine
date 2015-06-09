@@ -9,15 +9,6 @@ namespace :trf1_sjap do
   task :eadmin_login => :environment do
     eadmin_http_session()
   end
-  
-  task :solicitacao_detalhes, :solicitacao_id, :output_file do |t, args|
-    return 1 unless (session = eadmin_http_session() ) != nil
-    say("Recuperando página de detalhes da solicitação de ID=#{args.solicitacao_id}...")
-    page = session.solicitacao_detalhes(args.solicitacao_id)
-    say("Salvando detalhes em #{args.output_file}...")
-    File.write(args.output_file, page)
-    say("Salvo.")
-  end
 
   def eadmin_http_session
     config_path = ENV['HOME'] + '/.config/trf1-redmine/eadmin-login.yml'
