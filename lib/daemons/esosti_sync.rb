@@ -17,18 +17,14 @@ end
 
 sync_threads = {}
 
-def project_sync trf1_sjap_project
-  esosti_project_sync = Trf1Sjap::EsostiProjectSync.new trf1_sjap_project
-  while($running) do
-    esosti_project_sync.run_step
-    sleep 1
-  end
+continue_callback = Proc.new do |dist, *args|
+  $running
 end
 
 for trf1_sjap_project in Trf1SjapProject.find(:all)
   if ! sync_threads.has_key? trf1_sjap_project
     Rails.logger.info "Criando thread para " + trf1_sjap_project.to_s
-    sync_threads[trf1_sjap_project] = Thread.new{project_sync trf1_sjap_project}    
+    sync_threads[trf1_sjap_project] = Trf1Sjap::EsostiProjectSync.new(trf1_sjap_project, continue_callback)    
   end
 end
 

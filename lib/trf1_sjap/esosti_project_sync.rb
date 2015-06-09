@@ -4,15 +4,42 @@ require 'nokogiri'
 require 'unicode_utils/titlecase'
 
 module Trf1Sjap
-  class EsostiProjectSync
-    def initialize trf1_sjap_project
+  class EsostiProjectSync < Thread
+    def initialize trf1_sjap_project, continue_callback
       @trf1_sjap_project = trf1_sjap_project
+      @continue_callback = continue_callback
       @session = Trf1Sjap::EadminHttpSession.new(
           @trf1_sjap_project.eadmin_matricula,
           @trf1_sjap_project.eadmin_senha,
           @trf1_sjap_project.eadmin_banco
           )
       @login_phase = true
+      super { run }
+    end
+       
+    # Converte um identificador de usuário do e-Admin
+    # em campos para o model User do Redmine.
+    # 
+    # "AP20199 EDUARDO HENRIQUE BOGONI" => login: "ap20199", firstname: "Eduardo", lastname: "Henrique Bogoni"
+    #
+    #
+    def self.parse_solicitacao_user(esosti_solicitante)
+      parts = /\s*([0-9a-zA-Z]+)\s*\-\s*(\S+(?:\s+\S+)*)\s*/.match(esosti_solicitante)      
+      names = parts[2].scan(/\S+/)
+      return {
+        :login => parts[1].downcase, 
+        :firstname => capitalize_name([names[0]], 30), 
+        :lastname => capitalize_name(names[1..names.size], 255)
+      }
+    end
+
+    private
+    
+    def run
+      while(@continue_callback.call()) do
+        run_step
+        sleep 1
+      end
     end
 
     def run_step
@@ -40,24 +67,6 @@ module Trf1Sjap
         end
       end
     end
-    
-    # Converte um identificador de usuário do e-Admin
-    # em campos para o model User do Redmine.
-    # 
-    # "AP20199 EDUARDO HENRIQUE BOGONI" => login: "ap20199", firstname: "Eduardo", lastname: "Henrique Bogoni"
-    #
-    #
-    def self.parse_solicitacao_user(esosti_solicitante)
-      parts = /\s*([0-9a-zA-Z]+)\s*\-\s*(\S+(?:\s+\S+)*)\s*/.match(esosti_solicitante)      
-      names = parts[2].scan(/\S+/)
-      return {
-        :login => parts[1].downcase, 
-        :firstname => capitalize_name([names[0]], 30), 
-        :lastname => capitalize_name(names[1..names.size], 255)
-      }
-    end
-
-    private
     
     def self.capitalize_name(names, limit)
       names.map{|name| name.length <= 2 ? UnicodeUtils.downcase(name, :pt) : UnicodeUtils.titlecase(name, :pt)}.join(' ').truncate(limit)
