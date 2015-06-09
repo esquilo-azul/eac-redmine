@@ -24,7 +24,7 @@ module Trf1Sjap
       rescue SocketError, HTTPClient::BadResponseError, HTTPClient::TimeoutError => ex
         return ex.class.name + ': ' + ex.message
       end
-      if loggedUser?(html) != ''
+      if loggedUser?(html)
         return true
       end
       doc = Nokogiri::HTML(html)
@@ -40,7 +40,7 @@ module Trf1Sjap
       page.xpath("id('nome')/text()[3]").each do |node|
         return node.content.strip
       end
-      return ''
+      return false
     end
 
     def caixaAtendimentoSecao
