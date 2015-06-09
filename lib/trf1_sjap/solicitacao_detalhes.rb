@@ -4,12 +4,15 @@ require 'nokogiri'
 
 module Trf1Sjap
   class SolicitacaoDetalhes
+
+    SOLICITACAO_DESCRICAO_KEY='Descrição da Solicitação'
+
     def initialize(pageContent)
       @doc = Nokogiri::HTML(pageContent)
     end
 
     def descricao
-      return sanitize_descricao(parse_raw_data()[0].first[1])
+      return sanitize_descricao(updates()[0][:itens][SOLICITACAO_DESCRICAO_KEY])
     end
 
     def updates
@@ -18,7 +21,7 @@ module Trf1Sjap
       raw_data.shift(raw_entry_descricao_solicitacao_index(raw_data))
       # A primeira entrada contém apenas a descrição
       # redigida pelo solicitante.
-      raw_data[1].merge!(raw_data[1])
+      raw_data[1].merge!(raw_data[0])
       raw_data.delete_at(0)
       raw_data.map { |entry| UpdateFactory.build(entry) }      
     end
@@ -38,11 +41,11 @@ module Trf1Sjap
     # Procura pela entrada que contém a descrição da solicitação
     def raw_entry_descricao_solicitacao_index(raw_data_entries)
       raw_data_entries.each_with_index do |value, index|
-        if value.has_key?('Descrição da Solicitação')
+        if value.has_key?(SOLICITACAO_DESCRICAO_KEY)
           return index          
         end
       end
-      raise '\"Descrição da Solicitação\" não foi encontrada'
+      raise '\"' + SOLICITACAO_DESCRICAO_KEY + '\" não foi encontrada'
     end
 
     def updates_containers
@@ -105,7 +108,8 @@ module Trf1Sjap
       return {
         :tipo => @@fase_descricao_mapping[fase_descricao],
         :date => fase_data,
-        :descricao => fase_descricao
+        :descricao => fase_descricao,
+        :itens => update_entries
       }
     end
 
