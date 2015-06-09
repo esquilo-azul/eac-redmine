@@ -47,7 +47,7 @@ class Trf1SjapProject < ActiveRecord::Base
     issue.author_id = get_solicitacao_user_id(solicitacao)
     issue.tracker_id = get_tracker_id
     issue.esosti_id = solicitacao[:id]
-    try_save(issue)
+    Trf1Sjap::ModelUtils.save_or_raise(issue)
     return issue
   end
 
@@ -60,7 +60,7 @@ class Trf1SjapProject < ActiveRecord::Base
       user.firstname = solicitacao_user[:firstname]
       user.lastname = solicitacao_user[:lastname]
       user.mail = solicitacao_user[:login] + '@localhost.localhost'
-      try_save user
+      Trf1Sjap::ModelUtils.save_or_raise user
     end
     return user.id
   end
@@ -76,21 +76,5 @@ class Trf1SjapProject < ActiveRecord::Base
     names.map{|name| name.length <= 2 ? UnicodeUtils.downcase(name, :pt) : UnicodeUtils.titlecase(name, :pt)}.join(' ').truncate(limit)
   end
 
-  def active_record_base_errors_to_string errors
-    b = ''
-    errors.messages.each do |field, messages|
-      if b != ''
-        b += ' / '
-      end
-      b += field.to_s + ": " + messages.to_s
-    end
-    return b
-  end
-
-  def try_save model_instance
-    if ! model_instance.save
-      raise "Falha ao tentar salvar " + model_instance.class.name + ": " + active_record_base_errors_to_string(model_instance.errors)
-    end
-  end
 
 end
