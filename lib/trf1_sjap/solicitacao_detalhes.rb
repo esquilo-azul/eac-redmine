@@ -5,7 +5,10 @@ require 'nokogiri'
 module Trf1Sjap
   class SolicitacaoDetalhes
 
+    FASE_CADASTRO_DESCRICAO = 'CADASTRO SOLICITAÇÃO TI'
     SOLICITACAO_DESCRICAO_KEY='Descrição da Solicitação'
+    AUTOR_ITEM_NOME='Por'
+    FASE_ITEM_NOME='Fase'
 
     def initialize(pageContent)
       @doc = Nokogiri::HTML(pageContent)
@@ -23,7 +26,10 @@ module Trf1Sjap
       # redigida pelo solicitante.
       raw_data[1].merge!(raw_data[0])
       raw_data.delete_at(0)
-      raw_data.map { |entry| UpdateFactory.build(entry) }      
+      updates = raw_data.map { |entry| UpdateFactory.build(entry) }
+      raise 'updates.count <= 0' if updates.count <= 0
+      raise "updates[0][:fase_descricao] != FASE_CADASTRO_DESCRICAO (\"#{updates[0][:fase]}\")" if updates[0][:fase] != SolicitacaoDetalhes::FASE_CADASTRO_DESCRICAO
+      updates
     end
 
     def parse_raw_data
@@ -34,6 +40,16 @@ module Trf1Sjap
         data << update_consumer.to_hash
       end
       return data
+    end
+    
+    # Extrai a descrição da fase e a data/hora que aparecem
+    # no item "Fase" das atualizações de solicitação e-Sosti.
+    def self.parse_fase(input)
+      parts = /(.+)(\d{2}\/\d+\/\d+\s+\d+\:\d+\:\d+)/.match(input)
+      if parts == nil
+        raise "Não foi possível analisar \"#{input}\""
+      end
+      return [parts[1].strip, DateTime.strptime(parts[2],'%d/%m/%Y %H:%M:%S')]
     end
 
     private
@@ -80,45 +96,16 @@ module Trf1Sjap
 
   class UpdateFactory
     
-    @@fase_descricao_mapping = {
-      'CADASTRO SOLICITAÇÃO TI' => :cadastro,
-      'ENCAMINHAMENTO DE SOLICITAÇÃO DE TI PARA CAIXA PESSOAL' => :encaminhamento_caixa_pessoal,
-      'ENCAMINHAMENTO DE SOLICITAÇÃO DE TI ENTRE GRUPOS DA MESMA SEÇÃO' => :encaminhamento_intra_secao,
-      'ENCAMINHAMENTO DE SOLICITAÇÃO DE TI DE SEÇÃO PARA O TRIBUNAL' => :encaminhamento_tribunal,
-      'ENCAMINHAMENTO DE SOLICITAÇÃO ENTRE GRUPOS DO TRF1' => :encaminhamento_intra_tribunal,
-      'ENCAMINHAMENTO DE SOLICITAÇÃO DE TI DO TRIBUNAL PARA SEÇÃO' => :encaminhamento_secao,
-      'PEDIDO DE INFORMAÇÃO PARA SOLICITAÇÃO À TI' => :pedido_informacao,
-      'SOLICITAÇÃO DE EXTENSÃO DE PRAZO PARA SOLICITAÇÃO DE TI' => :pedido_extensao_prazo,
-      'DEVOLUÇÃO DE SOLICITAÇÃO DE TI' => :devolucao,
-      'CANCELAMENTO DE SOLICITAÇÃO' => :cancelamento,
-      'BAIXA SOLICITAÇÃO TI' => :baixa,
-      'AVALIAÇÃO DE SERVIÇO DE TI' => :avaliacao_aceita,
-      'AVALIAÇÃO DE SERVIÇO DE TI RECUSADA' => :avaliacao_recusada,
-      'DAR PARECER NA SOLICITAÇÃO DE TI' => :parecer
-    }
-    
     def self.build(update_entries)
-      if ! update_entries.has_key?('Fase')
-        raise "Entrada de solicitação e-Sosti não tem propriedade \"Fase\" (" + update_entries.to_s + ")"
+      if ! update_entries.has_key?(SolicitacaoDetalhes::FASE_ITEM_NOME)
+        raise "Entrada de solicitação e-Sosti não tem propriedade \"#{SolicitacaoDetalhes::FASE_ITEM_NOME}\" (" + update_entries.to_s + ")"
       end      
-      fase_descricao, fase_data = parse_fase(update_entries['Fase'])
-      if ! @@fase_descricao_mapping.has_key?(fase_descricao)
-        raise "Mapeamento não encontrado para \"#{fase_descricao}\""
-      end
+      fase_descricao, fase_data = SolicitacaoDetalhes.parse_fase(update_entries[SolicitacaoDetalhes::FASE_ITEM_NOME])
       return {
-        :tipo => @@fase_descricao_mapping[fase_descricao],
-        :date => fase_data,
-        :descricao => fase_descricao,
+        :data_hora => fase_data,
+        :fase => fase_descricao,
         :itens => update_entries
       }
-    end
-
-    def self.parse_fase(input)
-      parts = /(.+)(\d{2}\/\d+\/\d+\s+\d+\:\d+\:\d+)/.match(input)
-      if parts == nil
-        raise "Não foi possível analisar \"#{input}\""
-      end
-      return [parts[1].strip, DateTime.strptime(parts[2],'%d/%m/%Y %H:%M:%S')]
     end
 
   end

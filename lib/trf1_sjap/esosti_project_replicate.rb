@@ -47,6 +47,7 @@ module Trf1Sjap
         @login_thread = check_thread(@login_thread, LoginThread)
         @caixa_secao_atendimento_thread = check_thread(@caixa_secao_atendimento_thread, CaixaAtendimentoSecaoThread)
         @solicitacoes_thread = check_thread(@solicitacoes_thread, SolicitacoesThread)
+        @redmine_import_thread = check_thread(@redmine_import_thread, RedmineImportThread)
         sleep(SLEEP_INTERVAL)
       end
     end   
@@ -74,7 +75,12 @@ module Trf1Sjap
       def run_loop
         continue = true
         while (continue)
-          continue = !(run() === true)
+          begin
+            continue = !(run() === true)
+          rescue Exception => ex
+            log(ex.class.name + ': ' + ex.message)
+            sleep(SLEEP_INTERVAL)
+          end
         end
       end
       
@@ -146,7 +152,7 @@ module Trf1Sjap
         log 'Solicitações abertas: ' + solicitacoes_abertas.count.to_s
         for solicitacao in solicitacoes_abertas
           if ! @solicitacoes_threads.has_key?(solicitacao.id)
-            log 'Solicitação ID=#{solicitacao.id} não possui thread. Criando'
+            log "Solicitação ID=#{solicitacao.id} não possui thread. Criando"
             @solicitacoes_threads[solicitacao.id] = SolicitacaoThread.new(@esosti_project_sync, solicitacao)
           end
         end
@@ -191,6 +197,36 @@ module Trf1Sjap
         return "SOLICITACAO(#{@esosti_solicitacao.esosti_id})"
       end
       
+    end
+    
+    # Transforma as atualizações e-Sosti em atualizações do Redmine
+    class RedmineImportThread < LoopThread
+      
+      def run
+        updates = updates_abertos
+        log('Updates encontrados: ' + updates.count.to_s)
+        for update in updates_abertos
+          update_text = "#{update.esosti_solicitacao.esosti_id}/#{update.index}"
+          log("Importando #{update_text}")
+          result = EsostiRedmineImport.update_to_redmine(update)
+          log("Importado #{update_text}: #{result.inspect}")
+        end
+        sleep(SLEEP_INTERVAL)
+      end
+            
+      def to_s
+        return 'REDMINE IMPORT'
+      end
+      
+      private
+      
+      def updates_abertos
+        return EsostiUpdate.
+          where(journal_id: nil).
+          includes(:esosti_solicitacao).
+          where('esosti_solicitacaos.trf1_sjap_project_id' => @esosti_project_sync.trf1_sjap_project).
+          order(:esosti_solicitacao_id, :index)
+      end
     end
 
   end

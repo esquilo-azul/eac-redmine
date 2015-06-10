@@ -5,4 +5,5 @@ class EsostiSolicitacao < ActiveRecord::Base
   validates_presence_of :esosti_id, :trf1_sjap_project_id
   validates :closed, exclusion: { in: [nil] }
   belongs_to :trf1_sjap_project  
+  belongs_to :issue
 end
