@@ -4,7 +4,7 @@ require 'nokogiri'
 require 'unicode_utils/titlecase'
 
 module Trf1Sjap
-  class EsostiProjectSync < Thread
+  class EsostiProjectReplicate < Thread
     SLEEP_INTERVAL = 5
     attr_reader :session, :trf1_sjap_project
     def initialize trf1_sjap_project, continue_callback

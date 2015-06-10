@@ -25,7 +25,7 @@ while $running do
   for trf1_sjap_project in Trf1SjapProject.find(:all)
     if ! sync_threads.has_key? trf1_sjap_project
       Rails.logger.info "Criando thread para " + trf1_sjap_project.to_s
-      sync_threads[trf1_sjap_project] = Trf1Sjap::EsostiProjectSync.new(trf1_sjap_project, continue_callback)    
+      sync_threads[trf1_sjap_project] = Trf1Sjap::EsostiProjectReplicate.new(trf1_sjap_project, continue_callback)    
     end
   end
   sleep(5)
