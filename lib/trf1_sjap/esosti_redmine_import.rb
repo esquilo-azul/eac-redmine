@@ -106,6 +106,10 @@ module Trf1Sjap
         }
       end
 
+      def self.parse_solicitacao_descricao(descricao)
+        descricao.strip.gsub(/^\+/,'').strip
+      end
+
       private
 
       def create_issue()
@@ -130,7 +134,7 @@ module Trf1Sjap
       end
 
       def get_issue_description()
-        @esosti_update.item_valor(SolicitacaoDetalhes::SOLICITACAO_DESCRICAO_KEY)
+        UpdateToRedmine.parse_solicitacao_descricao(@esosti_update.item_valor(SolicitacaoDetalhes::SOLICITACAO_DESCRICAO_KEY))
       end
 
       def create_journal()

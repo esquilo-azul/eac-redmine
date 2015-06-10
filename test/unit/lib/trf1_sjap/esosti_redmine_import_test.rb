@@ -26,5 +26,12 @@ class Trf1Sjap::EsostiRedmineImportTest < ActiveSupport::TestCase
       :lastname => 'de N.'      
     }, Trf1Sjap::EsostiRedmineImport::UpdateToRedmine.parse_solicitacao_user('ABC123DEF - João DE NOMEMUITOLONGOMAIORQUETRINTACARACTERES'))
   end
+  
+  def test_parse_solicitacao_descricao
+    assert_equal(
+      'Favor instalar +1 computador tipo 2 para o servidor Marco Antonio Rodrigues Lima - AP20191', 
+      Trf1Sjap::EsostiRedmineImport::UpdateToRedmine.parse_solicitacao_descricao(' + Favor instalar +1 computador tipo 2 para o servidor Marco Antonio Rodrigues Lima - AP20191 ')
+    )
+  end
 
 end
