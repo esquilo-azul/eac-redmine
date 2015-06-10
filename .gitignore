@@ -31,4 +31,5 @@
 /.bundle
 /Gemfile.lock
 /Gemfile.local
+/log/esosti_solicitacao_detalhes/
 

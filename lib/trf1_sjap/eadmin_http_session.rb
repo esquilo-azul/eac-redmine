@@ -1,6 +1,7 @@
 # encoding: UTF-8
 
 require 'nokogiri'
+require 'fileutils'
 
 module Trf1Sjap
   class EadminHttpSession
@@ -55,6 +56,7 @@ module Trf1Sjap
       uri = 'http://sistemas.trf1.jus.br/app/e-Admin/sosti/detalhesolicitacao/detalhesol'
       body = '{"SSOL_ID_DOCUMENTO":"' + solicitacao_id.to_s + '"}'
       html = @httpClient.post_content(uri, body)
+      log_solicitacao_detalhes_html(solicitacao_id, html)
       if !loggedUser?(html)
         raise UserNotLogged.new
       end
@@ -62,6 +64,14 @@ module Trf1Sjap
     end
 
     class UserNotLogged < Exception
+    end
+    
+    private
+    
+    def log_solicitacao_detalhes_html(solicitacao_id, html)
+      log_file = "#{Rails.root}/log/esosti_solicitacao_detalhes/#{solicitacao_id}.html"
+      FileUtils::mkdir_p(File.dirname(log_file))
+      File.write(log_file, html)
     end
 
   end
