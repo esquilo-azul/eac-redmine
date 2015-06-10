@@ -160,7 +160,7 @@ module Trf1Sjap
       def esosti_update_to_notes()
         b = ''
         for item in @esosti_update.esosti_update_items
-          b += item.nome + ": " + item.valor + "\n"
+          b += "*#{item.nome}:* #{item.valor}\n"
         end
         b.strip
       end
