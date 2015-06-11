@@ -6,7 +6,7 @@ require 'unicode_utils/titlecase'
 module Trf1Sjap
   class EsostiProjectReplicate < Thread
     SLEEP_INTERVAL = 5
-    attr_reader :session, :trf1_sjap_project
+    attr_reader :session, :trf1_sjap_project, :import_mutex
     def initialize trf1_sjap_project, continue_callback
       @trf1_sjap_project = trf1_sjap_project
       @continue_callback = continue_callback
@@ -19,6 +19,7 @@ module Trf1Sjap
       @login_thread = nil
       @caixa_secao_atendimento_thread = nil     
       @signal_mutex = Mutex.new 
+      @import_mutex = Mutex.new 
       super { run }
     end
 
@@ -122,8 +123,10 @@ module Trf1Sjap
           log 'Buscando fonte...'          
           caixa_atendimento = @esosti_project_sync.session.caixaAtendimentoSecao          
           log "Solicitações encontradas: " + caixa_atendimento.solicitacoes.length.to_s
-          novas = Trf1Sjap::EsostiRedmineImport.import_caixa_secao_atendimento(@esosti_project_sync.trf1_sjap_project, caixa_atendimento.solicitacoes)
-          log "Novas solicitações: " + novas.to_s
+          @esosti_project_sync.import_mutex.syncronize do
+            novas = Trf1Sjap::EsostiRedmineImport.import_caixa_secao_atendimento(@esosti_project_sync.trf1_sjap_project, caixa_atendimento.solicitacoes)
+            log "Novas solicitações: " + novas.to_s
+          end
           sleep(SLEEP_INTERVAL)
         rescue Trf1Sjap::EadminHttpSession::UserNotLogged => ex
           log 'Não logado. Sinalizando...'
@@ -183,8 +186,10 @@ module Trf1Sjap
           log("Buscando fonte...")
           updates = @esosti_project_sync.session.solicitacao_detalhes(@esosti_solicitacao.esosti_id).updates()
           log("Updates encontrados: " + updates.count.to_s)
-          novos = Trf1Sjap::EsostiRedmineImport.import_solicitacao_detalhes(@esosti_solicitacao, updates)
-          log("Novos updates: " + novos.to_s)
+          @esosti_project_sync.import_mutex.syncronize do
+            novos = Trf1Sjap::EsostiRedmineImport.import_solicitacao_detalhes(@esosti_solicitacao, updates)
+            log("Novos updates: " + novos.to_s)
+          end
           sleep(SLEEP_INTERVAL)
         rescue Trf1Sjap::EadminHttpSession::UserNotLogged => ex
           log('Não logado. Sinalizando...')
@@ -203,13 +208,15 @@ module Trf1Sjap
     class RedmineImportThread < LoopThread
       
       def run
-        updates = updates_abertos
-        log('Updates encontrados: ' + updates.count.to_s)
-        for update in updates_abertos
-          update_text = "#{update.esosti_solicitacao.esosti_id}/#{update.index}"
-          log("Importando #{update_text}")
-          result = EsostiRedmineImport.update_to_redmine(update)
-          log("Importado #{update_text}: #{result.inspect}")
+        @esosti_project_sync.import_mutex.syncronize do
+          updates = updates_abertos
+          log('Updates encontrados: ' + updates.count.to_s)
+          for update in updates_abertos
+            update_text = "#{update.esosti_solicitacao.esosti_id}/#{update.index}"
+            log("Importando #{update_text}")
+            result = EsostiRedmineImport.update_to_redmine(update)
+            log("Importado #{update_text}: #{result.inspect}")
+          end
         end
         sleep(SLEEP_INTERVAL)
       end
