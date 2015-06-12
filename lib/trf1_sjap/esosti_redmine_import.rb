@@ -42,6 +42,7 @@ module Trf1Sjap
         esosti_solicitacao.closed = false
         esosti_solicitacao.trf1_sjap_project_id = trf1_sjap_project.id
         esosti_solicitacao.esosti_id = solicitacao[:id]
+        esosti_solicitacao.esosti_numero = solicitacao[:numero]
         ModelUtils::save_or_raise(esosti_solicitacao)
         return true
       else
@@ -130,10 +131,14 @@ module Trf1Sjap
       end
 
       def get_issue_subject()
-        truncate(get_issue_description(), length: Issue.columns_hash['subject'].limit)
+        truncate(get_solicitacao_descricao(), length: Issue.columns_hash['subject'].limit)
       end
 
       def get_issue_description()
+        '*Nº da solicitação:* ' + @esosti_update.esosti_solicitacao.esosti_numero + "\n\n" + get_solicitacao_descricao()
+      end
+
+      def get_solicitacao_descricao()
         UpdateToRedmine.parse_solicitacao_descricao(@esosti_update.item_valor(SolicitacaoDetalhes::SOLICITACAO_DESCRICAO_KEY))
       end
 
