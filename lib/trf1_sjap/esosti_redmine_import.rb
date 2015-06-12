@@ -81,12 +81,13 @@ module Trf1Sjap
 
       def run
         fase_descricao, fase_data = SolicitacaoDetalhes.parse_fase(@esosti_update.item_valor('Fase'))
-        result = [nil, nil]
+        result = {:issue_id => nil, :esosti_update_id => nil, :esosti_fase_id => nil}
         ActiveRecord::Base.transaction do
+          result[:esosti_fase_id] = import_esosti_fase(fase_descricao)
           if fase_descricao == SolicitacaoDetalhes::FASE_CADASTRO_DESCRICAO
-            result[0] = create_issue()
+            result[:issue_id] = create_issue()
           end
-          result[1] = create_journal()
+          result[:esosti_update_id] = create_journal()
         end
         result
       end
@@ -156,10 +157,6 @@ module Trf1Sjap
         Trf1Sjap::ModelUtils.save_or_raise(@esosti_update)
         raise '@esosti_update.journal_id == nil' if @esosti_update.journal_id == nil
         @esosti_update.journal_id
-      end
-      
-      def issue
-        
       end
 
       def esosti_update_to_notes()
@@ -234,6 +231,15 @@ module Trf1Sjap
           end
         end
         result
+      end
+      
+      def import_esosti_fase(esosti_fase_rotulo)
+        esosti_fase = EsostiFase.find_by_rotulo(esosti_fase_rotulo)
+        if !esosti_fase
+          esosti_fase = EsostiFase.new({:rotulo => esosti_fase_rotulo, :atribuir_autor => false})
+          ModelUtils::save_or_raise(esosti_fase)
+          esosti_fase.id
+        end
       end
 
     end
