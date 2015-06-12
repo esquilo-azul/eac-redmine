@@ -6,7 +6,7 @@ require 'unicode_utils/titlecase'
 module Trf1Sjap
   class EsostiProjectReplicate < Thread
     SLEEP_INTERVAL = 5
-    attr_reader :session, :trf1_sjap_project, :import_mutex
+    attr_reader :session, :trf1_sjap_project
     def initialize trf1_sjap_project, continue_callback
       @trf1_sjap_project = trf1_sjap_project
       @continue_callback = continue_callback
@@ -19,7 +19,6 @@ module Trf1Sjap
       @login_thread = nil
       @caixa_secao_atendimento_thread = nil     
       @signal_mutex = Mutex.new 
-      @import_mutex = Mutex.new 
       super { run }
     end
 
@@ -89,6 +88,21 @@ module Trf1Sjap
         end
       end
       
+      def run_database_operation
+        run = true
+        while(run)
+          begin
+            ActiveRecord::Base.connection_pool.with_connection do
+              yield
+            end
+            run = false
+          rescue ActiveRecord::ConnectionTimeoutError => ex
+            log(ex.class.name + ': ' + ex.message)
+            sleep(1)
+          end
+        end
+      end
+      
       def log(message)
         @esosti_project_sync.logger.info(@esosti_project_sync.trf1_sjap_project.project.identifier + "|" + to_s + ": " + message)
       end
@@ -127,7 +141,7 @@ module Trf1Sjap
           log 'Buscando fonte...'          
           caixa_atendimento = @esosti_project_sync.session.caixaAtendimentoSecao          
           log "Solicitações encontradas: " + caixa_atendimento.solicitacoes.length.to_s
-          @esosti_project_sync.import_mutex.syncronize do
+          run_database_operation do
             novas = Trf1Sjap::EsostiRedmineImport.import_caixa_secao_atendimento(@esosti_project_sync.trf1_sjap_project, caixa_atendimento.solicitacoes)
             log "Novas solicitações: " + novas.to_s
           end
@@ -190,7 +204,7 @@ module Trf1Sjap
           log("Buscando fonte...")
           updates = @esosti_project_sync.session.solicitacao_detalhes(@esosti_solicitacao.esosti_id).updates()
           log("Updates encontrados: " + updates.count.to_s)
-          @esosti_project_sync.import_mutex.syncronize do
+          run_database_operation do
             novos = Trf1Sjap::EsostiRedmineImport.import_solicitacao_detalhes(@esosti_solicitacao, updates)
             log("Novos updates: " + novos.to_s)
           end
@@ -212,7 +226,7 @@ module Trf1Sjap
     class RedmineImportThread < LoopThread
       
       def run
-        @esosti_project_sync.import_mutex.syncronize do
+        run_database_operation do
           updates = updates_abertos
           log('Updates encontrados: ' + updates.count.to_s)
           for update in updates_abertos
