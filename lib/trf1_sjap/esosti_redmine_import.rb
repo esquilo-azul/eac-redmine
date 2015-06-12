@@ -185,6 +185,12 @@ module Trf1Sjap
       end
 
       def get_tracker_id()
+        default_tracker_id = Setting.plugin_redmine_trf1_sjap['tracker_id']
+        if default_tracker_id != nil          
+          for tracker in @esosti_update.esosti_solicitacao.trf1_sjap_project.project.trackers            
+            return default_tracker_id if tracker.id == default_tracker_id.to_i
+          end
+        end
         raise 'Projeto não possui trackers' if @esosti_update.esosti_solicitacao.trf1_sjap_project.project.trackers.empty?
         return @esosti_update.esosti_solicitacao.trf1_sjap_project.project.trackers[0].id
       end

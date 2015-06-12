@@ -1,0 +1,10 @@
+<h2>Redmine TRF1-SJAP Plugin</h2>
+
+
+<div>
+Tracker de exportação de solicitações e-Sosti para issues Redmine.
+<br/>
+<select name="settings[tracker_id]">
+	<%= options_for_select(Tracker.all.collect {|p| [ p.name, p.id ] }, settings['tracker_id'] ) %>
+</select>
+</div>
