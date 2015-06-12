@@ -1,0 +1,12 @@
+<%= error_messages_for 'esosti_fase' %>
+<div class="box tabular">
+	<p>
+		<%= f.text_field :rotulo %>
+	</p>
+	<p>
+		<%= f.select :issue_status_id, IssueStatus.all.collect {|p| [ p.name, p.id ] }, {include_blank: '-- Nenhuma --'}%>
+	</p>
+	<p>
+		<%= f.check_box :atribuir_autor %>
+	</p>
+</div>

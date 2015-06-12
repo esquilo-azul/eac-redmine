@@ -1,0 +1,28 @@
+<div class="contextual">
+	<%= link_to l(:label_esosti_fase_new), new_esosti_fase_path, :class => 'icon icon-add' %>
+</div>
+
+<h2><%= l(:label_esosti_fase_plural)%></h2>
+
+<table class="list">
+	<thead>
+		<tr>
+			<th><%= l(:field_rotulo)%></th>
+			<th><%= l(:field_issue_status)%></th>
+			<th><%= l(:field_atribuir_autor)%></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<% @esosti_fases.each do |fase| %>
+		<tr class="<%= cycle("odd", "even") %>">
+			<td><%= link_to h(fase.rotulo), edit_esosti_fase_path(fase) %></td>
+			<td style="text-align: center"><%= fase.issue_status %></td>
+			<td style="text-align: center"><%= fase.atribuir_autor ?  l(:general_text_Yes) : l(:general_text_Yes) %></td>
+			<td class="buttons"> <%= delete_link esosti_fase_path(fase) %> </td>
+		</tr>
+		<% end %>
+	</tbody>
+</table>
+
+<% html_title(l(:label_issue_status_plural)) -%>

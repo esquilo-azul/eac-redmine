@@ -1,6 +1,6 @@
 pt-BR:
-  label_trf1_sjap: "TRF1 - SJAP"
-  field_eadmin_matricula: "Matrícula e-Admin"
-  field_eadmin_senha: "Senha e-Admin"
-  field_eadmin_banco: "Banco e-Admin"
-  notice_trf1_sjap_project_saved: "Configurações TRF1-SJAP para projeto foram salvas"
+  label_esosti_fase_plural: "Fases e-Sosti"
+  label_esosti_fase_new: "Nova fase e-Sosti"
+  field_rotulo: "Rótulo"
+  field_issue_status: "Situação da tarefa"
+  field_atribuir_autor: "Atribuir autor"
