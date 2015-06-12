@@ -76,11 +76,15 @@ module Trf1Sjap
       def run_loop
         continue = true
         while (continue)
-          begin
+          if Rails.env.development?
             continue = !(run() === true)
-          rescue Exception => ex
-            log(ex.class.name + ': ' + ex.message)
-            sleep(SLEEP_INTERVAL)
+          else
+            begin
+              continue = !(run() === true)
+            rescue RuntimeError, Exception => ex
+              log(ex.class.name + ': ' + ex.message)
+              sleep(SLEEP_INTERVAL)
+            end
           end
         end
       end

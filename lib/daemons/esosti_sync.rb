@@ -17,6 +17,7 @@ end
 
 sync_threads = {}
 
+Thread.abort_on_exception = true if Rails.env.development?
 continue_callback = Proc.new do |dist, *args|
   $running
 end
