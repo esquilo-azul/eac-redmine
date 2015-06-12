@@ -31,7 +31,7 @@ module Trf1Sjap
         return EsostiUpdate.
           where(journal_id: nil).
           includes(:esosti_solicitacao).
-          where('esosti_solicitacaos.trf1_sjap_project_id' => @esosti_project_sync.trf1_sjap_project).
+          where('esosti_solicitacaos.trf1_sjap_project_id' => @esosti_project_replicate.trf1_sjap_project).
           order(:esosti_solicitacao_id, :index)
       end
     end

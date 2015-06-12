@@ -5,7 +5,7 @@ module Trf1Sjap
     # Generalização de threads com loop infinito.
     class  LoopThread < Thread
       def initialize(esosti_project_sync)
-        @esosti_project_sync = esosti_project_sync
+        @esosti_project_replicate = esosti_project_sync
         super { run_loop }
       end
 
@@ -47,7 +47,7 @@ module Trf1Sjap
       end
 
       def log(message)
-        @esosti_project_sync.logger.info(@esosti_project_sync.trf1_sjap_project.project.identifier + "|" + to_s + ": " + message)
+        @esosti_project_replicate.logger.info(@esosti_project_replicate.trf1_sjap_project.project.identifier + "|" + to_s + ": " + message)
       end
 
       def to_s

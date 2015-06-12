@@ -7,16 +7,16 @@ module Trf1Sjap
       def run
         begin
           log 'Buscando fonte...'
-          caixa_atendimento = @esosti_project_sync.session.caixaAtendimentoSecao
+          caixa_atendimento = @esosti_project_replicate.session.caixaAtendimentoSecao
           log "Solicitações encontradas: " + caixa_atendimento.solicitacoes.length.to_s
           run_database_operation do
-            novas = Trf1Sjap::EsostiRedmineImport.import_caixa_secao_atendimento(@esosti_project_sync.trf1_sjap_project, caixa_atendimento.solicitacoes)
+            novas = Trf1Sjap::EsostiRedmineImport.import_caixa_secao_atendimento(@esosti_project_replicate.trf1_sjap_project, caixa_atendimento.solicitacoes)
             log "Novas solicitações: " + novas.to_s
           end
           sleep(SLEEP_INTERVAL)
         rescue Trf1Sjap::EadminHttpSession::UserNotLogged => ex
           log 'Não logado. Sinalizando...'
-          @esosti_project_sync.not_logged_signal()
+          @esosti_project_replicate.not_logged_signal()
           Thread.stop
         end
       end

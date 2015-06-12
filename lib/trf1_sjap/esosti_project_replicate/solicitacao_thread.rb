@@ -12,7 +12,7 @@ module Trf1Sjap
       def run
         begin
           log("Buscando fonte...")
-          updates = @esosti_project_sync.session.solicitacao_detalhes(@esosti_solicitacao.esosti_id).updates()
+          updates = @esosti_project_replicate.session.solicitacao_detalhes(@esosti_solicitacao.esosti_id).updates()
           log("Updates encontrados: " + updates.count.to_s)
           run_database_operation do
             novos = Trf1Sjap::EsostiRedmineImport.import_solicitacao_detalhes(@esosti_solicitacao, updates)
@@ -21,7 +21,7 @@ module Trf1Sjap
           sleep(SLEEP_INTERVAL)
         rescue Trf1Sjap::EadminHttpSession::UserNotLogged => ex
           log('Não logado. Sinalizando...')
-          @esosti_project_sync.not_logged_signal()
+          @esosti_project_replicate.not_logged_signal()
           Thread.stop
         end
       end
