@@ -46,6 +46,7 @@ module Trf1Sjap
 
     def caixaAtendimentoSecao
       pageContent = @httpClient.get_content('http://sistemas.trf1.jus.br/app/e-Admin/sosti/atendimentosecoes/atendimentousuario')
+      log_caixa_atendimento_secao_html(pageContent)
       if !loggedUser?(pageContent) 
         raise UserNotLogged.new
       end
@@ -67,6 +68,12 @@ module Trf1Sjap
     end
     
     private
+    
+    def log_caixa_atendimento_secao_html(html)
+      log_file = "#{Rails.root}/log/esosti_caixa_atendimento_secao/#{@usuario}-#{@banco}.html"
+      FileUtils::mkdir_p(File.dirname(log_file))
+      File.write(log_file, html)
+    end
     
     def log_solicitacao_detalhes_html(solicitacao_id, html)
       log_file = "#{Rails.root}/log/esosti_solicitacao_detalhes/#{solicitacao_id}.html"
