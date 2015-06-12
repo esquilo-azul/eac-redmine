@@ -11,16 +11,18 @@ module Trf1Sjap
 
     def solicitacoes
       data = []
-      columns = solicitacoes_columns()
-      for line in solicitacoes_lines()
-        line_cells  = line.xpath('td')
-        data.append({
-          :id => line.at_xpath('@value').text.strip.to_i,
-          :numero => column_cell_text(line_cells[columns[:numero]]),
-          :solicitante => column_cell_text(line_cells[columns[:solicitante]]),
-          :servico_atual => column_cell_text(line_cells[columns[:servico_atual]]),
-          :atendente => __parseAtendente(column_cell_text(line_cells[columns[:atendente]]))
-        })
+      if solicitacoes_table() != nil
+        columns = solicitacoes_columns()
+        for line in solicitacoes_lines()
+          line_cells  = line.xpath('td')
+          data.append({
+            :id => line.at_xpath('@value').text.strip.to_i,
+            :numero => column_cell_text(line_cells[columns[:numero]]),
+            :solicitante => column_cell_text(line_cells[columns[:solicitante]]),
+            :servico_atual => column_cell_text(line_cells[columns[:servico_atual]]),
+            :atendente => __parseAtendente(column_cell_text(line_cells[columns[:atendente]]))
+          })
+        end
       end
       return data
     end
