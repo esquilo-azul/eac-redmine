@@ -1,0 +1,36 @@
+# encoding: UTF-8
+
+module Trf1Sjap
+  class EsostiProjectReplicate
+    # Mantém threads de monitoramento de solicitações e-Sosti
+    class SolicitacoesThread < LoopThread
+      def initialize(trf1_sjap_project)
+        @solicitacoes_threads = {}
+        super(trf1_sjap_project)
+      end
+
+      def run
+        log 'Buscando solicitações e-Sosti abertas'
+        solicitacoes_abertas = EsostiSolicitacao.where(:closed => false, :trf1_sjap_project_id => @esosti_project_sync.trf1_sjap_project.id)
+        log 'Solicitações abertas: ' + solicitacoes_abertas.count.to_s
+        for solicitacao in solicitacoes_abertas
+          if ! @solicitacoes_threads.has_key?(solicitacao.id)
+            log "Solicitação ID=#{solicitacao.id} não possui thread. Criando"
+            @solicitacoes_threads[solicitacao.id] = SolicitacaoThread.new(@esosti_project_sync, solicitacao)
+          end
+        end
+        sleep(SLEEP_INTERVAL)
+      end
+
+      def to_s
+        return 'SOLICITACOES'
+      end
+
+      def wakeup_solicitacoes_threads
+        @solicitacoes_threads.each do |key, value|
+          value.wakeup()
+        end
+      end
+    end
+  end
+end
