@@ -34,7 +34,7 @@ module Trf1Sjap
       def run_step
         begin
           return !(run() === true)
-        rescue SocketError, ActiveRecord::ConnectionTimeoutError => ex
+        rescue SocketError, HTTPClient::BadResponseError, ActiveRecord::ConnectionTimeoutError => ex
           log(:warn, ex.class.name + ': ' + ex.message)
           sleep_long
           return true
