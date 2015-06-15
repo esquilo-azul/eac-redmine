@@ -13,7 +13,7 @@ module Trf1Sjap
             novas = Trf1Sjap::EsostiRedmineImport.import_caixa_secao_atendimento(@esosti_project_replicate.trf1_sjap_project, caixa_atendimento.solicitacoes)
             log((novas > 0 ? :info : :debug), "Novas solicitações: " + novas.to_s)
           end
-          sleep(SLEEP_INTERVAL)
+          sleep_long
         rescue Trf1Sjap::EadminHttpSession::UserNotLogged => ex
           log :debug, 'Não logado. Sinalizando...'
           @esosti_project_replicate.not_logged_signal()

@@ -18,7 +18,7 @@ module Trf1Sjap
             novos = Trf1Sjap::EsostiRedmineImport.import_solicitacao_detalhes(@esosti_solicitacao, updates)
             log((novos >0 ? :info : :debug), "Novos updates: " + novos.to_s)
           end
-          sleep(SLEEP_INTERVAL)
+          sleep_long
         rescue Trf1Sjap::EadminHttpSession::UserNotLogged => ex
           log(:debug, 'Não logado. Sinalizando...')
           @esosti_project_replicate.not_logged_signal()

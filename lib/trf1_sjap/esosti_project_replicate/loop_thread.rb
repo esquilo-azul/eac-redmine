@@ -19,15 +19,25 @@ module Trf1Sjap
         continue = true
         while (continue)
           if Rails.env.development?
-            continue = !(run() === true)
+            continue = run_step
           else
             begin
-              continue = !(run() === true)
+              continue = run_step
             rescue RuntimeError, Exception => ex
               log(:warn, ex.class.name + ': ' + ex.message)
-              sleep(SLEEP_INTERVAL)
+              sleep_long
             end
           end
+        end
+      end
+      
+      def run_step
+        begin
+          return !(run() === true)
+        rescue SocketError, ActiveRecord::ConnectionTimeoutError => ex
+          log(:warn, ex.class.name + ': ' + ex.message)
+          sleep_long
+          return true
         end
       end
 
@@ -43,6 +53,18 @@ module Trf1Sjap
 
       def to_s
         return self.class.name
+      end
+      
+      def sleep_short
+        random_sleep(1)
+      end
+      
+      def sleep_long
+        random_sleep(5)      
+      end
+      
+      def random_sleep(seconds)
+        sleep(seconds + rand(seconds + 1))        
       end
 
     end

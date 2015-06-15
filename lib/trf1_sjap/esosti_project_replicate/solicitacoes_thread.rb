@@ -19,7 +19,7 @@ module Trf1Sjap
             @solicitacoes_threads[solicitacao.id] = SolicitacaoThread.new(@esosti_project_replicate, solicitacao)
           end
         end
-        sleep(SLEEP_INTERVAL)
+        sleep_long
       end
 
       def to_s

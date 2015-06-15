@@ -18,7 +18,7 @@ module Trf1Sjap
             log(:info, "Importado #{update_text}: #{result.inspect}")
           end
         end
-        sleep(SLEEP_INTERVAL)
+        sleep_long
       end
             
       def to_s

@@ -5,7 +5,6 @@ require 'unicode_utils/titlecase'
 
 module Trf1Sjap
   class EsostiProjectReplicate < Thread
-    SLEEP_INTERVAL = 5
     attr_reader :session, :trf1_sjap_project
     def initialize trf1_sjap_project, continue_callback
       @trf1_sjap_project = trf1_sjap_project
@@ -48,7 +47,7 @@ module Trf1Sjap
         @caixa_secao_atendimento_thread = check_thread(@caixa_secao_atendimento_thread, CaixaAtendimentoSecaoThread)
         @solicitacoes_thread = check_thread(@solicitacoes_thread, SolicitacoesThread)
         @redmine_import_thread = check_thread(@redmine_import_thread, RedmineImportThread)
-        sleep(SLEEP_INTERVAL)
+        sleep(5)
       end
     end   
 

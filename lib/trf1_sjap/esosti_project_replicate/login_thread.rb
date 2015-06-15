@@ -13,7 +13,7 @@ module Trf1Sjap
           Thread.stop
         else
           log :warn, "Login falhou: " + loginResult.to_s
-          sleep(1)
+          sleep_short
         end
       end
 
