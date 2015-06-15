@@ -10,12 +10,12 @@ module Trf1Sjap
       end
 
       def run
-        log 'Buscando solicitações e-Sosti abertas'
+        log :debug, 'Buscando solicitações e-Sosti abertas'
         solicitacoes_abertas = EsostiSolicitacao.where(:closed => false, :trf1_sjap_project_id => @esosti_project_replicate.trf1_sjap_project.id)
-        log 'Solicitações abertas: ' + solicitacoes_abertas.count.to_s
+        log :debug, 'Solicitações abertas: ' + solicitacoes_abertas.count.to_s
         for solicitacao in solicitacoes_abertas
           if ! @solicitacoes_threads.has_key?(solicitacao.id)
-            log "Solicitação ID=#{solicitacao.id} não possui thread. Criando"
+            log :debug, "Solicitação ID=#{solicitacao.id} não possui thread. Criando"
             @solicitacoes_threads[solicitacao.id] = SolicitacaoThread.new(@esosti_project_replicate, solicitacao)
           end
         end

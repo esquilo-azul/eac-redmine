@@ -10,12 +10,12 @@ module Trf1Sjap
       def run
         run_database_operation do
           updates = updates_abertos
-          log('Updates encontrados: ' + updates.count.to_s)
+          log(:debug, 'Updates encontrados: ' + updates.count.to_s)
           for update in updates_abertos
             update_text = "#{update.esosti_solicitacao.esosti_id}/#{update.index}"
-            log("Importando #{update_text}")
+            log(:debug, "Importando #{update_text}")
             result = EsostiRedmineImport.update_to_redmine(update)
-            log("Importado #{update_text}: #{result.inspect}")
+            log(:info, "Importado #{update_text}: #{result.inspect}")
           end
         end
         sleep(SLEEP_INTERVAL)

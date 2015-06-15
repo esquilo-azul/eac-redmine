@@ -24,7 +24,7 @@ module Trf1Sjap
             begin
               continue = !(run() === true)
             rescue RuntimeError, Exception => ex
-              log(ex.class.name + ': ' + ex.message)
+              log(:warn, ex.class.name + ': ' + ex.message)
               sleep(SLEEP_INTERVAL)
             end
           end
@@ -32,22 +32,13 @@ module Trf1Sjap
       end
 
       def run_database_operation
-        run = true
-        while(run)
-          begin
-            ActiveRecord::Base.connection_pool.with_connection do
-              yield
-            end
-            run = false
-          rescue ActiveRecord::ConnectionTimeoutError => ex
-            log(ex.class.name + ': ' + ex.message)
-            sleep(1)
-          end
+        ActiveRecord::Base.connection_pool.with_connection do
+          yield
         end
       end
 
-      def log(message)
-        @esosti_project_replicate.logger.info(Time.now.strftime('%d/%m/%y %H:%I:%S') + "|" + @esosti_project_replicate.trf1_sjap_project.project.identifier + "|" + to_s + ": " + message)
+      def log(method, message)
+        @esosti_project_replicate.logger.send(method, Time.now.strftime('%d/%m/%y %H:%I:%S') + "|" + @esosti_project_replicate.trf1_sjap_project.project.identifier + "|" + to_s + ": " + message)
       end
 
       def to_s

@@ -5,14 +5,14 @@ module Trf1Sjap
     # Mantém uma sessão logada no e-Admin.
     class LoginThread < LoopThread
       def run
-        log "Login e-Admin " + @esosti_project_replicate.trf1_sjap_project.eadmin_matricula + "/" + @esosti_project_replicate.trf1_sjap_project.eadmin_banco
+        log :info, "Login e-Admin " + @esosti_project_replicate.trf1_sjap_project.eadmin_matricula + "/" + @esosti_project_replicate.trf1_sjap_project.eadmin_banco
         loginResult = @esosti_project_replicate.session.login
         if loginResult === true
-          log "Login ok"
+          log :info, "Login ok"
           @esosti_project_replicate.logged_signal
           Thread.stop
         else
-          log "Login falhou: " + loginResult.to_s
+          log :warn, "Login falhou: " + loginResult.to_s
           sleep(1)
         end
       end
