@@ -20,3 +20,7 @@ else
 	echo "Bundle incompleto"
 	(cd "$REDMINE_ROOT"; bundle install --without development test)
 fi
+
+if [ ! -f "$REDMINE_ROOT/config/initializers/secret_token.rb" ]; then
+	(cd "$REDMINE_ROOT"; bundle exec rake generate_secret_token)
+fi
