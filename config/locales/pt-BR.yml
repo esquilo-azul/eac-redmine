@@ -1107,3 +1107,9 @@ pt-BR:
   field_closed_on: Fechado
   setting_default_projects_tracker_ids: Tipos padrões para novos projeto
   label_total_time: Total
+    
+  # TRF1-SJAP
+  label_trf1_sjap: TRF1 - SJAP
+  field_eadmin_matricula: Matrícula
+  field_eadmin_senha: Senha
+  field_eadmin_banco: Banco 
