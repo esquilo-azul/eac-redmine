@@ -6,7 +6,4 @@
 	<p>
 		<%= f.select :issue_status_id, IssueStatus.all.collect {|p| [ p.name, p.id ] }, {include_blank: '-- Nenhuma --'}%>
 	</p>
-	<p>
-		<%= f.check_box :atribuir_autor %>
-	</p>
 </div>

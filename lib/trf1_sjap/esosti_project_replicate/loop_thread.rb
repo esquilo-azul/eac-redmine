@@ -34,7 +34,7 @@ module Trf1Sjap
       def run_step
         begin
           return !(run() === true)
-        rescue SocketError, HTTPClient::BadResponseError, ActiveRecord::ConnectionTimeoutError => ex
+        rescue SocketError, HTTPClient::BadResponseError, HTTPClient::KeepAliveDisconnected, ActiveRecord::ConnectionTimeoutError => ex
           log(:warn, ex.class.name + ': ' + ex.message)
           sleep_long
           return true
@@ -48,7 +48,7 @@ module Trf1Sjap
       end
 
       def log(method, message)
-        @esosti_project_replicate.logger.send(method, Time.now.strftime('%d/%m/%y %H:%I:%S') + "|" + @esosti_project_replicate.trf1_sjap_project.project.identifier + "|" + to_s + ": " + message)
+        @esosti_project_replicate.logger.send(method, Time.now.strftime('%d/%m/%y %H:%M:%S') + "|" + @esosti_project_replicate.trf1_sjap_project.project.identifier + "|" + to_s + ": " + message)
       end
 
       def to_s

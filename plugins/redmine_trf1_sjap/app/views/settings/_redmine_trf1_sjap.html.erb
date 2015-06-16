@@ -8,3 +8,11 @@ Tracker de exportação de solicitações e-Sosti para issues Redmine.
 	<%= options_for_select(Tracker.all.collect {|p| [ p.name, p.id ] }, settings['tracker_id'] ) %>
 </select>
 </div>
+
+<div>
+Usuário administrador
+<br/>
+<select name="settings[admin_user_id]">
+	<%= options_for_select(User.find(:all, order:'firstname,lastname').collect {|u| [ u.to_s, u.id ] }, settings['admin_user_id'] ) %>
+</select>
+</div>
