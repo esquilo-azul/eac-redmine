@@ -24,3 +24,5 @@ fi
 if [ ! -f "$REDMINE_ROOT/config/initializers/secret_token.rb" ]; then
 	(cd "$REDMINE_ROOT"; bundle exec rake generate_secret_token)
 fi
+
+rake redmine:plugins:process_version_change
