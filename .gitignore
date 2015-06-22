@@ -39,3 +39,6 @@
 /Gemfile.lock
 /Gemfile.local
 /config/secrets.yml
+/log/esosti_solicitacao_detalhes/
+/log/esosti_caixa_atendimento_secao/
+/log/esosti_sync.rb.pid

@@ -113,3 +113,5 @@ end
 gem "httpclient"
 gem 'nokogiri'
 gem 'highline'
+gem "daemons-rails"
+gem 'unicode_utils'

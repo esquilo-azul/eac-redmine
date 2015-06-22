@@ -1,6 +1,7 @@
 # encoding: UTF-8
 
 require 'nokogiri'
+require 'fileutils'
 
 module Trf1Sjap
   class EadminHttpSession
@@ -19,14 +20,18 @@ module Trf1Sjap
         'Conectar' => 'Conectar',
         :follow_redirect => true
       }
-      html = @httpClient.post_content(uri, body)
-      if loggedUser?(html) != ''
+      begin
+        html = @httpClient.post_content(uri, body)
+      rescue SocketError, HTTPClient::BadResponseError, HTTPClient::TimeoutError => ex
+        return ex.class.name + ': ' + ex.message
+      end
+      if loggedUser?(html)
         return true
       end
       doc = Nokogiri::HTML(html)
       errorNode = doc.at_xpath("id('conteudoLogin')/div[1]/text()")
       if errorNode != nil
-      	return errorNode.text
+      	return errorNode.text.strip
       end
       return 'Erro desconhecido'
     end
@@ -36,53 +41,44 @@ module Trf1Sjap
       page.xpath("id('nome')/text()[3]").each do |node|
         return node.content.strip
       end
-      return ''
+      return false
     end
 
     def caixaAtendimentoSecao
       pageContent = @httpClient.get_content('http://sistemas.trf1.jus.br/app/e-Admin/sosti/atendimentosecoes/atendimentousuario')
+      log_caixa_atendimento_secao_html(pageContent)
       if !loggedUser?(pageContent) 
-        raise "Usuário não está logado"
+        raise UserNotLogged.new
       end
       return CaixaAtendimentoSecao.new(pageContent)
     end
-
-  end
-
-  class CaixaAtendimentoSecao
-    def initialize(pageContent)
-      @doc = Nokogiri::HTML(pageContent)
+    
+    def solicitacao_detalhes(solicitacao_id)
+      uri = 'http://sistemas.trf1.jus.br/app/e-Admin/sosti/detalhesolicitacao/detalhesol'
+      body = '{"SSOL_ID_DOCUMENTO":"' + solicitacao_id.to_s + '"}'
+      html = @httpClient.post_content(uri, body)
+      log_solicitacao_detalhes_html(solicitacao_id, html)
+      if !loggedUser?(html)
+        raise UserNotLogged.new
+      end
+      return SolicitacaoDetalhes.new(html)
     end
 
-    def solicitacoes
-      data = []
-      for node in @doc.xpath("id('container_pagination')/table/tbody/tr")
-        data.append({
-          :numero => node.at_xpath('td[2]/a/text()').text.strip,
-          :solicitante => node.at_xpath('td[4]/text()').text.strip,
-          :servico_atual => node.at_xpath('td[5]/text()').text.strip,
-          :atendente => __parseAtendente(node.at_xpath('td[6]/text()').text)
-        })
-      end
-      return data
+    class UserNotLogged < Exception
     end
-
-    def __parseAtendente(text)
-      text = text.strip
-      if text == '-'
-        return ''
-      else
-      return text
-      end
+    
+    private
+    
+    def log_caixa_atendimento_secao_html(html)
+      log_file = "#{Rails.root}/log/esosti_caixa_atendimento_secao/#{@usuario}-#{@banco}.html"
+      FileUtils::mkdir_p(File.dirname(log_file))
+      File.write(log_file, html)
     end
-
-    def novaSolicitacao?
-      for s in solicitacoes
-        if s[:atendente] == ''
-        return true
-        end
-      end
-      return false
+    
+    def log_solicitacao_detalhes_html(solicitacao_id, html)
+      log_file = "#{Rails.root}/log/esosti_solicitacao_detalhes/#{solicitacao_id}.html"
+      FileUtils::mkdir_p(File.dirname(log_file))
+      File.write(log_file, html)
     end
 
   end

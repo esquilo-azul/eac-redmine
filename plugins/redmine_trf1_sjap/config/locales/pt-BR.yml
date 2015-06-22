@@ -1,0 +1,6 @@
+pt-BR:
+  label_esosti_fase_plural: "Fases e-Sosti"
+  label_esosti_fase_new: "Nova fase e-Sosti"
+  field_rotulo: "Rótulo"
+  field_issue_status: "Situação da tarefa"
+  field_atribuir_autor: "Atribuir autor"

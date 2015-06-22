@@ -28,3 +28,7 @@ EsostiAlerta.__countdown = function() {
 		setTimeout(EsostiAlerta.__countdown, 1000);
 	}
 }; 
+
+EsostiAlerta.update = function(){
+	EsostiAlerta.__countdownTime = 0;	
+};
