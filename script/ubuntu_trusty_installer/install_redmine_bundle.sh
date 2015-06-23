@@ -7,19 +7,12 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 REDMINE_ROOT=$(dirname $(dirname "$DIR"))
 
 bundleInstalled() {
-	(cd "$REDMINE_ROOT"; bundle check)	
+	$REDMINE_ROOT/bin/bundle check
 	return $?
 }
 
-"$DIR/apt_get_assert_packages.sh" ruby ruby-dev libmagickwand-dev libxslt1-dev libpq-dev imagemagick
-"$DIR/ruby_assert_gems.sh" bundler
-	
-if bundleInstalled; then
-	echo "Bundle completo"
-else
-	echo "Bundle incompleto"
-	(cd "$REDMINE_ROOT"; bundle install --without development test)
-fi
+"$DIR/apt_get_assert_packages.sh" cmake #ruby ruby-dev libmagickwand-dev libxslt1-dev libpq-dev imagemagick
+"$DIR/bundle_install.sh"
 
 SECRETS_FILE="$REDMINE_ROOT/config/secrets.yml"
 
