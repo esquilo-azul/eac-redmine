@@ -9,8 +9,6 @@ for PKG in $@; do
     if [ "$RESULT" != 'install ok installed' ] ; then
         echo "Package \"$PKG\" is not installed"
         INSTALL=" $PKG $INSTALL"
-    else
-        echo "Package \"$PKG\" is already installed"
     fi
 done
 

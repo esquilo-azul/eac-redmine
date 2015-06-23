@@ -25,5 +25,5 @@ done
 
 if [ ! -z "$INSTALL" ]; then
     echo "Será necessário instalar os seguintes ruby gems: $INSTALL"
-	sudo gem install -V --conservative $INSTALL 
+	gem install -V --conservative $INSTALL 
 fi
