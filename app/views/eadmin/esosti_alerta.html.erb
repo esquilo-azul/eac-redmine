@@ -22,7 +22,7 @@
 				</tr> 
 				<tr>
 					<td align="right"></td>
-					<td align="left"><%= button_to_function "Atualizar", "EsostiAlerta.update()", class: "button-small" %></td>
+					<td align="left"><%= button_tag "Atualizar", id: 'updateButton', class: "button-small" %></td>
 				</tr>
 			</table>
 		</td>
@@ -38,4 +38,7 @@
 <script type="text/javascript">
 	EsostiAlerta.ESOSTI_ALERTA_DATA_PATH = '<%= esosti_alerta_data_path %>';
 	EsostiAlerta.start();
+	$('#updateButton').bind('click', function(){
+		EsostiAlerta.update();
+	});
 </script>

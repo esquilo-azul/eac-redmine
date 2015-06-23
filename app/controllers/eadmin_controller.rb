@@ -1,8 +1,8 @@
 class EadminController < ApplicationController
   layout 'base'
   def esosti_alerta
-    request.params[:banco] = 'JFAP'
-    request.params[:intervalo] = 15
+    params[:banco] = 'JFAP'
+    params[:intervalo] = 15
   end
 
   def esosti_alerta_data
