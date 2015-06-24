@@ -27,7 +27,7 @@ if [ $RESULT -ne 0 ]; then
 fi
 
 # Gitolite
-"$DIR/apt_get_assert_packages.sh" gitolite
+"$DIR/lib/apt/assert_installed.sh" gitolite
 "$DIR/assert_user.sh" "$GITOLITE_USER" "$GITOLITE_USER_HOME"
 TEMPDIR=$(sudo -u "$REDMINE_USER" mktemp -d)
 PUBLICKEY_TEMP="$TEMPDIR/$SSH_KEY_NAME.pub"

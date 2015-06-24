@@ -44,7 +44,7 @@ changeDatabaseOwner() {
 }
 
 echo "POSTGRESQL: Instalando pacotes Debian..."
-"$DIR/apt_get_assert_packages.sh" postgresql
+"$DIR/lib/apt/assert_installed.sh" postgresql
 echo "POSTGRESQL: pacotes debian instalados"
 
 if userExists $USER; then

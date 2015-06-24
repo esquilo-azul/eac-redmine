@@ -5,7 +5,7 @@ set -e
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-"$DIR/apt_get_assert_packages.sh" curl
+"$DIR/lib/apt/assert_installed.sh" curl
 
 RVM_SOURCE=~/.rvm/scripts/rvm
 

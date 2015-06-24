@@ -24,7 +24,7 @@ passengerPath() {
 }
 
 echo "PASSENGER: instalando pacotes Debian..."
-"$DIR/apt_get_assert_packages.sh" libcurl4-openssl-dev libssl-dev apache2-dev libapr1-dev libaprutil1-dev libxslt1-dev ruby apache2
+"$DIR/lib/apt/assert_installed.sh" libcurl4-openssl-dev libssl-dev apache2-dev libapr1-dev libaprutil1-dev libxslt1-dev ruby apache2
 echo 'PASSENGER: instalando gem "passenger"...'
 "$DIR/ruby_assert_gems.sh" passenger
 

@@ -11,7 +11,7 @@ bundleInstalled() {
 	return $?
 }
 
-"$DIR/apt_get_assert_packages.sh" cmake #ruby ruby-dev libmagickwand-dev libxslt1-dev libpq-dev imagemagick
+"$DIR/lib/apt/assert_installed.sh" cmake #ruby ruby-dev libmagickwand-dev libxslt1-dev libpq-dev imagemagick
 "$DIR/bundle_install.sh"
 
 SECRETS_FILE="$REDMINE_ROOT/config/secrets.yml"
