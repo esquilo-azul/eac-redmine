@@ -15,7 +15,7 @@
 	<tbody>
 		<% @esosti_fases.each do |fase| %>
 		<tr class="<%= cycle("odd", "even") %>">
-			<td><%= link_to h(fase.rotulo), edit_esosti_fase_path(fase) %></td>
+			<td style="text-align: left"><%= link_to h(fase.rotulo), edit_esosti_fase_path(fase) %></td>
 			<td style="text-align: center"><%= fase.issue_status %></td>
 			<td class="buttons"> <%= delete_link esosti_fase_path(fase) %> </td>
 		</tr>

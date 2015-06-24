@@ -1,72 +1,53 @@
 class EsostiFasesController < ApplicationController
-  # GET /esosti_fases
-  # GET /esosti_fases.json
-  def index
-    @esosti_fases = EsostiFase.all
+  before_action :set_esosti_fase, only: [:show, :edit, :update, :destroy]
 
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @esosti_fases }
-    end
+  # GET /esosti_fases
+  def index
+    @esosti_fases = EsostiFase.all.order('rotulo')
   end
 
   # GET /esosti_fases/new
-  # GET /esosti_fases/new.json
   def new
     @esosti_fase = EsostiFase.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @esosti_fase }
-    end
   end
 
   # GET /esosti_fases/1/edit
   def edit
-    @esosti_fase = EsostiFase.find(params[:id])
   end
 
   # POST /esosti_fases
-  # POST /esosti_fases.json
   def create
-    @esosti_fase = EsostiFase.new(params[:esosti_fase])
-
-    respond_to do |format|
-      if @esosti_fase.save
-        format.html { redirect_to esosti_fases_path, notice: 'Esosti fase was successfully created.' }
-        format.json { render json: @esosti_fase, status: :created, location: esosti_fases_path }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @esosti_fase.errors, status: :unprocessable_entity }
-      end
+    @esosti_fase = EsostiFase.new(esosti_fase_params)
+    if @esosti_fase.save
+      redirect_to esosti_fases_url, notice: 'Esosti fase was successfully created.'
+    else
+      render :new
     end
   end
 
-  # PUT /esosti_fases/1
-  # PUT /esosti_fases/1.json
+  # PATCH/PUT /esosti_fases/1
   def update
-    @esosti_fase = EsostiFase.find(params[:id])
-
-    respond_to do |format|
-      if @esosti_fase.update_attributes(params[:esosti_fase])
-        format.html { redirect_to esosti_fases_path, notice: 'Esosti fase was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: "edit" }
-        format.json { render json: @esosti_fase.errors, status: :unprocessable_entity }
-      end
+    if @esosti_fase.update(esosti_fase_params)
+      redirect_to esosti_fases_url, notice: 'Esosti fase was successfully updated.'
+    else
+      render :edit
     end
   end
 
   # DELETE /esosti_fases/1
-  # DELETE /esosti_fases/1.json
   def destroy
-    @esosti_fase = EsostiFase.find(params[:id])
     @esosti_fase.destroy
-
-    respond_to do |format|
-      format.html { redirect_to esosti_fases_url }
-      format.json { head :no_content }
-    end
+    redirect_to esosti_fases_url, notice: 'Esosti fase was successfully destroyed.'
   end
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_esosti_fase
+      @esosti_fase = EsostiFase.find(params[:id])
+    end
+
+    # Only allow a trusted parameter "white list" through.
+    def esosti_fase_params
+      params.require(:esosti_fase).permit(:rotulo, :issue_status_id)
+    end
 end
