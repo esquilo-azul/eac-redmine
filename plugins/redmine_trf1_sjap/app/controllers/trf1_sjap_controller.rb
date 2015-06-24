@@ -11,8 +11,8 @@ class Trf1SjapController < ApplicationController
 
   def settings
     @trf1_sjap_project = current_trf1_sjap_project
-    if request.post? || request.put?
-      @trf1_sjap_project.attributes=params[:trf1_sjap_project]
+    if request.patch?
+      @trf1_sjap_project.attributes=params.require(:trf1_sjap_project).permit(:eadmin_matricula, :eadmin_senha, :eadmin_banco)
       if @trf1_sjap_project.save
         flash[:notice] = l(:notice_trf1_sjap_project_saved)
         redirect_to url_for(:action => 'settings', 'project_id' => @project.id)

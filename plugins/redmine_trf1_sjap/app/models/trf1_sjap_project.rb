@@ -1,5 +1,6 @@
 # encoding: UTF-8
 class Trf1SjapProject < ActiveRecord::Base
+  attr_accessible :eadmin_matricula, :eadmin_senha, :eadmin_banco
   belongs_to :project
   validates_uniqueness_of :project_id
   validates_presence_of :project_id, :eadmin_matricula, :eadmin_senha, :eadmin_banco
