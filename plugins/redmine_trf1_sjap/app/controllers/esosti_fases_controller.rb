@@ -1,4 +1,5 @@
 class EsostiFasesController < ApplicationController
+  before_filter :require_admin
   before_action :set_esosti_fase, only: [:show, :edit, :update, :destroy]
 
   # GET /esosti_fases
