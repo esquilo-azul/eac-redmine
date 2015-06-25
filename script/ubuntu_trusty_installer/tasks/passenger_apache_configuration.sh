@@ -4,6 +4,18 @@ set -u
 set -e
 
 
+function passenger_load {
+	echo LoadModule passenger_module "$("$INSTALL_ROOT/lib/passenger/apache_library.sh")"
+}
+
+function passenger_conf {
+	echo "
+	<IfModule mod_passenger.c>
+	     PassengerRoot $("$INSTALL_ROOT/lib/passenger/apache_library.sh")
+	     PassengerDefaultRuby $("$INSTALL_ROOT/lib/ruby/path.sh")
+	</IfModule>"
+}
+
 function task_dependencies {
 	echo passenger_apache_library
 }
@@ -22,16 +34,18 @@ function task_condition {
 	if [ ! -f /etc/apache2/mods-enabled/passenger.conf ]; then
 		return 1
 	fi
+	if [ "$(passenger_load | "$INSTALL_ROOT/lib/text/diff-stdin-file.sh" /etc/apache2/mods-enabled/passenger.load )" -ne 0 ]; then
+		return 1
+	fi 
+	if [ "$(passenger_conf | "$INSTALL_ROOT/lib/text/diff-stdin-file.sh" /etc/apache2/mods-enabled/passenger.conf )" -ne 0 ]; then
+		return 1
+	fi
 }
 export -f task_condition
 
 function task_execute {
-	echo LoadModule passenger_module "$("$INSTALL_ROOT/lib/passenger/apache_library.sh")" | sudo tee /etc/apache2/mods-available/passenger.load > /dev/null
-	echo "
-	<IfModule mod_passenger.c>
-	     PassengerRoot $("$INSTALL_ROOT/lib/passenger/apache_library.sh")
-	     PassengerDefaultRuby $("$INSTALL_ROOT/lib/ruby/path")
-	</IfModule>" | sudo tee /etc/apache2/mods-available/passenger.conf > /dev/null
+	passenger_load | sudo tee /etc/apache2/mods-available/passenger.load > /dev/null
+	passenger_conf | sudo tee /etc/apache2/mods-available/passenger.conf > /dev/null
 	sudo a2enmod passenger
 	sudo service apache2 restart
 }

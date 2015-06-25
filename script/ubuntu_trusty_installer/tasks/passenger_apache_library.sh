@@ -9,7 +9,7 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-	if [ -f $("$INSTALL_ROOT/lib/passenger/apache_library.sh") ]; then
+	if [ -f "$("$INSTALL_ROOT/lib/passenger/apache_library.sh")" ]; then
 		return 0
 	else
 		return 1
