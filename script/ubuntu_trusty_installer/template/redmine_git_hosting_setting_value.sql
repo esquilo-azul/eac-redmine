@@ -35,4 +35,3 @@ all_projects_use_git: 'false'
 delete_git_repositories: 'false'
 hierarchical_organisation: 'true'
 unique_repo_identifier: 'true'
-
