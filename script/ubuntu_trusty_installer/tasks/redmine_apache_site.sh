@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -u
+set -e
+
+function task_dependencies {
+	echo passenger_apache_configuration
+}
+export -f task_dependencies
+
+function task_condition {
+	if [ ! -f /etc/apache2/conf-available/redmine.conf ]; then
+		return 1
+	fi
+	if [ ! -f /etc/apache2/conf-enabled/redmine.conf ]; then
+		return 1
+	fi
+}
+export -f task_condition
+
+function task_execute {
+	echo 'RailsBaseUri "/redmine"' | sudo tee /etc/apache2/conf-available/redmine.conf > /dev/null
+	sudo a2enconf redmine
+	sudo service apache2 reload
+}
+export -f task_execute
+

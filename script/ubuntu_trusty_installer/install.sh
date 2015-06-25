@@ -23,9 +23,9 @@ printHelp() {
 	echo ""
 }
 
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-REDMINE_ROOT=$(dirname $(dirname "$DIR"))
-SAMPLE_SETTINGS="$DIR/default-settings.sh"
+export INSTALL_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export REDMINE_ROOT=$(dirname $(dirname "$INSTALL_ROOT"))
+SAMPLE_SETTINGS="$INSTALL_ROOT/default-settings.sh"
 DEFAULT_SETTINGS="$REDMINE_ROOT/config/install-settings.sh"
 
 if [ $# -ge 1 ]; then
@@ -59,12 +59,4 @@ do
 	source "$S"
 done
 
-export postgresql_database
-export gitolite_user
-export gitolite_user_home
-$DIR/install_postgresql.sh "$postgresql_database" "$postgresql_user" "$postgresql_password"
-$DIR/install_ruby.sh
-$DIR/install_redmine_bundle.sh
-$DIR/install_redmine_database.sh
-$DIR/install_gitolite.sh "$($DIR/rails_user.sh)" "$gitolite_user" "$gitolite_user_home" 'redmine_git_hosting_id'
-$DIR/install_apache.sh
+"$INSTALL_ROOT/lib/tasks/run_target.sh" all

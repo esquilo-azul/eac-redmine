@@ -1,0 +1,2 @@
+Defaults:redmine !requiretty
+${rails_user} ALL=(${gitolite_user}) NOPASSWD:ALL
