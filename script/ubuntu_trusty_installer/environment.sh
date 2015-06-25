@@ -56,4 +56,7 @@ do
 	source "$S"
 done
 
-export PATH="$(dirname "$("$INSTALL_ROOT/lib/ruby/path.sh")"):$PATH"
+set +e
+set +u
+source ~/.rvm/scripts/rvm
+rvm use "$rvm_ruby"
