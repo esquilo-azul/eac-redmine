@@ -14,7 +14,8 @@ function task_condition {
 export -f task_condition
 
 function task_execute {
-set +e
+	set +e
+	"$INSTALL_ROOT/lib/apt/assert_installed.sh" libmagickwand-dev libxslt1-dev libpq-dev imagemagick
 	"$REDMINE_ROOT/bin/bundle" install || "$REDMINE_ROOT/bin/bundle" update
 	set -e
 }
