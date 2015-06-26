@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo ~/.rvm/rubies/$rvm_ruby/bin/ruby
+echo ~/.rvm/wrappers/$rvm_ruby/ruby
