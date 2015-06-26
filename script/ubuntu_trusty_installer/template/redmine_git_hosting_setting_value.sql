@@ -1,7 +1,7 @@
 --- !ruby/hash:ActionController::Parameters
 gitolite_user: ${gitolite_user}
-gitolite_ssh_private_key: "${redmine_git_hosting_ssh_key_name}"
-gitolite_ssh_public_key: "${redmine_git_hosting_ssh_key_name}.pub"
+gitolite_ssh_private_key: "${redmine_git_hosting_ssh_key}"
+gitolite_ssh_public_key: "${redmine_git_hosting_ssh_key}.pub"
 gitolite_server_port: '22'
 gitolite_global_storage_dir: repositories/
 gitolite_recycle_bin_dir: recycle_bin/
