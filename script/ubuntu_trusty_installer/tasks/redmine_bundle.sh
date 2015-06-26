@@ -15,7 +15,10 @@ export -f task_condition
 
 function task_execute {
 	set +e
-	"$INSTALL_ROOT/lib/apt/assert_installed.sh" libmagickwand-dev libxslt1-dev libpq-dev imagemagick
+	# Dependências para o Redmine
+	"$INSTALL_ROOT/lib/apt/assert_installed.sh" libmagickwand-dev libxslt1-dev libpq-dev imagemagick 
+	# Dependências para o RedmineGitHosting
+	"$INSTALL_ROOT/lib/apt/assert_installed.sh" build-essential libssh2-1 libssh2-1-dev cmake libgpg-error-dev
 	"$REDMINE_ROOT/bin/bundle" install || "$REDMINE_ROOT/bin/bundle" update
 	set -e
 }
