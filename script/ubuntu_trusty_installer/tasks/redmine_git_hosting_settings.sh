@@ -24,5 +24,6 @@ function task_execute {
 	
 	local setting_value=$("$INSTALL_ROOT/lib/text/template.sh" "$INSTALL_ROOT/template/redmine_git_hosting_setting_value.sql" | "$INSTALL_ROOT/lib/text/escape_single_quotes.sh")
 	"$INSTALL_ROOT/lib/redmine/set_setting_value.sh" 'plugin_redmine_git_hosting' "$setting_value"
+	"$REDMINE_ROOT/bin/rake" redmine_git_hosting:install_hook_parameters redmine_git_hosting:install_hook_files redmine_git_hosting:fetch_changesets
 }
 export -f task_execute
