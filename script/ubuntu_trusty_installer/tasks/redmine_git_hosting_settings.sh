@@ -26,6 +26,10 @@ function task_execute {
 	export redmine_git_hosting_ssh_key=$("$INSTALL_ROOT/lib/redmine_git_hosting/ssh_key.sh")
 	local setting_value=$("$INSTALL_ROOT/lib/text/template.sh" "$INSTALL_ROOT/template/redmine_git_hosting_setting_value.sql" | "$INSTALL_ROOT/lib/text/escape_single_quotes.sh")
 	"$INSTALL_ROOT/lib/redmine/set_setting_value.sh" 'plugin_redmine_git_hosting' "$setting_value"
-	"$REDMINE_ROOT/bin/rake" redmine_git_hosting:install_hook_parameters redmine_git_hosting:install_hook_files redmine_git_hosting:fetch_changesets
 }
 export -f task_execute
+
+function task_triggers {
+	echo redmine_git_hosting_rescue
+}
+export f task_triggers
