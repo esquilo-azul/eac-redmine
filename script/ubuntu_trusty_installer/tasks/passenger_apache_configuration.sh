@@ -11,7 +11,7 @@ function passenger_load {
 function passenger_conf {
 	echo "
 	<IfModule mod_passenger.c>
-	     PassengerRoot $("$INSTALL_ROOT/lib/passenger/apache_library.sh")
+	     PassengerRoot $("$INSTALL_ROOT/lib/passenger/root.sh")
 	     PassengerDefaultRuby $("$INSTALL_ROOT/lib/ruby/path.sh")
 	</IfModule>"
 }
