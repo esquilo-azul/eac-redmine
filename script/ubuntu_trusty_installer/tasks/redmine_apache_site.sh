@@ -21,7 +21,11 @@ export -f task_condition
 function task_execute {
 	"$INSTALL_ROOT/lib/text/template.sh" "$INSTALL_ROOT/template/redmine_apache_site.conf" | sudo tee /etc/apache2/conf-available/redmine.conf > /dev/null
 	sudo a2enconf redmine
-	sudo service apache2 reload
 }
 export -f task_execute
+
+function task_triggers {
+	echo apache_restart
+}
+export f task_triggers
 

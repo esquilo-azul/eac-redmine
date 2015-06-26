@@ -47,6 +47,10 @@ function task_execute {
 	passenger_load | sudo tee /etc/apache2/mods-available/passenger.load > /dev/null
 	passenger_conf | sudo tee /etc/apache2/mods-available/passenger.conf > /dev/null
 	sudo a2enmod passenger
-	sudo service apache2 restart
 }
 export -f task_execute
+
+function task_triggers {
+	echo apache_restart
+}
+export f task_triggers

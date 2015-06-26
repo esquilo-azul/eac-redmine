@@ -24,4 +24,8 @@ function task_execute {
 }
 export -f task_execute
 
+function task_triggers {
+	echo apache_restart
+}
+export f task_triggers
 

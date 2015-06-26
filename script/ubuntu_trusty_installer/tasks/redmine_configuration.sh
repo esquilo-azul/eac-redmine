@@ -12,3 +12,8 @@ function task_execute {
 	"$INSTALL_ROOT/lib/text/template.sh" "$INSTALL_ROOT/template/redmine_configuration.yml" > "$REDMINE_ROOT/config/configuration.yml"
 }
 export -f task_execute
+
+function task_triggers {
+	echo apache_restart
+}
+export f task_triggers

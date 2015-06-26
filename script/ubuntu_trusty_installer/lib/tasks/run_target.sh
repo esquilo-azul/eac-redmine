@@ -4,20 +4,7 @@ set -e
 set -u
 
 export CHECKED_TASKS=''
-
-function _task_checked {
-	set +e	
-	echo "$CHECKED_TASKS" | grep "$1|" > /dev/null
-	local CHECKED=$?
-	set -e
-	echo $CHECKED
-}
-export -f _task_checked
-
-function _mark_task_checked {
-	CHECKED_TASKS="$CHECKED_TASKS""$1"'|'	
-}
-export -f _mark_task_checked
+export TRIGGERS=''
 
 function _function_exists {
 	set +e
@@ -48,21 +35,6 @@ function _call_task_function {
 	fi
 }
 export _call_task_function
-
-function _check_task_name {
-	set -e
-	set -u
-	local task=$1
-	set +e
-	echo $task | grep '^[a-z]\+\(_[a-z]\+\)\{0,\}$' > /dev/null
-	result=$?
-	set -e
-	if [ $result -ne 0 ]; then
-		echo "Invalid task name: \"$task\""
-		exit 1	
-	fi
-}
-export _check_task_name
 
 function _task_message {
 	echo -e "\e[96m$1\e[0m$2" 	
@@ -101,9 +73,12 @@ function check_task {
 	set -u
 	set -e
 	local task=$1
-	_check_task_name "$task"
-	if [ $(_task_checked "$task") -ne 0 ]; then
-		_mark_task_checked "$task"
+	if [ $("$INSTALL_ROOT/lib/text/valid_check_name.sh" "$task") -ne 0 ]; then
+		echo "Invalid task name: \"$task\""
+		exit 1
+	fi
+	if [ $("$INSTALL_ROOT/lib/text/checked.sh" "$CHECKED_TASKS" "$1") -ne 0 ]; then
+		CHECKED_TASKS=$("$INSTALL_ROOT/lib/text/check.sh" "$CHECKED_TASKS" "$1")
 		for dep in $(_call_task_function $task task_dependencies); do
 			check_task $dep
 		done
@@ -121,11 +96,28 @@ function check_task {
 				exit 1
 			else
 				_task_message_condition $task 0 0
+				for trigger in $(_call_task_function $task task_triggers); do
+					TRIGGERS=$("$INSTALL_ROOT/lib/text/check.sh" "$TRIGGERS" "$trigger")	
+				done
 			fi
 		else		
 			_task_message_condition $task 1 0
 		fi
 	fi
 }
+
+function run_triggers {
+	echo '-------------------------------------------'
+	echo "Triggers: \"$TRIGGERS\""
+	if [ -n "$TRIGGERS" ]; then
+		IFS='|' read -ra triggers <<< "$TRIGGERS"
+		for trigger in "${triggers[@]}"; do
+			echo "Executando trigger \"$trigger\"..."
+			'trigger_'$trigger
+		done
+	fi
+}
+
 export -f check_task
 check_task $1
+run_triggers
