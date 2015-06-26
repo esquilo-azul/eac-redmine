@@ -4,10 +4,7 @@ set -u
 set -e
 
 function task_condition {
-	"$REDMINE_ROOT/bin/bundle" exec rake db:migrate:status 2> /dev/null | grep '^\s*down\s' > /dev/null 2> /dev/null
-	if [ $? -eq 0 ]; then
-		return 1
-	fi	
+	return $("$INSTALL_ROOT/lib/redmine/migration_status.sh")
 }
 export -f task_condition
 

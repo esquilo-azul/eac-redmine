@@ -15,6 +15,6 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_execute {
-	"$REDMINE_ROOT/bin/bundle" exec rake db:setup	
+	"$REDMINE_ROOT/bin/bundle" exec rake db:create
 }
 export -f task_execute
