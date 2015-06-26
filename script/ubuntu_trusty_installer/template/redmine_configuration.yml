@@ -1,0 +1,13 @@
+default:
+  email_delivery:
+    delivery_method: :async_smtp
+    async_smtp_settings:
+      tls: ${stmp_tls}
+      enable_starttls_auto: true
+      openssl_verify_mode: 'none'
+      address: '${stmp_server}'
+      port: '${stmp_port}'
+      domain: '${stmp_server}'
+      authentication: ${stmp_authentication}
+      user_name: '${smtp_username}'
+      password: '${smtp_password}'

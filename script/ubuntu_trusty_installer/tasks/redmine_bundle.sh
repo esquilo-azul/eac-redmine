@@ -4,7 +4,7 @@ set -u
 set -e
 
 function task_dependencies {
-	echo bundler redmine_database_configuration
+	echo bundler redmine_database_configuration redmine_configuration
 }
 export -f task_dependencies
 
