@@ -56,7 +56,4 @@ do
 	source "$S"
 done
 
-set +e
-set +u
-source ~/.rvm/scripts/rvm
-rvm use "$rvm_ruby"
+source "$INSTALL_ROOT/lib/rvm/source.sh"

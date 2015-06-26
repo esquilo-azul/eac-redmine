@@ -3,6 +3,8 @@
 set -u
 set -e
 
+source "$INSTALL_ROOT/lib/rvm/source.sh"
+
 function task_condition {
 	if [ ! -f ~/.rvm/bin/rvm ]; then
 		return 1

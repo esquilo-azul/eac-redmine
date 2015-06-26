@@ -3,6 +3,8 @@
 set -u
 set -e
 
+source "$INSTALL_ROOT/lib/rvm/source.sh"
+
 function task_dependencies {
 	echo rvm
 }
@@ -16,6 +18,8 @@ function task_condition {
 export -f task_condition
 
 function task_execute {
+	set +u
+	set +e
 	rvm install $rvm_ruby
 }
 export -f task_execute
