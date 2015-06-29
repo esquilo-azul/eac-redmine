@@ -9,7 +9,7 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-	sudo -u "$("$INSTALL_ROOT/lib/rails/user.sh")" ssh -oBatchMode=yes -i "$($INSTALL_ROOT/lib/redmine_git_hosting/ssh_key.sh)" -l "$gitolite_user" localhost info
+	sudo -u "$("$INSTALL_ROOT/lib/rails/user.sh")" ssh -oBatchMode=yes -oStrictHostKeyChecking=no -i "$($INSTALL_ROOT/lib/redmine_git_hosting/ssh_key.sh)" -l "$gitolite_user" localhost info
 }
 export -f task_condition
 
