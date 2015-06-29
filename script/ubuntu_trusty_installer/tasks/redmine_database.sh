@@ -15,6 +15,6 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_execute {
-	"$REDMINE_ROOT/bin/bundle" exec rake db:create
+	sudo -u postgres createdb -O "$postgresql_user" "$postgresql_database"
 }
 export -f task_execute
