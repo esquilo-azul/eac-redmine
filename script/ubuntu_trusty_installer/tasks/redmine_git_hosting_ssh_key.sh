@@ -10,7 +10,6 @@ function task_condition {
 	set +e
 	sudo -u "$redmine_user" stat "$ssh_key" > /dev/null
 	local result=$?
-	set -e
 	return $result
 }
 export -f task_condition
