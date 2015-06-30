@@ -7,10 +7,7 @@ redmine_user=$("$INSTALL_ROOT/lib/rails/user.sh")
 ssh_key=$("$INSTALL_ROOT/lib/redmine_git_hosting/ssh_key.sh")
 
 function task_condition {
-	set +e
-	sudo -u "$redmine_user" stat "$ssh_key" > /dev/null
-	local result=$?
-	return $result
+	return $("$INSTALL_ROOT/lib/linux/sudo_file_exists.sh" "$redmine_user" "$ssh_key") 	
 }
 export -f task_condition
 
