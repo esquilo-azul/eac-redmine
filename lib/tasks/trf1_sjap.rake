@@ -66,60 +66,6 @@ namespace :trf1_sjap do
       end
     end
   end
-  
-  task :fix_redmine_git_hosting_migrations => :environment do
-    migrations = redmine_git_hosting_migrations 
-    puts "Total de migrações do plugin redmine_git_hosting: #{migrations.count}"
-    fixed = 0
-    for migration in  migrations
-      if check_migration(migration)
-        fixed += 1
-      end
-    end
-    puts "Total de migrações consertadas: #{fixed}"
-  end
-  
-  class SchemaMigration < ActiveRecord::Base
-  
-    TIMESTAMP_PATTERN = /^\d+/ 
-    
-    def timestamp
-      m = TIMESTAMP_PATTERN.match(version)
-      m[0] if m
-    end
-    
-    def fixed_version
-      version.gsub(TIMESTAMP_PATTERN, fixed_timestamp)
-    end
-       
-    def fixed_timestamp
-      timestamp.ljust(14, '0')      
-    end
-    
-  end
-  
-  def redmine_git_hosting_migrations
-    SchemaMigration.where("version like '%redmine_git_hosting%'")
-  end
-  
-  def check_migration(migration)    
-    if migration.timestamp != migration.fixed_timestamp
-      puts "Timestamp inválido. Corrigindo"
-      fix_migration(migration.version, migration.fixed_version)
-      true
-    else
-      false
-    end    
-  end
-  
-  def fix_migration(from, to)
-    puts "Updating \"#{from}\" to \"#{to}\""
-    ActiveRecord::Base.transaction do
-      ActiveRecord::SchemaMigration.delete_all(['version = ?', from])
-      ActiveRecord::SchemaMigration.new({:version => to}).save
-    end
-  end
-  
 
 end
 
