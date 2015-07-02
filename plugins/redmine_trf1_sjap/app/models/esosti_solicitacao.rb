@@ -6,4 +6,16 @@ class EsostiSolicitacao < ActiveRecord::Base
   validates :closed, exclusion: { in: [nil] }
   belongs_to :trf1_sjap_project  
   belongs_to :issue
+  
+  def closed_by_update?
+    for update in updates
+      return true if update.fase.is_closed
+    end
+    return false
+  end
+  
+  def updates 
+    EsostiUpdate.where(:esosti_solicitacao_id => id).order('index asc')
+  end
+  
 end

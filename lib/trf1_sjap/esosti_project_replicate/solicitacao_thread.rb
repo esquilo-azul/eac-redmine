@@ -11,14 +11,11 @@ module Trf1Sjap
 
       def run
         begin
-          log(:debug, "Buscando fonte...")
-          updates = @esosti_project_replicate.session.solicitacao_detalhes(@esosti_solicitacao.esosti_id).updates()
-          log(:debug, "Updates encontrados: " + updates.count.to_s)
-          run_database_operation do
-            novos = Trf1Sjap::EsostiRedmineImport.import_solicitacao_detalhes(@esosti_solicitacao, updates)
-            log((novos >0 ? :info : :debug), "Novos updates: " + novos.to_s)
+          if has_closed_update?
+            run_close
+          else
+            run_sync
           end
-          sleep_long
         rescue Trf1Sjap::EadminHttpSession::UserNotLogged => ex
           log(:debug, 'Não logado. Sinalizando...')
           @esosti_project_replicate.not_logged_signal()
@@ -29,6 +26,34 @@ module Trf1Sjap
       def to_s
         return "SOLICITACAO(#{@esosti_solicitacao.esosti_id})"
       end
+
+      private
+
+      def has_closed_update?
+        run_database_operation do
+          @esosti_solicitacao.closed_by_update?
+        end
+      end
+
+      def run_close
+        run_database_operation do
+          @esosti_solicitacao.closed = true
+          Trf1Sjap::ModelUtils.save_or_raise(@esosti_solicitacao)
+          log(:info, "Monitoramento de solicitação terminado")
+        end
+      end
+
+      def run_sync
+        log(:debug, "Buscando fonte...")
+        updates = @esosti_project_replicate.session.solicitacao_detalhes(@esosti_solicitacao.esosti_id).updates()
+        log(:debug, "Updates encontrados: " + updates.count.to_s)
+        run_database_operation do
+          novos = Trf1Sjap::EsostiRedmineImport.import_solicitacao_detalhes(@esosti_solicitacao, updates)
+          log((novos >0 ? :info : :debug), "Novos updates: " + novos.to_s)
+        end
+        sleep_long
+      end
+
     end
   end
 end
