@@ -23,7 +23,7 @@ class EsostiUsuario < ActiveRecord::Base
   def to_redmine_user
     user = User.find_by_login(matricula.downcase)
     if !user
-      user = User.new(EsostiUsuario.parse_full_name())
+      user = User.new(EsostiUsuario.parse_full_name(nome))
       user.login = matricula.downcase
       user.mail = user.login + '@localhost.localhost'
       Trf1Sjap::ModelUtils.save_or_raise user
