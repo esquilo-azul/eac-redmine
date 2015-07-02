@@ -48,7 +48,7 @@ module Trf1Sjap
       end
 
       def log(method, message)
-        @esosti_project_replicate.logger.send(method, Time.now.strftime('%d/%m/%y %H:%M:%S') + "|" + @esosti_project_replicate.trf1_sjap_project.project.identifier + "|" + to_s + ": " + message)
+        @esosti_project_replicate.logger.send(method, @esosti_project_replicate.trf1_sjap_project.project.identifier + "|" + to_s + ": " + message)
       end
 
       def to_s
