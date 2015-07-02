@@ -9,14 +9,12 @@ module Trf1Sjap
       attr_reader :result
       def initialize(esosti_update)
         @esosti_update = esosti_update
-        fase_descricao, fase_data = SolicitacaoDetalhes.parse_fase(@esosti_update.item_valor('Fase'))
-        @result = {:issue_id => nil, :esosti_update_id => nil, :esosti_fase_id => nil}
+        @result = {:issue_id => nil, :esosti_update_id => nil}
         ActiveRecord::Base.transaction do
-          @result[:esosti_fase_id] = import_esosti_fase(fase_descricao)
-          if fase_descricao == SolicitacaoDetalhes::FASE_CADASTRO_DESCRICAO
+          if @esosti_update.fase_rotulo == SolicitacaoDetalhes::FASE_CADASTRO_DESCRICAO
             @result[:issue_id] = create_issue()
           end
-          @result[:esosti_update_id] = create_journal(fase_descricao)
+          @result[:esosti_update_id] = create_journal
         end
       end
 
@@ -55,16 +53,14 @@ module Trf1Sjap
         UpdateToRedmine.parse_solicitacao_descricao(@esosti_update.item_valor(SolicitacaoDetalhes::SOLICITACAO_DESCRICAO_KEY))
       end
 
-      def create_journal(esosti_fase_rotulo)
+      def create_journal
         raise 'Update já importado' if @esosti_update.journal_id != nil
         raise 'Issue não associado' if @esosti_update.esosti_solicitacao.issue_id == nil
         issue = Issue.find(@esosti_update.esosti_solicitacao.issue_id)
         raise "Journal não é nulo: " + issue.current_journal.inspect if issue.current_journal
         previous_journal_id = issue.last_journal_id()
         issue.init_journal(get_solicitacao_user, esosti_update_to_notes())
-        esosti_fase = EsostiFase.find_by_rotulo(esosti_fase_rotulo)
-        raise "Fase e-Sosti não encontrada com o rótulo \"#{esosti_fase_rotulo}\"" if esosti_fase == nil
-        issue.status = esosti_fase.issue_status if esosti_fase.issue_status
+        issue.status = @esosti_update.fase.issue_status if @esosti_update.fase.issue_status
         Trf1Sjap::ModelUtils.save_or_raise(issue)
         raise 'Não foi criado um novo journal: ' + issue.last_journal_id().to_s if issue.last_journal_id() == previous_journal_id
         raise 'issue.last_journal_id() == nil' if issue.last_journal_id() == nil
@@ -95,15 +91,6 @@ module Trf1Sjap
         end
         raise 'Projeto não possui trackers' if @esosti_update.esosti_solicitacao.trf1_sjap_project.project.trackers.empty?
         return @esosti_update.esosti_solicitacao.trf1_sjap_project.project.trackers[0].id
-      end
-
-      def import_esosti_fase(esosti_fase_rotulo)
-        esosti_fase = EsostiFase.find_by_rotulo(esosti_fase_rotulo)
-        if !esosti_fase
-          esosti_fase = EsostiFase.new({:rotulo => esosti_fase_rotulo})
-          ModelUtils::save_or_raise(esosti_fase)
-        esosti_fase.id
-        end
       end
 
     end

@@ -16,4 +16,17 @@ class EsostiUpdate < ActiveRecord::Base
     end
   end
 
+  def fase
+    esosti_fase = EsostiFase.find_by_rotulo(fase_rotulo)
+    if !esosti_fase
+      esosti_fase = EsostiFase.new({:rotulo => esosti_fase_rotulo})
+      ModelUtils::save_or_raise(esosti_fase)        
+    end
+    esosti_fase
+  end
+  
+  def fase_rotulo
+    Trf1Sjap::SolicitacaoDetalhes.parse_fase(item_valor('Fase'))[0]
+  end
+
 end
