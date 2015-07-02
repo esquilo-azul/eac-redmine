@@ -9,6 +9,7 @@
 		<tr>
 			<th><%= l(:field_rotulo)%></th>
 			<th><%= l(:field_issue_status)%></th>
+			<th><%= l(:field_is_closed)%></th>
 			<th></th>
 		</tr>
 	</thead>
@@ -17,6 +18,7 @@
 		<tr class="<%= cycle("odd", "even") %>">
 			<td style="text-align: left"><%= link_to h(fase.rotulo), edit_esosti_fase_path(fase) %></td>
 			<td style="text-align: center"><%= fase.issue_status %></td>
+			<td style="text-align: center"><%= checked_image fase.is_closed %></td>
 			<td class="buttons"> <%= delete_link esosti_fase_path(fase) %> </td>
 		</tr>
 		<% end %>

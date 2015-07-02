@@ -49,6 +49,6 @@ class EsostiFasesController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def esosti_fase_params
-      params.require(:esosti_fase).permit(:rotulo, :issue_status_id)
+      params.require(:esosti_fase).permit(:rotulo, :issue_status_id, :is_closed)
     end
 end
