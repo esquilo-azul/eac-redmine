@@ -1,0 +1,19 @@
+namespace :trf1_sjap do
+  namespace :esosti do
+    
+    task :check_solicitacoes_closing => [:environment] do
+      solicitacoes = EsostiSolicitacao.where(:closed => false)
+      puts "Solicitações abertas: #{solicitacoes.count}"
+      for solicitacao in solicitacoes
+        puts "------------------------------"
+        puts "Verificando #{solicitacao.esosti_id}"
+        closed_by_update = solicitacao.closed_by_update?
+        puts "Fechado por update: #{closed_by_update}"
+        for update in solicitacao.updates
+          puts "\t#{update.fase.rotulo} => #{update.fase.is_closed}" 
+        end
+      end 
+    end
+
+  end
+end
