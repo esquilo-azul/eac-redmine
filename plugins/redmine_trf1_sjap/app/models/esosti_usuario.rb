@@ -13,6 +13,8 @@ class EsostiUsuario < ActiveRecord::Base
     usuario = find_by_matricula(fields[:matricula])
     if (!usuario)
       usuario = EsostiUsuario.new(fields)
+      usuario.matricula = fields[:matricula]
+      usuario.nome = fields[:nome]
       Trf1Sjap::ModelUtils.save_or_raise(usuario)
     end
     usuario

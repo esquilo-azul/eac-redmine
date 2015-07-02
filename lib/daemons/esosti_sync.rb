@@ -23,7 +23,7 @@ continue_callback = Proc.new do |dist, *args|
 end
 
 while $running do 
-  for trf1_sjap_project in Trf1SjapProject.find(:all)
+  for trf1_sjap_project in Trf1SjapProject.all
     if ! sync_threads.has_key? trf1_sjap_project
       Rails.logger.info "Criando thread para " + trf1_sjap_project.to_s
       sync_threads[trf1_sjap_project] = Trf1Sjap::EsostiProjectReplicate.new(trf1_sjap_project, continue_callback)    
