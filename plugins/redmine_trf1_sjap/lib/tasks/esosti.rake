@@ -15,5 +15,14 @@ namespace :trf1_sjap do
       end 
     end
 
+    task :list_open_solicitacoes => [:environment] do
+      solicitacoes = EsostiSolicitacao.where(:closed => false)      
+      for solicitacao in solicitacoes
+        puts "Verificando #{solicitacao.esosti_id} ##{solicitacao.issue_id}"
+      end
+      puts "------------------------------"
+      puts "Total: #{solicitacoes.count}" 
+    end
+
   end
 end
