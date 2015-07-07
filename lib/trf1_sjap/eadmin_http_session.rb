@@ -78,7 +78,17 @@ module Trf1Sjap
       File.write(log_file, html)
     end
 
+    def concurrency_limit
+      @@concurrency_limit ||= Trf1Sjap::ConcurrencyLimit.new(4)
+    end
+
     def request(method, resource, params = {})
+      concurrency_limit.process do
+        request_without_limit(method, resource, params)
+      end
+    end
+
+    def request_without_limit(method, resource, params = {})
       url = 'http://sistemas.trf1.jus.br/app/e-Admin' + resource
       if method == :post
         @httpClient.post_content(url, params)
