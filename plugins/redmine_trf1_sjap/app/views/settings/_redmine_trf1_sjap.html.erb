@@ -11,3 +11,8 @@
 		<%= options_for_select(User.all.order('firstname','lastname').collect {|u| [ u.to_s, u.id ] }, settings['admin_user_id'] ) %>
 	</select>
 </p>
+
+<p>
+	<label>Limite de requisições simultâneas ao e-Admin</label>
+	<%= number_field_tag 'settings[eadmin_request_limit]', settings['eadmin_request_limit'] %>	
+</p>

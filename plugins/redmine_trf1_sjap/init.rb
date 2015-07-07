@@ -9,7 +9,7 @@ Redmine::Plugin.register :redmine_trf1_sjap do
   version '0.0.1'
   url 'http://172.18.4.200/redmine/projects/redmine'
   author_url 'http://172.18.4.200/redmine/projects/seinf-ap'  
-  settings :default => {'empty' => true}, :partial => 'settings/redmine_trf1_sjap'
+  settings :default => {'eadmin_request_limit' => 4}, :partial => 'settings/redmine_trf1_sjap'
   project_module :redmine_trf1_sjap do
     permission :manage_trf1_sjap, :trf1_sjap => [:index, :settings, :eadmin_test_login] 
   end
