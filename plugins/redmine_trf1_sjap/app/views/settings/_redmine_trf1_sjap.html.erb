@@ -1,18 +1,13 @@
-<h2>Redmine TRF1-SJAP Plugin</h2>
+<p>
+	<label>Tracker de exportação de solicitações e-Sosti para issues Redmine.</label>
+	<select name="settings[tracker_id]">
+		<%= options_for_select(Tracker.all.collect {|p| [ p.name, p.id ] }, settings['tracker_id'] ) %>
+	</select>
+</p>
 
-
-<div>
-Tracker de exportação de solicitações e-Sosti para issues Redmine.
-<br/>
-<select name="settings[tracker_id]">
-	<%= options_for_select(Tracker.all.collect {|p| [ p.name, p.id ] }, settings['tracker_id'] ) %>
-</select>
-</div>
-
-<div>
-Usuário administrador
-<br/>
-<select name="settings[admin_user_id]">
-	<%= options_for_select(User.all.order('firstname','lastname').collect {|u| [ u.to_s, u.id ] }, settings['admin_user_id'] ) %>
-</select>
-</div>
+<p>
+	<label>Usuário administrador</label>
+	<select name="settings[admin_user_id]">
+		<%= options_for_select(User.all.order('firstname','lastname').collect {|u| [ u.to_s, u.id ] }, settings['admin_user_id'] ) %>
+	</select>
+</p>
