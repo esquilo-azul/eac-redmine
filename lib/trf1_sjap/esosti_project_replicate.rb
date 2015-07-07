@@ -5,7 +5,7 @@ require 'unicode_utils/titlecase'
 
 module Trf1Sjap
   class EsostiProjectReplicate < Thread
-    attr_reader :session, :trf1_sjap_project
+    attr_reader :session, :trf1_sjap_project, :login_control
     def initialize trf1_sjap_project, continue_callback
       @trf1_sjap_project = trf1_sjap_project
       @continue_callback = continue_callback
@@ -17,7 +17,7 @@ module Trf1Sjap
       @solicitacoes_thread = nil
       @login_thread = nil
       @caixa_secao_atendimento_thread = nil     
-      @signal_mutex = Mutex.new 
+      @login_control = LoginControl.new(self)
       super { run }
     end
 
@@ -32,19 +32,6 @@ module Trf1Sjap
         end
       end
       @@my_logger
-    end
-    
-    def not_logged_signal
-      @signal_mutex.synchronize {
-        @login_thread.wakeup() if @login_thread != nil
-      }
-    end
-    
-    def logged_signal
-      @signal_mutex.synchronize {
-        @caixa_secao_atendimento_thread.wakeup() if @caixa_secao_atendimento_thread != nil 
-        @solicitacoes_thread.wakeup_solicitacoes_threads() if @solicitacoes_thread != nil
-      }
     end
 
     private

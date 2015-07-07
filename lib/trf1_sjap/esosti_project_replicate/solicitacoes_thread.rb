@@ -26,11 +26,6 @@ module Trf1Sjap
         return 'SOLICITACOES'
       end
 
-      def wakeup_solicitacoes_threads
-        @solicitacoes_threads.each do |key, value|
-          value.wakeup()
-        end
-      end
     end
   end
 end
