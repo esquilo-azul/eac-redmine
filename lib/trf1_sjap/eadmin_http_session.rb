@@ -13,15 +13,14 @@ module Trf1Sjap
     end
 
     def login
-      uri = 'http://sistemas.trf1.jus.br/app/e-Admin/login'
-      body = { 'COU_COD_MATRICULA' => @usuario,
-        'COU_COD_PASSWORD' => @senha,
-        'COU_NM_BANCO' => @banco,
-        'Conectar' => 'Conectar',
-        :follow_redirect => true
-      }
       begin
-        html = @httpClient.post_content(uri, body)
+        html = request(:post, '/login', {
+          'COU_COD_MATRICULA' => @usuario,
+          'COU_COD_PASSWORD' => @senha,
+          'COU_NM_BANCO' => @banco,
+          'Conectar' => 'Conectar',
+          :follow_redirect => true
+        })
       rescue SocketError, HTTPClient::BadResponseError, HTTPClient::TimeoutError => ex
         return ex.class.name + ': ' + ex.message
       end
@@ -45,7 +44,7 @@ module Trf1Sjap
     end
 
     def caixaAtendimentoSecao
-      pageContent = @httpClient.get_content('http://sistemas.trf1.jus.br/app/e-Admin/sosti/atendimentosecoes/atendimentousuario')
+      pageContent = request(:get, '/sosti/atendimentosecoes/atendimentousuario')
       log_caixa_atendimento_secao_html(pageContent)
       if !loggedUser?(pageContent) 
         raise UserNotLogged.new
@@ -54,9 +53,7 @@ module Trf1Sjap
     end
     
     def solicitacao_detalhes(solicitacao_id)
-      uri = 'http://sistemas.trf1.jus.br/app/e-Admin/sosti/detalhesolicitacao/detalhesol'
-      body = '{"SSOL_ID_DOCUMENTO":"' + solicitacao_id.to_s + '"}'
-      html = @httpClient.post_content(uri, body)
+      html = request(:post, '/sosti/detalhesolicitacao/detalhesol',  '{"SSOL_ID_DOCUMENTO":"' + solicitacao_id.to_s + '"}')
       log_solicitacao_detalhes_html(solicitacao_id, html)
       if !loggedUser?(html)
         raise UserNotLogged.new
@@ -79,6 +76,17 @@ module Trf1Sjap
       log_file = "#{Rails.root}/log/esosti_solicitacao_detalhes/#{solicitacao_id}.html"
       FileUtils::mkdir_p(File.dirname(log_file))
       File.write(log_file, html)
+    end
+
+    def request(method, resource, params = {})
+      url = 'http://sistemas.trf1.jus.br/app/e-Admin' + resource
+      if method == :post
+        @httpClient.post_content(url, params)
+      elsif method == :get
+        @httpClient.get_content(url)
+      else
+        raise 'Unknown method: ' + method.to_s
+      end
     end
 
   end
