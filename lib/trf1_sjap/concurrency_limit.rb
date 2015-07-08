@@ -3,6 +3,7 @@ module Trf1Sjap
   class ConcurrencyLimit
     
     def initialize(limit)
+      raise "Limite não pode ser menor que 1 (limit: #{limit})" if limit < 1
       @limit = limit
       @count = 0
       @mutex = Mutex.new
