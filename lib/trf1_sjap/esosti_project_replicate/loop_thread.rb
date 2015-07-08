@@ -63,8 +63,18 @@ module Trf1Sjap
         random_sleep(5)      
       end
       
+      def sleep_eadmin
+        random_sleep(eadmin_pause)
+      end
+      
       def random_sleep(seconds)
         sleep(seconds + rand(seconds + 1))        
+      end
+      
+      def eadmin_pause
+        pause = Setting.plugin_redmine_trf1_sjap['eadmin_request_pause'].to_i
+        pause = 1 if pause < 1
+        pause
       end
 
     end

@@ -16,3 +16,8 @@
 	<label>Limite de requisições simultâneas ao e-Admin</label>
 	<%= number_field_tag 'settings[eadmin_request_limit]', settings['eadmin_request_limit'] %>	
 </p>
+
+<p>
+	<label>Pausa entre requisições de um <em>thread</em> ao e-Admin</label>
+	<%= number_field_tag 'settings[eadmin_request_pause]', settings['eadmin_request_pause'] %>	
+</p>
