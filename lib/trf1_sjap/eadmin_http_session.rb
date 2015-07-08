@@ -79,7 +79,15 @@ module Trf1Sjap
     end
 
     def concurrency_limit
-      @@concurrency_limit ||= Trf1Sjap::ConcurrencyLimit.new(Setting.plugin_redmine_trf1_sjap['eadmin_request_limit'].to_i)
+      @@concurrency_limit ||= Trf1Sjap::ConcurrencyLimit.new(limit)
+    end
+    
+    def limit
+      limit = Setting.plugin_redmine_trf1_sjap['eadmin_request_limit'].to_i
+      if limit < 1
+        limit = 1
+      end
+      limit
     end
 
     def request(method, resource, params = {})
