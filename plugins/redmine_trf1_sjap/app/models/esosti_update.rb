@@ -29,4 +29,8 @@ class EsostiUpdate < ActiveRecord::Base
     Trf1Sjap::SolicitacaoDetalhes.parse_fase(item_valor('Fase'))[0]
   end
 
+  def to_s
+    "#{esosti_solicitacao_id}/#{index}"
+  end
+
 end

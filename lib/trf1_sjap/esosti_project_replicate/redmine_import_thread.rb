@@ -19,7 +19,7 @@ module Trf1Sjap
           end          
         end
         run_database_operation do
-          updates = updates_abertos
+          updates = @esosti_project_replicate.trf1_sjap_project.esosti_updates_abertos
           log(:debug, 'Updates encontrados: ' + updates.count.to_s)
           for update in updates
             update_text = "#{update.esosti_solicitacao.esosti_id}/#{update.index}"
@@ -36,14 +36,6 @@ module Trf1Sjap
       end
       
       private
-      
-      def updates_abertos
-        return EsostiUpdate.
-          where(journal_id: nil).
-          includes(:esosti_solicitacao).
-          where('esosti_solicitacaos.trf1_sjap_project_id' => @esosti_project_replicate.trf1_sjap_project).
-          order(:esosti_solicitacao_id, :index)
-      end
       
       def atendente_mudancas
         return EsostiSolicitacao.where('atendente <> atendente_anterior and issue_id is not null')

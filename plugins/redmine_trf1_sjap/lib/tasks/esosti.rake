@@ -24,5 +24,17 @@ namespace :trf1_sjap do
       puts "Total: #{solicitacoes.count}" 
     end
 
+    task :updates_to_redmine => [:environment] do
+      for trf1_sjap_project in Trf1SjapProject.all
+        updates = trf1_sjap_project.esosti_updates_abertos
+        puts "Updates abertos encontrados para #{trf1_sjap_project}: #{updates.count}"
+        for update in updates
+          puts "Importando #{update}"
+          result = Trf1Sjap::EsostiRedmineImport.update_to_redmine(update)
+          puts "Importado #{update}: #{result.inspect}"
+        end
+      end
+    end
+
   end
 end

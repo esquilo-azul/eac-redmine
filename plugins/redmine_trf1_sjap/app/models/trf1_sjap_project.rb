@@ -8,4 +8,12 @@ class Trf1SjapProject < ActiveRecord::Base
     return project.to_s
   end
 
+  def esosti_updates_abertos
+    EsostiUpdate.
+          where(journal_id: nil).
+          includes(:esosti_solicitacao).
+          where('esosti_solicitacaos.trf1_sjap_project_id' => id).
+          order(:esosti_solicitacao_id, :index)
+  end
+
 end
