@@ -29,7 +29,7 @@ module Trf1Sjap
           raise 'Solicitação já importada: ' + @esosti_update.inspect + ", " + @esosti_update.esosti_solicitacao.inspect
         end
         issue = Issue.new
-        issue.project_id = @esosti_update.esosti_solicitacao.trf1_sjap_project.project_id
+        issue.project_id = @esosti_update.esosti_solicitacao.trf1_sjap_project.esosti_export_project.id
         issue.subject = get_issue_subject()
         issue.description = get_issue_description()
         issue.author_id = get_solicitacao_user().id

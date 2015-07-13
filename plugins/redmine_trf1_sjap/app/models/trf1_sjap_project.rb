@@ -1,11 +1,19 @@
 # encoding: UTF-8
 class Trf1SjapProject < ActiveRecord::Base
-  attr_accessible :eadmin_matricula, :eadmin_senha, :eadmin_banco
+  attr_accessible :eadmin_matricula, :eadmin_senha, :eadmin_banco, :esosti_export_project_id
   belongs_to :project
   validates_uniqueness_of :project_id
   validates_presence_of :project_id, :eadmin_matricula, :eadmin_senha, :eadmin_banco
   def to_s
     return project.to_s
+  end
+
+  def esosti_export_project
+    if esosti_export_project_id
+      Project.find(esosti_export_project_id)
+    else
+      project
+    end    
   end
 
   def esosti_updates_abertos
