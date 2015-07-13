@@ -42,7 +42,7 @@ module Trf1Sjap
       end
 
       def get_issue_subject()
-        truncate(get_solicitacao_descricao(), length: Issue.columns_hash['subject'].limit)
+        truncate(get_solicitacao_descricao(), length: 200)
       end
 
       def get_issue_description()
