@@ -185,6 +185,25 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
         'Data de vinculação' => '30/01/2015 18:42:09'
       }])
   end
+
+  def test_parse_properties_raw_data
+    file_test(:parse_properties_raw_data, 'solicitacao-detalhes_749708.html', {
+      'Solicitação Nº' => '2015310000196001960160000008',
+      'Data da Solicitação' => '30/01/2015 18:42:09',
+      'Unidade Solicitante' => 'SEPOD - SEÇÃO DE PROCESSAMENTO E PROCEDIMENTOS DIVERSOS - 196 - AP - /SEPOD/SECVA/VARA1/SSJLJI',
+      'Nome do Solicitante' => 'JOAQUIM DA SILVA OLIVEIRA',
+      'Matricula' => 'AP20060',
+      'E-mail do Solicitante' => 'AP20060@trf1.jus.br',
+      'Telefone' => '9636211534',
+      'Local de Atendimento' => 'SECRETARIA',
+      'Serviço Atual' => 'E-CVD - CATALOGADOR VIRTUAL DE DOCUMENTOS',
+      'Descrição' => 'Verificar erro no e-CVD SSJLJI, no que se refere ao link (lupa) responsável pelo anexo dos documentos digitalizados. ' + 
+      'O acesso ao e-CVD encontra-se normal. Entretanto, a catalogação de documentos não finaliza devido a falha no link (lupa) responsável por localizar e anexar os documentos digitalizados.',
+      'Observação' => 'Ao se clicar no referido link, a tela fica carregando e não finaliza. ' +
+      'Encontra-se anexa a respectiva tela, bem como a tela de complementos do menu "ferramentas" onde há a possível causa do problema, conforme relatado por colegas da SJAP que passaram pela mesma situação.',
+      'Encaminhado para' => '-'
+    })
+  end
   
   private
   

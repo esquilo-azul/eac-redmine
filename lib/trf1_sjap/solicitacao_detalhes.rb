@@ -42,6 +42,12 @@ module Trf1Sjap
       return data
     end
     
+    def parse_properties_raw_data
+      tbody = @doc.at_xpath("id('tabs-1')/table")
+      raise 'TBODY not found' if !tbody
+      PropertiesParser.new(tbody).properties
+    end
+
     # Extrai a descrição da fase e a data/hora que aparecem
     # no item "Fase" das atualizações de solicitação e-Sosti.
     def self.parse_fase(input)
@@ -186,5 +192,71 @@ module Trf1Sjap
     end
 
   end
+  
+  class PropertiesParser
+    
+    attr_reader :properties
+    
+    def initialize(tbody)
+      @properties = {}
+      [
+        SameParser.new('Solicitação Nº' , tbody),
+        SameParser.new('Data da Solicitação', tbody),
+        RightParser.new('Unidade Solicitante' , tbody),
+        RightParser.new('Nome do Solicitante', tbody),
+        RightParser.new('Matricula', tbody),
+        RightParser.new('E-mail do Solicitante', tbody),
+        RightParser.new('Telefone', tbody),
+        RightParser.new('Local de Atendimento', tbody),
+        RightParser.new('Serviço Atual', tbody),
+        BelowParser.new('Descrição', tbody),
+        BelowParser.new('Observação', tbody),
+        BelowParser.new('Encaminhado para', tbody)
+      ].each {|p| @properties[p.name] = p.value}      
+    end
+    
+    class AbstractParser
+      
+      attr_reader :name
+      
+      def initialize(name, tbody)
+        @name = name
+        @tbody = tbody
+      end
+      
+      def name_cell
+        for tag in ['td','th']
+          cell = @tbody.at_xpath('//' + tag + '[contains(text(), "' + @name + '")]')
+          return cell if cell
+        end
+        raise "Name cell not found (Name: \"#{@name}\")"
+      end
+      
+      def value
+        sub_value.gsub("\r", '').strip
+      end
+      
+    end
+    
+    class SameParser < AbstractParser      
+      def sub_value
+        name_cell.text.sub(@name + ':', '')
+      end
+    end
+    
+    class RightParser < AbstractParser 
+      def sub_value
+        name_cell.next_element.text
+      end
+    end
+    
+    class BelowParser < AbstractParser
+      def sub_value
+        name_cell.parent.next_element.at_xpath('td').text
+      end
+    end
+    
+  end
+  
 
 end
