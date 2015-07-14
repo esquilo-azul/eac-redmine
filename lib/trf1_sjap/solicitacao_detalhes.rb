@@ -11,7 +11,7 @@ module Trf1Sjap
     FASE_ITEM_NOME='Fase'
 
     def initialize(pageContent)
-      @doc = Nokogiri::HTML(pageContent)
+      @doc = Nokogiri::HTML(pageContent) { |c| c.noblanks }
     end
 
     def descricao
@@ -195,65 +195,86 @@ module Trf1Sjap
   
   class PropertiesParser
     
+    LABELS_SKIP = ['Guia para Atendimento Presencial']
     attr_reader :properties
     
     def initialize(tbody)
       @properties = {}
-      [
-        SameParser.new('Solicitação Nº' , tbody),
-        SameParser.new('Data da Solicitação', tbody),
-        RightParser.new('Unidade Solicitante' , tbody),
-        RightParser.new('Nome do Solicitante', tbody),
-        RightParser.new('Matricula', tbody),
-        RightParser.new('E-mail do Solicitante', tbody),
-        RightParser.new('Telefone', tbody),
-        RightParser.new('Local de Atendimento', tbody),
-        RightParser.new('Serviço Atual', tbody),
-        RightParser.new('Tombo', tbody),
-        BelowParser.new('Descrição', tbody),
-        BelowParser.new('Observação', tbody),
-        BelowParser.new('Encaminhado para', tbody)
-      ].select {|f| f.name_cell }.each {|f| @properties[f.name] = f.value}      
+      get_all_label_cells(tbody).each do |label_cell|
+        parser = ParserFactory.get_parser(label_cell)
+        @properties[parser.name] = parser.value if ! LABELS_SKIP.include?(parser.name)
+      end 
     end
     
+    def self.normalize_text(text)
+      text.gsub("\r|\n|\r\n", ' ').split.join(' ').gsub(/^\p{Space}*/,'').gsub(/\p{Space}*$/,'')
+    end
+
+    private
+    
+    def get_all_label_cells(tbody)
+      cells = []
+      cells << get_label_cell_by_name(tbody, 'Solicitação Nº')
+      cells << get_label_cell_by_name(tbody, 'Data da Solicitação')
+      cells.concat tbody.xpath('//th')
+    end
+
+    def get_label_cell_by_name(tbody, name)
+      for tag in ['td','th']
+        cell = tbody.at_xpath('//' + tag + '[contains(text(), "' + name + '")]')
+        return cell if cell
+      end
+      nil
+    end
+
+    class ParserFactory
+      def self.get_parser(label_cell)
+        if label_cell.name == 'td'
+          return SameParser.new(label_cell)
+        elsif label_cell.name == 'th'
+          if label_cell.parent.children.select {|c| c.kind_of?(Nokogiri::XML::Element)}.count == 1
+            return BelowParser.new(label_cell)
+          else
+            return RightParser.new(label_cell)
+          end
+        end
+      end
+
+    end
+
     class AbstractParser
       
-      attr_reader :name
+      attr_reader :cell_label
       
-      def initialize(name, tbody)
-        @name = name
-        @tbody = tbody
+      def initialize(cell_label)
+        @label_cell = cell_label
       end
       
-      def name_cell
-        for tag in ['td','th']
-          cell = @tbody.at_xpath('//' + tag + '[contains(text(), "' + @name + '")]')
-          return cell if cell
-        end
-        nil
-      end
-      
-      def value
-        sub_value.gsub("\r|\n|\r\n", ' ').split.join(' ').strip
+      def name
+        PropertiesParser.normalize_text(@label_cell.text.sub(':',''))
       end
       
     end
     
     class SameParser < AbstractParser      
-      def sub_value
-        name_cell.text.sub(@name + ':', '')
+      def value
+        PropertiesParser.normalize_text(@label_cell.text.sub(name + ':', ''))
+      end
+      
+      def name
+        PropertiesParser.normalize_text(/^([^:]+)/.match(@label_cell.text)[1])
       end
     end
     
-    class RightParser < AbstractParser 
-      def sub_value
-        name_cell.next_element.text
+    class RightParser < AbstractParser
+      def value
+        PropertiesParser.normalize_text(@label_cell.next_element.text)
       end
     end
     
     class BelowParser < AbstractParser
-      def sub_value
-        name_cell.parent.next_element.at_xpath('td').text
+      def value
+        PropertiesParser.normalize_text(@label_cell.parent.next_element.at_xpath('td').text)
       end
     end
     

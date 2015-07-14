@@ -217,6 +217,23 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
       'Descrição' => 'Problemas na impressão',      
       'Encaminhado para' => '-'
     })
+    file_test(:parse_properties_raw_data, 'solicitacao-detalhes_830904.html', {
+      'Solicitação Nº' => '2015310000269002690160000097',
+      'Data da Solicitação' => '17/06/2015 11:18:27',
+      'Unidade Solicitante' => 'SEINF - SEÇÃO DE TECNOLOGIA DA INFORMACAO - 269 - AP - /SEINF/NUCAD/SJAP',
+      'Nome do Solicitante' => 'EDUARDO HENRIQUE BOGONI',
+      'Matricula' => 'AP20199',
+      'Por ordem de' => 'JU446 - LÍVIA CRISTINA MARQUES PERES',
+      'E-mail do Solicitante' => 'eduardo.bogoni@trf1.jus.br',
+      'Telefone' => '(96)3214-1526',
+      'Local de Atendimento' => 'SEINF-AP',
+      'Serviço Atual' => 'SESOF - Mensageria - Administrar Falhas em mensagens',
+      'Descrição' => 'A Magistrada LÍVIA CRISTINA MARQUES PERES relata não estar recebendo mensagens de e-mail enviadas por dioleno.sousa@tre-ap.jus.br em sua caixa postal (livia.marques@trf1.jus.br). Foi verificado em seu Outlook (Caixa de entrada, Lixo Eletrônico, etc) e não encontramos a mensagem.' + 
+      ' Pedimos então que o responsável por dioleno.sousa@tre-ap.jus.br enviasse novamente a mensagem de email para eduardo.bogoni@trf1.jus.br e para um endereço do Gmail. A mensagem chegou somente no Gmail.' +
+      ' Enviamos uma mensagem por um endereço do Gmail a livia.marques@trf1.jus.br. Essa mensagem chegou na sua caixa postal.',
+      'Observação' => 'Suspeitamos que a mensagem de dioleno.sousa@tre-ap.jus.br esteja sendo bloqueada no servidor.',      
+      'Encaminhado para' => '-'
+    })
   end
   
   private
