@@ -209,10 +209,11 @@ module Trf1Sjap
         RightParser.new('Telefone', tbody),
         RightParser.new('Local de Atendimento', tbody),
         RightParser.new('Serviço Atual', tbody),
+        RightParser.new('Tombo', tbody),
         BelowParser.new('Descrição', tbody),
         BelowParser.new('Observação', tbody),
         BelowParser.new('Encaminhado para', tbody)
-      ].each {|p| @properties[p.name] = p.value}      
+      ].select {|f| f.name_cell }.each {|f| @properties[f.name] = f.value}      
     end
     
     class AbstractParser
@@ -229,11 +230,11 @@ module Trf1Sjap
           cell = @tbody.at_xpath('//' + tag + '[contains(text(), "' + @name + '")]')
           return cell if cell
         end
-        raise "Name cell not found (Name: \"#{@name}\")"
+        nil
       end
       
       def value
-        sub_value.gsub("\r", '').strip
+        sub_value.gsub("\r|\n|\r\n", ' ').split.join(' ').strip
       end
       
     end

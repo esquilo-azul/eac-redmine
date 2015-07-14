@@ -203,6 +203,20 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
       'Encontra-se anexa a respectiva tela, bem como a tela de complementos do menu "ferramentas" onde há a possível causa do problema, conforme relatado por colegas da SJAP que passaram pela mesma situação.',
       'Encaminhado para' => '-'
     })
+    file_test(:parse_properties_raw_data, 'solicitacao-detalhes_815452.html', {
+      'Solicitação Nº' => '2015310000249002490160000025',
+      'Data da Solicitação' => '20/05/2015 11:01:29',
+      'Unidade Solicitante' => 'SEPCE - SECAO DE PROTOCOLO E CERTIDOES - 249 - AP - /SEPCE/NUCJU/SJAP',
+      'Nome do Solicitante' => 'GRACIETE LOBATO VIDAL',
+      'Matricula' => 'AP7903',
+      'E-mail do Solicitante' => 'AP7903@trf1.jus.br',
+      'Telefone' => '9691130865',
+      'Local de Atendimento' => '- SEPCE',
+      'Serviço Atual' => 'IMPRESSORA',
+      'Tombo' => '7436 - IMPRESSORA SAMSUNG ML-3750-ND.',
+      'Descrição' => 'Problemas na impressão',      
+      'Encaminhado para' => '-'
+    })
   end
   
   private
