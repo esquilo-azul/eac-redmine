@@ -14,8 +14,8 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
     )
   end
 
-  def test_parse_raw_data
-    file_test(:parse_raw_data, 'solicitacao-detalhes_817986_2015-05-25_12-50-00.html', [{
+  def test_parse_updates_raw_data
+    file_test(:parse_updates_raw_data, 'solicitacao-detalhes_817986_2015-05-25_12-50-00.html', [{
         'Fase' => 'ENCAMINHAMENTO DE SOLICITAÇÃO DE TI PARA CAIXA PESSOAL 25/05/2015 12:45:05 0D 0h 0m 51s',
         'Por' => 'AP23PS - ADERVAN FRANS GUIMARAES MIRA JUNIOR',
         'Descrição' => '+ em atendimento'
@@ -30,7 +30,7 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
         'Descrição da Solicitação' => '+ Não consigo enviar mensagens com anexo'
       }
     ])
-    file_test(:parse_raw_data, 'solicitacao-detalhes_815452.html', [{
+    file_test(:parse_updates_raw_data, 'solicitacao-detalhes_815452.html', [{
         'Fase' => 'AVALIAÇÃO DE SERVIÇO DE TI 22/05/2015 11:13:18 2D 0h 11m 49s',
         'Avaliação' => 'ÓTIMO',
         'Por' => 'AP7903 - GRACIETE LOBATO VIDAL'
@@ -55,7 +55,7 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
       },{
         'Descrição da Solicitação' => '+ Problemas na impressão'
       }])
-    file_test(:parse_raw_data, 'solicitacao-detalhes_749708.html', [{
+    file_test(:parse_updates_raw_data, 'solicitacao-detalhes_749708.html', [{
         'Fase' => 'ENCAMINHAMENTO DE SOLICITAÇÃO ENTRE GRUPOS DO TRF1 07/05/2015 08:28:58 96D 14h 46m 48s',
         'Caixa destino' => 'CAIXA DE GESTÃO DE DEMANDAS DE TI DO(A): TRIBUNAL REGIONAL FEDERAL DA PRIMEIRA REGIÃO - 2 - TR',
         'Serviço' => 'E-CVD - CATALOGADOR VIRTUAL DE DOCUMENTOS',

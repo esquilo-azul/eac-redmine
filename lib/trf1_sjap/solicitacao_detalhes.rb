@@ -19,7 +19,7 @@ module Trf1Sjap
     end
 
     def updates
-      raw_data = parse_raw_data()
+      raw_data = parse_updates_raw_data()
       raw_data.reverse!
       raw_data.shift(raw_entry_descricao_solicitacao_index(raw_data))
       # A primeira entrada contém apenas a descrição
@@ -32,7 +32,7 @@ module Trf1Sjap
       updates
     end
 
-    def parse_raw_data
+    def parse_updates_raw_data
       data = []
       for container in updates_containers()
         update_consumer = UpdateConsumer.new
