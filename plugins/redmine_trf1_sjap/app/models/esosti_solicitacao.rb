@@ -1,7 +1,4 @@
 class EsostiSolicitacao < ActiveRecord::Base
-  NOME_SOLICITANTE_NOME = 'Nome do Solicitante'
-  MATRICULA_NOME = 'Matricula'
-  POR_ORDEM_NOME = 'Por ordem de'
   unloadable
   validates_uniqueness_of :esosti_id 
   validates_uniqueness_of :issue_id, allow_nil: true
@@ -45,16 +42,16 @@ class EsostiSolicitacao < ActiveRecord::Base
       esosti_solicitacao.closed = false
       esosti_solicitacao.trf1_sjap_project_id = trf1_sjap_project.id
       esosti_solicitacao.esosti_id = esosti_id
-      ModelUtils::save_or_raise(esosti_solicitacao)
+      Trf1Sjap::ModelUtils::save_or_raise(esosti_solicitacao)
     end
     esosti_solicitacao
   end
   
   def assert_usuario
-    if has_propriedade(POR_ORDEM_NOME)
-      usuario_rotulo = propriedade_valor(POR_ORDEM_NOME)
+    if has_propriedade(EsostiSolicitacaoPropriedade::POR_ORDEM_NOME)
+      usuario_rotulo = propriedade_valor(EsostiSolicitacaoPropriedade::POR_ORDEM_NOME)
     else
-      usuario_rotulo = "#{propriedade_valor(MATRICULA_NOME)} - #{propriedade_valor(NOME_SOLICITANTE_NOME)}"
+      usuario_rotulo = "#{propriedade_valor(EsostiSolicitacaoPropriedade::MATRICULA_NOME)} - #{propriedade_valor(EsostiSolicitacaoPropriedade::NOME_SOLICITANTE_NOME)}"
     end
     EsostiUsuario.get_or_create(usuario_rotulo)
   end
