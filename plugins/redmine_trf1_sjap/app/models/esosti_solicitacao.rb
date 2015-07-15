@@ -1,6 +1,7 @@
 class EsostiSolicitacao < ActiveRecord::Base
   NOME_SOLICITANTE_NOME = 'Nome do Solicitante'
   MATRICULA_NOME = 'Matricula'
+  POR_ORDEM_NOME = 'Por ordem de'
   unloadable
   validates_uniqueness_of :esosti_id 
   validates_uniqueness_of :issue_id, allow_nil: true
@@ -50,7 +51,12 @@ class EsostiSolicitacao < ActiveRecord::Base
   end
   
   def assert_usuario
-    EsostiUsuario.get_or_create("#{propriedade_valor(MATRICULA_NOME)} - #{propriedade_valor(NOME_SOLICITANTE_NOME)}")
+    if has_propriedade(POR_ORDEM_NOME)
+      usuario_rotulo = propriedade_valor(POR_ORDEM_NOME)
+    else
+      usuario_rotulo = "#{propriedade_valor(MATRICULA_NOME)} - #{propriedade_valor(NOME_SOLICITANTE_NOME)}"
+    end
+    EsostiUsuario.get_or_create(usuario_rotulo)
   end
 
   def assert_updates(raw_updates)
