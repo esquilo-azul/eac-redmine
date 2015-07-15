@@ -29,5 +29,13 @@ class Trf1SjapProject < ActiveRecord::Base
           where(issue_id: nil, trf1_sjap_project_id => id)
           order(id)
   end
+  
+  def create_eadmin_http_session
+    Trf1Sjap::EadminHttpSession.new(
+      eadmin_matricula,
+      eadmin_senha,
+      eadmin_banco
+    )
+  end
 
 end

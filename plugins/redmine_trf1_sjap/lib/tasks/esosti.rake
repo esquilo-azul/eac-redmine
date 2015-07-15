@@ -47,6 +47,40 @@ namespace :trf1_sjap do
         Trf1Sjap::ModelUtils.save_or_raise(esosti_solicitacao)
       end
     end
+    
+    task :import_solicitacao_detalhes, [:project_identifier, :esosti_id] => [:environment] do |t, args|
+      project = Project.find_by_identifier(args.project_identifier)
+      if !project
+        puts "Project not found (identifier=\"#{args.project_identifier}\")"
+        next
+      end
+      puts "Project found: \"#{project}\""
+      
+      trf1_sjap_project = Trf1SjapProject.find_by_project_id(project.id)
+      if !trf1_sjap_project
+        puts "Trf1SjapProject not found for \"#{project}\""
+        next
+      end
+      puts "Trf1SjapProject found"
+
+      session = trf1_sjap_project.create_eadmin_http_session
+      puts "Logging..."
+      loginResult = session.login
+      puts "Login result: #{loginResult}"
+        
+      if loginResult != true
+        next
+      end
+
+      puts "Recuperando detalhes..."         
+      solicitacao_detalhes = session.solicitacao_detalhes(args.esosti_id)
+      puts "Detalhes recuperados"
+      esosti_solicitacao = EsostiSolicitacao.get_or_create(trf1_sjap_project, args.esosti_id)      
+      puts "Updates: #{solicitacao_detalhes.updates.count}" 
+      puts "Propriedades: #{solicitacao_detalhes.propriedades.count}"
+      puts "Novos updates: #{esosti_solicitacao.assert_updates(solicitacao_detalhes.updates)}"
+      puts "Novas propriedades: #{esosti_solicitacao.assert_propriedades(solicitacao_detalhes.propriedades)}"
+    end
 
   end
 end
