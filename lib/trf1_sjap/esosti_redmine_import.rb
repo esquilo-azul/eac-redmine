@@ -9,9 +9,9 @@ module Trf1Sjap
       replicate.result
     end
 
-    # Replica no redmine os updates da página de detalhes de solicitação e-Sosti do e-Admin.
-    def self.import_solicitacao_detalhes(esosti_solicitacao, updates)
-      replicate = SolicitacaoDetalhesReplicate.new(esosti_solicitacao, updates)
+    # Replica no redmine as propriedades e os updates da página de detalhes de solicitação e-Sosti do e-Admin.
+    def self.import_solicitacao_detalhes(esosti_solicitacao, propriedades, updates)
+      replicate = SolicitacaoDetalhesReplicate.new(esosti_solicitacao, propriedades, updates)
       replicate.result
     end
 

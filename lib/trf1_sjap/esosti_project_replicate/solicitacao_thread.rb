@@ -41,11 +41,15 @@ module Trf1Sjap
         @esosti_project_replicate.login_control.on_logged do
           begin
             log(:debug, "Buscando fonte...")
-            updates = @esosti_project_replicate.session.solicitacao_detalhes(@esosti_solicitacao.esosti_id).updates()
+            detalhes = @esosti_project_replicate.session.solicitacao_detalhes(@esosti_solicitacao.esosti_id)
+            updates = detalhes.updates
+            propriedades = detalhes.propriedades
             log(:debug, "Updates encontrados: " + updates.count.to_s)
+            log(:debug, "Propriedades encontradas: " + propriedades.count.to_s)
             run_database_operation do
-              novos = Trf1Sjap::EsostiRedmineImport.import_solicitacao_detalhes(@esosti_solicitacao, updates)
-              log((novos >0 ? :info : :debug), "Novos updates: " + novos.to_s)
+              novos = Trf1Sjap::EsostiRedmineImport.import_solicitacao_detalhes(@esosti_solicitacao, propriedades, updates)
+              log((novos[0] >0 ? :info : :debug), "Novas propriedades: " + novos[0].to_s)
+              log((novos[1] >0 ? :info : :debug), "Novos updates: " + novos[1].to_s)
             end
             sleep_eadmin
           rescue Trf1Sjap::EadminHttpSession::UserNotLogged => ex

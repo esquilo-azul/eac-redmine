@@ -42,6 +42,10 @@ module Trf1Sjap
       return data
     end
     
+    def propriedades
+      parse_properties_raw_data
+    end
+
     def parse_properties_raw_data
       tbody = @doc.at_xpath("id('tabs-1')/table")
       raise 'TBODY not found' if !tbody
