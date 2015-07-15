@@ -19,7 +19,7 @@ module Trf1Sjap
       def import_caixa_secao_atendimento_solicitacao(trf1_sjap_project, solicitacao)
         esosti_solicitacao = EsostiSolicitacao.find_by_esosti_id(solicitacao[:id])
         if !esosti_solicitacao
-          esosti_solicitacao = EsostiSolicitacao.get_or_create(trf1_sjap_project, solicitacao[:id], solicitacao[:numero])
+          esosti_solicitacao = EsostiSolicitacao.get_or_create(trf1_sjap_project, solicitacao[:id])
         result = true
         else
         result = false

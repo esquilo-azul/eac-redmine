@@ -27,7 +27,7 @@ class EsostiSolicitacao < ActiveRecord::Base
     if propriedade
       return propriedade.valor
     else
-      raise "Proprieade não encontrada (esosti_propriedade_id: #{self.id}, nome: #{propriedade_nome}"
+      raise "Propriedade não encontrada (esosti_solicitacao_id: #{self.id}, esosti_id: #{esosti_id}, nome: #{propriedade_nome}, propriedades: #{propriedades.inspect}"
     end
   end
   
@@ -60,7 +60,7 @@ class EsostiSolicitacao < ActiveRecord::Base
     novos = 0
     index = 0
     for raw_update in raw_updates
-      novos += 1 if assert_update(index, raw_update)            
+      novos += 1 if assert_update(index, raw_update[:itens])
       index += 1
     end
     novos

@@ -26,8 +26,9 @@ class Trf1SjapProject < ActiveRecord::Base
   
   def esosti_solicitacaos_sem_issue
     EsostiSolicitacao.
-          where(issue_id: nil, trf1_sjap_project_id => id)
-          order(id)
+          where(issue_id: nil, trf1_sjap_project_id: id).
+          where('id in (select distinct(esosti_solicitacao_id) from esosti_solicitacao_propriedades)').
+          order('id')
   end
   
   def create_eadmin_http_session
