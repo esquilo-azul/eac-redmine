@@ -87,5 +87,17 @@ namespace :trf1_sjap do
       puts "Novas propriedades: #{esosti_solicitacao.assert_propriedades(solicitacao_detalhes.propriedades)}"
     end
 
+    task :replicate_solicitacao, [:esosti_id] => [:environment] do |t, args|
+      esosti_solicitacao = EsostiSolicitacao.find_by_esosti_id(args.esosti_id)
+      if !esosti_solicitacao
+        puts "Solicitação e-Sosti não encontrada com esosti_id=#{esosti_id}"
+        break
+      end
+      puts "Antes: #{esosti_solicitacao.issue_id}"
+      Trf1Sjap::EsostiRedmineImport.solicitacao_to_redmine(esosti_solicitacao)
+      esosti_solicitacao.updates.each { |update| Trf1Sjap::EsostiRedmineImport.update_to_redmine(update) }
+      puts "Depois: #{esosti_solicitacao.issue_id}"
+    end
+
   end
 end
