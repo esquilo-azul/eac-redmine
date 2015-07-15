@@ -37,7 +37,7 @@ module Trf1Sjap
       end
 
       def get_issue_description()
-        b = ''
+        b = "*Link*: #{eadmin_link_url}\n"
         for propriedade in @esosti_solicitacao.propriedades
           b += "*#{propriedade.nome}:* #{propriedade.valor}\n"
         end
@@ -57,6 +57,11 @@ module Trf1Sjap
         end
         raise 'Projeto não possui trackers' if @esosti_solicitacao.trf1_sjap_project.project.trackers.empty?
         return @esosti_solicitacao.trf1_sjap_project.project.trackers[0].id
+      end
+      
+      def eadmin_link_url
+        'http://sistemas.trf1.jus.br/app/e-Admin/sosti/pesquisarsolicitacoes/formpesquisa/nSosti/' + 
+          @esosti_solicitacao.propriedade_valor(EsostiSolicitacaoPropriedade::NUMERO_NOME)        
       end
 
     end
