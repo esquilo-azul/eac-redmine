@@ -36,15 +36,20 @@ namespace :trf1_sjap do
       end
     end
 
-    task :reset_solicitacao_import,  [:esosti_update_id] => [:environment] do |t, args|
+    task :reset_solicitacao_import,  [:esosti_id] => [:environment] do |t, args|
+      esosti_solicitacao = EsostiSolicitacao.find_by_esosti_id(args.esosti_id)
+      if !esosti_solicitacao
+        puts "Solicitação e-Sosti não encontrada com esosti_id=#{esosti_id}"
+        break
+      end
       ActiveRecord::Base.transaction do
-        esosti_solicitacao = EsostiSolicitacao.find(args.esosti_update_id)
         esosti_solicitacao.updates.each do |update|
           update.journal_id = nil
           Trf1Sjap::ModelUtils.save_or_raise(update)
         end
         esosti_solicitacao.issue_id = nil
         Trf1Sjap::ModelUtils.save_or_raise(esosti_solicitacao)
+        puts "Solicitação resetada (esosti_id=#{esosti_solicitacao.esosti_id})"
       end
     end
     
