@@ -1,8 +1,10 @@
 class EsostiSolicitacao < ActiveRecord::Base
+  NOME_SOLICITANTE_NOME = 'Nome do Solicitante'
+  MATRICULA_NOME = 'Matricula'
   unloadable
   validates_uniqueness_of :esosti_id 
   validates_uniqueness_of :issue_id, allow_nil: true
-  validates_presence_of :esosti_id, :esosti_numero, :trf1_sjap_project_id
+  validates_presence_of :esosti_id, :trf1_sjap_project_id
   validates :closed, exclusion: { in: [nil] }
   belongs_to :trf1_sjap_project  
   belongs_to :issue
@@ -17,18 +19,38 @@ class EsostiSolicitacao < ActiveRecord::Base
   def updates 
     EsostiUpdate.where(:esosti_solicitacao_id => id).order('index asc')
   end
+  
+  def propriedades 
+    EsostiSolicitacaoPropriedade.where(:esosti_solicitacao_id => id)
+  end
+  
+  def propriedade_valor(propriedade_nome)
+    propriedade = EsostiSolicitacaoPropriedade.where(esosti_solicitacao_id: self.id, nome: propriedade_nome).first
+    if propriedade
+      return propriedade.valor
+    else
+      raise "Proprieade não encontrada (esosti_propriedade_id: #{self.id}, nome: #{propriedade_nome}"
+    end
+  end
+  
+  def has_propriedade(propriedade_nome)
+    EsostiSolicitacaoPropriedade.where(esosti_solicitacao_id: self.id, nome: propriedade_nome).count > 0
+  end
 
-  def self.get_or_create(trf1_sjap_project, esosti_id, esosti_numero)
+  def self.get_or_create(trf1_sjap_project, esosti_id)
     esosti_solicitacao = EsostiSolicitacao.find_by_esosti_id(esosti_id)
     if !esosti_solicitacao
       esosti_solicitacao = EsostiSolicitacao.new
       esosti_solicitacao.closed = false
       esosti_solicitacao.trf1_sjap_project_id = trf1_sjap_project.id
       esosti_solicitacao.esosti_id = esosti_id
-      esosti_solicitacao.esosti_numero = esosti_numero
       ModelUtils::save_or_raise(esosti_solicitacao)
     end
     esosti_solicitacao
+  end
+  
+  def assert_usuario
+    EsostiUsuario.get_or_create("#{propriedade_valor(MATRICULA_NOME)} - #{propriedade_valor(NOME_SOLICITANTE_NOME)}")
   end
 
   def assert_updates(raw_updates)

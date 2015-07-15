@@ -23,5 +23,11 @@ class Trf1SjapProject < ActiveRecord::Base
           where('esosti_solicitacaos.trf1_sjap_project_id' => id).
           order(:esosti_solicitacao_id, :index)
   end
+  
+  def esosti_solicitacaos_sem_issue
+    EsostiSolicitacao.
+          where(issue_id: nil, trf1_sjap_project_id => id)
+          order(id)
+  end
 
 end
