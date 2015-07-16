@@ -7,7 +7,6 @@ module Trf1Sjap
 
     FASE_CADASTRO_DESCRICAO = 'CADASTRO SOLICITAÇÃO TI'
     SOLICITACAO_DESCRICAO_KEY='Descrição da Solicitação'
-    DESCRICAO_PROPRIEDADE_NOME='Descrição'
     AUTOR_ITEM_NOME='Por'
     FASE_ITEM_NOME='Fase'
 

@@ -1,4 +1,5 @@
 class EsostiSolicitacao < ActiveRecord::Base
+  include ActionView::Helpers::TextHelper
   unloadable
   validates_uniqueness_of :esosti_id 
   validates_uniqueness_of :issue_id, allow_nil: true
@@ -47,6 +48,26 @@ class EsostiSolicitacao < ActiveRecord::Base
     esosti_solicitacao
   end
   
+  def issue
+    if issue_id
+      Issue.find(issue_id)
+    else
+      new_issue = Issue.new
+      new_issue.project_id = trf1_sjap_project.esosti_export_project.id
+      new_issue.subject = get_issue_subject()
+      new_issue.description = get_issue_description()
+      new_issue.author_id = assert_usuario.to_redmine_user.id
+      new_issue.tracker_id = get_tracker_id()
+      ActiveRecord::Base.transaction do        
+        Trf1Sjap::ModelUtils.save_or_raise(new_issue)
+        self.issue_id = new_issue.id
+        Trf1Sjap::ModelUtils.save_or_raise(self)        
+      end
+      raise 'self.issue_id == nil' if self.issue_id == nil
+      new_issue
+    end
+  end
+
   def assert_usuario
     if has_propriedade(EsostiSolicitacaoPropriedade::POR_ORDEM_NOME)
       usuario_rotulo = propriedade_valor(EsostiSolicitacaoPropriedade::POR_ORDEM_NOME)
@@ -110,6 +131,37 @@ class EsostiSolicitacao < ActiveRecord::Base
     else
       false
     end
+  end
+
+  private
+
+  def get_issue_subject()
+    truncate(propriedade_valor(EsostiSolicitacaoPropriedade::DESCRICAO_NOME), length: 200)
+  end
+
+  def get_issue_description()
+    b = "*Link*: #{eadmin_link_url}\n"
+    for propriedade in propriedades
+      b += "*#{propriedade.nome}:* #{propriedade.valor}\n"
+    end
+    b.strip
+  end
+
+  def eadmin_link_url
+    'http://sistemas.trf1.jus.br/app/e-Admin/sosti/pesquisarsolicitacoes/formpesquisa/nSosti/' + 
+      propriedade_valor(EsostiSolicitacaoPropriedade::NUMERO_NOME)        
+  end
+
+
+  def get_tracker_id()
+    default_tracker_id = Setting.plugin_redmine_trf1_sjap['tracker_id']
+    if default_tracker_id != nil
+      for tracker in trf1_sjap_project.project.trackers
+        return default_tracker_id if tracker.id == default_tracker_id.to_i
+      end
+    end
+    raise 'Projeto não possui trackers' if trf1_sjap_project.project.trackers.empty?
+    return trf1_sjap_project.project.trackers[0].id
   end
   
 end
