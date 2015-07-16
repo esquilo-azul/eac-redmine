@@ -5,11 +5,29 @@ module Trf1Sjap
     class UnblockIssues      
       def self.check_all
         if !Setting.plugin_redmine_trf1_sjap['block_issue_status_id']
-          Rails::logger.warn('Setting.plugin_redmine_trf1_sjap["block_issue_status_id"] não foi setado')
+          Rails::logger.warn('Setting.plugin_redmine_trf1_sjap["block_issue_status_id"] não foi setado. Nenhum issue bloqueado será verificado.')
           return
         end
+        can_unblock = true
+        if !Setting.plugin_redmine_trf1_sjap['unblock_issue_status_id']
+          Rails::logger.warn('Setting.plugin_redmine_trf1_sjap["unblock_issue_status_id"] não foi setado. Nenhum issue será desbloqueado.')
+          can_unblock = false
+        end
+        if !Setting.plugin_redmine_trf1_sjap['admin_user_id']
+          Rails::logger.warn('Setting.plugin_redmine_trf1_sjap["admin_user_id"] não foi setado. Nenhum issue será desbloqueado.')
+          can_unblock = false
+        end
+        if !Setting.plugin_redmine_trf1_sjap['unblock_message']
+          Rails::logger.warn('Setting.plugin_redmine_trf1_sjap["unblock_message"] não foi setado. Nenhum issue será desbloqueado.')
+          can_unblock = false
+        end
         blocked_issues.each do |issue|
-          Rails::logger.debug "\##{issue.id} => blocked? #{blocked?(issue)})"
+          blocked = blocked?(issue)
+          Rails::logger.debug "\##{issue.id} => blocked? #{blocked})"
+          if !blocked['result'] && can_unblock
+            unblock(issue)
+            Rails::logger.info "\##{issue.id} desbloqueado"
+          end
         end
       end
 
@@ -43,6 +61,12 @@ module Trf1Sjap
 
       def self.blocked_by_start_date?(issue)
         issue.start_date != nil && issue.start_date < Date.today
+      end
+
+      def self.unblock(issue)
+        issue.init_journal(User.find(Setting.plugin_redmine_trf1_sjap['admin_user_id']), Setting.plugin_redmine_trf1_sjap["unblock_message"])
+        issue.status = IssueStatus.find(Setting.plugin_redmine_trf1_sjap['unblock_issue_status_id'])
+        Trf1Sjap::ModelUtils.save_or_raise(issue)
       end
     end
   end

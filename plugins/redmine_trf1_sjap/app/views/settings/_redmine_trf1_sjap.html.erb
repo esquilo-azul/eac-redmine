@@ -28,3 +28,15 @@
 		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['block_issue_status_id'] ) %>
 	</select>
 </p>
+
+<p>
+	<label>Situação que a tarefa recebe ao ser desbloqueada.</label>
+	<select name="settings[unblock_issue_status_id]">
+		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['unblock_issue_status_id'] ) %>
+	</select>
+</p>
+
+<p>
+	<label>Mensagem de desbloqueio de tarefa.</label>
+	<%= text_area_tag 'settings[unblock_message]', settings['unblock_message'] %>	
+</p>
