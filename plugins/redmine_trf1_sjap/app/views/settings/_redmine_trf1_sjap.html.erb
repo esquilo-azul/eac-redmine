@@ -21,3 +21,10 @@
 	<label>Pausa entre requisições de um <em>thread</em> ao e-Admin</label>
 	<%= number_field_tag 'settings[eadmin_request_pause]', settings['eadmin_request_pause'] %>	
 </p>
+
+<p>
+	<label>Situação de tarefa que indica que ela está bloqueada por outras tarefas ou pela data de início.</label>
+	<select name="settings[block_issue_status_id]">
+		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['block_issue_status_id'] ) %>
+	</select>
+</p>
