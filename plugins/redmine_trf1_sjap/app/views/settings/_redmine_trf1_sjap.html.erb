@@ -21,3 +21,17 @@
 	<label>Pausa entre requisições de um <em>thread</em> ao e-Admin</label>
 	<%= number_field_tag 'settings[eadmin_request_pause]', settings['eadmin_request_pause'] %>	
 </p>
+
+<p>
+	<label>Situação para tarefas que foram atribuídas para usuários não-membros do projeto.</label>
+	<select name="settings[assigned_to_no_member_status_id]">
+		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['assigned_to_no_member_status_id'] ) %>
+	</select>
+</p>
+
+<p>
+	<label>Situação para tarefas que retornaram de usuários não-membros do projeto.</label>
+	<select name="settings[assigned_to_member_status_id]">
+		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['assigned_to_member_status_id'] ) %>
+	</select>
+</p>
