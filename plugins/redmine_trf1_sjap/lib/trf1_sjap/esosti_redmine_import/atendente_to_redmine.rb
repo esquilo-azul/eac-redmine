@@ -10,6 +10,7 @@ module Trf1Sjap
       
       def initialize(esosti_solicitacao)
         @esosti_solicitacao = esosti_solicitacao
+        @cache = {}
         ActiveRecord::Base.transaction do
           issue = Issue.find(@esosti_solicitacao.issue_id)
           issue.init_journal(EsostiRedmineImport.get_admin_user(), nil)
@@ -38,25 +39,24 @@ module Trf1Sjap
       end
 
       def atendente_user_id()
-        if !defined? @atendente_user_id
-          if @esosti_solicitacao.atendente == ''
-            @atendente_user_id = nil
-          else
-            @atendente_user_id = EsostiUsuario.get_or_create(@esosti_solicitacao.atendente).to_redmine_user.id
-          end
-        end
-        @atendente_user_id
+        user_id_by_esosti_usuario_nome(__method__, @esosti_solicitacao.atendente)
       end
       
       def atendente_anterior_user_id()
-        if !defined? @atendente_anterior_user_id
-          if @esosti_solicitacao.atendente_anterior == ''
-            @atendente_anterior_user_id = nil
+        user_id_by_esosti_usuario_nome(__method__, @esosti_solicitacao.atendente_anterior)
+      end
+
+      def user_id_by_esosti_usuario_nome(cache_key, esosti_usuario_nome)
+        if !@cache.has_key?(cache_key)
+          if esosti_usuario_nome == ''
+            @cache[cache_key] = nil
           else
-            @atendente_anterior_user_id = EsostiUsuario.get_or_create(@esosti_solicitacao.atendente_anterior).to_redmine_user.id
+            esosti_usuario = EsostiUsuario.find_by_nome(esosti_usuario_nome)
+            raise "Usuário e-Sosti não encontrado com o nome \"#{esosti_usuario_nome}\"" if !esosti_usuario
+            @cache[cache_key] = esosti_usuario.to_redmine_user.id
           end
         end
-        @atendente_anterior_user_id
+        @cache[cache_key]
       end
     end
 
