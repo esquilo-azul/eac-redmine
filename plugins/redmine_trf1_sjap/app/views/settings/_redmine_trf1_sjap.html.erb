@@ -40,3 +40,17 @@
 	<label>Mensagem de desbloqueio de tarefa.</label>
 	<%= text_area_tag 'settings[unblock_message]', settings['unblock_message'] %>	
 </p>
+
+<p>
+	<label>Situação para tarefas que foram atribuídas para usuários não-membros do projeto.</label>
+	<select name="settings[assigned_to_no_member_status_id]">
+		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['assigned_to_no_member_status_id'] ) %>
+	</select>
+</p>
+
+<p>
+	<label>Situação para tarefas que retornaram de usuários não-membros do projeto.</label>
+	<select name="settings[assigned_to_member_status_id]">
+		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['assigned_to_member_status_id'] ) %>
+	</select>
+</p>

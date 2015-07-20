@@ -9,11 +9,7 @@ module Trf1Sjap
     def initialize trf1_sjap_project, continue_callback
       @trf1_sjap_project = trf1_sjap_project
       @continue_callback = continue_callback
-      @session = Trf1Sjap::EadminHttpSession.new(
-          @trf1_sjap_project.eadmin_matricula,
-          @trf1_sjap_project.eadmin_senha,
-          @trf1_sjap_project.eadmin_banco
-          )
+      @session = @trf1_sjap_project.create_eadmin_http_session
       @solicitacoes_thread = nil
       @login_thread = nil
       @caixa_secao_atendimento_thread = nil     

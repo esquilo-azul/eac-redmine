@@ -9,13 +9,19 @@ module Trf1Sjap
       replicate.result
     end
 
-    # Replica no redmine os updates da página de detalhes de solicitação e-Sosti do e-Admin.
-    def self.import_solicitacao_detalhes(esosti_solicitacao, updates)
-      replicate = SolicitacaoDetalhesReplicate.new(esosti_solicitacao, updates)
+    # Replica no redmine as propriedades e os updates da página de detalhes de solicitação e-Sosti do e-Admin.
+    def self.import_solicitacao_detalhes(esosti_solicitacao, propriedades, updates)
+      replicate = SolicitacaoDetalhesReplicate.new(esosti_solicitacao, propriedades, updates)
       replicate.result
     end
+    
+    # Transforma uma solicitação e-Sosti (Já na base de dados do Redmine) em um Issue Redmine
+    def self.solicitacao_to_redmine(esosti_solicitacao)
+      export = SolicitacaoToRedmine.new(esosti_solicitacao)
+      export.result
+    end
 
-    # Transforma um update e-Sosti (Já na base de dados do Redmine) em um Issue
+    # Transforma um update e-Sosti (Já na base de dados do Redmine) em um Comment Redmine
     # ou Comment no Redmine.
     def self.update_to_redmine(esosti_update)
       export = UpdateToRedmine.new(esosti_update)

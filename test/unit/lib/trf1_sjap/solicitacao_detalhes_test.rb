@@ -14,8 +14,8 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
     )
   end
 
-  def test_parse_raw_data
-    file_test(:parse_raw_data, 'solicitacao-detalhes_817986_2015-05-25_12-50-00.html', [{
+  def test_parse_updates_raw_data
+    file_test(:parse_updates_raw_data, 'solicitacao-detalhes_817986_2015-05-25_12-50-00.html', [{
         'Fase' => 'ENCAMINHAMENTO DE SOLICITAÇÃO DE TI PARA CAIXA PESSOAL 25/05/2015 12:45:05 0D 0h 0m 51s',
         'Por' => 'AP23PS - ADERVAN FRANS GUIMARAES MIRA JUNIOR',
         'Descrição' => '+ em atendimento'
@@ -30,7 +30,7 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
         'Descrição da Solicitação' => '+ Não consigo enviar mensagens com anexo'
       }
     ])
-    file_test(:parse_raw_data, 'solicitacao-detalhes_815452.html', [{
+    file_test(:parse_updates_raw_data, 'solicitacao-detalhes_815452.html', [{
         'Fase' => 'AVALIAÇÃO DE SERVIÇO DE TI 22/05/2015 11:13:18 2D 0h 11m 49s',
         'Avaliação' => 'ÓTIMO',
         'Por' => 'AP7903 - GRACIETE LOBATO VIDAL'
@@ -55,7 +55,7 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
       },{
         'Descrição da Solicitação' => '+ Problemas na impressão'
       }])
-    file_test(:parse_raw_data, 'solicitacao-detalhes_749708.html', [{
+    file_test(:parse_updates_raw_data, 'solicitacao-detalhes_749708.html', [{
         'Fase' => 'ENCAMINHAMENTO DE SOLICITAÇÃO ENTRE GRUPOS DO TRF1 07/05/2015 08:28:58 96D 14h 46m 48s',
         'Caixa destino' => 'CAIXA DE GESTÃO DE DEMANDAS DE TI DO(A): TRIBUNAL REGIONAL FEDERAL DA PRIMEIRA REGIÃO - 2 - TR',
         'Serviço' => 'E-CVD - CATALOGADOR VIRTUAL DE DOCUMENTOS',
@@ -184,6 +184,56 @@ class Trf1Sjap::SolicitacaoDetalhesTest < ActiveSupport::TestCase
         'Nome Documento' => 'Telas probelma e-CVD.pdf',
         'Data de vinculação' => '30/01/2015 18:42:09'
       }])
+  end
+
+  def test_parse_properties_raw_data
+    file_test(:parse_properties_raw_data, 'solicitacao-detalhes_749708.html', {
+      'Solicitação Nº' => '2015310000196001960160000008',
+      'Data da Solicitação' => '30/01/2015 18:42:09',
+      'Unidade Solicitante' => 'SEPOD - SEÇÃO DE PROCESSAMENTO E PROCEDIMENTOS DIVERSOS - 196 - AP - /SEPOD/SECVA/VARA1/SSJLJI',
+      'Nome do Solicitante' => 'JOAQUIM DA SILVA OLIVEIRA',
+      'Matricula' => 'AP20060',
+      'E-mail do Solicitante' => 'AP20060@trf1.jus.br',
+      'Telefone' => '9636211534',
+      'Local de Atendimento' => 'SECRETARIA',
+      'Serviço Atual' => 'E-CVD - CATALOGADOR VIRTUAL DE DOCUMENTOS',
+      'Descrição' => 'Verificar erro no e-CVD SSJLJI, no que se refere ao link (lupa) responsável pelo anexo dos documentos digitalizados. ' + 
+      'O acesso ao e-CVD encontra-se normal. Entretanto, a catalogação de documentos não finaliza devido a falha no link (lupa) responsável por localizar e anexar os documentos digitalizados.',
+      'Observação' => 'Ao se clicar no referido link, a tela fica carregando e não finaliza. ' +
+      'Encontra-se anexa a respectiva tela, bem como a tela de complementos do menu "ferramentas" onde há a possível causa do problema, conforme relatado por colegas da SJAP que passaram pela mesma situação.',
+      'Encaminhado para' => '-'
+    })
+    file_test(:parse_properties_raw_data, 'solicitacao-detalhes_815452.html', {
+      'Solicitação Nº' => '2015310000249002490160000025',
+      'Data da Solicitação' => '20/05/2015 11:01:29',
+      'Unidade Solicitante' => 'SEPCE - SECAO DE PROTOCOLO E CERTIDOES - 249 - AP - /SEPCE/NUCJU/SJAP',
+      'Nome do Solicitante' => 'GRACIETE LOBATO VIDAL',
+      'Matricula' => 'AP7903',
+      'E-mail do Solicitante' => 'AP7903@trf1.jus.br',
+      'Telefone' => '9691130865',
+      'Local de Atendimento' => '- SEPCE',
+      'Serviço Atual' => 'IMPRESSORA',
+      'Tombo' => '7436 - IMPRESSORA SAMSUNG ML-3750-ND.',
+      'Descrição' => 'Problemas na impressão',      
+      'Encaminhado para' => '-'
+    })
+    file_test(:parse_properties_raw_data, 'solicitacao-detalhes_830904.html', {
+      'Solicitação Nº' => '2015310000269002690160000097',
+      'Data da Solicitação' => '17/06/2015 11:18:27',
+      'Unidade Solicitante' => 'SEINF - SEÇÃO DE TECNOLOGIA DA INFORMACAO - 269 - AP - /SEINF/NUCAD/SJAP',
+      'Nome do Solicitante' => 'EDUARDO HENRIQUE BOGONI',
+      'Matricula' => 'AP20199',
+      'Por ordem de' => 'JU446 - LÍVIA CRISTINA MARQUES PERES',
+      'E-mail do Solicitante' => 'eduardo.bogoni@trf1.jus.br',
+      'Telefone' => '(96)3214-1526',
+      'Local de Atendimento' => 'SEINF-AP',
+      'Serviço Atual' => 'SESOF - Mensageria - Administrar Falhas em mensagens',
+      'Descrição' => 'A Magistrada LÍVIA CRISTINA MARQUES PERES relata não estar recebendo mensagens de e-mail enviadas por dioleno.sousa@tre-ap.jus.br em sua caixa postal (livia.marques@trf1.jus.br). Foi verificado em seu Outlook (Caixa de entrada, Lixo Eletrônico, etc) e não encontramos a mensagem.' + 
+      ' Pedimos então que o responsável por dioleno.sousa@tre-ap.jus.br enviasse novamente a mensagem de email para eduardo.bogoni@trf1.jus.br e para um endereço do Gmail. A mensagem chegou somente no Gmail.' +
+      ' Enviamos uma mensagem por um endereço do Gmail a livia.marques@trf1.jus.br. Essa mensagem chegou na sua caixa postal.',
+      'Observação' => 'Suspeitamos que a mensagem de dioleno.sousa@tre-ap.jus.br esteja sendo bloqueada no servidor.',      
+      'Encaminhado para' => '-'
+    })
   end
   
   private

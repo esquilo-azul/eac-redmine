@@ -23,7 +23,6 @@ module Trf1Sjap
           esosti_solicitacao.closed = false
           esosti_solicitacao.trf1_sjap_project_id = trf1_sjap_project.id
           esosti_solicitacao.esosti_id = solicitacao[:id]
-          esosti_solicitacao.esosti_numero = solicitacao[:numero]
         result = true
         else
         result = false

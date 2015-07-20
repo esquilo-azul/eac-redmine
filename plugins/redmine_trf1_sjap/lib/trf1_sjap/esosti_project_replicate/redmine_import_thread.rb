@@ -8,6 +8,31 @@ module Trf1Sjap
     # Transforma as atualizações e-Sosti em atualizações do Redmine
     class RedmineImportThread < LoopThread      
       def run
+        run_solicitacaos_sem_issue
+        run_atendente_mudancas
+        run_updates_abertos
+        sleep_long
+      end
+            
+      def to_s
+        return 'REDMINE IMPORT'
+      end
+      
+      private
+      
+      def run_solicitacaos_sem_issue
+        run_database_operation do
+          solicitacoes = @esosti_project_replicate.trf1_sjap_project.esosti_solicitacaos_sem_issue
+          log(:debug, "Solicitações sem issue: #{solicitacoes.count}")
+          for solicitacao in solicitacoes
+            log(:debug, "Criando issue para #{solicitacao}")
+            result = EsostiRedmineImport.solicitacao_to_redmine(solicitacao)
+            log(:info, "Importado #{solicitacao}: #{result.inspect}")
+          end
+        end
+      end
+      
+      def run_atendente_mudancas
         run_database_operation do
           solicitacoes = atendente_mudancas
           log(:debug, 'Mudanças de atendentes encontradas: ' + solicitacoes.count.to_s)
@@ -18,8 +43,11 @@ module Trf1Sjap
             log(:info, "Importada mudança de atendente #{solicitacao_text} => journal_id: #{result.inspect}")
           end          
         end
+      end
+      
+      def run_updates_abertos
         run_database_operation do
-          updates = updates_abertos
+          updates = @esosti_project_replicate.trf1_sjap_project.esosti_updates_abertos
           log(:debug, 'Updates encontrados: ' + updates.count.to_s)
           for update in updates
             update_text = "#{update.esosti_solicitacao.esosti_id}/#{update.index}"
@@ -28,21 +56,6 @@ module Trf1Sjap
             log(:info, "Importado #{update_text}: #{result.inspect}")
           end
         end
-        sleep_long
-      end
-            
-      def to_s
-        return 'REDMINE IMPORT'
-      end
-      
-      private
-      
-      def updates_abertos
-        return EsostiUpdate.
-          where(journal_id: nil).
-          includes(:esosti_solicitacao).
-          where('esosti_solicitacaos.trf1_sjap_project_id' => @esosti_project_replicate.trf1_sjap_project).
-          order(:esosti_solicitacao_id, :index)
       end
       
       def atendente_mudancas

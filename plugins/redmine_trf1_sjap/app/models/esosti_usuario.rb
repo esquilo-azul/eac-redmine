@@ -20,6 +20,25 @@ class EsostiUsuario < ActiveRecord::Base
     usuario
   end
 
+  def self.get_or_create_from_user(user)
+    instance = find_by_matricula(user.login)
+    if !instance
+      instance = new
+      instance.matricula = user.login.upcase
+      instance.nome = (user.firstname + ' ' + user.lastname).upcase
+      Trf1Sjap::ModelUtils.save_or_raise(instance)      
+    end
+    instance
+  end
+
+  def self.find_by_matricula(matricula)
+    where("lower(matricula) = ?", matricula.downcase).first
+  end
+
+  def self.find_by_nome(nome)
+    where("lower(nome) = ?", nome.downcase).first
+  end
+
   def to_redmine_user
     user = User.find_by_login(matricula.downcase)
     if !user
@@ -35,7 +54,7 @@ class EsostiUsuario < ActiveRecord::Base
   # "AP20199 EDUARDO HENRIQUE BOGONI" = { :matricula => "AP20199", :nome => "EDUARDO HENRIQUE BOGONI" }
   def self.parse_esosti_usuario_rotulo(esosti_usuario_rotulo)
     parts = /\s*([0-9a-zA-Z]+)\s*\-\s*(\S+(?:\s+\S+)*)\s*/.match(esosti_usuario_rotulo)
-    raise "Solicitante e-Sosti não pôde ser lido: \"#{esosti_solicitante}\"" if !parts
+    raise "Rótulo de usuário e-Sosti não coincide com o formato esperado: \"#{esosti_usuario_rotulo}\" (Formato esperado: <MATRÍCULA> - <NOME>)" if !parts
     {:matricula => parts[1], :nome => parts[2]}
   end
 

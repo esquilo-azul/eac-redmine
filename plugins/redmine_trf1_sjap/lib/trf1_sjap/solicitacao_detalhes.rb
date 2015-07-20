@@ -11,7 +11,7 @@ module Trf1Sjap
     FASE_ITEM_NOME='Fase'
 
     def initialize(pageContent)
-      @doc = Nokogiri::HTML(pageContent)
+      @doc = Nokogiri::HTML(pageContent) { |c| c.noblanks }
     end
 
     def descricao
@@ -19,7 +19,7 @@ module Trf1Sjap
     end
 
     def updates
-      raw_data = parse_raw_data()
+      raw_data = parse_updates_raw_data()
       raw_data.reverse!
       raw_data.shift(raw_entry_descricao_solicitacao_index(raw_data))
       # A primeira entrada contém apenas a descrição
@@ -32,7 +32,7 @@ module Trf1Sjap
       updates
     end
 
-    def parse_raw_data
+    def parse_updates_raw_data
       data = []
       for container in updates_containers()
         update_consumer = UpdateConsumer.new
@@ -42,6 +42,16 @@ module Trf1Sjap
       return data
     end
     
+    def propriedades
+      parse_properties_raw_data
+    end
+
+    def parse_properties_raw_data
+      tbody = @doc.at_xpath("id('tabs-1')/table")
+      raise 'TBODY not found' if !tbody
+      PropertiesParser.new(tbody).properties
+    end
+
     # Extrai a descrição da fase e a data/hora que aparecem
     # no item "Fase" das atualizações de solicitação e-Sosti.
     def self.parse_fase(input)
@@ -186,5 +196,93 @@ module Trf1Sjap
     end
 
   end
+  
+  class PropertiesParser
+    
+    LABELS_SKIP = ['Guia para Atendimento Presencial']
+    attr_reader :properties
+    
+    def initialize(tbody)
+      @properties = {}
+      get_all_label_cells(tbody).each do |label_cell|
+        parser = ParserFactory.get_parser(label_cell)
+        @properties[parser.name] = parser.value if ! LABELS_SKIP.include?(parser.name)
+      end 
+    end
+    
+    def self.normalize_text(text)
+      text.gsub("\r|\n|\r\n", ' ').split.join(' ').gsub(/^\p{Space}*/,'').gsub(/\p{Space}*$/,'')
+    end
+
+    private
+    
+    def get_all_label_cells(tbody)
+      cells = []
+      cells << get_label_cell_by_name(tbody, 'Solicitação Nº')
+      cells << get_label_cell_by_name(tbody, 'Data da Solicitação')
+      cells.concat tbody.xpath('//th')
+    end
+
+    def get_label_cell_by_name(tbody, name)
+      for tag in ['td','th']
+        cell = tbody.at_xpath('//' + tag + '[contains(text(), "' + name + '")]')
+        return cell if cell
+      end
+      nil
+    end
+
+    class ParserFactory
+      def self.get_parser(label_cell)
+        if label_cell.name == 'td'
+          return SameParser.new(label_cell)
+        elsif label_cell.name == 'th'
+          if label_cell.parent.children.select {|c| c.kind_of?(Nokogiri::XML::Element)}.count == 1
+            return BelowParser.new(label_cell)
+          else
+            return RightParser.new(label_cell)
+          end
+        end
+      end
+
+    end
+
+    class AbstractParser
+      
+      attr_reader :cell_label
+      
+      def initialize(cell_label)
+        @label_cell = cell_label
+      end
+      
+      def name
+        PropertiesParser.normalize_text(@label_cell.text.sub(':',''))
+      end
+      
+    end
+    
+    class SameParser < AbstractParser      
+      def value
+        PropertiesParser.normalize_text(@label_cell.text.sub(name + ':', ''))
+      end
+      
+      def name
+        PropertiesParser.normalize_text(/^([^:]+)/.match(@label_cell.text)[1])
+      end
+    end
+    
+    class RightParser < AbstractParser
+      def value
+        PropertiesParser.normalize_text(@label_cell.next_element.text)
+      end
+    end
+    
+    class BelowParser < AbstractParser
+      def value
+        PropertiesParser.normalize_text(@label_cell.parent.next_element.at_xpath('td').text)
+      end
+    end
+    
+  end
+  
 
 end

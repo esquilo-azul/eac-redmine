@@ -347,9 +347,6 @@ Rails.application.routes.draw do
 
   get 'robots.txt', :to => 'welcome#robots'
 
-  match 'eadmin/esosti_alerta', :controller => 'eadmin', :action => 'esosti_alerta', :via => [:get]
-  match 'eadmin/esosti_alerta_data', :controller => 'eadmin', :action => 'esosti_alerta_data', :as => 'esosti_alerta_data', :via => [:post]
-
   Dir.glob File.expand_path("plugins/*", Rails.root) do |plugin_dir|
     file = File.join(plugin_dir, "config/routes.rb")
     if File.exists?(file)

@@ -1,6 +1,5 @@
 # encoding: UTF-8
 
-require 'trf1_sjap/eadmin_http_session'
 require 'yaml'
 require 'highline/import'
 
