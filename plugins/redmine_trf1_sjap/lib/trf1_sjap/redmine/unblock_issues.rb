@@ -60,7 +60,7 @@ module Trf1Sjap
       end
 
       def self.blocked_by_start_date?(issue)
-        issue.start_date != nil && issue.start_date < Date.today
+        issue.start_date != nil && issue.start_date > Date.today
       end
 
       def self.unblock(issue)
