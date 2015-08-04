@@ -31,9 +31,10 @@
     </ul>
 </div>
 
-<div id="main" class="<%= sidebar_content? ? '' : 'nosidebar' %>">
+<div id="main" >
     <div id="sidebar">
-        <%= yield :sidebar %>
+        <h3>Módulos SJAP</h3>
+        <%= render_menu :trf1_sjap_menu %>
         <%= view_layouts_base_sidebar_hook_response %>
     </div>
 

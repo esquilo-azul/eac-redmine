@@ -5,3 +5,4 @@ pt-BR:
   field_issue_status: "Situação da tarefa"
   field_atribuir_autor: "Atribuir autor"
   field_esosti_export_project: "Projeto para exportação e-Sosti"
+  label_funcionario_plural: 'Funcionários'
