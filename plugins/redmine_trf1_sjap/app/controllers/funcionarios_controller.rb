@@ -1,5 +1,5 @@
 class FuncionariosController < ApplicationController
-  layout 'active_scaffold'
+  layout 'trf1_sjap'
   active_scaffold :"funcionario" do |conf|
   end
 end
