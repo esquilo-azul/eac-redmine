@@ -1,0 +1,2 @@
+gem 'active_scaffold'
+gem 'sass-rails', '~> 5.0'
