@@ -1,0 +1,20 @@
+<h2><%= l(:label_panel_issue_status_groups)%></h2>
+
+<table class="list">
+  <thead>
+    <tr>
+      <th><%= l(:field_name)%></th>
+      <th><%= l(:field_empty_message)%></th>
+      <th><%= l(:field_permanent)%></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @panel_issue_status_groups.each do |group| %>
+    <tr class="<%= cycle("odd", "even") %>">
+      <td style="text-align: left"><%= group.name %></td>
+      <td style="text-align: center"><%= group.empty_message %></td>
+      <td style="text-align: center"><%= checked_image(group.permanent)%></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
