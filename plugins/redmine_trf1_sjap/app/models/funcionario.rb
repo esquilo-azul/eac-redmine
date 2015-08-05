@@ -1,7 +1,7 @@
 class CpfValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     unless check_cpf(value)
-      record.errors[attribute] << (options[:message] || 'CPF inválido')
+      record.errors[attribute] << (options[:message] || 'CPF inválido (9 caracteres, somente dígitos)')
     end
   end
 
@@ -32,7 +32,7 @@ end
 class PasepPisNitValidator < ::ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     unless check_pis(value)
-      record.errors[attribute] << (options[:message] || 'PIS inválido')
+      record.errors[attribute] << (options[:message] || 'CPF inválido (11 caracteres, somente dígitos)')
     end
   end
 
