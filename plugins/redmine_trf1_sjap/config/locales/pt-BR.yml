@@ -6,9 +6,15 @@ pt-BR:
   field_atribuir_autor: "Atribuir autor"
   field_esosti_export_project: "Projeto para exportação e-Sosti"
   label_funcionario_plural: 'Funcionários'
+  label_cef_id_solicitacaos_plural: 'Solicitações de Identidade Digital da CEF'
   field_cpf: 'CPF'
   field_pis: 'PIS'
   field_matricula: 'Matrícula'
   field_nome: 'Nome'
   field_created_at: 'Criado em'
   field_updated_at: 'Modificado em'
+  field_data: 'Data'
+  field_perfil: 'Perfil'
+  field_protocolo: 'Protocolo'
+  field_situacao: 'Situação'
+  field_funcionario: 'Funcionário'
