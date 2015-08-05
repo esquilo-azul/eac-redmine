@@ -28,10 +28,40 @@ class CpfValidator < ActiveModel::EachValidator
   end
 end
 
+# https://github.com/shamanime/pasep-pis-nit/blob/master/lib/pasep-pis-nit/pis.rb
+class PasepPisNitValidator < ::ActiveModel::EachValidator
+  def validate_each(record, attribute, value)
+    unless check_pis(value)
+      record.errors[attribute] << (options[:message] || 'PIS inválido')
+    end
+  end
+
+  private
+
+  PESO = %w(3 2 9 8 7 6 5 4 3 2)
+
+  def check_pis(pis = nil)
+    return true if pis.nil?
+    return false if pis.length != 11
+    total = soma_digitos(pis)
+    resto = total % 11
+    verificador = 11 - resto
+    verificador = 0 if verificador == 10 || verificador == 11
+    verificador.to_s == pis[10]
+  end
+
+  def soma_digitos(pis)
+    soma = 0
+    (0..9).each { |i| soma += PESO[i].to_i * pis[i].to_i }
+    soma
+  end
+end
+
 class Funcionario < ActiveRecord::Base
   validates :nome, presence: true
   validates :cpf, uniqueness: true, allow_blank: true, cpf: true
   validates :matricula, uniqueness: { :case_sensitive => false }, allow_blank: true
+  validates :pis, uniqueness: true, pasep_pis_nit: true, allow_blank: true
 
   def to_s
     nome
