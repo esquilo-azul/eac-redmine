@@ -43,3 +43,4 @@
 /log/esosti_sync.rb.pid
 /config/install-settings.sh
 /nbproject
+/log/*.pid
