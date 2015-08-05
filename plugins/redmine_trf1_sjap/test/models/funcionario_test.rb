@@ -4,16 +4,21 @@ class FuncionarioTest < ActiveSupport::TestCase
   test "test empty fields" do
     f = Funcionario.new
     f.nome = "João"
+    assert_equal false, f.save
+
+    f.matricula = 'AP10001'
     assert_equal true, f.save
     
     f = Funcionario.new
     f.nome = "Maria"
+    f.matricula = 'AP10002'
     assert_equal true, f.save
   end
   
   test "test valid cpf" do
     f = Funcionario.new
     f.nome = "João"
+    f.matricula = 'AP10001'
     f.cpf = 'abc def efg'
     assert_equal false, f.save
     
@@ -30,11 +35,13 @@ class FuncionarioTest < ActiveSupport::TestCase
   test "test unique cpf" do
     f = Funcionario.new
     f.nome = "João"
+    f.matricula = 'AP10001'
     f.cpf = '77446953560'
     assert_equal true, f.save
 
     f = Funcionario.new
     f.nome = "Maria"
+    f.matricula = 'AP10002'
     f.cpf = '77446953560'
     assert_equal false, f.save
   end
@@ -49,16 +56,12 @@ class FuncionarioTest < ActiveSupport::TestCase
     f.nome = "Maria"
     f.matricula = 'AP10001'
     assert_equal false, f.save
-    
-    f = Funcionario.new
-    f.nome = "Maria"
-    f.matricula = 'ap10001'
-    assert_equal false, f.save
   end
 
   test 'test valid pis' do
     f = Funcionario.new
     f.nome = 'João'
+    f.matricula = 'AP10001'
     f.pis = 'abc def efg'
     assert_equal false, f.save
 
@@ -75,11 +78,13 @@ class FuncionarioTest < ActiveSupport::TestCase
   test 'test unique pis' do
     f = Funcionario.new
     f.nome = 'João'
+    f.matricula = 'AP10001'
     f.pis = '12013312816'
     assert_equal true, f.save
 
     f = Funcionario.new
-    f.nome = 'João'
+    f.nome = 'Maria'
+    f.matricula = 'AP10002'
     f.pis = '12013312816'
     assert_equal false, f.save
   end
