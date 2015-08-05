@@ -31,4 +31,5 @@ end
 class Funcionario < ActiveRecord::Base
   validates :nome, presence: true
   validates :cpf, uniqueness: true, allow_blank: true, cpf: true
+  validates :matricula, uniqueness: { :case_sensitive => false }, allow_blank: true
 end

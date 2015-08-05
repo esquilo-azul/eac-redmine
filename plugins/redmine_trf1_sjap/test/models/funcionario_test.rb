@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class FuncionarioTest < ActiveSupport::TestCase
-  test "test empty cpf" do
+  test "test empty fields" do
     f = Funcionario.new
     f.nome = "João"
     assert_equal true, f.save
@@ -27,6 +27,20 @@ class FuncionarioTest < ActiveSupport::TestCase
     assert_equal true, f.save
   end
   
-  
-  
+  test "test unique matricula" do
+    f = Funcionario.new
+    f.nome = "João"
+    f.matricula = 'AP10001'
+    assert_equal true, f.save
+    
+    f = Funcionario.new
+    f.nome = "Maria"
+    f.matricula = 'AP10001'
+    assert_equal false, f.save
+    
+    f = Funcionario.new
+    f.nome = "Maria"
+    f.matricula = 'ap10001'
+    assert_equal false, f.save
+  end
 end
