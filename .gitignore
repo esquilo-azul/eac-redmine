@@ -43,3 +43,5 @@
 /log/esosti_sync.rb.pid
 /config/install-settings.sh
 /nbproject
+/log/*.pid
+/log/cef_id_consulta_solicitacoes/*

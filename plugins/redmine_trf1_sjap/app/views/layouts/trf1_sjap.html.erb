@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="<%= current_language %>">
+<head>
+<meta charset="utf-8" />
+<title><%=h html_title %></title>
+<meta name="description" content="<%= Redmine::Info.app_name %>" />
+<meta name="keywords" content="issue,bug,tracker" />
+<%= csrf_meta_tag %>
+<%= favicon %>
+<%= stylesheet_link_tag 'jquery/jquery-ui-1.11.0', 'application', :media => 'all' %>
+<%= stylesheet_link_tag 'rtl', :media => 'all' if l(:direction) == 'rtl' %>
+<%= stylesheet_link_tag 'active_scaffold', 'application', :media => 'all' %>
+<%= javascript_heads %>
+<%=  javascript_include_tag 'active_scaffold' %>
+<%= heads_for_theme %>
+<%= call_hook :view_layouts_base_html_head %>
+<!-- page specific tags -->
+<%= yield :header_tags -%>
+</head>
+<body class="<%=h body_css_classes %>">
+<div id="wrapper">
+<div id="wrapper2">
+<div id="wrapper3">
+<div id="top-menu">
+    <div id="account">
+        <%= render_menu :account_menu -%>
+    </div>
+    <%= content_tag('div', "#{l(:label_logged_as)} #{link_to_user(User.current, :format => :username)}".html_safe, :id => 'loggedas') if User.current.logged? %>
+    <ul>
+      <li><%= link_to 'Voltar para o Redmine', '/' %>
+    </ul>
+</div>
+
+<div id="main" >
+    <div id="sidebar">
+        <h3>Módulos SJAP</h3>
+        <%= render_menu :trf1_sjap_menu %>
+        <%= view_layouts_base_sidebar_hook_response %>
+    </div>
+
+    <div id="content">
+        <%= render_flash_messages %>
+        <%= yield %>
+        <%= call_hook :view_layouts_base_content %>
+        <div style="clear:both;"></div>
+    </div>
+</div>
+</div>
+
+<div id="ajax-indicator" style="display:none;"><span><%= l(:label_loading) %></span></div>
+<div id="ajax-modal" style="display:none;"></div>
+
+<div id="footer">
+  <div class="bgl"><div class="bgr">
+    Desenvolvido por SEINF-AP    
+  </div></div>
+</div>
+</div>
+</div>
+<%= call_hook :view_layouts_base_body_bottom %>
+</body>
+</html>
