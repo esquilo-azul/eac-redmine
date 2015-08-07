@@ -48,8 +48,14 @@ module Trf1Sjap
 
       def rows
         table.xpath('tr[position()>2]').map do |row_node|
-          row_node.xpath('td').map { |c| sanitize_text(c.text) }
+          row_node.xpath('td').map { |c| cell_value(c) }
         end
+      end
+
+      def cell_value(node)
+        input = node.at_xpath('input/@value')
+        return sanitize_text(input.text) if input && !input.text.strip.empty?
+        sanitize_text(node.text)
       end
     end
   end
