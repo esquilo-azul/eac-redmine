@@ -9,8 +9,8 @@ class Trf1Sjap::Redmine::UnblockIssuesTest < ActiveSupport::TestCase
     issue.start_date = Date.today
     assert_equal false, Trf1Sjap::Redmine::UnblockIssues.blocked_by_start_date?(issue), 'Data de início é hoje'
     issue.start_date = Date.today - 1
-    assert_equal true, Trf1Sjap::Redmine::UnblockIssues.blocked_by_start_date?(issue), 'Date de início foi ontem'
+    assert_equal false, Trf1Sjap::Redmine::UnblockIssues.blocked_by_start_date?(issue), 'Date de início foi ontem'
     issue.start_date = Date.today + 1
-    assert_equal false, Trf1Sjap::Redmine::UnblockIssues.blocked_by_start_date?(issue), 'Date de início é amanhã'
+    assert_equal true, Trf1Sjap::Redmine::UnblockIssues.blocked_by_start_date?(issue), 'Date de início é amanhã'
   end
 end
