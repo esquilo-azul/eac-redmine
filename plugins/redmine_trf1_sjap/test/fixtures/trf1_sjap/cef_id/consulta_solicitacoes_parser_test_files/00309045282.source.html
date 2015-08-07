@@ -1,0 +1,1092 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 	
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pt-BR">
+
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=8" />
+
+<!--
+AC Caixa Livre
+Versão: 2.0.0
+Pacote: SHA2
+Versão: 2.1.0
+Data: 16-06-2015 13:37:59
+Mode: null
+-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<link rel="start" title="Pagina Inicial" href="http://www.caixa.gov.br" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="author" content="Caixa Economica Federal" />
+	<meta name="description" content="CAIXA" />
+	<meta name="distribution" content="Global" />
+	<meta name="keywords" content="CAIXA" />
+	<meta name="language" content="pt-br" />
+	<meta name="robots" content="NONE" />
+	<!-- Commons-Validator -->
+	<script type="text/javascript" src="/cefarstatic/js/commons/validateEmail.js"></script>
+	
+	<!-- Outros scripts -->	
+	<!-- script type="text/javascript" src="/cefarstatic/js/applet.js"></script -->
+	<script type="text/javascript" src="/cefarstatic/js/mascara.js"></script>
+	<script type="text/javascript" src="/cefarstatic/js/md5.js"></script>
+	<script type="text/javascript" src="/cefarstatic/js/menu.js"></script>
+	<script type="text/javascript" src="/cefarstatic/js/script.js"></script>
+	<script type="text/javascript" src="/cefarstatic/js/sha1.js"></script>
+	<script type="text/javascript" src="/cefarstatic/js/util.js"></script>
+	<script type="text/javascript" src="/cefarstatic/js/validacao.js"></script>
+<!-- Ocorrencia: 425 - Novo Design Internet -->
+	<script type="text/javascript" src="/cefarstatic/_newincludes/global.js"></script>
+	<script type="text/javascript" src="/cefarstatic/_newfuncoes/jquery.pack.js"></script>
+	<script type="text/javascript" src="/cefarstatic/_newfuncoes/functions.js"></script>
+	<script type="text/javascript" src="/cefarstatic/_newfuncoes/functions_deslizante.js"></script>
+	
+	<script type="text/javascript" src="/cefarstatic/js/jquery-ui.js"></script>
+	
+	<script type="text/javascript" src="/cefarstatic/js/log4javascript.js"></script>
+	<script type="text/javascript" src="/cefarstatic/js/exception.js"></script>
+	
+		
+	<!-- Crypto -->
+	<script type = "text/javascript" src = "/cefarstatic/js/crypto/crypto.js"></script>
+	<script type = "text/javascript" src = "/cefarstatic/js/crypto/win-api.js"></script>
+	<script type = "text/javascript" src = "/cefarstatic/js/crypto/nss-api.js"></script>
+	<script type = "text/javascript" src = "/cefarstatic/js/crypto/selector.js"></script>
+	
+	<!--  Crypto Engine -->
+	<script type = "text/javascript" src = "/cefarstatic/js/cryptoEngine/cryptoEngine.js"></script>
+	<script type = "text/javascript" src = "/cefarstatic/js/cryptoEngine/appletInterface.js"></script>
+	<script type = "text/javascript" src = "/cefarstatic/js/cryptoEngine/xapiripeInterface.js"></script>
+	<script type = "text/javascript" src = "/cefarstatic/js/cryptoEngine/arariweInterface.js"></script>	
+	
+	<style type="text/css">
+	<!--
+	@import url(/cefarstatic/css/jquery-ui.css);
+	-->
+	</style>
+	
+<script type="text/javascript" src="/cefarstatic/js/script.js"></script>
+<style type="text/css">
+<!--
+@import url(/cefarstatic/css/estilo.css);
+
+@import url(/cefarstatic/css/internas.css);
+
+@import url(/cefarstatic/_newcss/geral.css);
+
+@import url(/cefarstatic/_newcss/icaixa.css);
+
+@import url(/cefarstatic/_newcss/acessibilidade.css);
+
+@import url(/cefarstatic/_newcss/aba_deslizante.css);
+
+@import url(/cefarstatic/_newcss/rodape.css);
+-->
+</style>
+<title>Identidade Digital CAIXA
+</title>
+
+<!-- inicio:head -->
+
+		<style type="text/css">
+			#apl_tabela th {
+				font: Arial, Helvetica, sans-serif;
+				font-size: 11px;
+				background: #6F8CD6;
+				padding: 10px 5px 10px 5px;
+				text-align: left;
+				color: #FFFFFF;
+				font-weight: bold;
+				height: 31px;
+				margin: 0px;
+				border-width: 0px;
+				border-color: #BFCAE7;
+				border-style: solid;
+			}
+			
+			#apl_tabela tr.par {
+				background: #FFFFFF;
+			}
+			
+			#apl_tabela tr.impar {
+				background: #EFF3FD;
+			}
+			
+			#apl_tabela td {
+				font: Arial, Helvetica, sans-serif;
+				font-size: 11px;
+				padding: 5px 5px 6px 5px;
+				color: #666666;
+				height: 26px;
+				border-width: 0px;
+				border-color: #6F8CD6;
+				border-style: solid;
+			}
+			
+			#apl_tabela table {
+				border-width: 1px;
+				border-color: #6F8CD6;
+				border-style: solid;
+				cellpadding:0px;
+				cellspacing:0px;
+				width: 100%;
+			}
+			
+		</style>
+
+		<script language="javascript" type="text/javascript">
+			function redirecionar(url){
+				window.location = url;
+			}		
+			function valida(){
+				var validator = JsValidator("O formulário apresenta os seguintes erros:");
+				var cpf = document.getElementById("numeroCpf");
+
+				if(isBlankOrNull(cpf.value)){
+					validator.erro(
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"O campo Número do CPF não está preenchido", cpf);
+				} else if(!consisteCpf(cpf.value)){
+					validator.erro(
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"O campo Número do CPF está inválido", cpf);
+				}
+
+				return validator.mostrarErros();
+			}
+		</script>
+	
+<!-- fim:head -->
+
+</head>
+
+
+
+
+
+
+
+	
+		<body id="cd_naotem_como_pf_form">
+	
+	
+
+
+<div id="container">
+	<a id="linkSaltar" href="#conteudo" accesskey="s"><strong>[alt + s] Saltar para conteúdo
+	</strong>
+	</a>
+	
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Ocorrencia: 425 - Novo Design Internet -->
+<div id="novoTopo">
+	<div id="menu_ascessibilidade">
+		<!-- Menu de acessibilidade ao Deficiente visual -->
+		<a href="#acessibilidade" accesskey="C" tabindex="0" title="Menu de acessibilidade ao Deficiente visual: Tecle Alt + C para pular para conteúdo Tecle Alt + P para Pesquisar no BUSCA"></a>
+		<!-- Internet Caixa-->
+		<a href="https://internetbanking-asp.caixa.gov.br/caixabanking" accesskey="C" tabindex="0" title="INTERNET CAIXA PARA DEFICIENTES VISUAIS." target="_blank"></a>
+	</div>
+
+	<!-- Menu Header Caixa -->
+	<div id="icaixa">
+		<a href="http://www.caixa.gov.br" title="Página inicial da CAIXA" class="home_caixa"><img src="/cefarstatic/_newimages/icaixa/header_caixa.jpg" style="border:0" alt="CAIXA"/></a> 
+				<img src="/cefarstatic/_newimages/icaixa/O_banco_que_acredita.jpg" class="frase_header" alt="O banco que acredita nas pessoas"/>
+		<div class="areaIBank">
+			<a href="https://internetbanking.caixa.gov.br/SIIBC/index.processa" title="Clique aqui para acessar sua conta">Acesse o internet Banking</a>
+		</div>
+	</div>
+
+	<div id="menu" class="abrir_internas">
+		<ul>
+			<li class="menu" id="menu_deslizante"><a href="http://www.caixa.gov.br/#">Menu</a></li>
+			<li class="atendimento"><a href="http://www1.caixa.gov.br/atendimento/index.asp" title="Rede de atendimento">Rede de atendimento</a></li>
+			<li class="sobre">
+				<a href="#sobre">Sobre a CAIXA</a>
+				<ul>
+					<li><a href="http://www.caixa.gov.br/acaixa/index.asp" title="Apresenta&ccedil;&atilde;o">Apresenta&ccedil;&atilde;o</a></li>
+					<li><a href="http://www.caixa.gov.br/acaixa/conselho/index.asp" title="Presid&ecirc;ncia e Vice-Presid&ecirc;ncias">Presid&ecirc;ncia e Vice-Presid&ecirc;ncias</a></li>
+					<li><a href="http://www.caixa.gov.br/acaixa/processos_contas_anuais/index.asp" title="Processos de Contas Anuais">Processos de Contas Anuais</a></li>
+					<li><a href="http://www.caixa.gov.br/acaixa/relatorios/index.asp" title="Balan&ccedil;os e Demonstrativos">Balan&ccedil;os e Demonstrativos</a></li>
+					<li><a href="http://www.caixa.gov.br/acaixa/historia_missao.asp" title="Hist&oacute;ria e Miss&atilde;o">Hist&oacute;ria e Miss&atilde;o</a></li>
+					<li><a href="http://www.caixa.gov.br/acaixa/estrutura_organizacional.asp" title="Estrutura Organizacional">Estrutura Organizacional</a></li>
+					<li><a href="http://www.caixa.gov.br/acaixa/transparencia.asp" title="Transparencia Caixa">Transparência CAIXA</a></li>
+				</ul>
+			</li>
+			<li class="cultural"><a href="http://www.caixa.gov.br/caixacultural" title="CAIXA Cultural">CAIXA Cultural</a></li>
+			<li class="downloads"><a href="http://www1.caixa.gov.br/download/index.asp" title="Downloads">Downloads</a></li>
+			<li class="ouvidoria"><a href="http://www1.caixa.gov.br/ouvidoria/index.asp" title="Ouvidoria">Ouvidoria</a></li>
+			<li class="faleconosco"><a href="http://www1.caixa.gov.br/atendimento/telefones_da_caixa.asp" title="Fale conosco">Fale conosco</a></li>
+		</ul>
+	</div>
+
+</div>
+<script type="text/javascript" src="_newfuncoes/busca_abaDeslizante.js"></script>
+<span id="menu_deslizante_ajax"></span>
+<!-- *********************** CONTEUDO ABA DESliZANTE - INICIO ********************************-->
+<div id="menuAcessibilidade_deslizante">
+	<div class="menu_mostrar_deslizante" >
+		<ul id="aba_deslizante" class="voce_deslizante" >
+			<li class="voce_deslizante"><a href="#voce_deslizante" title="Voc&ecirc;</li>
+			<li class="empresas_deslizante"><a href="#empresas_deslizante" title="Empresas">Empresas</a></li>
+			<li class="governo_deslizante"><a href="#governo_deslizante" title="Governo">Governo</a></li>
+			<li class="judiciario_deslizante"><a href="#judiciario_deslizante" title="Judici&aacute;rio">Judici&aacute;rio</a></li>
+		</ul>
+		<div class="conteudo_deslizante" >
+			<!-- Aba VOCE -->
+			<div class="voce_deslizante">
+				<div id="cx_box_voce_deslizante">
+					<div class="especial_deslizante">
+						<img src="/cefarstatic/_newimages/_home/nova/tit/tit_areas_especiais.jpg" alt="Areas especiais para vocè  /> 
+						<ul>
+							<li><a title="CAIXA Show" href="http://www.caixa.gov.br/caixashow/">CAIXA Show</a></li>
+							<li><a title="Caixa Internacional" href="https://internetcaixa.caixa.gov.br/NASApp/siloj/index.do">Caixa Internacional</a> </li>
+							<li><a title="Im&oacute;veis a Venda" href="javascript:void(window.open('http://simov/asp/index.asp','Imoveis','scrollbars,width=720,height=520'))">Im&oacute;veis a Venda</a> </li>
+							<li><a title="Imprensa" href="http://imprensa/index.asp">Imprensa</a> </li>
+							<li><a title="Portal de Compras" href="javascript:void(window.open('http://_redirect/links/r_fornecedor.asp','Fornecedores','scrollbars,width=700,height=520'));">Portal de Compras</a> </li>
+						</ul>
+					</div>
+					<div class="interno_deslizante">
+						<div class="lista_deslizante">
+							<ul>
+<li><a title="Acesso via Celular" href="http://www.caixa.gov.br/Voce/Celular/index.asp">Acesso via Celular</a> </li>
+<li><a title="Aplica&ccedil;&otilde;es Financeiras" href="http://www.caixa.gov.br/Voce/investimentos/index.asp">Aplica&ccedil;&otilde;es Financeiras</a> </li>
+<li><a title="Bolsa Fam&iacute;lia" href="http://www.caixa.gov.br/Voce/Social/Transferencia/bolsa_familia/index.asp">Bolsa Fam&iacute;lia</a> </li>
+<li><a title="Capitaliza&ccedil;&otilde;es" href="http://www.caixacapitalizacao.com.br/" target="_blank">Capitaliza&ccedil;&otilde;es</a> </li>
+<li><a title="Cart&atilde;o de D&eacute;bito" href="http://www.caixa.gov.br/Voce/Cartao_de_Debito/index.asp">Cart&atilde;o de D&eacute;bito</a> </li>
+<li><a title="Cart&atilde;o de Cr&eacute;dito" href="http://www.caixa.gov.br/Voce/cartoes/index.asp">Cart&atilde;o de Cr&eacute;dito</a> </li>
+<li><a title="Cons&oacute;rcios CAIXA" href="http://www.caixaconsorcios.com.br/" target="_blank">Cons&oacute;rcios CAIXA</a> </li>
+<li><a title="Conta CAIXA Fácil" href="http://www.caixa.gov.br/Voce/contas/Conta_Caixa_Aqui/index.asp">Conta CAIXA Fácil</a> </li>
+<li><a title="Conta Corrente Pessoa F&iacute;sica" href="http://www.caixa.gov.br/Voce/contas/Conta_Corrente_Pessoa_Fisica/index.asp">Conta Corrente Pessoa F&iacute;sica</a> </li>
+<li><a title="Conta Universit&aacute;ria" href="http://www.caixa.gov.br/Voce/contas/Conta_Universitaria/index.asp">Conta Universit&aacute;ria</a> </li></ul>
+<ul>
+<li><a title="Contribui&ccedil;&atilde;o Sindical Urbana" href="http://www.caixa.gov.br/Voce/contribuicao_sindical/index.asp">Contribui&ccedil;&atilde;o Sindical Urbana</a> </li>
+<li><a title="Consigna&ccedil;&atilde;o CAIXA" href="http://www.caixa.gov.br/Voce/Credito/Consignacoes/index.asp">Consigna&ccedil;&atilde;o CAIXA</a> </li>
+<li><a title="Fundos de Investimento" href="http://www.caixa.gov.br/Voce/Investimentos/fundos/index.asp">Fundos de Investimento</a> </li>
+<li><a title="linhas de Cr&eacute;dito" href="http://www.caixa.gov.br/Voce/credito/index.asp">linhas de Cr&eacute;dito</a> </li>
+<li><a title="Mensagens via Celular" href="http://www.caixa.gov.br/Voce/mensagens_via_celular/index.asp">Mensagens Via Celular</a> </li>
+<li><a title="PIS" href="http://www.caixa.gov.br/Voce/Social/Beneficios/pis/index.asp">PIS</a> </li>
+<li><a title="Poupan&ccedil;a href="http://www.caixa.gov.br/Voce/poupanca/index.asp">Poupan&ccedil;a </a> </li>
+<li><a title="Previd&ecirc;ncia Privada" href="http://www.caixavidaeprevidencia.com.br/" target="_blank">Previd&ecirc;ncia Privada</a> </li>
+<li><a title="Seguros" href="http://www.caixaseguros.com.br/" target="_blank">Seguros</a> </li>
+<li><a title="Seguro Desemprego" href="http://www.caixa.gov.br/Voce/Social/Beneficios/seguro_desemprego/index.asp">Seguro Desemprego</a> </li></ul>
+<p><a title="Veja todos os produtos e servi&ccedil;os" href="http://www.caixa.gov.br/Voce/index.asp">Veja todos os produtos e servi&ccedil;os para vocèº¯a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Fim Aba VOCE -->
+			<!-- Aba EMPRESAS -->
+			<div class="empresas_deslizante">
+				<div id="cx_box_empresas_deslizante">
+					<div class="especial_deslizante">
+						<img src="resources/botao_area_empresa.jpg" alt="Areas especiais para sua Empresa" /> 
+<ul>
+<li><a title="Caixa Internacional" href="https://internetcaixa.caixa.gov.br/NASApp/siloj/index.do">Caixa Internacional</a> </li>
+<li><a title="Empres&aacute;rios Lot&eacute;ricos" href="javascript:void(window.open('https://lotericos/asp/login/index.asp','Loterias','scrollbars,width=800,height=610'));">Empres&aacute;rios Lot&eacute;ricos</a> </li>
+<li><a title="Franquias" href="javascript:void(window.open('http://popup/Generico/450x440_1.asp','Fraquias','scrollbars,width=660,height=615'));">Franquias</a> </li>
+<li><a title="Parcerias" href="http://www.caixa.gov.br/acaixa/parcerias/index.asp">Parcerias</a> </li>
+<li><a title="Portal de Compras" href="javascript:void(window.open('http://_redirect/links/r_fornecedor.asp','Fornecedores','scrollbars,width=700,height=520'));">Portal de Compras</a> </li>
+<li><a title="Portal de Empreendimentos da Habita&ccedil;&atilde;o" href="javascript:void(window.open('https://www.portaldeempreendimentos.caixa.gov.br','Empreendimentos','scrollbars=yes,top=6, left=10,width=1000,height=660'));">Portal&nbsp;Empreendimentos</a></li></ul>
+					</div>
+					<div class="topo_deslizante">
+						<div class="micro_deslizante">
+							<div class="titulo_topo_deslizante">
+								<h3><img src="/cefarstatic/_newimages/title/tit_micro_pequenas.jpg" alt="Micro e Pequenas Empresas" /></h3>
+								<ul>
+									<li class="veja_deslizante">Veja tamb&eacute;m</li>
+									<li><a href="#" class="medias_deslizante" title="Mè£©as e grandes empresas">M&eacute;dias e grandes empresas</a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="medias_deslizante">
+							<div class="titulo_topo_deslizante">
+								<h3><img src="/cefarstatic/_newimages/title/tit_medias_grandes.jpg" alt="Mè£©as e Grandes Empresas" /></h3>
+								<ul>
+									<li class="veja_deslizante">Veja tamb&eacute;m</li>
+									<li><a href="#" class="micro_deslizante" title="Micro e pequenas empresas">Micro e pequenas empresas</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="interno_deslizante">
+						<div class="micro_deslizante">
+							<div class="lista_deslizante">
+								<ul>
+<li><a title="Benef&iacute;cios para seus empregados" href="http://www.caixa.gov.br/pj/pj_comercial/mp/beneficios_empregados/index.asp">Benef&iacute;cios para seus empregados</a> </li>
+<li><a title="Capitaliza&ccedil;&atilde;o" href="http://www.caixacapitalizacao.com.br/" target="_blank">Capitaliza&ccedil;&atilde;o</a> </li>
+<li><a title="Cart&otilde;es" href="http://www.caixa.gov.br/pj/pj_comercial/mp/cartoes_credito/index.asp">Cart&otilde;es</a> </li>
+<li><a title="Cons&oacute;cios" href="http://www.caixaseguros.com.br/portal/site/CaixaConsorcios/menuitem.e0eb5ddb805481cdf7496e95a00066a0/?vgnextoid=26d572e5442d4110VgnVCM1000000a00660aRCRD" target="_blank">Cons&oacute;cios</a> </li>
+<li><a title="Conta Corrente" href="http://www.caixa.gov.br/pj/pj_comercial/mp/conta_corrente/index.asp">Conta Corrente</a> </li>
+<li><a title="Contribui&ccedil;&atilde;o Sindical Urbana" href="http://www.caixa.gov.br/pj/pj_comercial/mp/solucoes_recebimentos/contribuicao_sindical/index.asp">Contribui&ccedil;&atilde;o Sindical Urbana</a> </li>
+<li><a title="Conv&eacute;nios" href="http://www.caixa.gov.br/pj/pj_comercial/mp/convenios/index.asp">Conv&eacute;nios</a></li></ul>
+<ul>
+<li><a title="FGTS" href="http://www.caixa.gov.br/fgts/index.asp">FGTS</a> </li>
+<li><a title="Investimentos" href="http://www.caixa.gov.br/pj/pj_comercial/mp/investimentos/index.asp">Investimentos</a> </li>
+<li><a title="linhas de Cr&eacute;dito" href="http://www.caixa.gov.br/pj/pj_comercial/mp/linha_credito/index.asp">linhas de Cr&eacute;dito</a> </li>
+<li><a title="Promo&ccedil;&otilde;es Comerciais" href="http://pj/pj_comercial/mp/promocoes_comerciais/index.asp">Promo&ccedil;&otilde;es Comerciais</a> </li>
+<li><a title="Seguros" href="http://www.caixaseguros.com.br/" target="_blank">Seguros</a> </li>
+<li><a title="Solu&ccedil;&otilde;es em pagamentos" href="http://www.caixa.gov.br/pj/pj_comercial/mp/solucoes_pagamentos/index.asp">Solu&ccedil;&otilde;es em pagamentos</a> </li>
+<li><a title="Solu&ccedil;&otilde;es em recebimentos" href="http://www.caixa.gov.br/pj/pj_comercial/mp/solucoes_recebimentos/index.asp">Solu&ccedil;&otilde;es em recebimentos</a> </li></ul>
+<p><a title="Veja todos os produtos e servi&ccedil;os" href="http://www.caixa.gov.br/pj/pj_comercial/mp/index.asp">Veja todos os produtos e servi&ccedil;os para sua empresa</a></p>
+							</div>
+						</div>
+						<div class="medias_deslizante">
+							<div class="lista_deslizante">
+								<ul>
+<li><a title="Benef&iacute;cios para seus empregados" href="http://www.caixa.gov.br/pj/pj_comercial/mg/beneficios_empregados/index.asp">Benef&iacute;cios para seus empregados</a> </li>
+<li><a title="Capitaliza&ccedil;&atilde;os" href="http://www.caixacapitalizacao.com.br/" target="_blank">Capitaliza&ccedil;&atilde;o</a> </li>
+<li><a title="Cart&otilde;es" href="http://www.caixa.gov.br/pj/pj_comercial/mg/cartoes_credito/index.asp">Cart&otilde;es</a> </li>
+<li><a title="Cons&oacute;rcios" href="http://www.caixaseguros.com.br/portal/site/CaixaConsorcios/menuitem.e0eb5ddb805481cdf7496e95a00066a0/?vgnextoid=26d572e5442d4110VgnVCM1000000a00660aRCRD" target="_blank">Cons&oacute;rcios</a> </li>
+<li><a title="Conta Corrente" href="http://www.caixa.gov.br/pj/pj_comercial/mg/conta_corrente/index.asp">Conta Corrente</a> </li>
+<li><a title="Contribui&ccedil;&atilde;o Sindical Urbana" href="http://www.caixa.gov.br/pj/pj_comercial/mg/solucoes_recebimentos/contribuicao_sindical/index.asp">Contribui&ccedil;&atilde;o Sindical Urbana</a> </li>
+<li><a title="Conv&eacute;nios" href="http://www.caixa.gov.br/pj/pj_comercial/mg/convenios/index.asp">Conv&eacute;nios</a></li></ul>
+<ul>
+<li><a title="FGTS" href="http://fgts/index.asp">FGTS</a> 
+<li><a title="Investimentos" href="http://www.caixa.gov.br/pj/pj_comercial/mg/investimentos/index.asp">Investimentos</a> </li>
+<li><a title="linhas de Cr&eacute;dito" href="http://www.caixa.gov.br/pj/pj_comercial/mg/linha_credito/index.asp">linhas de Cr&eacute;dito</a> </li>
+<li><a title="Promo&ccedil;&otilde;es Comerciais" href="http://pj/pj_comercial/mg/promocoes_comerciais/index.asp">Promo&ccedil;&otilde;es Comerciais</a> </li>
+<li><a title="Seguros" href="http://www.caixaseguros.com.br/" target="_blank">Seguros</a> </li>
+<li><a title="Solu&ccedil;&otilde;es em pagamentos" href="http://www.caixa.gov.br/pj/pj_comercial/mg/solucoes_pagamentos/index.asp">Solu&ccedil;&otilde;es em pagamentos</a> </li>
+<li><a title="Solu&ccedil;&otilde;es em recebimentos" href="http://www.caixa.gov.br/pj/pj_comercial/mg/solucoes_recebimentos/index.asp">Solu&ccedil;&otilde;es em recebimentos</a></li></ul>
+<p><a title="Veja todos os produtos e servi&ccedil;os" href="http://www.caixa.gov.br/pj/pj_comercial/mg/index.asp">Veja todos os produtos e servi&ccedil;os para sua empresa</a></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Fim Aba EMPRESAS -->
+			<!-- Aba GOVERNO -->
+			<div class="governo_deslizante">
+				<div id="cx_box_governo_deslizante">
+					<div class="especial_deslizante">
+						<div style="margin: 0px 0px 0px -5px"><img src="resources/botao_area_governo.jpg" alt="Areas especiais para governo" /></div>
+<ul>
+<li><a title="Acompanhamento de Obras" href="https://webp.caixa.gov.br/urbanizacao/siurbn/acompanhamento/ac_publico/sistema/asp/ptei_filtro_inicial.asp">Acompanhamento de Obras</a> </li>
+<li><a title="Assist&eacutencia T&eacute;cnica" href="http://gov/gov_social/municipal/assistencia_tecnica/index.asp">Assist&eacute;ncia T&eacute;cnica</a> </li>
+<li><a title="Cadastro Único" href="http://gov/gov_social/municipal/distribuicao_servicos_cidadao/cadastramento_unico/index.asp">Cadastro Único</a> </li>
+<li><a title="Inova&ccedil;&atilde;o Tecnol&oacute;gica" href="http://gov/gov_social/municipal/programa_des_urbano/inov_tecno/index.asp">Inova&ccedil;&atilde;o Tecnol&oacute;gica</a> </li>
+<li><a title="SINAPI - &iacute;ndices da Constru&ccedil;&atilde;o Civil" href="https://webp.caixa.gov.br/casa/sinapi/index.asp?menu=0">SINAPI - &iacute;ndices da Constru&ccedil;&atilde;o Civil</a> </li>
+<li><a title="SISTN - Dados Cont&aacute;beis" href="https://sistn.caixa.gov.br/">SISTN - Dados Cont&aacute;beis</a></li></ul>
+					</div>
+					<div class="topo_deslizante">
+						<div class="municipal_deslizante">
+							<div class="titulo_topo_deslizante">
+								<h3 class="governo_deslizante"><img src="/cefarstatic/_newimages/title/tit_governo_municipal.jpg" alt="Governo Municipal" /></h3>
+								<ul>
+									<li class="veja_deslizante">Veja tamb&eacute;m</li>
+									<li><a href="#" class="estadual_deslizante" title="Estadual">Estadual</a></li>
+									<li><a href="#" class="federal_deslizante" title="Estadual">Federal</a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="estadual_deslizante">
+							<div class="titulo_topo_deslizante">
+								<h3 class="governo_deslizante"><img src="/cefarstatic/_newimages/title/tit_governo_estadual.jpg" alt="Governo Estadual" /></h3>
+								<ul>
+									<li class="veja_deslizante">Veja tamb&eacute;m</li>
+									<li><a href="#" class="municipal_deslizante" title="Municipal">Municipal</a></li>
+									<li><a href="#" class="federal_deslizante" title="Federal">Federal</a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="federal_deslizante">
+							<div class="titulo_topo_deslizante">
+								<h3 class="governo_deslizante"><img src="/cefarstatic/_newimages/title/tit_governo_federal.jpg" alt="Governo Federal" /></h3>
+								<ul>
+									<li class="veja_deslizante">Veja tamb&eacute;m</li>
+									<li><a href="#" class="municipal_deslizante" title="Municipal">Municipal</a></li>
+									<li><a href="#" class="estadual_deslizante" title="Estadual">Estadual</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="interno_deslizante">
+						<div class="municipal_deslizante">
+							<div class="lista_deslizante">
+								<ul>
+<li><a title="Arrecada&ccedil;&atilde;o" href="http://gov/gov_comercial/municipal/arrecadacao/index.asp">Arrecada&ccedil;&atilde;o</a> </li>
+<li><a title="Assist&eacute;ncia T&eacute;cnica" href="http://gov/gov_social/municipal/assistencia_tecnica/index.asp">Assist&eacute;ncia T&eacute;cnica</a> </li>
+<li><a title="Bolsa Fam&iacute;lia" href="http://gov/gov_social/municipal/distribuicao_servicos_cidadao/bolsa_familia/index.asp">Bolsa Fam&iacute;lia</a> </li>
+<li><a title="Cobran&ccedil;a de D&iacute;vida Ativa" href="http://gov/gov_comercial/municipal/arrecadacao/cobranca_divida_ativa/index.asp">Cobran&ccedil;a de D&iacute;vida Ativa</a> </li>
+<li><a title="Folha de pagamento" href="http://gov/gov_comercial/municipal/contas_pagamentos/folha_pagamento/index.asp">Folha de pagamento</a> </li>
+<li><a title="Fundo a Fundo" href="http://gov/gov_social/municipal/educacao_turismo_saude/fundo_fundo/index.asp">Fundo a Fundo</a> </li>
+<li><a title="Gest&atilde;o Pública - PNAFM" href="http://gov/gov_comercial/municipal/modernizacao_gestao_publica/pnafm/index.asp">Gest&atilde;o Pública - PNAFM</a> </li></ul>
+<ul>
+<li><a title="Investimentos" href="http://gov/gov_comercial/municipal/investimentos/index.asp">Investimentos</a> </li>
+<li><a title="Pagamento a Fornecedores" href="http://gov/gov_comercial/municipal/contas_pagamentos/pagamento_fornecedor/index.asp">Pagamento a Fornecedores</a> </li>
+<li><a title="PMAT" href="http://gov/gov_comercial/municipal/modernizacao_gestao_publica/pmat/index.asp">PMAT</a> </li>
+<li><a title="Previd&eacute;ncia" href="http://gov/gov_comercial/municipal/previdencia/index.asp">Previd&eacute;ncia</a> </li>
+<li><a title="Programas de Habita&ccedil;&atilde;o" href="http://gov/gov_social/municipal/programas_habitacao/index.asp">Programas de Habita&ccedil;&atilde;o</a> </li>
+<li><a title="Programas do OGU" href="http://gov/gov_social/municipal/programas_de_repasse_do_OGU/index.asp">Programas de Repasse do OGU</a> </li>
+<li><a title="Saneamento Ambiental" href="http://gov/gov_social/municipal/programa_des_urbano/saneamento_ambiental/index.asp">Saneamento Ambiental</a></li></ul>
+<p><a title="Veja todos os produtos e servi&ccedil;os" href="http://gov/gov_comercial/municipal/index.asp">Veja todos os produtos e servi&ccedil;os para seu municì¯©o</a></p>
+							</div>
+						</div>
+						<div class="federal_deslizante">
+							<div class="lista_deslizante">
+								<ul>
+<li><a title="Agente Jovem" href="http://gov/gov_social/estadual/distribuicao_servicos_cidadao/agente_jovem/index.asp">Agente Jovem</a> </li>
+<li><a title="Arrecada&ccedil;&atilde;o" href="http://gov/gov_comercial/federal/arrecadacao/index.asp">Arrecada&ccedil;&atilde;o</a> </li>
+<li><a title="Bolsa Fam&iacute;lia" href="http://gov/gov_social/estadual/distribuicao_servicos_cidadao/bolsa_familia/index.asp">Bolsa Fam&iacute;lia</a> </li>
+<li><a title="Brasil Joga limpo" href="http://gov/gov_social/federal/lista_completa_programas/brasil_joga_limpo.asp">Brasil Joga limpo</a> </li></ul>
+<ul>
+<li><a title="Contas e Pagamentos" href="http://gov/gov_comercial/federal/contas_pagamentos/index.asp">Contas e Pagamentos</a> </li>
+<li><a title="Habita&ccedil;&atilde;o de Interesse Social" href="http://gov/gov_social/federal/lista_completa_programas/habitacao_social.asp">Habita&ccedil;&atilde;o de Interesse Social</a> 
+<li><a title="PETI" href="http://gov/gov_social/estadual/distribuicao_servicos_cidadao/peti/index.asp">PETI</a> </li>
+<li><a title="Programas munic&iacute;pios" href="http://gov/gov_social/federal/lista_completa_programas/desenvolvimento_municipios_mg.asp">Programas munic&iacute;pios</a> </li>
+<li><a title="Farm&aacute;cia Popular" href="http://gov/gov_social/municipal/educacao_turismo_saude/programa_farmacia_popular/index.asp">Farm&aacute;cia Popular</a></li></ul>
+<p><a title="Veja todos os produtos e servi&ccedil;os" href="http://gov/gov_comercial/federal/index.asp">Veja todos os produtos e servi&ccedil;os</a></p>
+							</div>
+						</div>
+						<div class="estadual_deslizante">
+							<div class="lista_deslizante">
+								<ul>
+<li><a title="Acompanhamento de Obras" href="https://webp.caixa.gov.br/urbanizacao/siurbn/acompanhamento/ac_publico/sistema/asp/ptei_filtro_inicial.asp" target="_blank">Acompanhamento de Obras</a> </li>
+<li><a title="Arrecada&ccedil;&atilde;o de Concessionà±©as" href="http://gov/gov_comercial/estadual/arrecadacao/concessionarias/index.asp">Arrecada&ccedil;&atilde;o de Concessionà±©as</a> </li>
+<li><a title="Arrecada&ccedil;&atilde;o de Tributos" href="http://gov/gov_comercial/estadual/arrecadacao/arrecadacao_tributos/index.asp">Arrecada&ccedil;&atilde;o de Tributos</a> </li>
+<li><a title="Bolsa Fam&iacute;lia" href="http://gov/gov_social/estadual/distribuicao_servicos_cidadao/bolsa_familia/index.asp">Bolsa Fam&iacute;lia</a> </li>
+<li><a title="Cadastramento Único" href="http://gov/gov_social/estadual/distribuicao_servicos_cidadao/cadastramento_unico/index.asp">Cadastro Único</a> </li>
+<li><a title="Cobran&ccedil;a de D&iacute;vida Ativa" href="http://gov/gov_comercial/estadual/arrecadacao/cobranca_divida/index.asp">Cobran&ccedil;a de D&iacute;vida Ativa</a> </li>
+<li><a title="Contas e Pagamentos" href="http://gov/gov_comercial/estadual/contas_pagamentos/index.asp">Contas e Pagamentos</a> </li>
+<li><a title="Desenvolvimento Urbano" href="http://gov/gov_social/estadual/programas_desenvolvimento_urbano/index.asp">Desenvolvimento Urbano</a> </li></ul>
+<ul>
+<li><a title="Fundo a Fundo" href="http://gov/gov_social/estadual/educacao_turismo_saude/fundo_fundo/index.asp">Fundo a Fundo</a> </li>
+<li><a title="Investimentos" href="http://gov/gov_comercial/estadual/investimentos/index.asp">Investimentos</a> </li>
+<li><a title="Previd&eacute;ncia para Estados e Munic&iacute;pios" href="http://gov/gov_comercial/estadual/previdencia/index.asp">Previd&eacute;ncia para Estados e Munic&iacute;pios</a> </li>
+
+<li><a title="Programas Habita&ccedil;&atilde;o" href="http://gov/gov_social/estadual/programas_habitacao/index.asp">Programas Habita&ccedil;&atilde;o</a> </li>
+
+<li><a title="Programas do OGU" href="http://gov/gov_social/federal/lista_completa_programas/index.asp">Programas do OGU</a> </li>
+<li><a title="Saneamento Ambiental" href="http://gov/gov_social/estadual/programas_desenvolvimento_urbano/saneamento_ambiental/index.asp">Saneamento Ambiental</a> </li></ul>
+<p><a title="Veja todos os produtos" href="http://gov/gov_comercial/estadual/index.asp">Veja todos os produtos e servi&ccedil;os para seu estado</a></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Fim Aba GOVERNO -->
+			<!-- Aba JUDICIARIO -->
+			<div class="judiciario_deslizante">
+				<div id="cx_box_judiciario_deslizante">
+					<div class="especial_deslizante">
+						<img src="resources/areas_especiais_jud.jpg" alt="2ea especial Judicià±©o" /> 
+<ul>
+<li><a title="Para os Magistrados" href="http://judiciario/magistrados/index.asp">Para os Magistrados</a> </li>
+<li><a title="Para os Servidores" href="http://judiciario/servidores/index.asp">Para os Servidores</a> </li>
+<li><a title="Para os Advogados" href="http://judiciario/advogados/index.asp">Para os Advogados</a> </li>
+<li><a title="Para as Empresas" href="http://judiciario/empresas/index.asp">Para as Empresas</a> </li>
+<li><a title="Para Pessoa F&iacute;sica" href="http://judiciario/voce/index.asp">Para Pessoa F&iacute;sica</a></li></ul>
+					</div>
+					<div class="interno_deslizante">
+						<div class="lista_deslizante">
+							<ul>
+<li><a title="Capitaliza&ccedil;&atilde;o" href="http://www.caixacapitalizacao.com.br/">Capitaliza&ccedil;&atilde;o</a> </li>
+<li><a title="Cart&atilde;o de Cr&eacute;dito" href="http://www.caixa.gov.br/Voce/cartoes/index.asp">Cart&atilde;o de Cr&eacute;dito </a></li>
+<li><a title="Centraliza&ccedil;&atilde;o de Alvar&aacute;s" href="http://judiciario/empresas/cont_cent_rec_lev_alv_judiciais.asp">Centraliza&ccedil;&atilde;o de Alvar&aacute;s</a> </li>
+<li><a title="Certfica&ccedil;&atilde;o" href="http://icp.caixa.gov.br/" target="_blank" Digital>Certfica&ccedil;&atilde;o Digital</a> </li>
+<li><a title="Conta Sal&aacute;rio" href="http://judiciario/magistrados/conta_salario.asp">Conta Sal&aacute;rio </a></li>
+<li><a title="Cons&oacute;rcios CAIXA" href="http://www.caixaconsorcios.com.br/" target="_blank">Cons&oacute;rcios CAIXA </a></li></ul>
+<ul>
+<li><a title="Financiamento Imobili&aacute;rio" href="http://www.caixa.gov.br/habitacao/index.asp">Financiamento Imobili&aacute;rio</a> </li>
+<li><a title="Investimentos" href="http://www.caixa.gov.br/Voce/investimentos/index.asp">Investimentos </a></li>
+<li><a title="linhas de Cr&eacute;dito" href="http://www.caixa.gov.br/Voce/credito/index.asp">linhas de Cr&eacute;dito </a></li>
+<li><a title="Perguntas Freq&uuml;entes" href="http://judiciario/perguntas_frequentes.asp">Perguntas Freq&uuml;entes </a></li>
+<li><a title="Previd&eacute;ncia" href="http://www.caixavidaeprevidencia.com.br/" target="_blank">Previd&eacute;ncia </a></li>
+<li><a title="Seguros" href="http://www.caixaseguros.com.br/">Seguros </a></li></ul>
+<p><a title="Veja todos os produtos e servi&ccedil;os" href="http://judiciario/index.asp">Veja todos os produtos e servi&ccedil;os</a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Fim Aba JUDICIARIO -->
+		</div><!--fim Conteudo -->
+		<div class="rodape">
+			<ul>
+				<li><a href="/habitacao/index.asp" title="Habita&ccedil;&atilde;o">Habita&ccedil;&atilde;o</a></li>
+				<li><a href="/fgts/index.asp" title="FGTS">FGTS</a></li>
+			</ul>
+			<div id="busca_menu_deslizante">
+				<label for="busca_por">Buscar por:</label>
+				<input type="text" name="busca_por" id="busca_por" title="Busca" />
+				<button onclick="buscar_deslizante(document.getElementById('busca_por').value);" onkeypress="buscar_deslizante(document.getElementById('busca_por').value);" class="bt_ok">OK</button>
+			</div>
+			<a href="#" class="bt_recolher" title="Recolher">Recolher</a>		
+		</div>
+	</div>
+
+</div>
+<!-- 
+	<div id="cabecalho">
+		<h1>CAIXA</h1>
+		<p>Para você para todos os brasileiros</p>
+		<a href="/cefar/solicitacao/index.htm" id="linkhome">Página inicial</a>
+		<div><a id="acessesuaconta" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Acesse sua conta</a></div>
+	</div>
+	<h2 class="hide">Menu</h2>
+	<ul id="menu">
+		<li><a id="navcaixa" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">A Caixa</a></li>
+		<li><a id="navredeAtendimento" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Rede de antendimento</a></li>
+		<li><a id="navouvidoria" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Ouvidoria</a></li>
+		<li><a id="navdownload" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Download</a></li>
+		<li><a id="navmapaSite" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Glossário</a></li>
+		<li><a id="navseguranca" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Segurança</a></li>
+		<li><a id="navimprensa" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Imprensa</a></li>
+		<li><a id="navajuda" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Ajuda</a></li>
+	</ul>
+	<div id="cabecalhocont">
+		<h1>Identidade Digital CAIXA</h1>
+		<div><a id="voltar" href="javascript:history.back()">Voltar para a página anterior</a></div>
+		<div><a id="boasvindas" href="/cefar/solicitacao/index.htm">Boas Vindas</a></div>
+		<h2 id="tamanhofonte">Tamanho da Fonte (somente com CSS e JavaScript habilitados)</h2>
+		<ol>
+			<li><a id="fonte" href="javascript:mudarFonte('');">Fonte pequena</a></li>
+			<li><a id="fontemedio" href="javascript:mudarFonte('medio');">Fonte média</a></li>
+			<li><a id="fontegrande" href="javascript:mudarFonte('grande');">Fonte grande</a></li>
+		</ol>
+	</div>
+ -->
+ <div id="cabecalhocont">
+		<h1>Identidade Digital CAIXA</h1>
+		<div><a id="voltar" href="javascript:history.back()">Voltar para a página anterior</a></div>
+		<div><a id="boasvindas" href="/cefar/solicitacao/index.htm">Boas Vindas</a></div>
+		<h2 id="tamanhofonte">Tamanho da Fonte (somente com CSS e JavaScript habilitados)</h2>
+		<ol>
+			<li><a id="fonte" href="javascript:mudarFonte('');">Fonte pequena</a></li>
+			<li><a id="fontemedio" href="javascript:mudarFonte('medio');">Fonte média</a></li>
+			<li><a id="fontegrande" href="javascript:mudarFonte('grande');">Fonte grande</a></li>
+		</ol>
+	</div>
+	<div id="conteudo" style="width: 775px;">
+		<div id="contprimario">
+			<ul id="breadcrumb">
+				<li><a href="http://www.certificado.caixa.gov.br/">Página principal
+				</a>
+				</li>
+				
+<!-- inicio:breadcrumb -->
+
+<li><a href="http://caixa.gov.br/empresa/identidade-digital/Paginas/default.aspx">Como obter</a></li>
+		<li>Consultar solicitações</li>
+	
+<!-- fim:breadcrumb -->
+
+			</ul>
+			<div>
+				<!-- arrumando um bug do IE -->
+			</div>
+			<ol id="menusecao">
+				
+				
+				
+				
+				
+				
+				
+				
+
+				<li id="identidadesdigitais"
+					><a
+					href="http://caixa.gov.br/empresa/identidade-digital/Paginas/default.aspx">Identidades digitais CAIXA
+				</a>
+				</li>
+				<li id="comoobter" class="active"><a
+					href="http://caixa.gov.br/empresa/identidade-digital/Paginas/default.aspx ">Como obter
+				</a>
+				</li>
+				<li id="ondeconseguir" ><a
+					href="http://caixa.gov.br/Downloads/certificado-digital-agencias-habilitadas/agencias_habilitadas_caixa_certificacao_digital.pdf">Onde conseguir
+				</a>
+				</li>
+			</ol>
+
+			<div id="subcont" >
+				
+<!-- inicio:corpo -->
+
+		<h3>Consultar solicitações</h3>
+		<br />
+		<form id="form_consulta" action="/cefar/consulta/consulta/consulta.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0" method="post" onsubmit="return valida();">
+			<p>
+				<label for="numeroCpf">
+					Informe o CPF do titular.  <br/>
+					Se o certificado for para PJ ou equipamento servidor, informe o CPF do Responsável pelo uso do certificado:
+				</label>
+				
+					<input type="text" id="numeroCpf" name="numeroCpf" size="14" value="00309045282" />
+				
+			</p>
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<p>
+				<input type="submit" id="btnprocurar" value="Procurar Individual" />
+			</p>
+		</form>
+
+		<div id="apl_tabela">
+			
+			
+			
+			
+				<table>
+					<tr>
+						<th colspan="5">Solicitações</th>
+					</tr>
+					<tr class="impar">
+						<td>Nome (*):</td>
+						<td>Perfil:</td>
+						<td>Data:</td>
+						<td>Protocolo:</td>
+						<td>Situação:</td>
+					</tr>
+					
+						<tr class="par">
+							<td>
+								RENAN COUTINHO DINIZ
+							</td>
+							<td>
+								JS A3
+							</td>
+							<td>
+								23/02/2015
+							</td>
+							<td>309045282999443686150</td>
+							<td>
+								
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+
+	
+	
+		Fechada
+	
+	
+	
+	
+	
+
+ -->
+ <!--  Ocorrência : 373 -->
+ <!--  Ocorrência : 472 - estados 100 para certificados de aplicação -->
+ <!-- Migracao V2 - 05/12/2011 - Moises Dutra -->
+ 
+ 
+	
+	
+	
+	
+	
+	 
+	
+	
+		
+	
+	
+	
+	
+
+	
+		<a href="/cefar/consulta/instalacao/segundavia.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0?protocolo=309045282999443686150">
+			Certificado gravado com sucesso 
+		</a>
+	
+
+	
+
+	
+
+	
+
+	
+	
+	
+
+	
+
+	
+
+	
+
+	
+	
+		
+
+	
+
+
+	
+
+	
+
+							</td>
+						</tr>
+					
+				</table>
+			
+		</div>
+	
+<!-- fim:corpo -->
+
+			</div>
+		</div>
+		
+		
+			
+				<div id="contsecundario">
+					
+					<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pt-BR" lang="pt-BR">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<title>Emissao - 2 de 7</title>
+
+<link rel="stylesheet" type="text/css" href="/cefarstatic/secundario/_style/idc.css" />
+<script language="JavaScript" type="text/javascript" src="/cefarstatic/secundario/_script/jquery.accordion.js"></script><!-- accordion para jquery 1.2 -->
+<script language="JavaScript" type="text/javascript" src="/cefarstatic/secundario/_script/idc.js"></script>
+<script>initAccordion("#idc_col_lat_passoapasso", false);</script><!-- usar true para accordion animado -->
+</head>
+<body>
+
+<div id="idc_container">
+<!-- coluna inicia aqui -->
+<div id="idc_col_lat_links">
+<ul>
+<li><a href="http://caixa.gov.br/empresa/identidade-digital/perguntas-frequentes/Paginas/default.aspx" title="Perguntas Freq&uuml;entes">Perguntas Freq&uuml;entes</a></li>
+<!-- <li><a href="http://www.certificado.caixa.gov.br/possuo/duvidas/glossario/A.asp" title="Gloss&aacute;rio">Gloss&aacute;rio</a></li> -->
+<li><a href="http://caixa.gov.br/empresa/identidade-digital/Paginas/default.aspx#downloads" title="Download de Drivers e Cadeia de Certificados">Download de Drivers e Cadeia de Certificados</a></li>
+</ul>
+</div>
+<div class="idc_col_lat_secao" id="idc_col_lat_prerequisitos">
+<h4 title="Pr&eacute;-requisitos">Pr&eacute;-requisitos</h4>
+<p>Para emitir ou renovar o Certificado Digital s&atilde;o necess&aacute;rios os seguintes pr&eacute;-requisitos. Clique <a href="javascript:PopUp('http://caixa.gov.br/empresa/identidade-digital/Paginas/default.aspx#comoobter',680,400);">aqui</a>.</p>
+</div>
+<div class="idc_col_lat_secao" id="idc_col_lat_passoapasso">
+<h4 title="Passo a passo">Passo a passo</h4>
+<h5>1. Informar</h5>
+<div id="passo1">
+<p>Para iniciar o processo de emiss&atilde;o do Certificado Digital informe o n&uacute;mero do seu CPF e clique no bot&atilde;o "PROCURAR".</p>
+</div>
+<h5>2. Selecionar</h5>
+<div></div>
+<div>
+<p>
+Na tela apresentada, verifique se na coluna "Situa&ccedil;&atilde;o" consta o bot&atilde;o "PRONTO PARA EMISS&Atilde;O".
+Neste caso, clique para iniciar a emiss&atilde;o.
+</p>
+<p>
+<!-- Caso o certificado n&atilde;o esteja pronto para emiss&atilde;o, clique <a href="javascript:PopUp('http://www.certificado.caixa.gov.br/popup_tabela.asp',680,400);">aqui</a>. -->
+</p>
+</div>
+<h5>3. C&oacute;digo de emiss&atilde;o e senhas</h5>
+<div>
+<p>
+- Verifique na tela apresentada se n&uacute;mero constante no campo "Protocolo" &eacute; o mesmo n&uacute;mero constante no documento <i>C&oacute;digo para Emiss&atilde;o do seu Certificado Digital</i> recebido na Ag&ecirc;ncia da CAIXA.<br />
+<br />
+- Informe a "Senha de Emiss&atilde;o".<br />
+<br />
+- Informe o "C&oacute;digo de Emiss&atilde;o" constante no documento <i>C&oacute;digo para Emiss&atilde;o do seu Certificado Digital</i>.<br />
+<br />
+- Crie sua "Senha de Revoga&ccedil;&atilde;o" e clique em "CONTINUAR". Esta senha ser&aacute; usada quando voc&ecirc; precisar revogar o seu certificado.
+</p>
+</div>
+<h5>4. Gerar certificado</h5>
+<div>
+<p>- Selecione o Gerenciador do certificado.</p>
+<p>- Gerenciador de certificado ou Dispositivo criptogr&aacute;fico - &eacute; o sistema que gerencia a sua m&iacute;dia. Deve ser selecionado de acordo com o a m&iacute;dia usada.</p>
+<p>- Se no campo "Gerenciador de certificado" n&atilde;o aparecer o dispositivo relativo &agrave; sua m&iacute;dia, &eacute; poss&iacute;vel que a m&iacute;dia n&atilde;o seja homologada pela CAIXA ou n&atilde;o esteja instalada no seu computador.</p>
+<!-- <p>Clique <a href="javascript:PopUp('http://www.certificado.caixa.gov.br/popup_midias.asp',680,400);">aqui</a> para verificar as m&iacute;dias homologadas pela CAIXA.</p> -->
+<p>Clique <a href="javascript:PopUp('http://caixa.gov.br/empresa/identidade-digital/Paginas/default.aspx#comoobter',680,400);">aqui</a> para instalar o Gerenciador de certificados.</p>
+</div>
+<h5>5. PIN</h5>
+<div>
+<p>Ser&aacute; exibida uma nova janela do Windows solicitando a senha PIN do cart&atilde;o/token. Voc&ecirc; dever&aacute; digitar o PIN do cart&atilde;o/token. A senha PIN foi gravada na inicializa&ccedil;&atilde;o do cart&atilde;o/token.
+</p>
+<p>
+Clique <a href="javascript:PopUp('http://caixa.gov.br/Downloads/certificado-digital-roteiros/Roteiro_Cliente_A3_09022015.pdf',680,400);">aqui</a>, se ainda n&atilde;o inicializou seu cart&atilde;o/token.
+</p>
+</div>
+
+<h5>6. Gravar Certificado</h5>
+<div>
+<div id="u21_rtf">
+<p>Clique no bot&atilde;o "GRAVAR".</p>
+</div>
+</div>
+<h5 class="idc_ultimo_item">7. Concluir</h5>
+<div>
+<p>O Certificado Digital foi emitido com sucesso.</p>
+</div>
+</div>
+
+<div class="idc_col_lat_barra"><!-- Barra de diviso da coluna lateral --></div>
+<!-- coluna termina aqui -->
+</div>
+</body>
+</html>
+				</div>
+			
+			
+		
+	</div>
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Ocorrencia: 425 - Novo Design Internet -->
+<div id="novo_rodape_geral">
+	<span id="novo_rodape_barra_cinza"><!-- Não tirar esse comentário --></span>
+	<span id="novo_rodape_titulo"><!-- Não tirar esse comentário --></span>
+	<span id="novo_rodape_corpo_meio">
+		<span id="novo_rodape_produtos_servicos">
+			<span class="novo_rodape_titulo">Produtos e serviços para:</span>
+			<span class="novo_rodape_link"><a href="http://www.caixa.gov.br/voce/index.asp">Você</a></span>
+			<span class="novo_rodape_link">Empresas: <a href="http://www.caixa.gov.br/pj/pj_comercial/mp/index.asp">Micro e Pequenas</a>, <a href="http://www.caixa.gov.br/pj/pj_comercial/mg/index.asp">Médias e Grandes</a></span>
+			<span class="novo_rodape_link">Governo: <a href="http://www1.caixa.gov.br/gov/gov_comercial/municipal/index.asp">Municipal</a>, <a href="http://www1.caixa.gov.br/gov/gov_comercial/estadual/index.asp">Estadual</a>, <a href="http://www1.caixa.gov.br/gov/gov_comercial/federal/index.asp">Federal</a></span>
+			<span class="novo_rodape_link"><a href="http://www1.caixa.gov.br/judiciario/index.asp">Judiciário</a></span>
+		</span>
+
+		<span id="novo_rodape_veja_tambem">
+			<span class="novo_rodape_titulo_2">Veja também:</span>
+			<span class="novo_rodape_link_2"><a href="http://www1.caixa.gov.br/loterias/index.asp">Loterias</a></span>
+			<span class="novo_rodape_link_2"><a href="http://www.caixa.gov.br/habitacao/index.asp">Habitação</a></span>
+			<span class="novo_rodape_link_2"><a href="http://www.caixa.gov.br/fgts/index.asp">FGTS</a></span>
+		</span>
+		<span id="novo_rodape_botao_acesso_conta"><a href="#" onclick="maximized();" title="Clique aqui para acessar sua conta" id="novo_rodape_botao_acesso"><!-- Comentario --></a></span>
+		<span id="novo_rodape_busca"><label for="novo_rodape_busca_rodape">Busca por: </label><input type="text" name="busca_rodape" id="novo_rodape_busca_rodape" value="busque aqui" /><a href="#" onclick="javascript:buscar_deslizante(document.getElementById('busca_rodape').value);" onkeypress="javascript:buscar_deslizante(document.getElementById('busca_rodape').value);" id="novo_rodape_botao_ok" title="Acesse sua conta"></a></span>
+	</span>
+
+	<div id="novo_rodape_corpo_baixo">
+		<span id="novo_rodape_idioma"><a href="http://www1.caixa.gov.br/idiomas/ingles/index.asp">English</a> | <a href="http://www1.caixa.gov.br/idiomas/espanhol/index.asp">Español</a></span>
+		<span id="novo_rodape_politica_termos"><a href="http://www.caixa.gov.br/seguranca/politica_privacidade.asp">Política de Privacidade</a> | <a href="http://www.caixa.gov.br/seguranca/termos_de_uso.asp">Termos de uso</a></span>
+		<span id="novo_rodape_mapa_seguranca_imprensa">
+			<a id="novo_rodape_mapa" title="Mapa do Site" href="http://www.caixa.gov.br/mapa/index.asp">Mapa do Site</a>
+			<a id="novo_rodape_seguranca" title="Segurança" href="http://www.caixa.gov.br/seguranca/index.asp">Segurança</a>
+			<a id="novo_rodape_imprensa" title="Imprensa" href="http://www1.caixa.gov.br/imprensa/index.asp">Imprensa</a>
+			<a id="novo_rodape_rss" title="RSS" href="http://www1.caixa.gov.br/rss/index.asp">RSS</a>
+		</span>
+	</div>
+</div>
+
+<!-- 
+	<div id="rodapeapoio">
+		<h2>O que você procura?</h2>
+		<ul id="oqueprocura">
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Crédito</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">CAIXA Internacional</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Loterias</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Habitação</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">FGTS</a></li>
+		</ul>
+		<h2>Sites para</h2>
+		<ul id="sitespara">
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">VOCÊ</a></li>
+			<li>EMPRESA: <a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Micro e pequenas</a> | <a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Médias e Grandes</a></li>
+			<li>GOVERNO: <a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Municipal</a> | <a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Estadual</a> | <a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Federal</a></li>
+		</ul>
+		<h2>CAIXA de A a Z</h2>
+		<ol id="caixaaaz">
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">A</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">B</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">C</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">D</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">E</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">F</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">G</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">H</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">I</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">J</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">K</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">L</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">M</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">N</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">O</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">P</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Q</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">R</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">S</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">T</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">U</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">V</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">W</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">X</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Y</a></li>
+			<li><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Z</a></li>
+		</ol>
+		<form id="buscainteligente" action="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">
+			<div>
+				<label for="campobusca">Busca Inteligente:</label>
+				<input id="campobusca" type="text" />
+				<input type="submit" id="submit" />
+			</div>
+		</form>
+		<form id="sitesespeciais" action="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">
+			<div>
+				<label for="especiais">Sites especiais:</label>
+				<select id="especiais">
+					<option>foobar lorem camp consect</option>
+					<option>bar</option>
+					<option>camp</option>
+				</select>
+			</div>
+		</form>
+		<div><a id="rod_imprensa" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Imprensa</a></div>
+		<div><a id="rod_mapaSite" href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Acesse o mapa do site</a></div>
+	</div>
+	<form id="language_form" action="">
+		<input type="hidden" id="language" name="language" />
+		<div id="rodape">
+			<p id="rod_idiomas">See this site in <a href="javascript:trocaLinguagem('en')">English</a> | <a href="javascript:trocaLinguagem('es')">Español</a></p>
+			<p class="license"><a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Política de privacidade</a> | <a href="/cefar/consulta/indisponivel.htm;jsessionid=6BCCD2CDC323CC78229DF02BEEE67BE0">Termos de uso</a> &copy; CAIXA 2005</p>
+		</div>
+	</form>
+ -->
+</div>
+</body>
+</html>
+
+
