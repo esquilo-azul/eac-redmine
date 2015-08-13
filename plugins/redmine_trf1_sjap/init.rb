@@ -22,6 +22,6 @@ Redmine::Plugin.register :redmine_trf1_sjap do
   end
 
   Redmine::MenuManager.map :top_menu do |menu|
-    menu.push :trf1_sjap, '/sjap', :caption => 'SJAP'
+    menu.push :trf1_sjap, {:controller => 'trf1_sjap_welcome', :action => 'index'}, :caption => 'SJAP'
   end
 end
