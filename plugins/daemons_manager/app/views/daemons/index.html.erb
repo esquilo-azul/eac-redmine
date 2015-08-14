@@ -16,6 +16,7 @@
       <td class="buttons">
         <% if daemon.running %>
           <%= link_to('Parar', stop_daemon_path(daemon)) %>
+          <%= link_to('Reiniciar', restart_daemon_path(daemon)) %>
         <% else %>
           <%= link_to('Iniciar', start_daemon_path(daemon)) %>
         <% end %>

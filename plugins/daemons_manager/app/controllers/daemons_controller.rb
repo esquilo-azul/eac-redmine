@@ -14,6 +14,10 @@ class DaemonsController < ApplicationController
     daemon_action(:stop, 'Daemon parado')
   end
   
+  def restart
+    daemon_action(:restart, 'Daemon reiniciado')
+  end
+
   private 
   
   def daemon_action(method, success_message)

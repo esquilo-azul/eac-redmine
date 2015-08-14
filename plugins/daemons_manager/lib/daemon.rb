@@ -27,6 +27,11 @@ class Daemon
     @controller.stop
   end
   
+  def restart
+    stop
+    start
+  end
+
   def name
     @controller.app_name
   end
