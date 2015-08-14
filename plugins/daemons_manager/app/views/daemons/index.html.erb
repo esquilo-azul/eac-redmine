@@ -14,8 +14,11 @@
       <td style="text-align: left"><%= daemon.name %></td>
       <td style="center-align: left"><%= checked_image daemon.running %></td>
       <td class="buttons">
-        <%= link_to('Iniciar', start_daemon_path(daemon)) %>
-        <%= link_to('Parar', stop_daemon_path(daemon)) %>
+        <% if daemon.running %>
+          <%= link_to('Parar', stop_daemon_path(daemon)) %>
+        <% else %>
+          <%= link_to('Iniciar', start_daemon_path(daemon)) %>
+        <% end %>
       </td>
     </tr>
   <% end %>
