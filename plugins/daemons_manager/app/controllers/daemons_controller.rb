@@ -1,6 +1,5 @@
 class DaemonsController < ApplicationController
   before_action :require_admin
-  before_action :set_daemon, only: [:start]
   layout 'admin'
 
   def index
@@ -8,10 +7,20 @@ class DaemonsController < ApplicationController
   end
 
   def start
+    daemon_action(:start, 'Daemon inicializado')    
+  end
+  
+  def stop
+    daemon_action(:stop, 'Daemon parado')
+  end
+  
+  private 
+  
+  def daemon_action(method, success_message)
     @daemon = Daemon.find(params[:id])
-    @daemon.start
-    redirect_to daemons_url, notice: "Daemon inicializado"
+    @daemon.send(method)
+    redirect_to daemons_url, notice: success_message
   rescue ActiveRecord::RecordNotFound
-    redirect_to daemons_url, notice: "Daemon não encontrado com o ID=#{params[:id]}" unless @daemon
+    redirect_to daemons_url, notice: "Daemon não encontrado com o ID=#{params[:id]}"
   end
 end

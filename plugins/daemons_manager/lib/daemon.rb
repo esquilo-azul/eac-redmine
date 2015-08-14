@@ -23,6 +23,10 @@ class Daemon
     @controller.start
   end
   
+  def stop
+    @controller.stop
+  end
+  
   def name
     @controller.app_name
   end
