@@ -40,6 +40,10 @@ class Daemon
     @controller.status == :running
   end
   
+  def log_file
+    "#{Rails.root}/log/#{@controller.app_name}.log"
+  end
+
   def to_s
     id
   end

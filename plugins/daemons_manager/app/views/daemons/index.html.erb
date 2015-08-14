@@ -20,6 +20,7 @@
         <% else %>
           <%= link_to('Iniciar', start_daemon_path(daemon)) %>
         <% end %>
+        <%= link_to('Log', log_daemon_path(daemon)) %>
       </td>
     </tr>
   <% end %>

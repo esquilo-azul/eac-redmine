@@ -18,6 +18,13 @@ class DaemonsController < ApplicationController
     daemon_action(:restart, 'Daemon reiniciado')
   end
 
+  def log
+    @daemon = Daemon.find(params[:id])
+    @log = File.read(@daemon.log_file)
+  rescue ActiveRecord::RecordNotFound
+    redirect_to daemons_url, notice: "Daemon não encontrado com o ID=#{params[:id]}"
+  end
+
   private 
   
   def daemon_action(method, success_message)
