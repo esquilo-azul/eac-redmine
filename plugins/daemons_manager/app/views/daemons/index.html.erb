@@ -1,0 +1,18 @@
+<h2><%= l(:label_daemons) %></h2>
+
+<table class="list">
+<thead>
+  <tr>
+    <th><%= l(:field_name)%></th>
+    <th><%= l(:field_status)%></th>
+  </tr>
+</thead>
+<tbody>
+  <% @daemons.each do |daemon| %>
+    <tr class="<%= cycle("odd", "even") %>">
+      <td style="text-align: left"><%= daemon.app_name %></td>
+      <td style="center-align: left"><%= daemon.status %></td>
+    </tr>
+  <% end %>
+</tbody>
+</table>
