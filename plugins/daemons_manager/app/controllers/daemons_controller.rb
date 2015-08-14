@@ -1,14 +1,17 @@
 class DaemonsController < ApplicationController
   before_action :require_admin
+  before_action :set_daemon, only: [:start]
   layout 'admin'
 
   def index
-    @daemons = find_all
+    @daemons = Daemon.all
   end
 
-  private
-
-  def find_all
-    Daemons::Rails::Monitoring.statuses.map { |v| Daemons::Rails::Monitoring.controller(v[0]) }
+  def start
+    @daemon = Daemon.find(params[:id])
+    @daemon.start
+    redirect_to daemons_url, notice: "Daemon inicializado"
+  rescue ActiveRecord::RecordNotFound
+    redirect_to daemons_url, notice: "Daemon não encontrado com o ID=#{params[:id]}" unless @daemon
   end
 end

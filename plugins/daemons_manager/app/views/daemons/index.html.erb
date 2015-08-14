@@ -4,14 +4,16 @@
 <thead>
   <tr>
     <th><%= l(:field_name)%></th>
-    <th><%= l(:field_status)%></th>
+    <th><%= l(:field_running)%></th>
+    <th>&nbsp;</th>
   </tr>
 </thead>
 <tbody>
   <% @daemons.each do |daemon| %>
     <tr class="<%= cycle("odd", "even") %>">
-      <td style="text-align: left"><%= daemon.app_name %></td>
-      <td style="center-align: left"><%= daemon.status %></td>
+      <td style="text-align: left"><%= daemon.name %></td>
+      <td style="center-align: left"><%= checked_image daemon.running %></td>
+      <td class="buttons"><%= link_to('Iniciar', start_daemon_path(daemon)) %></td>
     </tr>
   <% end %>
 </tbody>
