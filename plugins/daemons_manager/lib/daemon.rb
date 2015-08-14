@@ -43,8 +43,25 @@ class Daemon
   def log_file
     "#{Rails.root}/log/#{@controller.app_name}.log"
   end
+  
+  def autostart
+    return false unless ActiveRecord::Base.connection.table_exists? Setting.table_name
+    Setting.plugin_daemons_manager[autostart_key]
+  end
+
+  def toogle_autostart
+    all = Setting.plugin_daemons_manager
+    all[autostart_key] = !autostart
+    Setting.plugin_daemons_manager = all
+  end
 
   def to_s
     id
+  end
+
+  private
+
+  def autostart_key
+    "daemons.#{@controller.app_name}.autostart"
   end
 end

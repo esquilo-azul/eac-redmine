@@ -2,3 +2,4 @@ pt-BR:
   label_daemon: "Daemon"
   label_daemons: "Daemons"
   field_running: 'Em execução'
+  field_autostart: 'Inicialização automática'

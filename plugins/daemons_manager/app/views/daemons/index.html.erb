@@ -5,6 +5,7 @@
   <tr>
     <th><%= l(:field_name)%></th>
     <th><%= l(:field_running)%></th>
+    <th><%= l(:field_autostart)%></th>
     <th>&nbsp;</th>
   </tr>
 </thead>
@@ -13,6 +14,7 @@
     <tr class="<%= cycle("odd", "even") %>">
       <td style="text-align: left"><%= daemon.name %></td>
       <td style="center-align: left"><%= checked_image daemon.running %></td>
+      <td style="center-align: left"><%= checked_image daemon.autostart %></td>
       <td class="buttons">
         <% if daemon.running %>
           <%= link_to('Parar', stop_daemon_path(daemon)) %>
@@ -20,6 +22,7 @@
         <% else %>
           <%= link_to('Iniciar', start_daemon_path(daemon)) %>
         <% end %>
+        <%= link_to('Inicialização automática', toogle_autostart_daemon_path(daemon)) %>
         <%= link_to('Log', log_daemon_path(daemon)) %>
       </td>
     </tr>
