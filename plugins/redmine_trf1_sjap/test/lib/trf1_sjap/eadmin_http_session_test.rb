@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-require File.expand_path('../../../../test_helper', __FILE__)
+require 'test_helper'
 
 class Trf1Sjap::EadminHttpSessionTest < ActiveSupport::TestCase
   def test_not_logged

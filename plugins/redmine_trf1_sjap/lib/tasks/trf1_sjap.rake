@@ -6,8 +6,7 @@ require 'highline/import'
 namespace :trf1_sjap do
 
   tests = []
-  tests << "plugins/redmine_trf1_sjap/test/models/funcionario_test.rb"
-  tests << "test/unit/lib/trf1_sjap/*_test.rb"
+  tests << "plugins/redmine_trf1_sjap/test/**/*_test.rb"
   Rake::TestTask.new(:test_all => "db:test:prepare") do |t|
     t.libs << "test"
     t.test_files = tests
