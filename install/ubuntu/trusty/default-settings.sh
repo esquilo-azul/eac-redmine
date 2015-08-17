@@ -1,4 +1,5 @@
 export postgresql_database=redmine
+export postgresql_database_test=redmine_test
 export postgresql_user=redmine
 export postgresql_password=redmine
 export gitolite_user=git

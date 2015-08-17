@@ -15,3 +15,12 @@ development:
   password: ${postgresql_password}
   encoding: utf8
   pool: 50
+
+test:
+  adapter: postgresql
+  database: ${postgresql_database_test}
+  host: localhost
+  username: ${postgresql_user}
+  password: ${postgresql_password}
+  encoding: utf8
+  pool: 50
