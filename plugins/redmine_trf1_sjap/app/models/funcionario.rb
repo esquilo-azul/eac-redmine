@@ -66,4 +66,20 @@ class Funcionario < ActiveRecord::Base
   def to_s
     nome
   end
+  
+  def cef_id_solicitacoes_consulta_outdated(now = Time.now)
+    return false if cpf.nil?
+    return true if cef_id_solicitacoes_ultima_consulta.nil?
+    return (now - cef_id_solicitacoes_ultima_consulta) > Funcionario.cef_id_solicitacoes_consulta_outdated_seconds
+  end
+  
+  def self.find_all_cef_id_solicitacoes_consulta_outdated
+    self.all.select {|f| f.cef_id_solicitacoes_consulta_outdated}
+  end
+  
+  def self.cef_id_solicitacoes_consulta_outdated_seconds
+    setting_value = Setting.plugin_redmine_trf1_sjap['cef_id_solicitacoes_consulta_outdated_seconds'].to_i
+    return setting_value if setting_value
+    60 * 60 * 24
+  end
 end
