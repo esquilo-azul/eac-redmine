@@ -8,6 +8,7 @@ pt-BR:
   label_funcionario_plural: 'Funcionários'
   label_cef_id_solicitacaos_plural: 'Solicitações de Identidade Digital da CEF'
   label_ponto_terminal_plural: 'Terminais de Ponto'
+  label_ponto_terminal_entrada_plural: 'Entradas Terminal de Ponto'
   field_cpf: 'CPF'
   field_descricao: 'Descrição'
   field_endereco: 'Endereço'  
