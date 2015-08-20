@@ -5,6 +5,15 @@ require 'highline/import'
 
 namespace :trf1_sjap do
 
+  tests = []
+  tests << "plugins/redmine_trf1_sjap/test/**/*_test.rb"
+  Rake::TestTask.new(:test_all => "db:test:prepare") do |t|
+    t.libs << "test"
+    t.test_files = tests
+    t.verbose = true
+  end
+  Rake::Task['trf1_sjap:test_all'].comment = "Executa testes somente dos recursos desenvolvidos pela TRF1-SJAP."
+
   task :eadmin_login => :environment do
     eadmin_http_session()
   end

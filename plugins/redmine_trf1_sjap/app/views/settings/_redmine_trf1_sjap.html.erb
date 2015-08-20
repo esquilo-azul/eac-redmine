@@ -54,3 +54,8 @@
 		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['assigned_to_member_status_id'] ) %>
 	</select>
 </p>
+
+<p>
+  <label>Prazo para expiração da consulta de identidades digitais da CEF (Em segundos).</label>
+  <%= number_field_tag 'settings[cef_id_solicitacoes_consulta_outdated_seconds]', settings['cef_id_solicitacoes_consulta_outdated_seconds'] %>	
+</p>

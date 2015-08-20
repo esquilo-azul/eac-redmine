@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-require File.expand_path('../../../../test_helper', __FILE__)
+require 'test_helper'
 
 class Trf1Sjap::EsostiRedmineImportTest < ActiveSupport::TestCase
   def test_parse_solicitacao_user
@@ -41,12 +41,4 @@ class Trf1Sjap::EsostiRedmineImportTest < ActiveSupport::TestCase
       :lastname => 'de N.'      
     }, name_parsed)
   end
-  
-  def test_parse_solicitacao_descricao
-    assert_equal(
-      'Favor instalar +1 computador tipo 2 para o servidor Marco Antonio Rodrigues Lima - AP20191', 
-      Trf1Sjap::EsostiRedmineImport::UpdateToRedmine.parse_solicitacao_descricao(' + Favor instalar +1 computador tipo 2 para o servidor Marco Antonio Rodrigues Lima - AP20191 ')
-    )
-  end
-
 end

@@ -15,16 +15,20 @@ Signal.trap("TERM") do
 end
 
 while($running) do
-  Funcionario.where('cpf is not null').where('cef_id_solicitacoes_ultima_consulta is null or extract(seconds from (now() - cef_id_solicitacoes_ultima_consulta)) > 86400').each do |f|
+  funcionarios = Funcionario.find_all_cef_id_solicitacoes_consulta_outdated
+  Rails.logger.debug "Funcionários desatualizados: #{funcionarios.count}"
+  funcionarios.each do |f|
     break unless $running
-    Rails.logger.debug "Consultando para #{f} / #{f.cpf}"   
+    Rails.logger.info "Consultando para #{f} / #{f.cpf}"   
     begin      
       consulta = Trf1Sjap::CefId::ConsultaSolicitacoes.new(f.cpf)
-      Rails.logger.debug "\tSolicitações encontradas: #{consulta.solicitacoes.count}"
+      Rails.logger.info "\tSolicitações encontradas: #{consulta.solicitacoes.count}"
       CefIdSolicitacao.import_from_consulta(f, consulta.solicitacoes)
     rescue SocketError, HTTPClient::BadResponseError, HTTPClient::KeepAliveDisconnected, HTTPClient::ReceiveTimeoutError, Errno::ECONNRESET => ex
       Rails.logger.warn ex    
     end
-  end  
-  sleep 120 if $running
+  end
+  sleep_time=60
+  Rails.logger.debug "Esperando #{sleep_time} segundos até a próxima execução"
+  sleep sleep_time if $running
 end
