@@ -23,7 +23,7 @@ Redmine::Plugin.register :redmine_trf1_sjap do
   Redmine::MenuManager.map :trf1_sjap_menu do |menu|
     menu.push :main, {:controller => 'trf1_sjap_welcome', :action => 'index'}, :caption => 'Página inicial'
     menu.push :funcionarios, {:controller => 'funcionarios', :action => 'index'}, :caption => :label_funcionario_plural, :if => Proc.new { User.current.admin? }
-    menu.push :cef_id_solicitacaos, {:controller => 'cef_id_solicitacaos', :action => 'index'}, :caption => :label_cef_id_solicitacaos_plural, :if => Proc.new { User.current.admin? }
+    menu.push :cef_id_solicitacaos, {:controller => 'cef_id_solicitacaos', :action => 'index'}, :caption => :label_cef_id_solicitacaos_plural, :if => Proc.new { User.current.admin? }    
   end
 
   Redmine::MenuManager.map :top_menu do |menu|
