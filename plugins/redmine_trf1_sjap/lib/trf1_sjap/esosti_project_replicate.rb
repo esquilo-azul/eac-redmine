@@ -18,16 +18,7 @@ module Trf1Sjap
     end
 
     def logger
-      if defined?(@@my_logger).nil?
-        if Rails.env.production?
-          @@my_logger = Logger.new("#{Rails.root}/log/esosti_project_sync.log")
-          @@my_logger.level = Logger::INFO
-        else
-          @@my_logger = Logger.new(STDOUT)
-          @@my_logger.level = Logger::DEBUG
-        end
-      end
-      @@my_logger
+      Rails.logger
     end
 
     private
