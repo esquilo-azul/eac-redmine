@@ -15,6 +15,14 @@ module Sjap
           replicate(session, :funcionarios, :funcionario)
         end
 
+        def self.run_all
+          terminais = PontoTerminal.where(tipo: 'SUPERFACIL')
+          Rails.logger.debug "Terminais \"Super Fácil\" encontrados: #{terminais.count}"
+          terminais.each do |terminal|
+            new(terminal).run
+          end
+        end
+
         private
 
         def login(session)
