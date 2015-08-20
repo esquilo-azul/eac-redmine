@@ -23,25 +23,27 @@ module Trf1Sjap
           logged_user?(content)
         end
 
-        def registros(data_hora_inicio, data_hora_termino)
-          content = @http_client.get_content(
-            server_url,
-            'pgCode' => '8',
-            'opType' => '5',
-            'lblId' => '2',
-            'visibleDiv' => 'communication',
-            'lblNsrI' => '000000001',
-            'lblNsrF' => '000066288',
-            'lblDataI' => data_hora_inicio.strftime('%d/%m/%y+%H:%M'),
-            'lblDataF' => data_hora_termino.strftime('%d/%m/%y+%H:%M')
-          )
-          content.force_encoding('iso-8859-1').encode('utf-8')
+        def pontos
+          export(8, 5);
+        end
+        
+        def funcionarios
+          export(10, 5)
         end
 
         private
 
         def logged_user?(page_content)
           Nokogiri::HTML(page_content).at_xpath('//h1/text()').to_s == 'MENU'
+        end
+        
+        def export(pgCode, opType)
+          content = @http_client.get_content(
+            server_url,
+            'pgCode' => pgCode.to_s,
+            'opType' => opType.to_s,
+          )
+          content.force_encoding('iso-8859-1').encode('utf-8')
         end
 
         def server_url

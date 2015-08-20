@@ -2,7 +2,7 @@ class PontoTerminalEntrada < ActiveRecord::Base
   belongs_to :ponto_terminal
 
   validates :ponto_terminal, presence: true
-  validates :tipo, presence: true, inclusion: %w(ponto)
+  validates :tipo, presence: true, inclusion: %w(ponto funcionario)
   validates :chave, presence: true, uniqueness: { scope: [:ponto_terminal, :tipo] }
 
   def self.replicate(ponto_terminal, tipo, chave)
