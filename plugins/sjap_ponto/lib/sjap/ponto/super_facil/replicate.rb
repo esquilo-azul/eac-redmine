@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-module Trf1Sjap
+module Sjap
   module Ponto
     module SuperFacil
       class Replicate
@@ -9,7 +9,7 @@ module Trf1Sjap
         end
 
         def run
-          session = Trf1Sjap::Ponto::SuperFacil::Session.new(server_url, @ponto_terminal.usuario, @ponto_terminal.senha)
+          session = Sjap::Ponto::SuperFacil::Session.new(server_url, @ponto_terminal.usuario, @ponto_terminal.senha)
           login(session)
           replicate(session, :pontos, :ponto)
           replicate(session, :funcionarios, :funcionario)

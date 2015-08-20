@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-module Trf1Sjap
+module Sjap
   module Ponto
     module SuperFacil
       class Session
