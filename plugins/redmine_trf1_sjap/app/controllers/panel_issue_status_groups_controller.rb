@@ -1,6 +1,7 @@
 class PanelIssueStatusGroupsController < ApplicationController
   before_action :set_panel_issue_status_group, only: [:edit, :update]
-  
+  before_filter :require_admin
+
   def index
     @panel_issue_status_groups = PanelIssueStatusGroup.all
   end
