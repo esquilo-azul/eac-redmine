@@ -1,3 +1,8 @@
 pt-BR:
+  field_autor: 'Autor'
+  field_data_hora: 'Data/Hora'
+  field_motivo: 'Motivo'
+  field_terminal: 'Terminal'
+  label_ponto_entrada_plural: 'Entradas de Ponto'
   label_ponto_terminal_plural: 'Terminais de Ponto'
   label_ponto_terminal_entrada_plural: 'Entradas Terminal de Ponto'
