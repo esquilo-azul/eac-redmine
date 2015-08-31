@@ -7,6 +7,7 @@ class PontoEntradasController < ApplicationController
     conf.columns[:funcionario].form_ui = :select
     conf.columns[:terminal].form_ui = :select
     conf.create.columns.exclude :autor, :terminal
+    conf.actions.exclude :update, :delete
   end
 
   def before_create_save(record)
