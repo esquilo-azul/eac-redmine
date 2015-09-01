@@ -7,6 +7,7 @@ pt-BR:
   field_esosti_export_project: "Projeto para exportação e-Sosti"
   label_funcionario_plural: 'Funcionários'
   label_cef_id_solicitacaos_plural: 'Solicitações de Identidade Digital da CEF'
+  label_user_role_plural: 'Perfis de Usuário'
   field_cpf: 'CPF'
   field_descricao: 'Descrição'
   field_endereco: 'Endereço'  
@@ -23,3 +24,4 @@ pt-BR:
   field_protocolo: 'Protocolo'
   field_situacao: 'Situação'
   field_funcionario: 'Funcionário'
+  field_role: 'Perfil'
