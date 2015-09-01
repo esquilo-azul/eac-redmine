@@ -13,6 +13,14 @@ class PontoEntradasController < ApplicationController
     conf.actions.exclude :update, :delete
   end
 
+  def create_authorized?
+    UserRole.user_has_role('ponto_entrada_create')
+  end
+
+  def list_authorized?
+    UserRole.user_has_role('ponto_entrada_read')
+  end
+
   def before_create_save(record)
     record.metodo = 'MANUAL'
     record.autor = User.current
