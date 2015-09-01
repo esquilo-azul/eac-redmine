@@ -1,6 +1,7 @@
 pt-BR:
   field_autor: 'Autor'
   field_data_hora: 'Data/Hora'
+  field_metodo: 'Método'
   field_motivo: 'Motivo'
   field_terminal: 'Terminal'
   label_ponto_entrada_plural: 'Entradas de Ponto'

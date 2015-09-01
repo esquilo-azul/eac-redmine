@@ -6,6 +6,7 @@ class CreatePontoEntradas < ActiveRecord::Migration
       t.belongs_to :terminal, class_name: 'PontoTerminal'
       t.belongs_to :autor, class_name: 'User'
       t.string :motivo
+      t.string :metodo
 
       t.timestamps null: false
     end
