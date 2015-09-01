@@ -1,2 +1,2 @@
-gem 'active_scaffold'
+gem 'active_scaffold', :git => 'ssh://git@172.18.4.200/seinf-ap/redmine/redmine_active_scaffold.git'
 gem 'sass-rails', '~> 5.0'
