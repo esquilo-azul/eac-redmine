@@ -7,6 +7,8 @@ class PontoEntradasController < ApplicationController
     conf.columns[:funcionario].form_ui = :select
     conf.columns[:terminal].form_ui = :select
     conf.columns[:motivo].required = true
+    conf.actions.swap :search, :field_search
+    conf.field_search.columns = :funcionario
     conf.create.columns.exclude :autor, :terminal, :metodo
     conf.actions.exclude :update, :delete
   end
