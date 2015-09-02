@@ -24,10 +24,16 @@
   <%= link_to 'Voltar', daemons_path %>
 </div>
 
-<%= 
-content_tag(:div, id: 'daemonLog') do
-  content_tag(:pre) do
-  @log
-  end 
-  end
-%>
+<%= content_tag(:p,) do
+  "Caminho do log: \"#{@daemon.log_file}\""
+end %>
+
+<% if @log %>
+  <%= content_tag(:div, id: 'daemonLog') do
+    content_tag(:pre) { @log }
+  end %>
+<% else %>
+  <%= content_tag(:p,) do
+    content_tag(:em) { 'Arquivo de log não encontrado.' }
+  end %>
+<% end %>

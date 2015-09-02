@@ -20,7 +20,8 @@ class DaemonsController < ApplicationController
 
   def log
     @daemon = Daemon.find(params[:id])
-    @log = File.read(@daemon.log_file)
+    @log = nil
+    @log = File.read(@daemon.log_file) if File.exist?(@daemon.log_file)
   rescue ActiveRecord::RecordNotFound
     redirect_to daemons_url, notice: "Daemon não encontrado com o ID=#{params[:id]}"
   end
