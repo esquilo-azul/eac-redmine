@@ -7,12 +7,16 @@ class PontoEntrada < ActiveRecord::Base
   validates :funcionario, presence: true
   validates :metodo, presence: true, inclusion: ['MANUAL', 'TERMINAL']
   validates :motivo, presence: true, length: { minimum: 3 }, if: Proc.new{|u| u.metodo == 'MANUAL' }
+  validates :terminal, presence: true, if: proc { |u| u.metodo == 'TERMINAL' }
   validate :autor_usuario_logado
 
   def autor_usuario_logado
-    return unless self.metodo == 'MANUAL'
-    if !User.current || self.autor != User.current
+    if metodo == 'MANUAL'
+      return if User.current && autor == User.current
       errors.add(:autor, 'Autor não é o usuário logado.')
+    elsif metodo == 'TERMINAL'
+      return unless autor
+      errors.add(:autor, 'Autor deve ser nulo.')
     end
   end 
 end
