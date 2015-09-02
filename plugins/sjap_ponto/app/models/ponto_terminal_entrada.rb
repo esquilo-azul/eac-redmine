@@ -1,5 +1,6 @@
 class PontoTerminalEntrada < ActiveRecord::Base
   belongs_to :ponto_terminal
+  belongs_to :exportado, polymorphic: true
 
   validates :ponto_terminal, presence: true
   validates :tipo, presence: true, inclusion: %w(ponto funcionario)
