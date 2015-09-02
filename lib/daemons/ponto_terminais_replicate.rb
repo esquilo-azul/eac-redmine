@@ -16,7 +16,12 @@ end
 
 while($running) do
   begin
-    Rake::Task['sjap:ponto:terminais_replicate'].invoke
+    Sjap::Ponto::SuperFacil::Replicate.run_all
+  rescue Exception => ex
+    Rails.logger.warn ex
+  end
+  begin
+    Sjap::Ponto::SuperFacil::Import.run_all
   rescue Exception => ex
     Rails.logger.warn ex
   end
