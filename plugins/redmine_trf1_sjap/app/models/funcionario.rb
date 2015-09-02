@@ -32,7 +32,7 @@ end
 class PasepPisNitValidator < ::ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     unless check_pis(value)
-      record.errors[attribute] << (options[:message] || 'CPF inválido (11 caracteres, somente dígitos)')
+      record.errors[attribute] << (options[:message] || 'PIS inválido (11 caracteres, somente dígitos)')
     end
   end
 
