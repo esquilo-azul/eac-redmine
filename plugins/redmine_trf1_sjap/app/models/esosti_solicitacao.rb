@@ -1,69 +1,69 @@
 class EsostiSolicitacao < ActiveRecord::Base
   include ActionView::Helpers::TextHelper
   unloadable
-  validates_uniqueness_of :esosti_id 
+  validates_uniqueness_of :esosti_id
   validates_uniqueness_of :issue_id, allow_nil: true
   validates_presence_of :esosti_id, :trf1_sjap_project_id
   validates :closed, exclusion: { in: [nil] }
-  belongs_to :trf1_sjap_project  
+  belongs_to :trf1_sjap_project
   belongs_to :issue
-  
+
   def closed_by_update?
     for update in updates
       return true if update.fase.is_closed
     end
-    return false
+    false
   end
-  
-  def updates 
-    EsostiUpdate.where(:esosti_solicitacao_id => id).order('index asc')
+
+  def updates
+    EsostiUpdate.where(esosti_solicitacao_id: id).order('index asc')
   end
-  
-  def propriedades 
-    EsostiSolicitacaoPropriedade.where(:esosti_solicitacao_id => id)
+
+  def propriedades
+    EsostiSolicitacaoPropriedade.where(esosti_solicitacao_id: id)
   end
-  
+
   def propriedade_valor(propriedade_nome)
-    propriedade = EsostiSolicitacaoPropriedade.where(esosti_solicitacao_id: self.id, nome: propriedade_nome).first
+    propriedade = EsostiSolicitacaoPropriedade.where(esosti_solicitacao_id: id, nome: propriedade_nome).first
     if propriedade
       return propriedade.valor
     else
-      raise "Propriedade não encontrada (esosti_solicitacao_id: #{self.id}, esosti_id: #{esosti_id}, nome: #{propriedade_nome}, propriedades: #{propriedades.inspect}"
+      fail "Propriedade não encontrada (esosti_solicitacao_id: #{id}, esosti_id: #{esosti_id}, nome: #{propriedade_nome}, propriedades: #{propriedades.inspect}"
     end
   end
-  
+
   def has_propriedade(propriedade_nome)
-    EsostiSolicitacaoPropriedade.where(esosti_solicitacao_id: self.id, nome: propriedade_nome).count > 0
+    EsostiSolicitacaoPropriedade.where(esosti_solicitacao_id: id, nome: propriedade_nome).count > 0
   end
 
   def self.get_or_create(trf1_sjap_project, esosti_id)
     esosti_solicitacao = EsostiSolicitacao.find_by_esosti_id(esosti_id)
-    if !esosti_solicitacao
+    unless esosti_solicitacao
       esosti_solicitacao = EsostiSolicitacao.new
       esosti_solicitacao.closed = false
       esosti_solicitacao.trf1_sjap_project_id = trf1_sjap_project.id
       esosti_solicitacao.esosti_id = esosti_id
-      Trf1Sjap::ModelUtils::save_or_raise(esosti_solicitacao)
+      Trf1Sjap::ModelUtils.save_or_raise(esosti_solicitacao)
     end
     esosti_solicitacao
   end
-  
+
   def issue
     if issue_id
       Issue.find(issue_id)
     else
       new_issue = Issue.new
       new_issue.project_id = trf1_sjap_project.esosti_export_project.id
-      new_issue.subject = get_issue_subject()
-      new_issue.description = get_issue_description()
+      new_issue.subject = get_issue_subject
+      new_issue.description = get_issue_description
       new_issue.author_id = assert_usuario.to_redmine_user.id
-      new_issue.tracker_id = get_tracker_id()
-      ActiveRecord::Base.transaction do        
+      new_issue.tracker_id = get_tracker_id
+      ActiveRecord::Base.transaction do
         Trf1Sjap::ModelUtils.save_or_raise(new_issue)
         self.issue_id = new_issue.id
-        Trf1Sjap::ModelUtils.save_or_raise(self)        
+        Trf1Sjap::ModelUtils.save_or_raise(self)
       end
-      raise 'self.issue_id == nil' if self.issue_id == nil
+      fail 'self.issue_id == nil' if issue_id.nil?
       new_issue
     end
   end
@@ -112,13 +112,13 @@ class EsostiSolicitacao < ActiveRecord::Base
   def assert_propriedades(raw_propriedades)
     novos = 0
     raw_propriedades.each do |nome, valor|
-      novos += 1 if assert_propriedade(nome, valor)            
+      novos += 1 if assert_propriedade(nome, valor)
     end
     novos
   end
 
   def assert_propriedade(nome, valor)
-    propriedade = EsostiSolicitacaoPropriedade.where(esosti_solicitacao_id: id, nome: nome).first        
+    propriedade = EsostiSolicitacaoPropriedade.where(esosti_solicitacao_id: id, nome: nome).first
     if !propriedade
       ActiveRecord::Base.transaction do
         propriedade = EsostiSolicitacaoPropriedade.new
@@ -135,11 +135,11 @@ class EsostiSolicitacao < ActiveRecord::Base
 
   private
 
-  def get_issue_subject()
+  def get_issue_subject
     truncate(propriedade_valor(EsostiSolicitacaoPropriedade::DESCRICAO_NOME), length: 200)
   end
 
-  def get_issue_description()
+  def get_issue_description
     b = "*Link*: #{eadmin_link_url}\n"
     for propriedade in propriedades
       b += "*#{propriedade.nome}:* #{propriedade.valor}\n"
@@ -148,20 +148,18 @@ class EsostiSolicitacao < ActiveRecord::Base
   end
 
   def eadmin_link_url
-    'http://sistemas.trf1.jus.br/app/e-Admin/sosti/pesquisarsolicitacoes/formpesquisa/nSosti/' + 
-      propriedade_valor(EsostiSolicitacaoPropriedade::NUMERO_NOME)        
+    'http://sistemas.trf1.jus.br/app/e-Admin/sosti/pesquisarsolicitacoes/formpesquisa/nSosti/' +
+      propriedade_valor(EsostiSolicitacaoPropriedade::NUMERO_NOME)
   end
 
-
-  def get_tracker_id()
+  def get_tracker_id
     default_tracker_id = Setting.plugin_redmine_trf1_sjap['tracker_id']
-    if default_tracker_id != nil
+    unless default_tracker_id.nil?
       for tracker in trf1_sjap_project.project.trackers
         return default_tracker_id if tracker.id == default_tracker_id.to_i
       end
     end
-    raise 'Projeto não possui trackers' if trf1_sjap_project.project.trackers.empty?
-    return trf1_sjap_project.project.trackers[0].id
+    fail 'Projeto não possui trackers' if trf1_sjap_project.project.trackers.empty?
+    trf1_sjap_project.project.trackers[0].id
   end
-  
 end

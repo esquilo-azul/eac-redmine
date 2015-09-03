@@ -15,18 +15,14 @@ module Trf1Sjap
 
       def on_logged(&block)
         @mutex.synchronize do
-          if ! @logged
-            @loggedCv.wait(@mutex)
-          end 
+          @loggedCv.wait(@mutex) unless @logged
         end
         block.call
       end
-      
+
       def on_not_logged(&block)
         @mutex.synchronize do
-          if @logged
-            @notLoggedCv.wait(@mutex)
-          end 
+          @notLoggedCv.wait(@mutex) if @logged
         end
         block.call
       end
@@ -37,14 +33,13 @@ module Trf1Sjap
           @loggedCv.broadcast
         end
       end
-      
+
       def not_logged
-        @mutex.synchronize do          
+        @mutex.synchronize do
           @logged = false
           @notLoggedCv.broadcast
         end
       end
-
     end
   end
 end

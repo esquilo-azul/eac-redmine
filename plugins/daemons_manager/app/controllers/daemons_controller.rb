@@ -7,13 +7,13 @@ class DaemonsController < ApplicationController
   end
 
   def start
-    daemon_action(:start, 'Daemon inicializado')    
+    daemon_action(:start, 'Daemon inicializado')
   end
-  
+
   def stop
     daemon_action(:stop, 'Daemon parado')
   end
-  
+
   def restart
     daemon_action(:restart, 'Daemon reiniciado')
   end
@@ -30,8 +30,8 @@ class DaemonsController < ApplicationController
     daemon_action(:toogle_autostart, 'Inicialização automática modificada')
   end
 
-  private 
-  
+  private
+
   def daemon_action(method, success_message)
     @daemon = Daemon.find(params[:id])
     @daemon.send(method)

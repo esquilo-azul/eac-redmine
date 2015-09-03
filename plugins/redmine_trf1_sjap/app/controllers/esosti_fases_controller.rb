@@ -42,13 +42,14 @@ class EsostiFasesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_esosti_fase
-      @esosti_fase = EsostiFase.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def esosti_fase_params
-      params.require(:esosti_fase).permit(:rotulo, :issue_status_id, :is_closed)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_esosti_fase
+    @esosti_fase = EsostiFase.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def esosti_fase_params
+    params.require(:esosti_fase).permit(:rotulo, :issue_status_id, :is_closed)
+  end
 end

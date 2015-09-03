@@ -60,23 +60,23 @@ end
 class Funcionario < ActiveRecord::Base
   validates :nome, presence: true
   validates :cpf, uniqueness: true, allow_blank: true, cpf: true
-  validates :matricula, presence: true, uniqueness: { :case_sensitive => false }
+  validates :matricula, presence: true, uniqueness: { case_sensitive: false }
   validates :pis, uniqueness: true, pasep_pis_nit: true, allow_blank: true
 
   def to_s
     nome
   end
-  
+
   def cef_id_solicitacoes_consulta_outdated(now = Time.now)
     return false if cpf.nil?
     return true if cef_id_solicitacoes_ultima_consulta.nil?
-    return (now - cef_id_solicitacoes_ultima_consulta) > Funcionario.cef_id_solicitacoes_consulta_outdated_seconds
+    (now - cef_id_solicitacoes_ultima_consulta) > Funcionario.cef_id_solicitacoes_consulta_outdated_seconds
   end
-  
+
   def self.find_all_cef_id_solicitacoes_consulta_outdated
-    self.all.select {|f| f.cef_id_solicitacoes_consulta_outdated}
+    all.select(&:cef_id_solicitacoes_consulta_outdated)
   end
-  
+
   def self.cef_id_solicitacoes_consulta_outdated_seconds
     setting_value = Setting.plugin_redmine_trf1_sjap['cef_id_solicitacoes_consulta_outdated_seconds'].to_i
     return setting_value if setting_value

@@ -13,9 +13,7 @@ module Trf1Sjap
         @cpf = cpf
       end
 
-      def solicitacoes
-        parser.solicitacoes
-      end
+      delegate :solicitacoes, to: :parser
 
       private
 
@@ -26,8 +24,8 @@ module Trf1Sjap
           body
         end
       end
-      
-      def parser 
+
+      def parser
         ConsultaSolicitacoesParser.new(html)
       end
 
@@ -37,12 +35,12 @@ module Trf1Sjap
           http_client.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
           url = 'https://certificadodigital.caixa.gov.br/cefar/consulta/consulta/consulta.htm'
           http_client.post(url, 'numeroCpf' => @cpf)
-        end        
+        end
       end
 
       def log_consulta(html)
         log_file = "#{Rails.root}/log/cef_id_consulta_solicitacoes/#{cpf}.html"
-        FileUtils::mkdir_p(File.dirname(log_file))
+        FileUtils.mkdir_p(File.dirname(log_file))
         File.write(log_file, html)
       end
     end

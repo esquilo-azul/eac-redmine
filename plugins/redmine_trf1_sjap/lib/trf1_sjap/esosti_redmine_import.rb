@@ -1,7 +1,6 @@
 # encoding: UTF-8
 
 module Trf1Sjap
-  
   class EsostiRedmineImport
     # Replica no redmine os e-Sostis encontrados na caixa de atendimentos da seção do e-Sosti no e-Admin.
     def self.import_caixa_secao_atendimento(trf1_sjap_project, solicitacoes)
@@ -14,7 +13,7 @@ module Trf1Sjap
       replicate = SolicitacaoDetalhesReplicate.new(esosti_solicitacao, propriedades, updates)
       replicate.result
     end
-    
+
     # Transforma uma solicitação e-Sosti (Já na base de dados do Redmine) em um Issue Redmine
     def self.solicitacao_to_redmine(esosti_solicitacao)
       export = SolicitacaoToRedmine.new(esosti_solicitacao)
@@ -36,7 +35,7 @@ module Trf1Sjap
 
     private
 
-    def self.get_admin_user()
+    def self.get_admin_user
       User.find(Setting.plugin_redmine_trf1_sjap['admin_user_id'])
     end
   end

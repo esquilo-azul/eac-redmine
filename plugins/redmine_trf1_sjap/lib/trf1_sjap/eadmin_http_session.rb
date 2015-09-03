@@ -5,7 +5,7 @@ require 'fileutils'
 
 module Trf1Sjap
   class EadminHttpSession
-    def initialize usuario, senha, banco='JFAP'
+    def initialize(usuario, senha, banco = 'JFAP')
       @httpClient = HTTPClient.new
       @usuario = usuario
       @senha = senha
@@ -14,25 +14,19 @@ module Trf1Sjap
 
     def login
       begin
-        html = request(:post, '/login', {
-          'COU_COD_MATRICULA' => @usuario,
-          'COU_COD_PASSWORD' => @senha,
-          'COU_NM_BANCO' => @banco,
-          'Conectar' => 'Conectar',
-          :follow_redirect => true
-        })
+        html = request(:post, '/login',           'COU_COD_MATRICULA' => @usuario,
+                                                  'COU_COD_PASSWORD' => @senha,
+                                                  'COU_NM_BANCO' => @banco,
+                                                  'Conectar' => 'Conectar',
+                                                  :follow_redirect => true)
       rescue SocketError, HTTPClient::BadResponseError, HTTPClient::TimeoutError => ex
         return ex.class.name + ': ' + ex.message
       end
-      if loggedUser?(html)
-        return true
-      end
+      return true if loggedUser?(html)
       doc = Nokogiri::HTML(html)
       errorNode = doc.at_xpath("id('conteudoLogin')/div[1]/text()")
-      if errorNode != nil
-      	return errorNode.text.strip
-      end
-      return 'Erro desconhecido'
+      return errorNode.text.strip unless errorNode.nil?
+      'Erro desconhecido'
     end
 
     def loggedUser?(pageContent)
@@ -40,53 +34,47 @@ module Trf1Sjap
       page.xpath("id('nome')/text()[3]").each do |node|
         return node.content.strip
       end
-      return false
+      false
     end
 
     def caixaAtendimentoSecao
       pageContent = request(:get, '/sosti/atendimentosecoes/atendimentousuario')
       log_caixa_atendimento_secao_html(pageContent)
-      if !loggedUser?(pageContent) 
-        raise UserNotLogged.new
-      end
-      return CaixaAtendimentoSecao.new(pageContent)
+      fail UserNotLogged.new unless loggedUser?(pageContent)
+      CaixaAtendimentoSecao.new(pageContent)
     end
-    
+
     def solicitacao_detalhes(solicitacao_id)
-      html = request(:post, '/sosti/detalhesolicitacao/detalhesol',  '{"SSOL_ID_DOCUMENTO":"' + solicitacao_id.to_s + '"}')
+      html = request(:post, '/sosti/detalhesolicitacao/detalhesol', '{"SSOL_ID_DOCUMENTO":"' + solicitacao_id.to_s + '"}')
       log_solicitacao_detalhes_html(solicitacao_id, html)
-      if !loggedUser?(html)
-        raise UserNotLogged.new
-      end
-      return SolicitacaoDetalhes.new(html)
+      fail UserNotLogged.new unless loggedUser?(html)
+      SolicitacaoDetalhes.new(html)
     end
 
     class UserNotLogged < Exception
     end
-    
+
     private
-    
+
     def log_caixa_atendimento_secao_html(html)
       log_file = "#{Rails.root}/log/esosti_caixa_atendimento_secao/#{@usuario}-#{@banco}.html"
-      FileUtils::mkdir_p(File.dirname(log_file))
+      FileUtils.mkdir_p(File.dirname(log_file))
       File.write(log_file, html)
     end
-    
+
     def log_solicitacao_detalhes_html(solicitacao_id, html)
       log_file = "#{Rails.root}/log/esosti_solicitacao_detalhes/#{solicitacao_id}.html"
-      FileUtils::mkdir_p(File.dirname(log_file))
+      FileUtils.mkdir_p(File.dirname(log_file))
       File.write(log_file, html)
     end
 
     def concurrency_limit
       @@concurrency_limit ||= Trf1Sjap::ConcurrencyLimit.new(limit)
     end
-    
+
     def limit
       limit = Setting.plugin_redmine_trf1_sjap['eadmin_request_limit'].to_i
-      if limit < 1
-        limit = 1
-      end
+      limit = 1 if limit < 1
       limit
     end
 
@@ -103,10 +91,8 @@ module Trf1Sjap
       elsif method == :get
         @httpClient.get_content(url)
       else
-        raise 'Unknown method: ' + method.to_s
+        fail 'Unknown method: ' + method.to_s
       end
     end
-
   end
-
 end

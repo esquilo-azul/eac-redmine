@@ -6,8 +6,8 @@ class PontoEntrada < ActiveRecord::Base
 
   validates :data_hora, presence: true
   validates :funcionario, presence: true
-  validates :metodo, presence: true, inclusion: ['MANUAL', 'TERMINAL']
-  validates :motivo, presence: true, length: { minimum: 3 }, if: Proc.new{|u| u.metodo == 'MANUAL' }
+  validates :metodo, presence: true, inclusion: %w(MANUAL TERMINAL)
+  validates :motivo, presence: true, length: { minimum: 3 }, if: proc { |u| u.metodo == 'MANUAL' }
   validates :terminal, presence: true, if: proc { |u| u.metodo == 'TERMINAL' }
   validate :autor_usuario_logado
 
@@ -19,5 +19,5 @@ class PontoEntrada < ActiveRecord::Base
       return unless autor
       errors.add(:autor, 'Autor deve ser nulo.')
     end
-  end 
+  end
 end

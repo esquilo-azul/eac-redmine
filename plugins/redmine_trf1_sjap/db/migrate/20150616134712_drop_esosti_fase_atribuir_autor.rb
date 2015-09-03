@@ -6,5 +6,4 @@ class DropEsostiFaseAtribuirAutor < ActiveRecord::Migration
   def down
     add_column :esosti_fases, :atribuir_autor, :boolean
   end
-  
 end

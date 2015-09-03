@@ -7,10 +7,10 @@ class EadminController < ApplicationController
 
   def esosti_alerta_data
     session = Trf1Sjap::EadminHttpSession.new(
-        request.params[:matricula],
-        request.params[:senha],
-        request.params[:banco]
-      )
+      request.params[:matricula],
+      request.params[:senha],
+      request.params[:banco]
+    )
     @loginResult = session.login
     @solicitacoes = nil
     if @loginResult === true
@@ -22,7 +22,6 @@ class EadminController < ApplicationController
       @loginMessage = @loginResult
       @loginResult = false
     end
-    render(:layout => false) if request.xhr?
+    render(layout: false) if request.xhr?
   end
-
 end

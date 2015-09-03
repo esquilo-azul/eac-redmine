@@ -18,11 +18,11 @@ end
 
 if defined?($server_mode) && $server_mode
   Daemon.all.each do |daemon|
-    Rails::logger.info "Daemon #{daemon.name} autostart: #{daemon.autostart}"
+    Rails.logger.info "Daemon #{daemon.name} autostart: #{daemon.autostart}"
     if daemon.autostart
-      Rails::logger.info "Inicialização daemon #{daemon.name}..."
+      Rails.logger.info "Inicialização daemon #{daemon.name}..."
       daemon.start
-      Rails::logger.info "Daemon #{daemon.name} inicializado."
+      Rails.logger.info "Daemon #{daemon.name} inicializado."
     end
   end
 end

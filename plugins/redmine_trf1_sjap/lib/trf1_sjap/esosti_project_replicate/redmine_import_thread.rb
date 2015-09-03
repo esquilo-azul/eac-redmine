@@ -6,20 +6,20 @@ require 'unicode_utils/titlecase'
 module Trf1Sjap
   class EsostiProjectReplicate
     # Transforma as atualizações e-Sosti em atualizações do Redmine
-    class RedmineImportThread < LoopThread      
+    class RedmineImportThread < LoopThread
       def run
         run_solicitacaos_sem_issue
         run_atendente_mudancas
         run_updates_abertos
         sleep_long
       end
-            
+
       def to_s
-        return 'REDMINE IMPORT'
+        'REDMINE IMPORT'
       end
-      
+
       private
-      
+
       def run_solicitacaos_sem_issue
         run_database_operation do
           solicitacoes = @esosti_project_replicate.trf1_sjap_project.esosti_solicitacaos_sem_issue
@@ -31,7 +31,7 @@ module Trf1Sjap
           end
         end
       end
-      
+
       def run_atendente_mudancas
         run_database_operation do
           solicitacoes = atendente_mudancas
@@ -41,10 +41,10 @@ module Trf1Sjap
             log(:debug, "Importando mudança de atendentes #{solicitacao_text}")
             result = EsostiRedmineImport.import_atendente_mudanca(solicitacao)
             log(:info, "Importada mudança de atendente #{solicitacao_text} => journal_id: #{result.inspect}")
-          end          
+          end
         end
       end
-      
+
       def run_updates_abertos
         run_database_operation do
           updates = @esosti_project_replicate.trf1_sjap_project.esosti_updates_abertos
@@ -57,11 +57,10 @@ module Trf1Sjap
           end
         end
       end
-      
+
       def atendente_mudancas
-        return EsostiSolicitacao.where('atendente <> atendente_anterior and issue_id is not null')
+        EsostiSolicitacao.where('atendente <> atendente_anterior and issue_id is not null')
       end
     end
   end
-
 end

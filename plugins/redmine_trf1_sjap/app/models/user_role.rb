@@ -11,7 +11,7 @@ class UserRole < ActiveRecord::Base
   validates :role, uniqueness: { scope: [:user], message: 'Usuário já possui este perfil' }
 
   def self.user_has_role(role, user = false)
-    raise "UserRole::ROLES não inclui o perfil \"#{role}\". Verifique." unless ROLES.include?(role)
+    fail "UserRole::ROLES não inclui o perfil \"#{role}\". Verifique." unless ROLES.include?(role)
     user = User.current unless user
     return false unless user
     !UserRole.where(user: user, role: role).empty?

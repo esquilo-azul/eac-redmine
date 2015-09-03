@@ -39,7 +39,7 @@ class PontoEntradasController < ApplicationController
   end
 
   def cancela
-    process_action_link_action do |record|
+    process_action_link_action do |_record|
       @ponto = find_if_allowed(params[:id], :read)
       @record = PontoCancelamento.new
       @record.ponto_entrada = @ponto
@@ -56,7 +56,7 @@ class PontoEntradasController < ApplicationController
     record.autor = User.current
   end
 
-  private 
+  private
 
   def authorize_cancela?(record)
     UserRole.user_has_role('ponto_cancelamento_create') && record.cancelamento.nil?

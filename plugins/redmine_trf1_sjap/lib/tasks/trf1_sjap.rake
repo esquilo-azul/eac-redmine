@@ -4,76 +4,72 @@ require 'yaml'
 require 'highline/import'
 
 namespace :trf1_sjap do
-
   tests = []
-  tests << "plugins/redmine_trf1_sjap/test/**/*_test.rb"
-  Rake::TestTask.new(:test_all => "db:test:prepare") do |t|
-    t.libs << "test"
+  tests << 'plugins/redmine_trf1_sjap/test/**/*_test.rb'
+  Rake::TestTask.new(test_all: 'db:test:prepare') do |t|
+    t.libs << 'test'
     t.test_files = tests
     t.verbose = true
   end
-  Rake::Task['trf1_sjap:test_all'].comment = "Executa testes somente dos recursos desenvolvidos pela TRF1-SJAP."
+  Rake::Task['trf1_sjap:test_all'].comment = 'Executa testes somente dos recursos desenvolvidos pela TRF1-SJAP.'
 
-  task :eadmin_login => :environment do
-    eadmin_http_session()
+  task eadmin_login: :environment do
+    eadmin_http_session
   end
 
   def eadmin_http_session
     config_path = ENV['HOME'] + '/.config/trf1-redmine/eadmin-login.yml'
-    config = {:nome => 'Eduardo', :cidade=>'Macapá'}
+    config = { nome: 'Eduardo', cidade: 'Macapá' }
     begin
       config = YAML.load_file(config_path)
       say("Login do e-Admin retirado de \"#{config_path}\"")
     rescue Errno::ENOENT => ex
       say("Arquivo de configuração \"<%= color('#{config_path}', BOLD) %>\" ainda não existe")
       config = {}
-      config[:login] = ask("E-admin login? ")
-      config[:senha]= ask("E-admin senha: ") { |q| q.echo = "*" }
-      config[:banco] = ask("E-admin banco: ")
+      config[:login] = ask('E-admin login? ')
+      config[:senha] = ask('E-admin senha: ') { |q| q.echo = '*' }
+      config[:banco] = ask('E-admin banco: ')
     end
 
     session = Trf1Sjap::EadminHttpSession.new(config[:login], config[:senha], config[:banco])
     say('Efetuando login...')
     loginResult = session.login
     if loginResult === true
-      if ! File.exist?(config_path)
+      unless File.exist?(config_path)
         say('Login ok. Salvando arquivo de configuração...')
-        FileUtils::mkdir_p(File.dirname(config_path))
-        File.write(config_path, config.to_yaml)        
+        FileUtils.mkdir_p(File.dirname(config_path))
+        File.write(config_path, config.to_yaml)
         say('Arquivo salvo')
       end
-    return session
+      return session
     else
       say("<%= color('Login falhou: #{loginResult}', RED) %>")
       return nil
     end
-
   end
-  
-  task :nokogiri_parse, :input_file, :xpath  do |t, args|
+
+  task :nokogiri_parse, :input_file, :xpath do |_t, args|
     doc = Nokogiri::HTML(File.read(args.input_file))
-    if args.xpath == nil
+    if args.xpath.nil?
       nodes = [doc.root]
     else
-      puts "XPATH: " + args.xpath
+      puts 'XPATH: ' + args.xpath
       nodes = doc.xpath(args.xpath)
-      
+
     end
-    puts "NODES FOUND: " + nodes.length.to_s
+    puts 'NODES FOUND: ' + nodes.length.to_s
     for node in nodes
       puts '==========================================='
       print_node(node, 0)
     end
   end
-  
-  def print_node(node,level)
-    if node.kind_of?(Nokogiri::XML::Element) 
-      puts "  " * level + node.name
+
+  def print_node(node, level)
+    if node.is_a?(Nokogiri::XML::Element)
+      puts '  ' * level + node.name
       for child in node.children
         print_node(child, level + 1)
       end
     end
   end
-
 end
-

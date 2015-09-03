@@ -4,13 +4,13 @@ class EsostiFase < ActiveRecord::Base
   validates_presence_of :rotulo
   validates_uniqueness_of :rotulo
   belongs_to :issue_status
-  
+
   def to_s
     rotulo
   end
 
-  def is_closed_by_rotulo(fase_rotulo) 
+  def is_closed_by_rotulo(fase_rotulo)
     fase = EsostiFase.find_by_rotulo(fase_rotulo)
-    return fase && fase.is_closed
-  end  
+    fase && fase.is_closed
+  end
 end

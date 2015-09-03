@@ -31,7 +31,7 @@ module Trf1Sjap
       end
 
       def doc
-        @doc ||= Nokogiri.HTML(@html)  { |config| config.options = Nokogiri::XML::ParseOptions::NOBLANKS }
+        @doc ||= Nokogiri.HTML(@html) { |config| config.options = Nokogiri::XML::ParseOptions::NOBLANKS }
       end
 
       def sanitize_text(text)

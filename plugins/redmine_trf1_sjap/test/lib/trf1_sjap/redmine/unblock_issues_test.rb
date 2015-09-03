@@ -1,9 +1,8 @@
 # encoding: UTF-8
 
-
 class Trf1Sjap::Redmine::UnblockIssuesTest < ActiveSupport::TestCase
   def test_blocked_by_start_date
-    issue = Issue.new    
+    issue = Issue.new
     issue.start_date = nil
     assert_equal false, Trf1Sjap::Redmine::UnblockIssues.blocked_by_start_date?(issue), 'Sem data de início'
     issue.start_date = Date.today

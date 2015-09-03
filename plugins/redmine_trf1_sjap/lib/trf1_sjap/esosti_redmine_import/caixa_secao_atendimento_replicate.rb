@@ -3,7 +3,6 @@
 module Trf1Sjap
   class EsostiRedmineImport
     class CaixaSecaoAtendimentoReplicate
-
       attr_reader :result
       def initialize(trf1_sjap_project, solicitacoes)
         @result = 0
@@ -20,15 +19,14 @@ module Trf1Sjap
         esosti_solicitacao = EsostiSolicitacao.find_by_esosti_id(solicitacao[:id])
         if !esosti_solicitacao
           esosti_solicitacao = EsostiSolicitacao.get_or_create(trf1_sjap_project, solicitacao[:id])
-        result = true
+          result = true
         else
-        result = false
+          result = false
         end
         esosti_solicitacao.atendente = solicitacao[:atendente].strip
-        ModelUtils::save_or_raise(esosti_solicitacao)
+        ModelUtils.save_or_raise(esosti_solicitacao)
         result
       end
-
     end
   end
 end

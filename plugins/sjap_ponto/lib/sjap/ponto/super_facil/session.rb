@@ -24,9 +24,9 @@ module Sjap
         end
 
         def pontos
-          export(8, 5);
+          export(8, 5)
         end
-        
+
         def funcionarios
           export(10, 5)
         end
@@ -36,12 +36,12 @@ module Sjap
         def logged_user?(page_content)
           Nokogiri::HTML(page_content).at_xpath('//h1/text()').to_s == 'MENU'
         end
-        
+
         def export(pgCode, opType)
           content = @http_client.get_content(
             server_url,
             'pgCode' => pgCode.to_s,
-            'opType' => opType.to_s,
+            'opType' => opType.to_s
           )
           content.force_encoding('iso-8859-1').encode('utf-8')
         end
