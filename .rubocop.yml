@@ -1,0 +1,35 @@
+AllCops:
+  RunRailsCops: true
+  Exclude:
+    - 'app/**/*'
+    - 'bin/**/*'
+    - 'config/**/*'
+    - 'config.ru'
+    - 'CONTRIBUTING.md'
+    - 'db/**/*'
+    - 'doc/**/*'
+    - 'extra/**/*'
+    - 'files/**/*'
+    - 'Gemfile'
+    - 'Gemfile.lock'
+    - 'install/**/*'
+    - 'lib/**/*'
+    - 'log/**/*'
+    - 'nbproject/**/*'
+    - 'plugins/redmine_bootstrap_kit/**/*'
+    - 'plugins/redmine_git_hosting/**/*'
+    - 'public/**/*'
+    - 'Rakefile'
+    - 'README.rdoc'
+    - 'script/**/*'
+    - 'test/**/*'
+    - 'tmp/**/*'
+  
+Style/Documentation:
+  Enabled: false
+
+Style/AsciiComments:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 100
