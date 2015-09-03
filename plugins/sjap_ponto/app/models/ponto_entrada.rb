@@ -2,6 +2,7 @@ class PontoEntrada < ActiveRecord::Base
   belongs_to :funcionario
   belongs_to :terminal, class_name: 'PontoTerminal'
   belongs_to :autor, class_name: 'User'
+  has_one :cancelamento, class_name: 'PontoCancelamento', inverse_of: :ponto_entrada
 
   validates :data_hora, presence: true
   validates :funcionario, presence: true

@@ -1,5 +1,7 @@
 class UserRole < ActiveRecord::Base
   ROLES = %w(
+    ponto_cancelamento_read
+    ponto_cancelamento_create
     ponto_entrada_create
     ponto_entrada_read
   )

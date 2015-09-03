@@ -15,5 +15,6 @@ Redmine::Plugin.register :sjap_ponto do
     menu.push :ponto_terminals, {:controller => 'ponto_terminals', :action => 'index'}, :caption => :label_ponto_terminal_plural, :if => Proc.new { User.current.admin? }
     menu.push :ponto_terminal_entradas, {:controller => 'ponto_terminal_entradas', :action => 'index'}, :caption => :label_ponto_terminal_entrada_plural, :if => Proc.new { User.current.admin? }
     menu.push :ponto_entradas, {:controller => 'ponto_entradas', :action => 'index'}, :caption => :label_ponto_entrada_plural, :if => Proc.new { UserRole.user_has_role('ponto_entrada_read') }
+    menu.push :ponto_cancelamentos, {:controller => 'ponto_cancelamentos', :action => 'index'}, :caption => :label_ponto_cancelamento_plural, :if => Proc.new { UserRole.user_has_role('ponto_cancelamento_read') }
   end
 end
