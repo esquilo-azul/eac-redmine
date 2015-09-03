@@ -25,6 +25,8 @@ Redmine::Plugin.register :redmine_trf1_sjap do
     menu.push :funcionarios, { controller: 'funcionarios', action: 'index' }, caption: :label_funcionario_plural, if: proc { User.current.admin? }
     menu.push :cef_id_solicitacaos, { controller: 'cef_id_solicitacaos', action: 'index' }, caption: :label_cef_id_solicitacaos_plural, if: proc { User.current.admin? }
     menu.push :user_roles, { controller: 'user_roles', action: 'index' }, caption: :label_user_role_plural, if: proc { User.current.admin? }
+    menu.push :panel_issue_status_groups, {:controller => 'panel_issue_status_groups', :action => 'index'}, 
+      :caption => :label_panel_issue_status_groups, :if => Proc.new { User.current.admin?} 
   end
 
   Redmine::MenuManager.map :top_menu do |menu|

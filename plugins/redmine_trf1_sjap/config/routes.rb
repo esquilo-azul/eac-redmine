@@ -1,5 +1,6 @@
 RedmineApp::Application.routes.draw do
   resources :esosti_fases
+  resources :panel_issue_status_groups
   resources(:funcionarios) { as_routes }
   resources(:cef_id_solicitacaos) { as_routes }
   resources(:user_roles) { as_routes }

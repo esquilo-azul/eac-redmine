@@ -5,9 +5,11 @@ pt-BR:
   field_issue_status: "Situação da tarefa"
   field_atribuir_autor: "Atribuir autor"
   field_esosti_export_project: "Projeto para exportação e-Sosti"
+  label_panel_issue_status_groups: "Grupos de situações de tarefas"
   label_funcionario_plural: 'Funcionários'
   label_cef_id_solicitacaos_plural: 'Solicitações de Identidade Digital da CEF'
   label_user_role_plural: 'Perfis de Usuário'
+  label_panel_issue_status_group_new: "Nova mensagem"
   field_cpf: 'CPF'
   field_descricao: 'Descrição'
   field_endereco: 'Endereço'  
@@ -25,3 +27,5 @@ pt-BR:
   field_situacao: 'Situação'
   field_funcionario: 'Funcionário'
   field_role: 'Perfil'
+  field_empty_message: "Messagem quando vazia"
+  field_permanent: "Permanente"
