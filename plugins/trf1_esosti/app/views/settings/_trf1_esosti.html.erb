@@ -11,6 +11,11 @@
 </p>
 
 <p>
+	<label>Limite de threads simultâneos para a replicação e-Sosti</label>
+	<%= number_field_tag 'settings[esosti_replicate_threads_limit]', settings['esosti_replicate_threads_limit'] %>
+</p>
+
+<p>
 	<label>Situação para tarefas que foram atribuídas para usuários não-membros do projeto.</label>
 	<select name="settings[assigned_to_no_member_status_id]">
 		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['assigned_to_no_member_status_id'] ) %>

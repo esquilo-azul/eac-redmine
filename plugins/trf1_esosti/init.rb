@@ -10,7 +10,8 @@ Redmine::Plugin.register :trf1_esosti do
   url 'http://172.18.4.200/redmine/projects/redmine'
   author_url 'http://172.18.4.200/redmine/projects/seinf-ap'
   settings default: {
-    'eadmin_request_limit' => 4
+    'eadmin_request_limit' => 4,
+    'esosti_replicate_threads_limit' => 8
   }, partial: 'settings/trf1_esosti'
   project_module :redmine_trf1_sjap do
     permission :manage_esosti, trf1_sjap: [:settings, :eadmin_test_login]

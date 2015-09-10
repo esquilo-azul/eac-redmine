@@ -18,7 +18,7 @@ module Trf1
       end
 
       def self.run_threads
-        pool = Thread.pool(8)
+        pool = Thread.pool(Setting.plugin_trf1_esosti['esosti_replicate_threads_limit'].to_i)
         pool.process { SolicitacoesImport.run_all }
         for trf1_sjap_project in Trf1SjapProject.all
           Rails.logger.debug "Adicionando tarefas de atualização para #{trf1_sjap_project}"
