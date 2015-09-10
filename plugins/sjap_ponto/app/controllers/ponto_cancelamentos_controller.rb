@@ -1,6 +1,5 @@
 class PontoCancelamentosController < ApplicationController
   layout 'trf1_sjap'
-  before_filter :require_admin
   active_scaffold :ponto_cancelamento do |conf|
     conf.actions.exclude :update, :delete, :create
   end
