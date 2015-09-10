@@ -155,11 +155,11 @@ class EsostiSolicitacao < ActiveRecord::Base
   def get_tracker_id
     default_tracker_id = Setting.plugin_trf1_esosti['tracker_id']
     unless default_tracker_id.nil?
-      for tracker in trf1_sjap_project.project.trackers
+      for tracker in trf1_sjap_project.esosti_export_project.trackers
         return default_tracker_id if tracker.id == default_tracker_id.to_i
       end
     end
-    fail 'Projeto não possui trackers' if trf1_sjap_project.project.trackers.empty?
-    trf1_sjap_project.project.trackers[0].id
+    fail 'Projeto não possui trackers' if trf1_sjap_project.esosti_export_project.trackers.empty?
+    trf1_sjap_project.esosti_export_project.trackers[0].id
   end
 end
