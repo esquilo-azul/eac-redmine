@@ -70,7 +70,7 @@ module Trf1Sjap
       end
 
       def eadmin_pause
-        pause = Setting.plugin_redmine_trf1_sjap['eadmin_request_pause'].to_i
+        pause = Setting.plugin_trf1_esosti['eadmin_request_pause'].to_i
         pause = 1 if pause < 1
         pause
       end

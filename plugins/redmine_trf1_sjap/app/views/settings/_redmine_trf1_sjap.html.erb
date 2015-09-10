@@ -1,25 +1,8 @@
 <p>
-	<label>Tracker de exportação de solicitações e-Sosti para issues Redmine.</label>
-	<select name="settings[tracker_id]">
-		<%= options_for_select(Tracker.all.collect {|p| [ p.name, p.id ] }, settings['tracker_id'] ) %>
-	</select>
-</p>
-
-<p>
 	<label>Usuário administrador</label>
 	<select name="settings[admin_user_id]">
 		<%= options_for_select(User.all.order('firstname','lastname').collect {|u| [ u.to_s, u.id ] }, settings['admin_user_id'] ) %>
 	</select>
-</p>
-
-<p>
-	<label>Limite de requisições simultâneas ao e-Admin</label>
-	<%= number_field_tag 'settings[eadmin_request_limit]', settings['eadmin_request_limit'] %>	
-</p>
-
-<p>
-	<label>Pausa entre requisições de um <em>thread</em> ao e-Admin</label>
-	<%= number_field_tag 'settings[eadmin_request_pause]', settings['eadmin_request_pause'] %>	
 </p>
 
 <p>
@@ -39,20 +22,6 @@
 <p>
 	<label>Mensagem de desbloqueio de tarefa.</label>
 	<%= text_area_tag 'settings[unblock_message]', settings['unblock_message'] %>	
-</p>
-
-<p>
-	<label>Situação para tarefas que foram atribuídas para usuários não-membros do projeto.</label>
-	<select name="settings[assigned_to_no_member_status_id]">
-		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['assigned_to_no_member_status_id'] ) %>
-	</select>
-</p>
-
-<p>
-	<label>Situação para tarefas que retornaram de usuários não-membros do projeto.</label>
-	<select name="settings[assigned_to_member_status_id]">
-		<%= options_for_select(IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['assigned_to_member_status_id'] ) %>
-	</select>
 </p>
 
 <p>

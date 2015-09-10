@@ -9,8 +9,8 @@ class Trf1Sjap::AtendenteToRedmineTest < ActiveSupport::TestCase
 
   def test_changes
     Setting.plugin_redmine_trf1_sjap['admin_user_id'] = 1
-    Setting.plugin_redmine_trf1_sjap['assigned_to_no_member_status_id'] = 4
-    Setting.plugin_redmine_trf1_sjap['assigned_to_member_status_id'] = 2
+    Setting.plugin_trf1_esosti['assigned_to_no_member_status_id'] = 4
+    Setting.plugin_trf1_esosti['assigned_to_member_status_id'] = 2
     esosti_solicitacao = EsostiSolicitacao.find(1)
     esosti_solicitacao.issue
 

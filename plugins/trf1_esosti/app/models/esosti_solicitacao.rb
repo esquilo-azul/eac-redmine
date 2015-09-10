@@ -153,7 +153,7 @@ class EsostiSolicitacao < ActiveRecord::Base
   end
 
   def get_tracker_id
-    default_tracker_id = Setting.plugin_redmine_trf1_sjap['tracker_id']
+    default_tracker_id = Setting.plugin_trf1_esosti['tracker_id']
     unless default_tracker_id.nil?
       for tracker in trf1_sjap_project.project.trackers
         return default_tracker_id if tracker.id == default_tracker_id.to_i

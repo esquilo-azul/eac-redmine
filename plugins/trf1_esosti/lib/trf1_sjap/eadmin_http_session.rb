@@ -73,7 +73,7 @@ module Trf1Sjap
     end
 
     def limit
-      limit = Setting.plugin_redmine_trf1_sjap['eadmin_request_limit'].to_i
+      limit = Setting.plugin_trf1_esosti['eadmin_request_limit'].to_i
       limit = 1 if limit < 1
       limit
     end

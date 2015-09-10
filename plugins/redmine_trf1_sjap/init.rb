@@ -9,14 +9,12 @@ Redmine::Plugin.register :redmine_trf1_sjap do
   version '0.0.1'
   url 'http://172.18.4.200/redmine/projects/redmine'
   author_url 'http://172.18.4.200/redmine/projects/seinf-ap'
-  settings default: {
-    'eadmin_request_limit' => 4,
-    'eadmin_request_pause' => 60,
+  settings default: {    
     'unblock_message' => 'Esta tarefa foi automaticamente desbloqueada.',
     'cef_id_solicitacoes_consulta_outdated_seconds' => 60 * 60 * 24
   }, partial: 'settings/redmine_trf1_sjap'
   project_module :redmine_trf1_sjap do
-    permission :manage_trf1_sjap, trf1_sjap: [:index, :settings, :eadmin_test_login]
+    permission :manage_trf1_sjap, trf1_sjap: [:index]
   end
   menu :project_menu, :redmine_trf1_sjap, { controller: 'trf1_sjap', action: 'index' }, caption: :label_trf1_sjap, after: :files, param: :project_id
 

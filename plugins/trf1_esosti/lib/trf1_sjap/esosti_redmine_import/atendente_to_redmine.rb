@@ -14,10 +14,10 @@ module Trf1Sjap
           if is_project_member_or_empty(atendente_user_id)
             issue.assigned_to_id = atendente_user_id
             unless is_project_member_or_empty(atendente_anterior_user_id)
-              issue.status_id = Setting.plugin_redmine_trf1_sjap['assigned_to_member_status_id']
+              issue.status_id = Setting.plugin_trf1_esosti['assigned_to_member_status_id']
             end
           else
-            issue.status_id = Setting.plugin_redmine_trf1_sjap['assigned_to_no_member_status_id']
+            issue.status_id = Setting.plugin_trf1_esosti['assigned_to_no_member_status_id']
           end
           Trf1Sjap::ModelUtils.save_or_raise(issue)
           @result = issue.current_journal.id
