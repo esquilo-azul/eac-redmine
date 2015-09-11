@@ -1,7 +1,7 @@
 class EadminController < ApplicationController
   unloadable
   layout 'base'
-  before_filter :find_project_by_project_id, :authorize
+  before_filter :find_project_by_project_id, :authorize, only: [:eadmin_test_login, :settings]
   before_filter :find_trf1_sjap_project, only: [:eadmin_test_login, :settings]
 
   def esosti_alerta
