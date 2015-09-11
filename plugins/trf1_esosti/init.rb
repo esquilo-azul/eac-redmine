@@ -16,4 +16,8 @@ Redmine::Plugin.register :trf1_esosti do
   project_module :redmine_trf1_sjap do
     permission :manage_esosti, trf1_sjap: [:settings, :eadmin_test_login]
   end
+
+  Redmine::MenuManager.map :trf1_sjap_module_menu do |menu|
+    menu.push :settings, { controller: 'trf1_sjap', action: 'settings' }, caption: 'Configurações', permission: :manage_esosti
+  end
 end

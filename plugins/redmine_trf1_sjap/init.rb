@@ -27,6 +27,10 @@ Redmine::Plugin.register :redmine_trf1_sjap do
               caption: :label_panel_issue_status_groups, if: proc { User.current.admin? }
   end
 
+  Redmine::MenuManager.map :trf1_sjap_module_menu do |menu|
+    menu.push :main, { controller: 'trf1_sjap', action: 'index' }, caption: 'Início', permission: :manage_trf1_sjap
+  end
+
   Redmine::MenuManager.map :top_menu do |menu|
     menu.push :trf1_sjap, { controller: 'trf1_sjap_welcome', action: 'index' }, caption: 'SJAP'
   end
