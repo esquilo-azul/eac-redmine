@@ -1,4 +1,5 @@
 class EsostiFasesController < ApplicationController
+  layout 'trf1_sjap'
   before_filter :require_admin
   before_action :set_esosti_fase, only: [:show, :edit, :update, :destroy]
 

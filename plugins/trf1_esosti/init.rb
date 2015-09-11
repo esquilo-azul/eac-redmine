@@ -20,4 +20,8 @@ Redmine::Plugin.register :trf1_esosti do
   Redmine::MenuManager.map :trf1_sjap_module_menu do |menu|
     menu.push :settings, { controller: 'trf1_sjap', action: 'settings' }, caption: 'Configurações', permission: :manage_esosti
   end
+
+  Redmine::MenuManager.map :trf1_sjap_menu do |menu|
+    menu.push :esosti_fases, { controller: 'esosti_fases', action: 'index' }, caption: :label_esosti_fase_plural, if: proc { User.current.admin? }
+  end
 end
