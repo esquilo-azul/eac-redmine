@@ -5,7 +5,8 @@ module Sjap
     module SuperFacil
       class PontoParser
         WITHOUT_SEPARATOR_PARTS = {
-          begin: 10,
+          nsr: 9,
+          type: 1,
           day: 2,
           month: 2,
           year: 4,
@@ -16,7 +17,8 @@ module Sjap
         }
 
         WITH_SEPARATOR_PARTS = {
-          begin: 10,
+          nsr: 9,
+          type: 1,
           day: 2,
           month: 2,
           year: 4,
