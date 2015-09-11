@@ -14,11 +14,11 @@ Redmine::Plugin.register :trf1_esosti do
     'esosti_replicate_threads_limit' => 8
   }, partial: 'settings/trf1_esosti'
   project_module :redmine_trf1_sjap do
-    permission :manage_esosti, trf1_sjap: [:settings, :eadmin_test_login]
+    permission :manage_esosti, eadmin: [:settings, :eadmin_test_login]
   end
 
   Redmine::MenuManager.map :trf1_sjap_module_menu do |menu|
-    menu.push :settings, { controller: 'trf1_sjap', action: 'settings' }, caption: 'Configurações', permission: :manage_esosti
+    menu.push :settings, { controller: 'eadmin', action: 'settings' }, caption: 'Configurações', permission: :manage_esosti
   end
 
   Redmine::MenuManager.map :trf1_sjap_menu do |menu|
