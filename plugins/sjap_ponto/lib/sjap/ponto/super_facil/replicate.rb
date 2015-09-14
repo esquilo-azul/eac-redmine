@@ -11,8 +11,11 @@ module Sjap
         def run
           session = Sjap::Ponto::SuperFacil::Session.new(server_url, @ponto_terminal.usuario, @ponto_terminal.senha)
           login(session)
-          replicate(session, :pontos, :ponto)
-          replicate(session, :funcionarios, :funcionario)
+          replicate(session, :pontos, :ponto) do |l|
+            Sjap::Ponto::Mte::AfdRegistroParser.parse_line(l)[:tipo] ==
+              Sjap::Ponto::Mte::AfdRegistroParser::TIPO_MARCACAO_PONTO
+          end
+          replicate(session, :funcionarios, :funcionario) { |_l| true }
         end
 
         def self.run_all
@@ -31,12 +34,13 @@ module Sjap
           Rails.logger.debug 'Logado'
         end
 
-        def replicate(session, session_method, entrada_tipo)
+        def replicate(session, session_method, entrada_tipo, &condition)
           Rails.logger.debug "Recuperando registros tipo \"#{entrada_tipo}\" em #{server_url}..."
           total = 0
           novos = 0
           ActiveRecord::Base.transaction do
             session.send(session_method).each_line do |line|
+              next unless condition.call(line)
               novos += 1 if PontoTerminalEntrada.replicate(@ponto_terminal, entrada_tipo, line)
               total += 1
             end
