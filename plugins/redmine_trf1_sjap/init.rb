@@ -34,4 +34,8 @@ Redmine::Plugin.register :redmine_trf1_sjap do
   Redmine::MenuManager.map :top_menu do |menu|
     menu.push :trf1_sjap, { controller: 'trf1_sjap_welcome', action: 'index' }, caption: 'SJAP'
   end
+
+  ActiveScaffold.set_defaults do |conf|
+    conf.list.per_page = 100
+  end
 end
