@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+system(
+  File.join(File.dirname(__FILE__), 'bundle'),
+  'exec', 'rubocop', *ARGV
+)
