@@ -13,6 +13,7 @@ pt-BR:
   field_cpf: 'CPF'
   field_descricao: 'Descrição'
   field_endereco: 'Endereço'  
+  field_lotacao: 'Lotação'
   field_pis: 'PIS'
   field_senha: 'Senha'
   field_tipo: 'Tipo'
