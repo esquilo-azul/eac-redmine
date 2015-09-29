@@ -6,12 +6,14 @@
       <th rowspan="2"><%= l(:field_nome)%></th>
       <th rowspan="2"><%= l(:field_matricula)%></th>
       <th rowspan="2"><%= l(:field_cpf)%></th>
-      <th colspan="3">Tokens gravados</th>
+      <th colspan="0">Tokens gravados</th>
     </tr>
     <tr>
       <th>Data</th>
       <th>Perfil</th>
       <th>Protocolo</th>
+      <th>Data de renovação</th>
+      <th>Dias para renovação</th>
     </tr>
   </thead>
   <tbody>
@@ -24,6 +26,8 @@
         <td rowspan="<%= rowspan %>" style="text-align: center; vertical-align: middle"><%= f.matricula %></td>
         <td rowspan="<%= rowspan %>" style="text-align: center; vertical-align: middle"><%= f.cpf ? f.cpf : '-' %></td>
         <% if solicitacaos.empty? %>
+          <td>-</td>
+          <td>-</td>
           <td>-</td>
           <td>-</td>
           <td>-</td>

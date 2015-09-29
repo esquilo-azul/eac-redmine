@@ -1,4 +1,5 @@
 class CefIdSolicitacao < ActiveRecord::Base
+  RENOVACAO_DIAS = 365 * 3 - 90
   SITUACAO_GRAVADO = 'Certificado gravado com sucesso'
 
   belongs_to :funcionario
@@ -14,6 +15,14 @@ class CefIdSolicitacao < ActiveRecord::Base
 
   def self.find_all_by_funcionario_and_situacao(funcionario, situacao)
     where(funcionario: funcionario, situacao: situacao).order(data: :asc).all
+  end
+
+  def data_renovacao
+    data ? data + RENOVACAO_DIAS.days : nil
+  end
+
+  def dias_renovacao
+    data_renovacao ? (data_renovacao - Date.today).to_i : nil
   end
 
   private
