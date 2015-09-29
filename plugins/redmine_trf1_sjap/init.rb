@@ -10,8 +10,7 @@ Redmine::Plugin.register :redmine_trf1_sjap do
   url 'http://172.18.4.200/redmine/projects/redmine'
   author_url 'http://172.18.4.200/redmine/projects/seinf-ap'
   settings default: {
-    'unblock_message' => 'Esta tarefa foi automaticamente desbloqueada.',
-    'cef_id_solicitacoes_consulta_outdated_seconds' => 60 * 60 * 24
+    'unblock_message' => 'Esta tarefa foi automaticamente desbloqueada.'
   }, partial: 'settings/redmine_trf1_sjap'
   project_module :redmine_trf1_sjap do
     permission :manage_trf1_sjap, trf1_sjap: [:index]
@@ -21,7 +20,6 @@ Redmine::Plugin.register :redmine_trf1_sjap do
   Redmine::MenuManager.map :trf1_sjap_menu do |menu|
     menu.push :main, { controller: 'trf1_sjap_welcome', action: 'index' }, caption: 'Página inicial'
     menu.push :funcionarios, { controller: 'funcionarios', action: 'index' }, caption: :label_funcionario_plural, if: proc { User.current.admin? }
-    menu.push :cef_id_solicitacaos, { controller: 'cef_id_solicitacaos', action: 'index' }, caption: :label_cef_id_solicitacaos_plural, if: proc { User.current.admin? }
     menu.push :user_roles, { controller: 'user_roles', action: 'index' }, caption: :label_user_role_plural, if: proc { User.current.admin? }
     menu.push :panel_issue_status_groups, { controller: 'panel_issue_status_groups', action: 'index' },
               caption: :label_panel_issue_status_groups, if: proc { User.current.admin? }

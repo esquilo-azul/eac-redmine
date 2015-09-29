@@ -78,8 +78,8 @@ class Funcionario < ActiveRecord::Base
   end
 
   def self.cef_id_solicitacoes_consulta_outdated_seconds
-    setting_value = Setting.plugin_redmine_trf1_sjap['cef_id_solicitacoes_consulta_outdated_seconds'].to_i
-    return setting_value if setting_value
+    setting_value = Setting.plugin_cef_ids['cef_id_solicitacoes_consulta_outdated_seconds']
+    return setting_value.to_i if setting_value
     60 * 60 * 24
   end
 end
