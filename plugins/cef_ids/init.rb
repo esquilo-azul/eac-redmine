@@ -14,10 +14,10 @@ Redmine::Plugin.register :cef_ids do
   }, partial: 'settings/cef_ids'
 
   Redmine::MenuManager.map :cef_ids do |menu|
-    menu.push :cef_id_solicitacaos, { controller: 'cef_id_solicitacaos', action: 'index' }, caption: :label_cef_id_solicitacaos_plural, if: proc { User.current.admin? }
+    menu.push :cef_id_solicitacaos, { controller: 'cef_id_solicitacaos', action: 'index' }, caption: :label_cef_id_solicitacaos_plural, if: proc { UserRole.user_has_role('cef_id_solicitacao_read') }
     menu.push :cef_id_solicitacaos_relatorio_gravacaos,
               { controller: 'cef_id_solicitacaos', action: 'relatorio_gravacoes' },
               caption: 'Relatório de gravações',
-              if: proc { User.current.admin? }
+              if: proc { UserRole.user_has_role('cef_id_solicitacao_read') }
   end
 end
