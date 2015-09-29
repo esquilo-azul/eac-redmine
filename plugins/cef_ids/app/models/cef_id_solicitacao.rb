@@ -1,4 +1,6 @@
 class CefIdSolicitacao < ActiveRecord::Base
+  SITUACAO_GRAVADO = 'Certificado gravado com sucesso'
+
   belongs_to :funcionario
   validates :funcionario, presence: true
 
@@ -8,6 +10,10 @@ class CefIdSolicitacao < ActiveRecord::Base
       funcionario.cef_id_solicitacoes_ultima_consulta = DateTime.now
       Trf1Sjap::ModelUtils.save_or_raise(funcionario)
     end
+  end
+
+  def self.find_all_by_funcionario_and_situacao(funcionario, situacao)
+    where(funcionario: funcionario, situacao: situacao).order(data: :asc).all
   end
 
   private

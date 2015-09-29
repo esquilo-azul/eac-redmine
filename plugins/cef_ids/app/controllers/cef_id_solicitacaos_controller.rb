@@ -6,4 +6,8 @@ class CefIdSolicitacaosController < ApplicationController
     conf.list.columns.exclude :created_at
     conf.list.columns.exclude :updated_at
   end
+
+  def relatorio_gravacoes
+    @funcionarios = Funcionario.order(nome: :asc, matricula: :asc)
+  end
 end

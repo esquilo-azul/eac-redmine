@@ -15,5 +15,9 @@ Redmine::Plugin.register :cef_ids do
 
   Redmine::MenuManager.map :trf1_sjap_menu do |menu|
     menu.push :cef_id_solicitacaos, { controller: 'cef_id_solicitacaos', action: 'index' }, caption: :label_cef_id_solicitacaos_plural, if: proc { User.current.admin? }
+    menu.push :cef_id_solicitacaos_relatorio_gravacaos,
+              { controller: 'cef_id_solicitacaos', action: 'relatorio_gravacoes' },
+              caption: 'Relatório de gravações',
+              if: proc { User.current.admin? }
   end
 end
