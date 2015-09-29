@@ -1,0 +1,9 @@
+<% Trf1Sjap::RedminePlugins.plugins.each do |menu| %>
+  <% content = render_menu menu %>  
+  <% if content %>
+    <div style="margin-bottom: 1.0em">
+      <h4><%= t("menu_#{menu}") %></h4>
+      <%= content %>
+    </div>
+  <% end %>
+<% end %>

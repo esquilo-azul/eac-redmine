@@ -17,7 +17,7 @@ Redmine::Plugin.register :redmine_trf1_sjap do
   end
   menu :project_menu, :redmine_trf1_sjap, { controller: 'trf1_sjap', action: 'index' }, caption: :label_trf1_sjap, after: :files, param: :project_id
 
-  Redmine::MenuManager.map :trf1_sjap_menu do |menu|
+  Redmine::MenuManager.map :redmine_trf1_sjap do |menu|
     menu.push :main, { controller: 'trf1_sjap_welcome', action: 'index' }, caption: 'Página inicial'
     menu.push :funcionarios, { controller: 'funcionarios', action: 'index' }, caption: :label_funcionario_plural, if: proc { User.current.admin? }
     menu.push :user_roles, { controller: 'user_roles', action: 'index' }, caption: :label_user_role_plural, if: proc { User.current.admin? }
