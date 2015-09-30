@@ -9,4 +9,8 @@ class CefIdSolicitacaosController < ApplicationController
     conf.actions.swap :search, :field_search
     conf.field_search.columns = :funcionario, :data
   end
+
+  def relatorio_gravacoes
+    @funcionarios = Funcionario.order(nome: :asc, matricula: :asc)
+  end
 end

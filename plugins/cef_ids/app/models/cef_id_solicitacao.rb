@@ -1,4 +1,7 @@
 class CefIdSolicitacao < ActiveRecord::Base
+  RENOVACAO_DIAS = 365 * 3 - 90
+  SITUACAO_GRAVADO = 'Certificado gravado com sucesso'
+
   belongs_to :funcionario
   validates :funcionario, presence: true
 
@@ -8,6 +11,18 @@ class CefIdSolicitacao < ActiveRecord::Base
       funcionario.cef_id_solicitacoes_ultima_consulta = DateTime.now
       Trf1Sjap::ModelUtils.save_or_raise(funcionario)
     end
+  end
+
+  def self.find_all_by_funcionario_and_situacao(funcionario, situacao)
+    where(funcionario: funcionario, situacao: situacao).order(data: :asc).all
+  end
+
+  def data_renovacao
+    data ? data + RENOVACAO_DIAS.days : nil
+  end
+
+  def dias_renovacao
+    data_renovacao ? (data_renovacao - Date.today).to_i : nil
   end
 
   private

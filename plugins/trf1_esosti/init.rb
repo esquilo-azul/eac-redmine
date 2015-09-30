@@ -21,7 +21,7 @@ Redmine::Plugin.register :trf1_esosti do
     menu.push :settings, { controller: 'eadmin', action: 'settings' }, caption: 'Configurações', permission: :manage_esosti
   end
 
-  Redmine::MenuManager.map :trf1_sjap_menu do |menu|
+  Redmine::MenuManager.map :trf1_esosti do |menu|
     menu.push :esosti_fases, { controller: 'esosti_fases', action: 'index' }, caption: :label_esosti_fase_plural, if: proc { User.current.admin? }
   end
 end

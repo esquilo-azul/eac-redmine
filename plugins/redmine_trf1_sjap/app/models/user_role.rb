@@ -1,5 +1,6 @@
 class UserRole < ActiveRecord::Base
   ROLES = %w(
+    cef_id_solicitacao_read
     ponto_cancelamento_read
     ponto_cancelamento_create
     ponto_entrada_create
@@ -14,6 +15,7 @@ class UserRole < ActiveRecord::Base
     fail "UserRole::ROLES não inclui o perfil \"#{role}\". Verifique." unless ROLES.include?(role)
     user = User.current unless user
     return false unless user
+    return true if user.admin
     !UserRole.where(user: user, role: role).empty?
   end
 end

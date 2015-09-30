@@ -13,6 +13,7 @@ pt-BR:
   field_cpf: 'CPF'
   field_descricao: 'Descrição'
   field_endereco: 'Endereço'  
+  field_lotacao: 'Lotação'
   field_pis: 'PIS'
   field_senha: 'Senha'
   field_tipo: 'Tipo'
@@ -29,3 +30,4 @@ pt-BR:
   field_role: 'Perfil'
   field_empty_message: "Messagem quando vazia"
   field_permanent: "Permanente"
+  menu_redmine_trf1_sjap: 'Principal'

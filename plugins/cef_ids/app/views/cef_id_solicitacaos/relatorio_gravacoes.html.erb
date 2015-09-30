@@ -1,0 +1,47 @@
+<h2>Relatório de gravações de identidades digitais da CEF</h2>
+
+<table class="list">
+  <thead>
+    <tr>
+      <th rowspan="2"><%= l(:field_nome)%></th>
+      <th rowspan="2"><%= l(:field_matricula)%></th>
+      <th rowspan="2"><%= l(:field_cpf)%></th>
+      <th colspan="0">Tokens gravados</th>
+    </tr>
+    <tr>
+      <th>Data</th>
+      <th>Perfil</th>
+      <th>Protocolo</th>
+      <th>Data de renovação</th>
+      <th>Dias para renovação</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @funcionarios.each do |f| %>
+      <% solicitacaos = CefIdSolicitacao.find_all_by_funcionario_and_situacao(f, CefIdSolicitacao::SITUACAO_GRAVADO) %>
+      <% rowspan = solicitacaos.count > 0 ? solicitacaos.count : 1 %>
+      <% rowclass = cycle("odd", "even") %>
+      <tr class="<%= rowclass %>">
+        <td rowspan="<%= rowspan %>" style="text-align: left; vertical-align: middle"><%= f.nome %></td>
+        <td rowspan="<%= rowspan %>" style="text-align: center; vertical-align: middle"><%= f.matricula %></td>
+        <td rowspan="<%= rowspan %>" style="text-align: center; vertical-align: middle"><%= f.cpf ? f.cpf : '-' %></td>
+        <% if solicitacaos.empty? %>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        <% else %>
+          <%= render partial: 'solicitacao_rows', locals: {solicitacao: solicitacaos[0]} %>
+        <% end %>
+      </tr>
+      <% if solicitacaos.count > 1 %>
+        <% solicitacaos[1, solicitacaos.count].each do |s| %>
+          <tr class="<%= rowclass %>">
+            <%= render partial: 'solicitacao_rows', locals: {solicitacao: s} %>
+          </tr>
+        <% end  %>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
