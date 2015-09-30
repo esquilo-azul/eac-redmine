@@ -5,25 +5,31 @@ module Sjap
   module Ponto
     module SuperFacil
       class ImportTest < ActiveSupport::TestCase
+        def setup
+          @funcionario = Funcionario.new
+          @funcionario.nome = 'Eduardo Henrique Bogoni'
+          @funcionario.matricula = 'AP20199'
+          @funcionario.pis = '13143342608'
+          assert_save @funcionario
+
+          @funcionario1 = Funcionario.new(nome: 'Fulano', matricula: 'AP1234', pis: '19036107493')
+          assert_save @funcionario1
+
+          @ponto_terminal = PontoTerminal.new
+          @ponto_terminal.descricao = 'Terminal 1'
+          @ponto_terminal.tipo = 'SUPERFACIL'
+          @ponto_terminal.endereco = 'localhost'
+          @ponto_terminal.usuario = 'usuario'
+          @ponto_terminal.senha = 'senha'
+          @ponto_terminal.fuso_horario = '-03:00'
+          assert_save @ponto_terminal
+        end
+
         def test_parse_line
-          f = Funcionario.new
-          f.nome = 'Eduardo Henrique Bogoni'
-          f.matricula = 'AP20199'
-          f.pis = '13143342608'
-          assert_save f
-
-          pt = PontoTerminal.new
-          pt.descricao = 'Terminal 1'
-          pt.tipo = 'SUPERFACIL'
-          pt.endereco = 'localhost'
-          pt.usuario = 'usuario'
-          pt.senha = 'senha'
-          assert_save pt
-
           pte = PontoTerminalEntrada.new
           pte.chave = '0000543403140420151509013143342608'
           pte.tipo = 'ponto'
-          pte.ponto_terminal = pt
+          pte.ponto_terminal = @ponto_terminal
           assert_save pte
 
           assert Import.import_ponto(pte)
@@ -34,9 +40,30 @@ module Sjap
 
           pe = pte.exportado
           assert_equal 'TERMINAL', pe.metodo
-          assert_equal pt, pe.terminal
-          assert_equal Time.zone.local(2015, 4, 14, 15, 9), pe.data_hora
-          assert_equal f, pe.funcionario
+          assert_equal @ponto_terminal, pe.terminal
+          assert_equal Time.new(2015, 4, 14, 15, 9, 0, '-03:00'), pe.data_hora
+          assert_equal @funcionario, pe.funcionario
+          assert_equal '', pe.motivo
+        end
+
+        def test_parse_line_dois
+          pte = PontoTerminalEntrada.new
+          pte.chave = '0000727083240920150836019036107493'
+          pte.tipo = 'ponto'
+          pte.ponto_terminal = @ponto_terminal
+          assert_save pte
+
+          assert Import.import_ponto(pte)
+
+          pte.reload
+          assert pte.exportado
+          assert pte.exportado.is_a?(PontoEntrada)
+
+          pe = pte.exportado
+          assert_equal 'TERMINAL', pe.metodo
+          assert_equal @ponto_terminal, pe.terminal
+          assert_equal Time.new(2015, 9, 24, 8, 36, 0, '-03:00'), pe.data_hora
+          assert_equal @funcionario1, pe.funcionario
           assert_equal '', pe.motivo
         end
 
