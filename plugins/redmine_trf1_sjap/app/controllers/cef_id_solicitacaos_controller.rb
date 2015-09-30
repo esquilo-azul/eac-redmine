@@ -5,5 +5,8 @@ class CefIdSolicitacaosController < ApplicationController
     conf.columns[:funcionario].form_ui = :select
     conf.list.columns.exclude :created_at
     conf.list.columns.exclude :updated_at
+    conf.actions.exclude :update, :delete, :create
+    conf.actions.swap :search, :field_search
+    conf.field_search.columns = :funcionario, :data
   end
 end
