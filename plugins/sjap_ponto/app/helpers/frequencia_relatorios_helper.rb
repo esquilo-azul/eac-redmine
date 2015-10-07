@@ -16,9 +16,13 @@ module FrequenciaRelatoriosHelper
   end
 
   def format_horas_executadas(data)
-    return '' if data[:intervalos_executados].empty?
+    sum = intervalos_duracao_soma(data)
+    sum > 0 ? format_time_diff(sum) : ''
+  end
+
+  def format_horas_executadas_total(datas)
     sum = 0
-    data[:intervalos_executados].each { |i| sum += i.duracao }
+    datas.each { |data| sum += intervalos_duracao_soma(data) }
     format_time_diff(sum)
   end
 
@@ -31,5 +35,11 @@ module FrequenciaRelatoriosHelper
     hours = (diff / 3600).floor
     minutes = (((diff - hours * 3600) / 60).floor).to_s.rjust(2, '0')
     "#{hours}:#{minutes}"
+  end
+
+  def intervalos_duracao_soma(data)
+    sum = 0
+    data[:intervalos_executados].each { |i| sum += i.duracao }
+    sum
   end
 end
