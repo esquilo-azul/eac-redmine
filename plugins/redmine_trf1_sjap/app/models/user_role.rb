@@ -1,6 +1,7 @@
 class UserRole < ActiveRecord::Base
   ROLES = %w(
     cef_id_solicitacao_read
+    frequencia_relatorio_read
     ponto_cancelamento_read
     ponto_cancelamento_create
     ponto_entrada_create

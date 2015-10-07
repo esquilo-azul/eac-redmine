@@ -1,0 +1,15 @@
+<%= labelled_form_for @frequencia_relatorio do |f| %>
+  <%= error_messages_for 'frequencia_relatorio' %>
+  <div class="box tabular">
+    <p>
+      <%= f.select :funcionario_id, @funcionarios, {include_blank: '-- Não selecionado --'}%>
+    </p>
+    <p>
+      <%= f.select :ano, @anos %>
+    </p>
+    <p>
+      <%= f.select :mes, @meses %>
+    </p>
+  </div>
+  <%= submit_tag 'Consultar' %>
+<% end %>

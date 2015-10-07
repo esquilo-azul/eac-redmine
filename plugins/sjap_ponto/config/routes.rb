@@ -9,4 +9,5 @@ RedmineApp::Application.routes.draw do
   end
   resources(:ponto_terminal_entradas) { as_routes }
   resources(:ponto_terminals) { as_routes }
+  match 'frequencia_relatorios', to: 'frequencia_relatorios#index', via: [:get, :post]
 end

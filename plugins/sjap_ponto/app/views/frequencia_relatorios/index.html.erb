@@ -1,0 +1,9 @@
+<h2>Relatório de frequência</h2>
+
+<h3>Busca</h3>
+<%= render :partial => 'form' %>
+
+<% if @datas  %>
+  <h3>Frequência de funcionário</h3>
+  <%= render :partial => 'funcionario_relatorio' %>
+<% end %>
