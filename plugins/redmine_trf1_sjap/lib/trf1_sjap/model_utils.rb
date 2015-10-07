@@ -14,5 +14,11 @@ module Trf1Sjap
         fail 'Falha ao tentar salvar ' + model_instance.class.name + ': ' + active_record_base_errors_to_string(model_instance.errors)
       end
     end
+
+    def self.destroy_or_raise(model_instance)
+      unless model_instance.destroy
+        fail 'Falha ao tentar remover' + model_instance.class.name
+      end
+    end
   end
 end

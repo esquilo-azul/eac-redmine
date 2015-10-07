@@ -11,5 +11,10 @@ namespace :sjap do
     task terminais_import: :environment do
       Sjap::Ponto::SuperFacil::Import.run_all
     end
+
+    desc 'Apaga as entradas de ponto geradas por terminal'
+    task terminais_clear: :environment do
+      Sjap::Ponto::PontoTerminalEntradaClear.run
+    end
   end
 end
