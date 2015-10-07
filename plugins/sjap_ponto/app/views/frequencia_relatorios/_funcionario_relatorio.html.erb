@@ -2,21 +2,22 @@
 <p>Mês/ano: <%= @frequencia_relatorio.mes %>/<%= @frequencia_relatorio.ano %></p>
 
 <table class="list">
-	<thead>
-		<tr>
-			<th><%= l(:field_dia)%></th>
+  <thead>
+    <tr>
+      <th><%= l(:field_dia)%></th>
       <th><%= l(:field_dia_semana)%></th>
       <th><%= l(:field_intervalos_executados)%></th>
-      
-		</tr>
-	</thead>
-	<tbody>
-		<% @datas.each do |d| %>
-		<tr class="<%= cycle("odd", "even") %>">
-			<td style="text-align: center"><%= format_dia(d) %></td>
-      <td style="text-align: center"><%= format_dia_semana(d) %></td>
-      <td style="text-align: center"><%= format_intervalos_executados(d) %></td>
-		</tr>
-		<% end %>
-	</tbody>
+      <th><%= l(:field_horas_executadas)%></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @datas.each do |d| %>
+      <tr class="<%= cycle("odd", "even") %>">
+        <td style="text-align: center"><%= format_dia(d) %></td>
+        <td style="text-align: center"><%= format_dia_semana(d) %></td>
+        <td style="text-align: center"><%= format_intervalos_executados(d) %></td>
+        <td style="text-align: center"><%= format_horas_executadas(d) %></td>
+      </tr>
+    <% end %>
+  </tbody>
 </table>

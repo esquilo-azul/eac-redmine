@@ -36,6 +36,19 @@ class FrequenciaRelatorio
     PontoEntrada.where(funcionario_id: funcionario_id, data_hora: data.beginning_of_day..data.end_of_day).order(data_hora: :asc)
   end
 
+  class Intervalo
+    attr_accessor :inicio, :termino
+
+    def initialize(inicio)
+      @inicio = inicio
+      @termino = nil
+    end
+
+    def duracao
+      @termino ? @termino.data_hora - @inicio.data_hora : 0
+    end
+  end
+
   class IntervaloBuilder
     attr_reader :intervalos
 
@@ -52,10 +65,10 @@ class FrequenciaRelatorio
     end
 
     def add_ponto_entrada(pe)
-      if !current || (current && current[:termino])
-        @intervalos << { inicio: pe, termino: nil }
+      if !current || (current && current.termino)
+        @intervalos << Intervalo.new(pe)
       else
-        current[:termino] = pe
+        current.termino = pe
       end
     end
   end

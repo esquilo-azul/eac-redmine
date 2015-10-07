@@ -4,6 +4,7 @@ pt-BR:
   field_data_hora: 'Data/Hora'
   field_dia: 'Dia'
   field_dia_semana: 'Dia da semana'
+  field_horas_executadas: 'Horas executadas'
   field_intervalos_executados: 'Intervalos executados'
   field_mes: 'Mês'
   field_metodo: 'Método'
