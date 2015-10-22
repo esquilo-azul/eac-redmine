@@ -1,5 +1,8 @@
 class FrequenciaRelatoriosController < ApplicationController
+  include Sjap::RolesAuthorization
+
   layout 'trf1_sjap'
+  before_filter { |c| c.require_role('frequencia_relatorio_read') }
 
   def index
     if request.post?
