@@ -69,3 +69,9 @@ EsostiAlerta.unidade_was_checked = function (id) {
     return true
   }
 }
+
+EsostiAlerta.select_all_unidades = function (check) {
+  EsostiAlerta.unidades_check_boxes().each(function () {
+    this.checked = check;
+  });
+}

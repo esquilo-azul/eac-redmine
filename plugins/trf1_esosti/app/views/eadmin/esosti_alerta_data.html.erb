@@ -28,6 +28,8 @@
         <%= check_box_tag 'unidade[]', k, class: 'unidade_filter_option' %><%= v %>
       </span>
     <%  end %>
+    <button onclick="EsostiAlerta.select_all_unidades(true)">Todos</button>
+    <button onclick="EsostiAlerta.select_all_unidades(false)">Nenhum</button>
   </p>
 
   <table class="list">
