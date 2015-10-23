@@ -21,7 +21,7 @@ class EadminController < ApplicationController
       @login_message = 'Ok'
       caixa = session.caixa_atendimento_central(unidades)
       @solicitacoes = caixa.solicitacoes
-      @unidades_filter_options = caixa.unidades_filter_options
+      @unidades_filter_options = unidades_filter_options(caixa)
       @nova_solicitacao = caixa.nova_solicitacao?
     else
       @login_message = @login_result
@@ -63,6 +63,15 @@ class EadminController < ApplicationController
   def trf1_sjap_project_params
     params.require(:trf1_sjap_project).permit(:eadmin_matricula, :eadmin_senha, :eadmin_banco,
                                               :esosti_export_project_id)
+  end
+
+  def unidades_filter_options(caixa)
+    r = {}
+    caixa.unidades_filter_options.each do |k, v|
+      m = /([A-Z]{2})$/.match(v)
+      r[k] = m ? m[1] : v
+    end
+    r
   end
 
   def unidades

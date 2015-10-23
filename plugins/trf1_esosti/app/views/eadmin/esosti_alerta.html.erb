@@ -1,6 +1,11 @@
+<% content_for :header_tags do -%>
+  <%= stylesheet_link_tag 'eadmin/esosti_data', :plugin => 'trf1_esosti'%>
+  <%= javascript_include_tag('esosti_alerta') %>
+<% end -%> 
+
 <h2>Alerta e-Sosti</h2>
 
-<table>
+<table class="alerta_layout">
 	<tr>
 		<td rowspan="2">
 			<table>
@@ -32,8 +37,6 @@
 		<td id="resultContainer">&nbsp;</td>
 	</tr>
 </table>
-
-<%= javascript_include_tag('esosti_alerta') %>
 
 <script type="text/javascript">
 	EsostiAlerta.ESOSTI_ALERTA_DATA_PATH = '<%= esosti_alerta_data_path %>';
