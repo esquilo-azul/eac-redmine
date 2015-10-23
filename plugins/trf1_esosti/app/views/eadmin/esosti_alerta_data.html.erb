@@ -21,6 +21,14 @@
     </p>
   <% end %>
 
+  <div id="unidades_filter" >
+    <% @unidades_filter_options.each do |k, v|  %>
+      <div class="unidade_filter_option" >
+        <%= check_box_tag 'unidade[]', k, class: 'unidade_filter_option' %><%= v %>
+      </div>
+    <%  end %>
+  </div>
+
   <table class="list">
     <thead>
       <tr>
