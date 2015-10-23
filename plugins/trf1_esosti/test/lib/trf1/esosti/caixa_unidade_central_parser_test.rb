@@ -7,9 +7,9 @@ module Trf1
     class CaixaUnidadeCentralParserTest < ActiveSupport::TestCase
       include Sjap::TestHelpers::Files
 
-      test 'unidades filter options' do
+      test 'data' do
         assert_files_with_path do |path|
-          Trf1::Esosti::CaixaUnidadeCentralParser.new(File.read(path)).unidades_filter_options
+          Trf1::Esosti::CaixaUnidadeCentralParser.new(File.read(path)).data
         end
       end
 
