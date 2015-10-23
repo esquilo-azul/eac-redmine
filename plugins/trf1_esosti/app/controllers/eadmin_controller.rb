@@ -15,16 +15,16 @@ class EadminController < ApplicationController
       request.params[:senha],
       request.params[:banco]
     )
-    @loginResult = session.login
+    @login_result = session.login
     @solicitacoes = nil
-    if @loginResult === true
-      @loginMessage = 'Ok'
+    if @login_result === true
+      @login_message = 'Ok'
       caixa = session.caixaAtendimentoSecao
       @solicitacoes = caixa.solicitacoes
-      @novaSolicitacao = caixa.novaSolicitacao?
+      @nova_solicitacao = caixa.nova_solicitacao?
     else
-      @loginMessage = @loginResult
-      @loginResult = false
+      @login_message = @login_result
+      @login_result = false
     end
     render(layout: false) if request.xhr?
   end

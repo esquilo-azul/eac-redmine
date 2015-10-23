@@ -3,7 +3,7 @@
 </p>
 
 <p>
-	<strong>Resultado do login: </strong><%= @loginMessage %>
+	<strong>Resultado do login: </strong><%= @login_message %>
 </p>
 
 
@@ -13,10 +13,10 @@
 </p>
 
 <p>
-	<strong>Nova solicitação: </strong><%= @novaSolicitacao ? 'Sim' : 'Não' %>
+	<strong>Nova solicitação: </strong><%= @nova_solicitacao ? 'Sim' : 'Não' %>
 </p>
 
-<% if @novaSolicitacao %>
+<% if @nova_solicitacao %>
 	<p>
 		<%= audio_tag('esosti_alerta.ogg', autoplay: true) %>
 	<p>

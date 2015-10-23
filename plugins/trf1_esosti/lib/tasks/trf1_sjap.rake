@@ -24,8 +24,8 @@ namespace :trf1_sjap do
 
     session = Trf1Sjap::EadminHttpSession.new(config[:login], config[:senha], config[:banco])
     say('Efetuando login...')
-    loginResult = session.login
-    if loginResult === true
+    login_result = session.login
+    if login_result === true
       unless File.exist?(config_path)
         say('Login ok. Salvando arquivo de configuração...')
         FileUtils.mkdir_p(File.dirname(config_path))
@@ -34,7 +34,7 @@ namespace :trf1_sjap do
       end
       return session
     else
-      say("<%= color('Login falhou: #{loginResult}', RED) %>")
+      say("<%= color('Login falhou: #{login_result}', RED) %>")
       return nil
     end
   end
