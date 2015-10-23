@@ -45,6 +45,7 @@ module Trf1Sjap
     end
 
     def caixa_atendimento_central(unidades)
+      url = '/sosti/atendimentosecoes/caixaunidadecentral/page/1/itemsperpage/250'
       if unidades
         params = [
           ['DOCM_NR_DOCUMENTO', ''],
@@ -66,13 +67,9 @@ module Trf1Sjap
           %w(Filtrar Filtrar)
         ]
         unidades.each { |u| params << ['MODE_ID_CAIXA_ENTRADA[]', u] }
-        page_content = request(
-          :post,
-          '/sosti/atendimentosecoes/caixaunidadecentral',
-          params
-        )
+        page_content = request(:post, url, params)
       else
-        page_content = request(:get, '/sosti/atendimentosecoes/caixaunidadecentral')
+        page_content = request(:get, url)
       end
       fail UserNotLogged.new unless loggedUser?(page_content)
       Trf1::Esosti::CaixaUnidadeCentralParser.new(page_content)
