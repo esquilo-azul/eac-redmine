@@ -44,6 +44,10 @@ EsostiAlerta.on_new_data = function () {
 EsostiAlerta.to_unidades_filter_options = function () {
   EsostiAlerta.unidades_check_boxes().each(function (i) {
     $(this).attr('checked', EsostiAlerta.unidade_was_checked($(this).val()));
+    $(this).change(function() {
+      EsostiAlerta.unidades_filter_options[$(this).val()] = $(this).is(':checked') ? true : false;
+      console.log("[" + $(this).val() + "]: " + $(this).is(':checked'));
+    });
   });
 }
 
