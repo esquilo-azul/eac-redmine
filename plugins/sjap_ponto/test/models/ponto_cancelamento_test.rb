@@ -15,6 +15,7 @@ class PontoCancelamentoTest < ActiveSupport::TestCase
     t.endereco = 'localhost'
     t.usuario = 'usuario'
     t.senha = 'senha'
+    t.fuso_horario = '-03:00'
     assert_equal true, t.save
 
     p = PontoEntrada.new

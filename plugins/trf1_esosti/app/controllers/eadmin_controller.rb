@@ -15,16 +15,17 @@ class EadminController < ApplicationController
       request.params[:senha],
       request.params[:banco]
     )
-    @loginResult = session.login
+    @login_result = session.login
     @solicitacoes = nil
-    if @loginResult === true
-      @loginMessage = 'Ok'
-      caixa = session.caixaAtendimentoSecao
+    if @login_result === true
+      @login_message = 'Ok'
+      caixa = session.caixa_atendimento_central(unidades)
       @solicitacoes = caixa.solicitacoes
-      @novaSolicitacao = caixa.novaSolicitacao?
+      @unidades_filter_options = unidades_filter_options(caixa)
+      @nova_solicitacao = caixa.nova_solicitacao?
     else
-      @loginMessage = @loginResult
-      @loginResult = false
+      @login_message = @login_result
+      @login_result = false
     end
     render(layout: false) if request.xhr?
   end
@@ -62,5 +63,23 @@ class EadminController < ApplicationController
   def trf1_sjap_project_params
     params.require(:trf1_sjap_project).permit(:eadmin_matricula, :eadmin_senha, :eadmin_banco,
                                               :esosti_export_project_id)
+  end
+
+  def unidades_filter_options(caixa)
+    r = {}
+    caixa.unidades_filter_options.each do |k, v|
+      m = /([A-Z]{2})$/.match(v)
+      r[k] = m ? m[1] : v
+    end
+    r
+  end
+
+  def unidades
+    return nil unless request.params[:unidades] && request.params[:unidades].is_a?(Hash)
+    r = []
+    request.params[:unidades].each do |k, v|
+      r << k if v == 'true'
+    end
+    r
   end
 end

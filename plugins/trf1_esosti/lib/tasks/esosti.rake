@@ -69,10 +69,10 @@ namespace :trf1_sjap do
 
       session = trf1_sjap_project.create_eadmin_http_session
       puts 'Logging...'
-      loginResult = session.login
-      puts "Login result: #{loginResult}"
+      login_result = session.login
+      puts "Login result: #{login_result}"
 
-      next if loginResult != true
+      next if login_result != true
 
       puts 'Recuperando detalhes...'
       solicitacao_detalhes = session.solicitacao_detalhes(args.esosti_id)

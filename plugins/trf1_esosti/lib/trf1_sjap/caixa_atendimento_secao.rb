@@ -33,7 +33,7 @@ module Trf1Sjap
       end
     end
 
-    def novaSolicitacao?
+    def nova_solicitacao?
       for s in solicitacoes
         return true if s[:atendente] == ''
       end

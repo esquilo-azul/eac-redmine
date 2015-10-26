@@ -44,6 +44,37 @@ module Trf1Sjap
       CaixaAtendimentoSecao.new(pageContent)
     end
 
+    def caixa_atendimento_central(unidades)
+      url = '/sosti/atendimentosecoes/caixaunidadecentral/page/1/itemsperpage/250'
+      if unidades
+        params = [
+          ['DOCM_NR_DOCUMENTO', ''],
+          %w(SNAT_CD_NIVEL 2),
+          ['DOCM_CD_MATRICULA_CADASTRO', ''],
+          ['SSOL_CD_MATRICULA_ATENDENTE', ''],
+          ['MOFA_ID_FASE', ''],
+          ['DOCM_CD_LOTACAO_GERADORA', ''],
+          ['TRF1_SECAO', ''],
+          ['SGRS_ID_GRUPO', ''],
+          %w(SOMENTE_PRINCIPAL N),
+          ['DATA_INICIAL_CADASTRO', ''],
+          ['DATA_FINAL_CADASTRO', ''],
+          ['DATA_INICIAL', ''],
+          ['DATA_FINAL', ''],
+          ['DOCM_CD_MATRICULA_CADASTRO_VALUE', ''],
+          ['SSOL_CD_MATRICULA_ATENDENTE_VALUE', ''],
+          ['DOCM_CD_LOTACAO_GERADORA_VALUE', ''],
+          %w(Filtrar Filtrar)
+        ]
+        unidades.each { |u| params << ['MODE_ID_CAIXA_ENTRADA[]', u] }
+        page_content = request(:post, url, params)
+      else
+        page_content = request(:get, url)
+      end
+      fail UserNotLogged.new unless loggedUser?(page_content)
+      Trf1::Esosti::CaixaUnidadeCentralParser.new(page_content)
+    end
+
     def solicitacao_detalhes(solicitacao_id)
       html = request(:post, '/sosti/detalhesolicitacao/detalhesol', '{"SSOL_ID_DOCUMENTO":"' + solicitacao_id.to_s + '"}')
       log_solicitacao_detalhes_html(solicitacao_id, html)

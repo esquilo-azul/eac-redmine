@@ -1,0 +1,1792 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>e-Sosti - CAIXA DE ATENDIMENTO DA SEÇÃO CENTRALIZADO</title>
+                <link href="/app/e-Admin/css/blueprint/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/css/blueprint/print.css" media="print" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/img/trf1.ico" rel="shortcut icon" type="image/x-icon" />
+<link href="/app/e-Admin/js/jquery-ui-1.8.14/css/custom-theme/jquery-ui-1.8.14.custom.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/css/layout.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/js/tooltipster-1.2/css/tooltipster.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/css/form.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/js/wijmo-open/development-bundle/themes/wijmo/jquery.wijmo.wijsuperpanel.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/app/e-Admin/js/wijmo-open/development-bundle/themes/wijmo/jquery.wijmo.wijmenu.css" media="screen, projection" rel="stylesheet" type="text/css" />	<script type="text/javascript">
+    //<![CDATA[
+
+			var base_url = "/app/e-Admin",
+                         timeout = "1445629103",
+			 time_render = "1445614703";
+		    //]]>
+</script>
+<script type="text/javascript" src="/app/e-Admin/js/jquery-ui-1.8.14/js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/jquery-ui-1.8.14/js/jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/wijmo-open/development-bundle/external/jquery.bgiframe-2.1.3-pre.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/wijmo-open/development-bundle/wijmo/jquery.wijmo.wijutil.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/wijmo-open/development-bundle/wijmo/jquery.wijmo.wijmenu.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/wmenu/jquery.wmenu.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/notificacaoGeral.js"></script>       <style type="text/css" media="screen">
+
+            .ui-state-default a:hover {
+                color: #ffffff;
+
+            }
+
+        </style>
+        <script type="text/javascript">
+            
+            var msg_ajuda_by_id; 
+            var botao_ajuda_by_id;
+            var flashMessages_by_id;
+            var botao_ajuda_recolhe_by_id;
+            var msg_informacao_by_id;
+            var botao_informacao_by_id;
+
+            $(document)
+            .ajaxStart(function(){
+                $('div#loading').show();
+            })
+            .ajaxStop(function (){
+                window.setTimeout(function () {
+                    $('div#loading').hide('slow');
+                }, '10');
+            });
+            
+            $(function() {
+                $( "#accordion" ).accordion();
+                $( "#tabs" ).tabs();
+                $( "#datepicker" ).datepicker();
+                $( "#dialog" ).dialog({
+                  resizable: true,
+                    // height:140,
+                    //modal: true,
+                    buttons: {
+                        "Delete all items": function() {
+                            $( this ).dialog( "close" );
+                        },
+                        Cancel: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
+                $( ".sair" ).button({
+                    icons: {
+                        primary: "ui-icon-power"
+                    }
+                });
+                $( ".novo" ).button({
+                    icons: {
+                        primary: "ui-icon-document"
+                    }
+                });
+                $( ".editar" ).button({
+                    icons: {
+                        primary: "ui-icon-pencil"
+                    }
+                });
+                $( ".excluir" ).button({
+                    icons: {
+                        primary: "ui-icon-trash"
+                    }
+                });
+                $( ".adicionar" ).button({
+                    icons: {
+                        primary: "ui-icon-plusthick"
+                    }
+                });
+                $( ".ordemDESC" ).button({
+                    icons: {
+                        primary: "ui-icon-triangle-1-s"
+                    }
+                });
+                $( ".ordemASC" ).button({
+                    icons: {
+                        primary: "ui-icon-triangle-1-n"
+                    }
+                });
+                $( ".listar" ).button({
+                    icons: {
+                        primary: "ui-icon-arrowthickstop-1-s"
+                    }
+                });
+
+                $( ".submitComum" ).button();
+                
+                $( ".painel" ).buttonset();
+
+                $( "button, input:submit, a", ".dema" ).button();
+                $( "a", ".paginationControl" ).button();
+                $( "span.disabled", ".paginationControl" ).button({disabled:true});
+                $( "a", ".dema" ).click(function() {
+                    location.href = this.href;
+                    return false;
+                });
+
+                $(".navigation").wijmenu();
+                $("input:text").addClass("x-form-text");
+//                $("input:text").addClass("x-form-text");
+
+                $("select").addClass("x-form-text");
+                $("input.datepicker").datepicker($.datepicker.regional["pt_BR"]);
+                $("textarea").addClass("x-form-field");
+
+                $(".grid").addClass("ui-widget ui-widget-content");
+                $("thead tr",".grid").addClass("ui-widget-header");
+                $('a.icoAdminlink').wmenu({
+                    itemShowid :'#mudarUsuario',
+                    selectedClass :'icoAdminlink_click'
+                });
+                
+                /*AJUDA DO PROGRAMA*/
+                $( "#botao_ajuda" ).button({
+                    icons: {
+                        primary: "ui-icon-help"
+                    }
+                }).attr('style','position: absolute; right: 0px; width: 28px; height: 16px; display: none;');
+                $( "#botao_ajuda_recolhe" ).button({
+                    icons: {
+                        primary: "ui-icon-arrowstop-1-n"
+                    }
+                }).attr('style','position: relative; left: 350px; bottom: -10px; width: 28px; height: 16px;')
+                .attr('title','Recolher ajuda');
+                
+                flashMessages_by_id = $('#flashMessages');
+                msg_ajuda_by_id =  $('#msg_ajuda');
+                botao_ajuda_by_id =  $('#botao_ajuda');
+                botao_ajuda_recolhe_by_id =  $('#botao_ajuda_recolhe');
+                botao_ajuda_by_id.click(
+                    function(){
+                        if(msg_ajuda_by_id.css('display') == 'block'){
+                            msg_ajuda_by_id.hide("blind");
+                        }else{
+                            msg_ajuda_by_id.show("blind");
+                        }
+                    }
+                );
+                botao_ajuda_recolhe_by_id.click(
+                    function(){
+                            msg_ajuda_by_id.hide("blind");
+                    }
+                );
+                /*AJUDA DO PROGRAMA************/
+                
+                /*INFORMAÇÃO DO PROGRAMA*/
+                msg_informacao_by_id =  $('#msg_informacao');
+                botao_informacao_by_id =  $('#botao_informacao');
+                botao_informacao_by_id.click(
+                    function(){
+                        if(msg_informacao_by_id.css('display') == 'block'){
+                            msg_informacao_by_id.hide("blind");
+                        }else{
+                            msg_informacao_by_id.show("blind");
+                        }
+                    }
+                );
+                $( "#botao_informacao" ).button({
+                    icons: {
+                        primary: "ui-icon-notice"
+                    }
+                }).attr('style','position: absolute; right: 30px; width: 28px; height: 16px; display: none; ');
+                /*INFORMAÇÃO DO PROGRAMA************/
+                
+            });
+        </script>
+    </head>
+    <body>
+        <div id="geral">
+            <div id="topo">
+                    <div class="span-4" id="loading" style="z-index: 5000; position: absolute; top:90px; left: 350px; display: none; ">
+                        <div style="margin: 1px 0 0 30px;" class="span-1 last"><img src="/app/e-Admin/img/ajax-loader_1.gif"/></div><div class="span-2"><strong>Aguarde...</strong></div>
+                    </div>
+                <a href="/app/e-Admin/admin"><h1><abbr title="Sistema de Atendimento a Solicitações de TI">e-Sosti</abbr></h1></a>
+                <div id="tools">
+                    <div id="user">
+                        <div class="span-10 last first" id="tools-usuario" style="float:right;">
+                            <div id="user-name" class="span-10 last">
+                                                                <div id="icoAdmin"><a href="#" class="icoAdminlink" rel="mudarUsuario"></a></div>
+                                <div id="nome">
+                                        <!--                                    <br/>-->
+                                    SEINF - SEÇÃO DE TECNOLOGIA DA INFORMACAO - 269                                    <br/>
+                                    AP20199 - EDUARDO HENRIQUE BOGONI                                </div>
+                                <div id="mudarUsuario">
+                                    <ul>
+                                        <li><a href="#">administrar</a></li>
+                                        <li><a href="#">outro</a></li>
+                                        <!--<li><a href="#" class="sair">sair</a></li>-->
+                                        <a href="/app/e-Admin/login/logout" class="sair">sair</a>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div><!--user-->
+                </div><!--administrativa-->
+            </div><!--topo-->
+            <div id="menu">
+                 <ul class="navigation">
+    <li>
+        <a href="/app/e-Admin/guardiao">Guardião</a>
+        <ul>
+            <li>
+                <a href="/app/e-Admin/guardiao/perfil">Gerenciar Perfis</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/guardiao/unidadeperfil/form">Perfil Unidade</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/guardiao/perfilpessoa/form">Perfil Pessoa</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/guardiao/perfilpessoaadm/form">Perfil Pessoa ADM</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/app/e-Admin/sisad">Sisad</a>
+        <ul>
+            <li>
+                <a href="/app/e-Admin/sisad/pesquisadcmto">Pesquisar</a>
+            </li>
+            <li>
+                <a href="#">Cadastros</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/documento/cadastrar">Documento</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/cadastrodcmtoext/orgaoendereco">Pessoas / Orgãos</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/cadastrodcmtoext/cadastrotipodoc">Tipo de Documento</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sisad/caixapessoal/rascunhos">Caixa Pessoal</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixapessoal/entrada">Caixa de Entrada</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixapessoal/arquivadospessoal">Documentos Arquivados</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixapessoal/encaminhados">Documentos Encaminhados</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/admin/notificacoes/minhasnotificacoes">Minhas Notificações</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaminuta/minutas">Minutas</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sisad/caixaminuta/minutas">Entrada</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/caixaminuta/minutasfinalizadas">Finalizadas</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixapessoal/rascunhos">Rascunhos</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sisad/caixaaviso/entrada">Caixa Avisos</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaaviso/entrada">Pessoal</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaaviso/entradaunidade">Unidade</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sisad/caixaunidade/rascunhos">Caixa Unidade</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/arquivadosunidade">Arquivados</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/entrada">Caixa de Entrada</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/etiqueta/criar">Criar Etiqueta</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/documentosdaunidade">Documentos da Unidade</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/encaminhados">Documentos Encaminhados</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/guardiao/perfilpessoa/form">Permissões de Acesso</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/processosdaunidade">Processos da Unidade</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/protocolar">Protocolar Documentos</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/solicitacoesdaunidade">Solicitações da Unidade</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/caixaunidade/trocarcaixa">Trocar Caixa</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sisad/cadastrodcmto/form">Formulários</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formularioaviso/form">Aviso</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formulariocircular/form">Circular</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formularioinformacao/form">Informação</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formulariomemorando/form">Memorando</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formulariominuta/form">Minuta</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sisad/formulariooficio/form">Ofício</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/solicitacao/form">Sosti - Solicitação à Informática</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sosti/minhassolicitacoes/atendimento">Minhas Solicitações de TI</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/pesquisarsolicitacoes">Pesquisar Solicitações</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/emacompanhamento">Acompanhamento</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/avaliadas">Avaliadas</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/solicitacao/form">Cadastrar e-Sosti</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/atendimento">Em Atendimento</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/baixadas">Histórico de Baixadas</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/avaliacao">Para Avaliação</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/homologacao">Para Homologar</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/minhassolicitacoes/pedidoinformacao">Pedido de Informação</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/relatoriossolicitacoes/solicitacoesperiodo">Relatórios</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/relatoriossolicitacoes/solicitacoesperiodo">Solicitações por Período</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sisad/relatorioprocesso/autuadosunidade">Relatórios</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sisad/relatorioprocesso/autuadosunidade">Processos</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/apensadosanexados">Apensados / Anexados / Vinculados</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/arquivadosunidade">Arquivados na Unidade</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/autuadosassunto">Autuados por Assunto e Período</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/autuadosunidade">Autuados por Unidade e Período</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/distribuidosredistribuidos">Distribuídos / Redistribuídos</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/encaminhadosunidade">Encaminhados pela Unidade</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/paradosnaunidade">Parados na Unidade</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/orgaojulgador">Por Órgão Julgador</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/processosrelator">Por Relator</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/sigilosos">Sigilosos</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sisad/relatorioprocesso/naunidade">Na Unidade por Período</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li class="active">
+        <a href="/app/e-Admin/sosti">Sosti</a>
+        <ul>
+            <li>
+                <a href="/app/e-Admin/sosti/pesquisarsolicitacoes">Pesquisar Solicitações</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sosti/helpdesk/atendimentointerno">Atendimento aos Usuários</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sosti/solicitacao/form">Cadastrar Solicitações</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/solicitacaousertisecoes/form">Grupos de Serviços Seções</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/solicitacaouserti/form">Grupos de Serviços TRF1</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/solicitacao/form">Solicitações Locais</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="active">
+                <a href="#">Caixas</a>
+                <ul>
+                    <li class="active">
+                        <a href="/app/e-Admin/sosti/atendimentosecoes/atendimentousuario">Atendimento das Seções</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/atendimentosecoes/atendimentousuario">Entrada</a>
+                            </li>
+                            <li class="active">
+                                <a href="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral">Caixa de Atendimento Centralizado</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sosti/atendimentosecoes/encaminhadasparatrf1">Solicitações Encaminhadas ao TRF1</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/caixapessoal/entrada">Caixa Pessoal</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/caixapessoal/entrada">Entrada</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sosti/minhassolicitacoes/minhassolicitacoesperiodo">Solicitações Baixadas</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/helpdesk">Helpdesk</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/helpdesk/primeironivel">1º Nível - SAT</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/sosti/gruposervico">Manutenção</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/gruposervico">Técnico</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/gruposervico">Grupos de Serviços</a>
+                            </li>
+                            <li>
+                                <a href="/app/e-Admin/sosti/servicoadm">Serviços ADM</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/gruposervico">Gestor</a>
+                        <ul>
+                            <li>
+                                <a href="/app/e-Admin/sosti/servico">Serviços</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Relatórios</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/relatoriossolicitacoes/solicitacoesunidadeperiodo">Solicitações por Unidade e Período</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/relatoriossolicitacoes/solicitacoesporservico">Relatório de Solicitações por Serviço</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Relatórios SLA</a>
+                <ul>
+                    <li>
+                        <a href="/app/e-Admin/sosti/slasecoes/triagem">Indicadores Nível Mínimo Serviço Seções</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/relatorioshelpdesk/solicitacoesperiodo">Solicitações Atendidas por Período</a>
+                    </li>
+                    <li>
+                        <a href="/app/e-Admin/sosti/relatorioshelpdesk/primeiroatendimentosolicitacoes">Primeiro Atendimento das Solicitações</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/app/e-Admin/guardiao/perfilpessoaadm/form">Permissão Pessoa</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/app/e-Admin/transporte">Transporte</a>
+        <ul>
+            <li>
+                <a href="/app/e-Admin/transporte/acidente">Acidente</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/transporte/motorista">Motorista</a>
+            </li>
+            <li>
+                <a href="/app/e-Admin/transporte/multa">Multa</a>
+            </li>
+        </ul>
+    </li>
+</ul>            </div><!--menu-->
+            <div id="container">
+                <!--	<div id="menuEsquerdo"></div>--><!--menuEsquerdo-->
+                <div id="conteudo" >
+                    <div id="tools_aux">
+                        <span title="Tempo até que a sessão expire" id="contador" style="right: 0; top: 20px; float: right; position: relative; z-index: 0; color: #999999;"></span>
+                        <a title="Informações sobre está página" id='botao_informacao' class="botao_informacao_icon"></a>
+                        <a href="#" title="Ajuda desta página" id='botao_ajuda' class="ajuda_icon"></a>
+                                                <div id="dialog_time_out"></div>
+                    </div>
+                    <h2>CAIXA DE ATENDIMENTO DA SEÇÃO CENTRALIZADO</h2>
+                    <div id="flashMessages"></div>
+                    <div id="flashMessagesView"></div>
+<div class="help" id="msg_ajuda" style="display: none; " >
+    <script>
+        $(function(){
+            botao_ajuda_by_id.delay(200).show('scale');
+        })
+        $(function() {
+            $("select#TRF1_SECAO").change(
+                function () {
+                        var secao = $(this).val().split('|')[0];
+                        var lotacao = $(this).val().split('|')[1];
+                        var tipolotacao = $(this).val().split('|')[2];
+                        $("select#SSER_ID_SERVICO").html("");
+                    $.ajax({
+                        url: base_url + '/sosti/solicitacaousertisecoes/ajaxgruposervicosecoes/secao/'+secao+ '/lotacao/'+lotacao+'/tipo/'+tipolotacao,
+                        dataType : 'html',
+                        beforeSend:function() {
+                            $("#SGRS_ID_GRUPO").removeClass('erroInputSelect');
+                            $("#SGRS_ID_GRUPO").html('');
+                            $("#SGRS_ID_GRUPO").addClass('carregandoInputSelect');
+                        },
+                        success: function(data) {
+                            $('#SGRS_ID_GRUPO').html(data);
+                            //$("#SSER_ID_SERVICO").html(data);
+                            $("#SGRS_ID_GRUPO").removeClass('carregandoInputSelect');
+                            $("#SGRS_ID_GRUPO").focus();
+                        },
+                        error: function(){
+                        }
+                    });
+                });
+            });
+       
+       /* $(function() {
+         $("select#SECAO_SUBSECAO").change(
+                function () {
+                        var secao = $(this).val().split('|')[0];
+                        var lotacao = $(this).val().split('|')[1];
+                        var tipolotacao = $(this).val().split('|')[2];
+                    $.ajax({
+                        url: base_url + '/sosti/solicitacaousertisecoes/ajaxgruposervicosecoes/secao/'+secao+ '/lotacao/'+lotacao+'/tipo/'+tipolotacao,
+                        dataType : 'html',
+                        beforeSend:function() {
+                        },
+                        success: function(data) {
+                            $('select#SGRS_ID_GRUPO').html(data);
+                        },
+                        error: function(){
+                        }
+                    });
+                });
+        });*/
+        
+        $(function() {
+            $('#SGRS_ID_GRUPO').change(
+                function(){
+                    //$("#SSER_ID_SERVICO").removeAttr('disabled');
+                    $.ajax({
+                        url: base_url +'/sosti/solicitacaousertisecoes/ajaxservicos',
+                        dataType: 'html',
+                        type: 'POST',
+                        data: this.value,
+                        contentType: 'application/json',
+                        processData: false,
+                      beforeSend:function() {
+                          $("#SSER_ID_SERVICO").removeClass('erroInputSelect');
+                          $("#SSER_ID_SERVICO").html('');
+                          $("#SSER_ID_SERVICO").addClass('carregandoInputSelect');
+                      },
+                      success: function(data) {
+                          $("#SSER_ID_SERVICO").html(data);
+                          $("#SSER_ID_SERVICO").removeClass('carregandoInputSelect');
+                          $("#SSER_ID_SERVICO").focus();
+                      },
+                      error: function(){
+                          $("#SSER_ID_SERVICO").removeClass('x-form-field');
+                          $("#SSER_ID_SERVICO").val('Erro ao carregar.');
+                          $("#SSER_ID_SERVICO").addClass('erroInputSelect');
+                          $("#SSER_ID_SERVICO").html('<option>Erro ao carregar</option>');
+                      }
+                    });  
+                }
+            );
+            $("#SSOL_NR_TOMBO-label").hide();
+            $("#SSOL_NR_TOMBO-element").hide();
+            $("#DE_MAT-label").hide();
+            $("#DE_MAT-element").hide();
+            
+            
+            $('#SSER_ID_SERVICO').change(
+                function(){
+                    var unidade = $(this).val().split('|')[1];
+                    if(unidade == 'S'){
+                        $("#SSOL_NR_TOMBO-label").show();
+                        $("#SSOL_NR_TOMBO-element").show();
+                        $("#DE_MAT-label").show();
+                        $("#DE_MAT-element").show();
+                    }else{
+                        $("#SSOL_NR_TOMBO-label").hide();
+                        $("#SSOL_NR_TOMBO-element").hide();
+                        $("#DE_MAT-label").hide();
+                        $("#DE_MAT-element").hide();
+                    }
+                }
+            );
+        });
+    </script>
+    <h3>Ajuda&ensp;</h3>
+    <p>Esta é a <b>Caixa</b> de visualização da equipe que realiza os atendimentos presenciais nas unidades solicitantes.</p>
+    <ul>
+        <li>Os campos de título (nº. da solicitação, tempo real, nome solicitante etc.) permitem ordenação automática, bastando clicar no campo.</li>
+        <li>A ordenação do sistema é da mais antiga para a mais nova.</li>
+        <li>Para ver o conteúdo de uma solicitação, clica-se duas vezes onde o cursor estiver posicionado.</li>
+        <li>O conteúdo da lista quando aberto  pela primeira vez irá listar todos os itens existentes. Para ter uma melhor visualização da listagem  clique em <strong>filtrar</strong>.</li>
+        <li>O sistema mostrará a tela <b>Detalhe</b>, onde constam os dados do Documento (solicitação) e o seu Histórico.</li>
+        <li>Poderá <b>Encaminhar</b> uma ou mais solicitações para: <i>outro nível de atendimento</i>, <i>grupo de atendimento</i> ou um <i>técnico determinado</i>.</li>
+        <li>Clicando em <b>Baixar</b>, as solicitações podem ser baixadas individualmente ou por lote.</li>
+        <li>Clicando em <b>Espera</b>, o sistema permite colocar uma ou várias solicitações em espera.</li>
+        <li>Ao clicar no botão <b>Nova</b>, o sistema irá direcionar o cadastrante para a tela de cadastro de uma nova solicitação, permitindo a criação e o atendimento.</li>
+    <br />
+    <p><b>Atenção</b>: Não se esqueça de realizar as descrições quando solicitadas.</p>
+    
+<!--    <a target="_blank" title="Documento de ajuda completo" href="/app/e-Admin/sisad/gerenciared/recuperar/dcmto/472880100233">Ajuda completa.</a>-->
+    <a id="botao_ajuda_recolhe" href="#" ></a>
+</div>
+
+<script type="text/javascript">
+                
+    $(function() {
+
+
+       
+        botao_escolhe_caixa_recolhe_by_id =  $('#botao_escolhe_caixa_recolhe');
+        botao_escolhe_caixa_recolhe_by_id.button({
+            icons: {
+                primary: "ui-icon-arrowthickstop-1-n"
+            }
+        }).attr('style','position: absolute; right: 0; width: 28px; height: 16px;')
+        .attr('title','Recolher escolher nível');
+
+        botao_escolhe_caixa_recolhe_by_id.click(
+            function(){
+                    $.cookie('mostrar_escolhe_caixa', 'nao');
+                    $("#fieldset_escolhe_caixa").hide("blind");
+                    $(this).hide("scale");
+                    botao_escolhe_caixa_mostra_by_id.show("scale");
+            }
+        );
+            
+        botao_escolhe_caixa_mostra_by_id =  $('#botao_escolhe_caixa_mostra');
+        botao_escolhe_caixa_mostra_by_id.button({
+            icons: {
+                primary: "ui-icon-arrowthickstop-1-s"
+            }
+        }).attr('style','position: absolute; right: 30px; width: 28px; height: 16px;')
+        .attr('title','Mostrar escolher nível');
+
+        botao_escolhe_caixa_mostra_by_id.click(
+            function(){
+                    $.cookie('mostrar_escolhe_caixa', 'sim');
+                    $("#fieldset_escolhe_caixa").show("blind");
+                    $(this).hide("scale");
+                    botao_escolhe_caixa_recolhe_by_id.show("scale");
+            }
+        );
+       if($.cookie('mostrar_escolhe_caixa') === 'nao'){
+            $("#fieldset_escolhe_caixa").hide("");
+            botao_escolhe_caixa_recolhe_by_id.hide("scale");
+       }else{
+            botao_escolhe_caixa_mostra_by_id.hide("scale");
+       }
+
+    });
+</script>
+
+<script type="text/javascript">
+    
+    var GLOBAL_indice_abas =  0;
+    var xhr_abrir_documento; 
+      
+    var grid_tbody_tr;
+    $(function(){
+
+        grid_tbody_tr = $("table.grid > tbody > tr");
+        grid_tbody_tr.click(
+            function(){
+                grid_tbody_tr.removeClass('hover_nav');
+                
+                var this_tr = $(this);
+                var is_checked_tr = $(this).attr('marcado');
+                
+                var input_check_box = $(this).find('input[type=checkbox]');
+                var is_checked_input = input_check_box.attr('checked');
+                
+                if( (is_checked_input == undefined && is_checked_tr == undefined) || (is_checked_input != undefined && is_checked_tr == undefined) ){
+                    input_check_box.attr('checked','checked');
+                    this_tr.attr('marcado','marcado');
+                    this_tr.addClass('hover');
+                }else{
+                    input_check_box.removeAttr('checked');
+                    this_tr.removeAttr('marcado');
+                    this_tr.removeClass('hover');
+                }
+                input_check_box.focus();
+            }
+        );
+         
+          grid_tbody_tr.each(function(i,val){
+                var $this = $(this).find('input[type=checkbox]').val();
+                var objeto = jQuery.parseJSON($this);
+              if(typeof objeto == 'object' && $(this)[0].className != "" && objeto != null) {
+                  if (objeto.STATUSVIDEO != null) {
+                      var video = objeto.STATUSVIDEO;
+                      if (video == 'AMANHA') {
+                          $(this).find('td').first().addClass('videoconferenciaamanha');
+                      }
+                  }
+              }
+           });    
+            
+            
+        grid_tbody_tr.dblclick(
+            function(){
+                var this_tr = $(this);
+                var input_check_box = $(this).find('input');
+                
+                  grid_tbody_tr.each(
+                    function(){
+                        var this_tr = $(this);
+                        var input_check_box = $(this).find('input');
+                        
+                        input_check_box.removeAttr('checked');
+                        this_tr.removeAttr('marcado');
+                        this_tr.removeClass('hover');
+                    }
+                  );
+                
+                var div_dialog_by_id =  $("#dialog-documentos_detalhe");
+                value_input_check_box = input_check_box.val();
+                input_check_box.attr('checked', 'checked');
+                this_tr.attr('marcado','marcado');
+                this_tr.addClass('hover');
+                
+                if (xhr_abrir_documento) {
+                    xhr_abrir_documento.abort();
+                }
+                
+                url = '/app/e-Admin/sosti/detalhesolicitacao/detalhesol';
+                                xhr_abrir_documento = $.ajax({
+                url: url,
+                dataType: 'html',
+                type: 'POST',
+                data: value_input_check_box,
+                contentType: 'application/json',
+                processData: false, 
+                beforeSend:function() {
+                    if(! div_dialog_by_id.dialog( "isOpen" )){
+                    div_dialog_by_id.dialog("open");
+                    }
+                },
+                success: function(data) {
+                    div_dialog_by_id.html(data);
+
+                },
+                complete: function(){
+                    
+                },
+                error : function(){
+                    
+                }
+                });
+            }
+        ); 
+        $("input[type=checkbox][name=input_check_all_grid]").click(
+            function(){
+                if($(this).attr('checked')){
+                    $(".nav_check_boxes").attr('checked','checked');
+                    $("tr[name=rowList]").addClass('hover');
+                }else{
+                    $(".nav_check_boxes").removeAttr('checked');
+                     $("tr[name=rowList]").removeClass('hover');
+                }
+            }
+        );
+        var form_valido = false;
+        $('input[name=acao]').click(
+            function(){
+                var acao = this.value;
+                var formhelpdesk = $('form[name=helpdesk]');
+                if(acao == 'Encaminhar'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/atendimentosecoes/encaminhar');
+                }else if(acao == 'Baixar'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/solicitacao/baixarcaixa');
+                }else if(acao == 'Espera'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/solicitacao/esperacaixa');
+                }else if(acao == 'Demandar ao TRF1'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/atendimentosecoes/demandartrf');
+                }else if(acao == 'Solicitar Informação'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/solicitacao/solicitarinformacao');
+                }else if(acao == 'Trocar Serviço'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/solicitacao/trocarservico');
+                }else if(acao == 'Parecer'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/solicitacao/parecer');
+                }else if(acao == 'Vincular'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/solicitacao/vincular');
+                }else if (acao == 'Desvincular') {
+                    formhelpdesk.attr('action', '/app/e-Admin/sosti/solicitacao/desvincular');
+                }else if(acao == 'Categorias'){
+                }else if(acao == 'Desvincular Atendente'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/solicitacao/desvincularatendente');
+                }else if(acao == 'Categorias'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/categorias/categorizar');
+                }else if(acao == 'Extensão de Prazo'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/solicitacao/extenderprazo');
+                } else if(acao == 'Cancelar'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/solicitacao/cancelar');
+                }else if(acao == 'Excel'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/detalhesolicitacao/detalhesolexportacao/param/detalhexls');
+                }else if(acao == 'PDF'){
+                    formhelpdesk.attr('action','/app/e-Admin/sosti/detalhesolicitacao/detalhesolexportacao/param/detalhepdf');
+                }
+            }
+        );
+        
+        $("#Filtrar").click( 
+            function(){
+                form_valido = true;
+            }
+        );
+        
+        $('form[name=helpdesk]').submit(
+           function(){          
+                
+               if(form_valido){
+                   return true;
+               }
+               
+                var solictacaoSelecionada = $("input[type=checkbox][name=solicitacao[]]:checked").val();
+                if (solictacaoSelecionada == undefined){ 
+                    var mensagem = "<div class='notice'><strong>Alerta:</strong> Escolha uma solicitação!</div>";
+                    $('#flashMessages').html(mensagem);
+                    return false;
+                }else{
+                    return true;
+                }
+                
+           }
+        );
+        $("#dialog-documentos_detalhe").dialog({
+            title    : 'Detalhe',
+                    autoOpen : false,
+                    modal    : false,
+                    show: 'fold',
+                    hide: 'fold',
+                    resizable: true,
+                    width: 800,
+                    position: [580,140,0,0],
+                    buttons : {
+                            Ok: function() {
+                                    $(this).dialog("close");
+                            }
+                    }
+       });
+    });
+</script>
+
+ 
+<script type="text/javascript">
+$(function() {
+    $("#DOCM_CD_MATRICULA_CADASTRO").autocomplete({
+        source: base_url+"/sosti/solicitacao/ajaxnomesolicitante",
+        minLength: 3,
+        delay: 300,
+        select: function( event, ui ) {
+                            if( ui.item.value != null ){ 
+                                $("#DOCM_CD_MATRICULA_CADASTRO_VALUE").val(ui.item.value);
+                            }
+                },
+        change: function( event, ui ) {
+                            if( ui.item.value != null ){ 
+                                $("#DOCM_CD_MATRICULA_CADASTRO_VALUE").val(ui.item.value);
+                            }
+        }
+
+    }).keyup(
+            function(){
+                if(this.value == ""){
+                    $("#DOCM_CD_MATRICULA_CADASTRO_VALUE").val('');
+                }
+    });
+
+    $("#SSOL_CD_MATRICULA_ATENDENTE").autocomplete({
+        source: base_url+"/sosti/solicitacao/ajaxnomesolicitante",
+        minLength: 3,
+        delay: 300,
+        select: function( event, ui ) {
+                            if( ui.item.value != null ){ 
+                                $("#SSOL_CD_MATRICULA_ATENDENTE_VALUE").val(ui.item.value);
+                            }
+                },
+        change: function( event, ui ) {
+                            if( ui.item.value != null ){ 
+                                $("#SSOL_CD_MATRICULA_ATENDENTE_VALUE").val(ui.item.value);
+                            }
+        }
+
+    }).keyup(
+            function(){
+                if(this.value == ""){
+                    $("#SSOL_CD_MATRICULA_ATENDENTE_VALUE").val('');
+                }
+    });
+
+    $("#DOCM_CD_LOTACAO_GERADORA").autocomplete({
+        source: base_url+"/sosti/solicitacao/ajaxunidade",
+        minLength: 3,
+        delay: 500,
+        select: function( event, ui ) {
+                                if( ui.item.value != null ){ 
+                                    $("#DOCM_CD_LOTACAO_GERADORA_VALUE").val(ui.item.value);
+                                }
+                },
+        change: function( event, ui ) {
+                                if( ui.item.value != null ){  
+                                     $("#DOCM_CD_LOTACAO_GERADORA_VALUE").val(ui.item.value);
+                                }
+        }
+    }).keyup(
+            function(){
+                if(this.value == ""){
+                    $("#DOCM_CD_LOTACAO_GERADORA_VALUE").val('');
+                }
+    });
+
+
+
+    $('#pesquisar')
+        .click(function() {
+            
+                 $("#pesq_div").toggle();
+
+//                if(pesq_div.css('display') == "none"){
+//                    pesq_div.show('');
+//                }else{
+//                    pesq_div.hide('');
+//                }
+        });
+
+    $('#Filtrar').button();
+
+    $("#botao_ajuda_recolhe").click(
+       function(){
+            $("#pesq_div").hide();
+            $("#pesquisar").show();
+    });
+});
+</script>
+<script type="text/javascript">
+            $(function() {
+                var dates = $( "#DATA_INICIAL, #DATA_FINAL" ).datepicker({
+			dateFormat: 'dd/mm/yy',
+			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'],
+			dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+			dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+			monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro',
+					     'Outubro','Novembro','Dezembro'],
+ 			monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+ 			nextText: 'Próximo',
+ 		        prevText: 'Anterior',
+			changeMonth: true,
+			numberOfMonths: 1,
+			changeMonth: true,
+			changeYear: true,
+			changeMonth: true,
+			onSelect: function( selectedDate ) {
+				var option = this.id == "DATA_INICIAL" ? "minDate" : "maxDate",
+					instance = $( this ).data( "datepicker" );
+					date = $.datepicker.parseDate(
+						instance.settings.dateFormat ||
+						$.datepicker._defaults.dateFormat,
+						selectedDate, instance.settings );
+				dates.not( this ).datepicker( "option", option, date );
+			}
+		});
+                
+                var dates_cadastro = $( "#DATA_INICIAL_CADASTRO, #DATA_FINAL_CADASTRO" ).datepicker({
+			dateFormat: 'dd/mm/yy',
+			dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'],
+			dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+			dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+			monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro',
+					     'Outubro','Novembro','Dezembro'],
+ 			monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+ 			nextText: 'Próximo',
+ 		        prevText: 'Anterior',
+			changeMonth: true,
+			numberOfMonths: 1,
+			changeMonth: true,
+			changeYear: true,
+			changeMonth: true,
+			onSelect: function( selectedDate ) {
+				var option = this.id == "DATA_INICIAL_CADASTRO" ? "minDate" : "maxDate",
+					instance = $( this ).data( "datepicker" );
+					date = $.datepicker.parseDate(
+						instance.settings.dateFormat ||
+						$.datepicker._defaults.dateFormat,
+						selectedDate, instance.settings );
+				dates_cadastro.not( this ).datepicker( "option", option, date );
+			}
+		});
+	    }); 
+</script>
+<script type="text/javascript">
+$(function() {
+            $('#SGRS_ID_GRUPO').change(
+                function(){
+                    $("#SSER_ID_SERVICO").removeAttr('disabled');
+                    $.ajax({
+                        url: '/app/e-Admin/sosti/solicitacao/ajaxservicos',
+                        dataType: 'html',
+                        type: 'POST',
+                        data: this.value,
+                        contentType: 'application/json',
+                        processData: false,
+                      beforeSend:function() {
+                          $("#SSER_ID_SERVICO").removeClass('erroInputSelect');
+                          $("#SSER_ID_SERVICO").html('');
+                          $("#SSER_ID_SERVICO").addClass('carregandoInputSelect');
+                      },
+                      success: function(data) {
+                          $("#SSER_ID_SERVICO").html(data);
+                          $("#SSER_ID_SERVICO").removeClass('carregandoInputSelect');
+                          $("#SSER_ID_SERVICO").focus();
+                      },
+                      error: function(){
+                          $("#SSER_ID_SERVICO").removeClass('x-form-field');
+                          $("#SSER_ID_SERVICO").val('Erro ao carregar.');
+                          $("#SSER_ID_SERVICO").addClass('erroInputSelect');
+                          $("#SSER_ID_SERVICO").html('<option>Erro ao carregar</option>');
+                      }
+                    });  
+                }
+            );
+            $("#SSOL_NR_TOMBO-label").hide();
+            $("#SSOL_NR_TOMBO-element").hide();
+            $("#DE_MAT-label").hide();
+            $("#DE_MAT-element").hide();
+            
+            
+//            $('#SSER_ID_SERVICO').change(
+//                function(){
+//                    var unidade = $(this).val().split('|')[1];
+//                    if(unidade == 'S'){
+//                        $("#SSOL_NR_TOMBO-label").show();
+//                        $("#SSOL_NR_TOMBO-element").show();
+//                        $("#DE_MAT-label").show();
+//                        $("#DE_MAT-element").show();
+//                    }else{
+//                        $("#SSOL_NR_TOMBO-label").hide();
+//                        $("#SSOL_NR_TOMBO-element").hide();
+//                        $("#DE_MAT-label").hide();
+//                        $("#DE_MAT-element").hide();
+//                    }
+//                }
+//            );
+            $('#SSOL_NR_TOMBO').focusout(
+                function(){
+                    $.ajax({
+                      //url: "sosti/solicitacao/ajaxdesctombo/id/"+this.value,
+                      url: "ajaxdesctombo/id/"+this.value,
+                      beforeSend:function() {
+                          $("#DE_MAT").removeClass('erroInputTextArea');
+                          $("#DE_MAT").val('');
+                          $("#DE_MAT").removeClass('x-form-field');
+                          $("#DE_MAT").addClass('carregandoTextArea');
+                      },
+                      success: function(data) {
+                          $("#DE_MAT").val(data);
+                          $("#DE_MAT").removeClass('carregandoInputTextArea');
+                          $("#DE_MAT").addClass('x-form-field');
+                          $("#DE_MAT").focus();
+                      },
+                      error: function(){
+                          $("#DE_MAT").removeClass('carregandoInputTextArea');
+                          $("#DE_MAT").removeClass('x-form-field');
+                          $("#DE_MAT").val('Erro ao carregar.');
+                          $("#DE_MAT").addClass('erroInputTextArea');
+                      }
+                    });  
+                }
+            );
+            if( $('#SERVICO-nomecompleto').is(':checked') == true){
+                
+                $('#SSER_DS_SERVICO').hide();
+                $('#SSER_DS_SERVICO-label').hide();
+                $('#SSER_DS_SERVICO').attr('disabled', 'disabled');
+                
+                $('#SSER_ID_SERVICO').show();
+                $('#SSER_ID_SERVICO-label').show();
+                $('#SSER_ID_SERVICO').removeAttr('disabled');
+                var description_obj = $('#SSER_ID_SERVICO-element').find('.description');
+                description_obj.show();
+                
+                
+            }else if ( $('#SERVICO-partenome').is(':checked') == true) {
+                
+                
+                $('#SSER_ID_SERVICO').hide();
+                $('#SSER_ID_SERVICO-label').hide();
+                $('#SSER_ID_SERVICO').attr('disabled', 'disabled');
+                var description_obj = $('#SSER_ID_SERVICO-element').find('.description');
+                description_obj.hide();
+                
+                $('#SSER_DS_SERVICO').show();
+                $('#SSER_DS_SERVICO-label').show();
+                $('#SSER_DS_SERVICO').removeAttr('disabled');
+                
+                
+                
+            } 
+            $('input[type=radio][name=SERVICO]').click(
+                function(){
+                if(this.value == 'nomecompleto'){
+                    
+                    $('#SSER_DS_SERVICO').hide();
+                    $('#SSER_DS_SERVICO').val("");
+                    $('#SSER_DS_SERVICO-label').hide();
+                    $('#SSER_DS_SERVICO').attr('disabled', 'disabled');
+
+                    $('#SSER_ID_SERVICO').show();
+                    $('#SSER_ID_SERVICO-label').show();
+                    $('#SSER_ID_SERVICO').removeAttr('disabled');
+                    var description_obj = $('#SSER_ID_SERVICO-element').find('.description');
+                    description_obj.show();
+                    
+                }else if (this.value == 'partenome'){
+                    $('#SSER_ID_SERVICO').hide();
+                    $('#SSER_ID_SERVICO').val("");
+                    $('#SSER_ID_SERVICO-label').hide();
+                    $('#SSER_ID_SERVICO').attr('disabled', 'disabled');
+                    var description_obj = $('#SSER_ID_SERVICO-element').find('.description');
+                    description_obj.hide();
+
+                    $('#SSER_DS_SERVICO').show();
+                    $('#SSER_DS_SERVICO-label').show();
+                    $('#SSER_DS_SERVICO').removeAttr('disabled');
+                }
+                    
+            });
+        });
+    
+	
+	
+ </script>
+ <script type="text/javascript">
+    $(function(){
+
+        // Função para verificar se o campo atendente esta vazio
+         $(".grid").each(function(){
+          $(".desvincular").click(function(){ 
+          var solictacaoSelecionada = $("input[type=checkbox][name=solicitacao[]]").is(':checked');
+              var ckeckBox = $("input[type=checkbox][name=solicitacao[]]:checked").val();
+              var splite   = ckeckBox.split(',')[2];
+              var splite2  = splite.split(':')[1];
+              var spliteMatricula   = ckeckBox.split(',')[1];
+              var spliteMatriculaAtendentes        = spliteMatricula.split('-')[0];
+              var string                           = spliteMatriculaAtendentes.split(':')[1];
+              var spliteMatriculaAtendentesArray   = string.substring(1,10) ;
+              var usuarioLogado                    = $("#usuarioLogado").val();  
+             if(usuarioLogado != spliteMatriculaAtendentesArray){
+                 
+                 var mensagem = "<div class='notice'>\n\
+                                 <strong>Alerta:</strong>\n\
+                                   Desvinculação somente com atendente ou o responsável pela caixa!\n\
+                                 </div>";
+                    $('#flashMessages').html(mensagem);
+                    return false;
+             }
+              
+          if(solictacaoSelecionada == true){
+              if(splite2 == 'null'){
+                  var mensagem = "<div class='notice'><strong>Alerta:</strong> Campo atendente vazio!</div>";
+                    $('#flashMessages').html(mensagem);
+                    return false;
+              };
+          };
+          });  
+        });
+        
+        function h2d(h) {return parseInt(h,16);}
+        var labels = $("#CATE_ID_CATEGORIA-element").find('label');
+        var cores = $("input[type=checkbox][name=CATE_ID_CATEGORIA[]] ").attr('cores');
+        cores = jQuery.parseJSON(cores);
+		if(cores){
+			$.each(cores, function(chave, cor) {
+				$(labels[chave]).css('background-color', cor);
+				var cor_numeros = cor.substr(1,cor.length);
+				var aux_numeros = h2d(cor_numeros);
+				if(aux_numeros >= (h2d('FFFFFF')/2) ){
+					$(labels[chave]).css('color', '#000');
+				}else{
+					$(labels[chave]).css('color', '#FFFFFF');
+				}
+			});
+		}
+    });
+</script>
+<div id="container_escolhe_caixa">
+    <a id="botao_escolhe_caixa_recolhe" href="#"></a>
+    <a id="botao_escolhe_caixa_mostra"  href="#" ></a>
+    <fieldset id="fieldset_escolhe_caixa">
+        <legend>Filtro de Solicitações da Caixa de Atendimento da Seção</legend>  
+        <div class="painel" >
+            <input type="button" title="Último Filtro" name="acao" value="Filtro" id="pesquisar">
+            <a title="Novo Filtro" name="acao" value="Filtrar" id="ultimo_filtro" href="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/nova/1" >Limpar Filtro/Retirar Filtro</a>
+            &emsp;&emsp;<span style="color: #2E4557;"><strong>Filtro Ativo</strong></span>
+        </div> 
+        <div id="pesq_div"  style="display:none">
+            <form enctype="application/x-www-form-urlencoded" action="" method="post"><dl class="zend_form">
+<dt id="DOCM_NR_DOCUMENTO-label"><label for="DOCM_NR_DOCUMENTO" class="optional">Nº da Solicitação:</label></dt>
+<dd id="DOCM_NR_DOCUMENTO-element">
+<input type="text" name="DOCM_NR_DOCUMENTO" id="DOCM_NR_DOCUMENTO" value="" style="width: 540px;" /></dd>
+<dt id="SNAT_CD_NIVEL-label"><label for="SNAT_CD_NIVEL" class="optional">Nivel de Atendimento:</label></dt>
+<dd id="SNAT_CD_NIVEL-element">
+<select name="SNAT_CD_NIVEL" id="SNAT_CD_NIVEL">
+    <option value="" label=""></option>
+    <option value="2" label="SERVIÇOS DE ATENDIMENTO TÉCNICO PRESENCIAL" selected="selected">SERVIÇOS DE ATENDIMENTO TÉCNICO PRESENCIAL</option>
+    <option value="3" label="SERVIÇOS DE ATENDIMENTO DE SUPORTE ESPECIALIZADO">SERVIÇOS DE ATENDIMENTO DE SUPORTE ESPECIALIZADO</option>
+    <option value="4" label="SERVIÇOS DE ATENDIMENTO EXTERNO NAS SUBSEÇÕES">SERVIÇOS DE ATENDIMENTO EXTERNO NAS SUBSEÇÕES</option>
+</select></dd>
+<dt id="DOCM_CD_MATRICULA_CADASTRO-label"><label for="DOCM_CD_MATRICULA_CADASTRO" class="optional">Solicitante:</label></dt>
+<dd id="DOCM_CD_MATRICULA_CADASTRO-element">
+<input type="text" name="DOCM_CD_MATRICULA_CADASTRO" id="DOCM_CD_MATRICULA_CADASTRO" value="" style="text-transform: uppercase; width: 540px;" /></dd>
+<dt id="SSOL_CD_MATRICULA_ATENDENTE-label"><label for="SSOL_CD_MATRICULA_ATENDENTE" class="optional">Atendente:</label></dt>
+<dd id="SSOL_CD_MATRICULA_ATENDENTE-element">
+<input type="text" name="SSOL_CD_MATRICULA_ATENDENTE" id="SSOL_CD_MATRICULA_ATENDENTE" value="" style="text-transform: uppercase; width: 540px;" /></dd>
+<dt id="MOFA_ID_FASE-label"><label for="MOFA_ID_FASE" class="optional">Última Fase:</label></dt>
+<dd id="MOFA_ID_FASE-element">
+<select name="MOFA_ID_FASE" id="MOFA_ID_FASE">
+    <option value="" label="" selected="selected"></option>
+    <option value="1019" label="AVALIAÇÃO DE SERVIÇO DE TI RECUSADA">AVALIAÇÃO DE SERVIÇO DE TI RECUSADA</option>
+    <option value="1006" label="CADASTRO SOLICITAÇÃO TI">CADASTRO SOLICITAÇÃO TI</option>
+    <option value="1022" label="ENCAMINHAMENTO DE SOLICITAÇÃO DE TI DE SEÇÃO PARA O TRIBUNAL">ENCAMINHAMENTO DE SOLICITAÇÃO DE TI DE SEÇÃO PARA O TRIBUNAL</option>
+    <option value="1013" label="ENCAMINHAMENTO DE SOLICITAÇÃO DE TI PARA CAIXA PESSOAL">ENCAMINHAMENTO DE SOLICITAÇÃO DE TI PARA CAIXA PESSOAL</option>
+    <option value="1001" label="ENCAMINHAMENTO DE SOLICITAÇÃO ENTRE GRUPOS DO TRF1">ENCAMINHAMENTO DE SOLICITAÇÃO ENTRE GRUPOS DO TRF1</option>
+    <option value="1007" label="ESPERA SOLICITAÇÃO TI">ESPERA SOLICITAÇÃO TI</option>
+    <option value="1025" label="INCLUSÃO DE INFORMAÇÃO PARA SOLICITAÇÃO DE TI">INCLUSÃO DE INFORMAÇÃO PARA SOLICITAÇÃO DE TI</option>
+    <option value="1024" label="PEDIDO DE INFORMAÇÃO PARA SOLICITAÇÃO À TI">PEDIDO DE INFORMAÇÃO PARA SOLICITAÇÃO À TI</option>
+    <option value="1008" label="TROCA DE SERVIÇO SOLICITAÇÃO TI">TROCA DE SERVIÇO SOLICITAÇÃO TI</option>
+</select></dd>
+<dt id="DOCM_CD_LOTACAO_GERADORA-label"><label for="DOCM_CD_LOTACAO_GERADORA" class="optional">Unidade Solicitante:</label></dt>
+<dd id="DOCM_CD_LOTACAO_GERADORA-element">
+<input type="text" name="DOCM_CD_LOTACAO_GERADORA" id="DOCM_CD_LOTACAO_GERADORA" value="" style="text-transform: uppercase; width: 540px;" /></dd>
+<dt id="TRF1_SECAO-label"><label for="TRF1_SECAO" class="optional">Filtrar Região: TRF1 ou Seção</label></dt>
+<dd id="TRF1_SECAO-element">
+<select name="TRF1_SECAO" id="TRF1_SECAO" style="width: 500px; ">
+    <option value="" label="" selected="selected"></option>
+    <option value="AC|3|1" label="SEÇÃO JUDICIÁRIA DO ACRE">SEÇÃO JUDICIÁRIA DO ACRE</option>
+    <option value="AM|4|1" label="SEÇÃO JUDICIÁRIA DO AMAZONAS">SEÇÃO JUDICIÁRIA DO AMAZONAS</option>
+    <option value="AP|5|1" label="SEÇÃO JUDICIÁRIA DO AMAPÁ">SEÇÃO JUDICIÁRIA DO AMAPÁ</option>
+    <option value="BA|6|1" label="SEÇÃO JUDICIÁRIA DA BAHIA">SEÇÃO JUDICIÁRIA DA BAHIA</option>
+    <option value="DF|7|1" label="SEÇÃO JUDICIÁRIA DO DISTRITO FEDERAL">SEÇÃO JUDICIÁRIA DO DISTRITO FEDERAL</option>
+    <option value="GO|8|1" label="SEÇÃO JUDICIÁRIA DE GOIÁS">SEÇÃO JUDICIÁRIA DE GOIÁS</option>
+    <option value="MA|9|1" label="SEÇÃO JUDICIÁRIA DO MARANHÃO">SEÇÃO JUDICIÁRIA DO MARANHÃO</option>
+    <option value="MG|10|1" label="SEÇÃO JUDICIÁRIA DE MINAS GERAIS">SEÇÃO JUDICIÁRIA DE MINAS GERAIS</option>
+    <option value="MT|11|1" label="SEÇÃO JUDICIÁRIA DE MATO GROSSO">SEÇÃO JUDICIÁRIA DE MATO GROSSO</option>
+    <option value="PA|12|1" label="SEÇÃO JUDICIÁRIA DO PARÁ">SEÇÃO JUDICIÁRIA DO PARÁ</option>
+    <option value="PI|13|1" label="SEÇÃO JUDICIÁRIA DO PIAUÍ">SEÇÃO JUDICIÁRIA DO PIAUÍ</option>
+    <option value="RO|14|1" label="SEÇÃO JUDICIÁRIA DE RONDÔNIA">SEÇÃO JUDICIÁRIA DE RONDÔNIA</option>
+    <option value="RR|15|1" label="SEÇÃO JUDICIÁRIA DE RORAIMA">SEÇÃO JUDICIÁRIA DE RORAIMA</option>
+    <option value="TO|16|1" label="SEÇÃO JUDICIÁRIA DE TOCANTINS">SEÇÃO JUDICIÁRIA DE TOCANTINS</option>
+</select></dd>
+<dt id="SGRS_ID_GRUPO-label"><label for="SGRS_ID_GRUPO" class="optional">Grupo de Serviço:</label></dt>
+<dd id="SGRS_ID_GRUPO-element">
+<select name="SGRS_ID_GRUPO" id="SGRS_ID_GRUPO" style="width: 650px;">
+    <option value="" label="" selected="selected"></option>
+</select></dd>
+<dt id="SSER_ID_SERVICO-label"><label for="SSER_ID_SERVICO" class="optional">Serviço:</label></dt>
+<dd id="SSER_ID_SERVICO-element">
+<select name="SSER_ID_SERVICO[]" id="SSER_ID_SERVICO" multiple="multiple" style="width: 450px;height:150px ">
+    
+</select></dd>
+<dt id="CATE_ID_CATEGORIA-label"><label for="CATE_ID_CATEGORIA" class="optional">Categorias:</label></dt>
+<dd id="CATE_ID_CATEGORIA-element">
+</dd>
+<dt id="MODE_ID_CAIXA_ENTRADA-label"><label for="MODE_ID_CAIXA_ENTRADA" class="optional">Selecione Caixa de unidade:</label></dt>
+<dd id="MODE_ID_CAIXA_ENTRADA-element">
+<select name="MODE_ID_CAIXA_ENTRADA[]" id="MODE_ID_CAIXA_ENTRADA" multiple="multiple" style="height: 250px">
+    <option value="6" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DO AMAZONAS - 4 - AM">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DO AMAZONAS - 4 - AM</option>
+    <option value="8" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DO DISTRITO FEDERAL - 7 - DF">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DO DISTRITO FEDERAL - 7 - DF</option>
+    <option value="9" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DE GOIAS - 8 - GO">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DE GOIAS - 8 - GO</option>
+    <option value="12" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DE MATO GROSSO - 11 - MT">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DE MATO GROSSO - 11 - MT</option>
+    <option value="5" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DO ACRE - 3 - AC">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DO ACRE - 3 - AC</option>
+    <option value="7" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DA BAHIA - 6 - BA">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DA BAHIA - 6 - BA</option>
+    <option value="10" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DO MARANHÃO - 9 - MA">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DO MARANHÃO - 9 - MA</option>
+    <option value="11" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DE MINAS GERAIS - 10 - MG">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DE MINAS GERAIS - 10 - MG</option>
+    <option value="18" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DO AMAPÁ - 5 - AP" selected="selected">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DO AMAPÁ - 5 - AP</option>
+    <option value="13" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DO ESTADO DO PARÁ - 12 - PA">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DO ESTADO DO PARÁ - 12 - PA</option>
+    <option value="14" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DO PIAUI - 13 - PI">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DO PIAUI - 13 - PI</option>
+    <option value="15" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DO ESTADO DE RONDÔNIA - 14 - RO">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SEÇÃO JUDICIÁRIA DO ESTADO DE RONDÔNIA - 14 - RO</option>
+    <option value="16" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DE RORAIMA - 15 - RR">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DE RORAIMA - 15 - RR</option>
+    <option value="17" label="CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DE TOCANTINS - 16 - TO">CAIXA DE ATENDIMENTO AO USUÁRIO DO(A): SECAO JUDICIARIA DE TOCANTINS - 16 - TO</option>
+</select>
+<p class="description">Este é um campo de multiseleção. Pressione a tecla CTRL para selecionar vários itens.</p></dd>
+<dt id="SOMENTE_PRINCIPAL-label"><label for="SOMENTE_PRINCIPAL" class="optional">Mostrar Solicitações Vinculadas (Filhas)</label></dt>
+<dd id="SOMENTE_PRINCIPAL-element">
+<input type="hidden" name="SOMENTE_PRINCIPAL" value="N" /><input type="checkbox" name="SOMENTE_PRINCIPAL" id="SOMENTE_PRINCIPAL" value="S" /></dd>
+<dt id="DATA_INICIAL_CADASTRO-label"><label for="DATA_INICIAL_CADASTRO" class="optional">Data inicial - Cadastro:</label></dt>
+<dd id="DATA_INICIAL_CADASTRO-element">
+<input type="text" name="DATA_INICIAL_CADASTRO" id="DATA_INICIAL_CADASTRO" value="" /></dd>
+<dt id="DATA_FINAL_CADASTRO-label"><label for="DATA_FINAL_CADASTRO" class="optional">Data final - Cadastro:</label></dt>
+<dd id="DATA_FINAL_CADASTRO-element">
+<input type="text" name="DATA_FINAL_CADASTRO" id="DATA_FINAL_CADASTRO" value="" /></dd>
+<dt id="DATA_INICIAL-label"><label for="DATA_INICIAL" class="optional">Data inicial - Última Fase:</label></dt>
+<dd id="DATA_INICIAL-element">
+<input type="text" name="DATA_INICIAL" id="DATA_INICIAL" value="" /></dd>
+<dt id="DATA_FINAL-label"><label for="DATA_FINAL" class="optional">Data final - Última Fase:</label></dt>
+<dd id="DATA_FINAL-element">
+<input type="text" name="DATA_FINAL" id="DATA_FINAL" value="" /></dd>
+
+<input type="hidden" name="DOCM_CD_MATRICULA_CADASTRO_VALUE" value="" id="DOCM_CD_MATRICULA_CADASTRO_VALUE" />
+
+<input type="hidden" name="SSOL_CD_MATRICULA_ATENDENTE_VALUE" value="" id="SSOL_CD_MATRICULA_ATENDENTE_VALUE" />
+
+<input type="hidden" name="DOCM_CD_LOTACAO_GERADORA_VALUE" value="" id="DOCM_CD_LOTACAO_GERADORA_VALUE" />
+<dt id="Filtrar-label">&#160;</dt><dd id="Filtrar-element">
+<input type="submit" name="Filtrar" id="Filtrar" value="Filtrar" /></dd></dl></form>            <span id="botao_ajuda_recolhe" ></span>
+        </div>
+    </fieldset>
+</div>
+<form name="helpdesk" action="" method="post" >
+        <div class="containerpainel">
+        <div class="painel">
+                          <a class="" href="/app/e-Admin/sosti/atendentecaixa/list/">Atendentes</a>
+                        <input type="submit" title="Baixar a solicitação" name="acao" value="Baixar"/>
+            <input type="submit" title="Cancelar solicitação" name="acao" value="Cancelar"/>
+			              <input type="submit" title="Criar Nova Categoria / Categorizar e Descategorização de Solicitações de TI" name="acao" value="Categorias"/>
+                        <input type="hidden" name="usuarioLogado" id="usuarioLogado" value="AP20199"/>
+            <input type="submit" title="Encaminhar a solicitação" name="acao" value="Encaminhar"/>
+            <input type="submit" title="Colocar a solicitação em spera" name="acao" value="Espera"/>
+            <input type="submit" title="Extensão de prazo para solicitações de TI" name="acao" value="Extensão de Prazo" />
+            <input type="submit" title="Dar parecer" name="acao" value="Parecer"/>
+            <a class="ui-button ui-widget ui-state-default ui-corner-left estiloBotao"   href="/app/e-Admin/sosti/respostapadrao/list/idGrupo/38">Resposta Padrão</a>             <input type="submit" title="Vincular de TI" name="acao" value="Vincular"/>
+            <input type="submit" title="Desvincular de TI" name="acao" value="Desvincular"/>
+            <input type="submit" title="Pedir Informação para Solicitação de TI" name="acao" value="Solicitar Informação"/>
+            <input type="submit" title="Trocar o serviço da solicitação de TI" name="acao" value="Trocar Serviço"/>
+            <input type="submit" title="Gerar PDF" name="acao" value="PDF"/>
+            <input type="submit" title="Gerar Excel" name="acao" value="Excel"/>
+            <input type="submit" class="desvincular" title="Desvincular Atendente" name="acao" value="Desvincular Atendente"/>
+<!--            <input type="submit" title="Colocar a solicitação em spera" name="acao" value="Demandar ao TRF1"/>-->
+<!--            <input name="" type="button" onClick='javascript:location.href="/sosti/helpdesk/atendimentointerno"' value="Nova">-->
+        </div>
+   </div>
+    <div id="container_pagination">
+        <table class="grid">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" name="input_check_all_grid" id="check_all" /> 
+                    </th>
+                    <th></th>
+                    <th><a href="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/ordem/SSOL_ID_DOCUMENTO/direcao/ASC ">N. da solicitação<span class="ordenacaodesc"></span></a></th>
+                    <th><a href="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/ordem/MOVI_DH_ENCAMINHAMENTO/direcao/ASC ">Tempo total<span class="ordenacaodesc"></span></a></th>
+                    <th><a href="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/ordem/NOME_USARIO_CADASTRO/direcao/ASC ">Nome do solicitante<span class="ordenacaodesc"></span></a></th>
+                    <th><a href="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/ordem/SSER_DS_SERVICO/direcao/ASC ">Serviço atual<span class="ordenacaodesc"></span></a></th>
+                    <th><a href="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/ordem/NOME_ATENDENTE/direcao/ASC ">Atendente<span class="ordenacaodesc"></span></a></th>
+                                            <th>Categorias</th>
+                                        <th>Vinculada</th>
+                </tr>
+            </thead>
+           <tbody>
+                                    <tr name="rowList" value="902359">
+                        <td                                                         >
+                            <input class="nav_grid_check_box nav_check_boxes"
+                                   id="902359" name="solicitacao[]"
+                                   type="checkbox" value="{&quot;SSOL_ID_DOCUMENTO&quot;:&quot;902359&quot;,&quot;ATENDENTE&quot;:&quot;AP29PS - RONALDO DIAS CARDOSO JUNIOR&quot;,&quot;NOME_ATENDENTE&quot;:&quot;RONALDO DIAS CARDOSO JUNIOR&quot;,&quot;DOCM_NR_DOCUMENTO&quot;:&quot;2015310000260002600160000035&quot;,&quot;DOCM_CD_MATRICULA_CADASTRO&quot;:&quot;AP20100&quot;,&quot;DOCM_DS_ASSUNTO_DOC&quot;:&quot;Inslalar comutador na sala multiuso para apresenta&amp;ccedil;&amp;atilde;o de palestrante.&quot;,&quot;MASCARA_DOCM&quot;:&quot;2015\/AP\/SEDER\/35&quot;,&quot;NOME_USARIO_CADASTRO&quot;:&quot;ANT\u00d4NIO FAUSTO VIANA J\u00daNIOR&quot;,&quot;MOFA_ID_MOVIMENTACAO&quot;:&quot;1615359&quot;,&quot;MOFA_DH_FASE&quot;:&quot;23\/10\/2015 11:54:05&quot;,&quot;MOFA_ID_FASE&quot;:&quot;1013&quot;,&quot;DATA_ATUAL&quot;:&quot;23\/10\/2015 13:38:22&quot;,&quot;MOVI_ID_MOVIMENTACAO&quot;:&quot;1615359&quot;,&quot;MOVI_DH_ENCAMINHAMENTO&quot;:&quot;23\/10\/2015 11:53:16&quot;,&quot;MODE_ID_CAIXA_ENTRADA&quot;:&quot;18&quot;,&quot;MODE_SG_SECAO_UNID_DESTINO&quot;:&quot;AP&quot;,&quot;MODE_CD_SECAO_UNID_DESTINO&quot;:&quot;269&quot;,&quot;TEMPO_TOTAL&quot;:&quot;105,1&quot;,&quot;MOVIMENTACAO&quot;:&quot;23\/10\/2015 11:53:16&quot;,&quot;SNAS_ID_NIVEL&quot;:&quot;18&quot;,&quot;SNAT_CD_NIVEL&quot;:&quot;2&quot;,&quot;SSER_ID_SERVICO&quot;:&quot;7023&quot;,&quot;SSER_DS_SERVICO&quot;:&quot;ESTAT\u00cdSTICA - Solicita\u00e7\u00f5es Diversas&quot;,&quot;SESP_DH_LIMITE_ESP&quot;:null,&quot;ESPERA_FLAG&quot;:null,&quot;VINCULADA&quot;:&quot;0&quot;,&quot;STATUS_EXTENSAO&quot;:null,&quot;STATUSVIDEO&quot;:null}"/>
+                        </td>
+                        <td>
+                                                    </td>
+                        <td>
+                            <a href="#" class="tooltip"
+                               title="Inslalar comutador na sala multiuso para apresenta&ccedil;&atilde;o de palestrante.">2015/AP/SEDER/35                        </td>
+                        <td>0D 1h 45m 6s</td>
+                        <td>AP20100 - ANTÔNIO FAUSTO VIANA JÚNIOR</td>
+                        <td>ESTATÍSTICA - Solicitações Diversas</td>
+                        <td>RONALDO DIAS CARDOSO JUNIOR</td>
+                                                <td>
+                                                    </td>
+                                                <td></td>
+                    </tr>
+                                                        <tr name="rowList" value="902336">
+                        <td                                                         >
+                            <input class="nav_grid_check_box nav_check_boxes"
+                                   id="902336" name="solicitacao[]"
+                                   type="checkbox" value="{&quot;SSOL_ID_DOCUMENTO&quot;:&quot;902336&quot;,&quot;ATENDENTE&quot;:&quot;AP23PS - ADERVAN FRANS GUIMARAES MIRA JUNIOR&quot;,&quot;NOME_ATENDENTE&quot;:&quot;ADERVAN FRANS GUIMARAES MIRA JUNIOR&quot;,&quot;DOCM_NR_DOCUMENTO&quot;:&quot;2015310000136001360160000018&quot;,&quot;DOCM_CD_MATRICULA_CADASTRO&quot;:&quot;AP20020&quot;,&quot;DOCM_DS_ASSUNTO_DOC&quot;:&quot;ao tentar anexar documentos, a tela de erro &amp;eacute; exibida. informo que o problema est&amp;aacute; ocorrendo somente nesta m&amp;aacute;quina.&quot;,&quot;MASCARA_DOCM&quot;:&quot;2015\/AP\/SEPOD-3\u00aa VARA\/18&quot;,&quot;NOME_USARIO_CADASTRO&quot;:&quot;MARICLEUMA SANTOS K\u00d6HLER SOUZA&quot;,&quot;MOFA_ID_MOVIMENTACAO&quot;:&quot;1615326&quot;,&quot;MOFA_DH_FASE&quot;:&quot;23\/10\/2015 11:28:35&quot;,&quot;MOFA_ID_FASE&quot;:&quot;1013&quot;,&quot;DATA_ATUAL&quot;:&quot;23\/10\/2015 13:38:22&quot;,&quot;MOVI_ID_MOVIMENTACAO&quot;:&quot;1615326&quot;,&quot;MOVI_DH_ENCAMINHAMENTO&quot;:&quot;23\/10\/2015 11:27:40&quot;,&quot;MODE_ID_CAIXA_ENTRADA&quot;:&quot;18&quot;,&quot;MODE_SG_SECAO_UNID_DESTINO&quot;:&quot;AP&quot;,&quot;MODE_CD_SECAO_UNID_DESTINO&quot;:&quot;269&quot;,&quot;TEMPO_TOTAL&quot;:&quot;130,7&quot;,&quot;MOVIMENTACAO&quot;:&quot;23\/10\/2015 11:27:40&quot;,&quot;SNAS_ID_NIVEL&quot;:&quot;18&quot;,&quot;SNAT_CD_NIVEL&quot;:&quot;2&quot;,&quot;SSER_ID_SERVICO&quot;:&quot;7270&quot;,&quot;SSER_DS_SERVICO&quot;:&quot;JEF VIRTUAL - DOCUMENTOS&quot;,&quot;SESP_DH_LIMITE_ESP&quot;:null,&quot;ESPERA_FLAG&quot;:null,&quot;VINCULADA&quot;:&quot;0&quot;,&quot;STATUS_EXTENSAO&quot;:null,&quot;STATUSVIDEO&quot;:null}"/>
+                        </td>
+                        <td>
+                                                    </td>
+                        <td>
+                            <a href="#" class="tooltip"
+                               title="ao tentar anexar documentos, a tela de erro &eacute; exibida. informo que o problema est&aacute; ocorrendo somente nesta m&aacute;quina.">2015/AP/SEPOD-3ª VARA/18                        </td>
+                        <td>0D 2h 10m 41s</td>
+                        <td>AP20020 - MARICLEUMA SANTOS KÖHLER SOUZA</td>
+                        <td>JEF VIRTUAL - DOCUMENTOS</td>
+                        <td>ADERVAN FRANS GUIMARAES MIRA JUNIOR</td>
+                                                <td>
+                                                    </td>
+                                                <td></td>
+                    </tr>
+                                                        <tr name="rowList" value="902332">
+                        <td                                                         >
+                            <input class="nav_grid_check_box nav_check_boxes"
+                                   id="902332" name="solicitacao[]"
+                                   type="checkbox" value="{&quot;SSOL_ID_DOCUMENTO&quot;:&quot;902332&quot;,&quot;ATENDENTE&quot;:&quot;AP29PS - RONALDO DIAS CARDOSO JUNIOR&quot;,&quot;NOME_ATENDENTE&quot;:&quot;RONALDO DIAS CARDOSO JUNIOR&quot;,&quot;DOCM_NR_DOCUMENTO&quot;:&quot;2015310000136001360160000017&quot;,&quot;DOCM_CD_MATRICULA_CADASTRO&quot;:&quot;AP20020&quot;,&quot;DOCM_DS_ASSUNTO_DOC&quot;:&quot;instalar programa&quot;,&quot;MASCARA_DOCM&quot;:&quot;2015\/AP\/SEPOD-3\u00aa VARA\/17&quot;,&quot;NOME_USARIO_CADASTRO&quot;:&quot;MARICLEUMA SANTOS K\u00d6HLER SOUZA&quot;,&quot;MOFA_ID_MOVIMENTACAO&quot;:&quot;1615319&quot;,&quot;MOFA_DH_FASE&quot;:&quot;23\/10\/2015 11:26:30&quot;,&quot;MOFA_ID_FASE&quot;:&quot;1013&quot;,&quot;DATA_ATUAL&quot;:&quot;23\/10\/2015 13:38:22&quot;,&quot;MOVI_ID_MOVIMENTACAO&quot;:&quot;1615319&quot;,&quot;MOVI_DH_ENCAMINHAMENTO&quot;:&quot;23\/10\/2015 11:25:17&quot;,&quot;MODE_ID_CAIXA_ENTRADA&quot;:&quot;18&quot;,&quot;MODE_SG_SECAO_UNID_DESTINO&quot;:&quot;AP&quot;,&quot;MODE_CD_SECAO_UNID_DESTINO&quot;:&quot;269&quot;,&quot;TEMPO_TOTAL&quot;:&quot;133,08&quot;,&quot;MOVIMENTACAO&quot;:&quot;23\/10\/2015 11:25:17&quot;,&quot;SNAS_ID_NIVEL&quot;:&quot;18&quot;,&quot;SNAT_CD_NIVEL&quot;:&quot;2&quot;,&quot;SSER_ID_SERVICO&quot;:&quot;366&quot;,&quot;SSER_DS_SERVICO&quot;:&quot;INSTALA\u00c7\u00c3O DE PROGRAMAS E APLICATIVOS&quot;,&quot;SESP_DH_LIMITE_ESP&quot;:null,&quot;ESPERA_FLAG&quot;:null,&quot;VINCULADA&quot;:&quot;0&quot;,&quot;STATUS_EXTENSAO&quot;:null,&quot;STATUSVIDEO&quot;:null}"/>
+                        </td>
+                        <td>
+                                                    </td>
+                        <td>
+                            <a href="#" class="tooltip"
+                               title="instalar programa">2015/AP/SEPOD-3ª VARA/17                        </td>
+                        <td>0D 2h 13m 4s</td>
+                        <td>AP20020 - MARICLEUMA SANTOS KÖHLER SOUZA</td>
+                        <td>INSTALAÇÃO DE PROGRAMAS E APLICATIVOS</td>
+                        <td>RONALDO DIAS CARDOSO JUNIOR</td>
+                                                <td>
+                                                    </td>
+                                                <td></td>
+                    </tr>
+                                                        <tr name="rowList" value="902330">
+                        <td                                                         >
+                            <input class="nav_grid_check_box nav_check_boxes"
+                                   id="902330" name="solicitacao[]"
+                                   type="checkbox" value="{&quot;SSOL_ID_DOCUMENTO&quot;:&quot;902330&quot;,&quot;ATENDENTE&quot;:&quot;AP29PS - RONALDO DIAS CARDOSO JUNIOR&quot;,&quot;NOME_ATENDENTE&quot;:&quot;RONALDO DIAS CARDOSO JUNIOR&quot;,&quot;DOCM_NR_DOCUMENTO&quot;:&quot;2015310000136001360160000016&quot;,&quot;DOCM_CD_MATRICULA_CADASTRO&quot;:&quot;AP20020&quot;,&quot;DOCM_DS_ASSUNTO_DOC&quot;:&quot;ao tentar anexar documento a tela de erro &amp;eacute; exibida. Solicito a verifica&amp;ccedil;&amp;atilde;o do problema com urg&amp;ecirc;ncia. Acredito que &amp;eacute; na m&amp;aacute;quina, j&amp;aacute; que em outras m&amp;aacute;quinas consigo acessar o virtual normalmente.&quot;,&quot;MASCARA_DOCM&quot;:&quot;2015\/AP\/SEPOD-3\u00aa VARA\/16&quot;,&quot;NOME_USARIO_CADASTRO&quot;:&quot;MARICLEUMA SANTOS K\u00d6HLER SOUZA&quot;,&quot;MOFA_ID_MOVIMENTACAO&quot;:&quot;1615317&quot;,&quot;MOFA_DH_FASE&quot;:&quot;23\/10\/2015 11:25:00&quot;,&quot;MOFA_ID_FASE&quot;:&quot;1013&quot;,&quot;DATA_ATUAL&quot;:&quot;23\/10\/2015 13:38:22&quot;,&quot;MOVI_ID_MOVIMENTACAO&quot;:&quot;1615317&quot;,&quot;MOVI_DH_ENCAMINHAMENTO&quot;:&quot;23\/10\/2015 11:24:28&quot;,&quot;MODE_ID_CAIXA_ENTRADA&quot;:&quot;18&quot;,&quot;MODE_SG_SECAO_UNID_DESTINO&quot;:&quot;AP&quot;,&quot;MODE_CD_SECAO_UNID_DESTINO&quot;:&quot;269&quot;,&quot;TEMPO_TOTAL&quot;:&quot;133,9&quot;,&quot;MOVIMENTACAO&quot;:&quot;23\/10\/2015 11:24:28&quot;,&quot;SNAS_ID_NIVEL&quot;:&quot;18&quot;,&quot;SNAT_CD_NIVEL&quot;:&quot;2&quot;,&quot;SSER_ID_SERVICO&quot;:&quot;7281&quot;,&quot;SSER_DS_SERVICO&quot;:&quot;JEF VIRTUAL - TRAMITA\u00c7\u00c3O&quot;,&quot;SESP_DH_LIMITE_ESP&quot;:null,&quot;ESPERA_FLAG&quot;:null,&quot;VINCULADA&quot;:&quot;0&quot;,&quot;STATUS_EXTENSAO&quot;:null,&quot;STATUSVIDEO&quot;:null}"/>
+                        </td>
+                        <td>
+                                                    </td>
+                        <td>
+                            <a href="#" class="tooltip"
+                               title="ao tentar anexar documento a tela de erro &eacute; exibida. Solicito a verifica&ccedil;&atilde;o do problema com urg&ecirc;ncia. Acredito que &eacute; na m&aacute;quina, j&aacute; que em outras m&aacute;quinas consigo acessar o virtual normalmente.">2015/AP/SEPOD-3ª VARA/16                        </td>
+                        <td>0D 2h 13m 53s</td>
+                        <td>AP20020 - MARICLEUMA SANTOS KÖHLER SOUZA</td>
+                        <td>JEF VIRTUAL - TRAMITAÇÃO</td>
+                        <td>RONALDO DIAS CARDOSO JUNIOR</td>
+                                                <td>
+                                                    </td>
+                                                <td></td>
+                    </tr>
+                                                        <tr name="rowList" value="902256">
+                        <td                                                         >
+                            <input class="nav_grid_check_box nav_check_boxes"
+                                   id="902256" name="solicitacao[]"
+                                   type="checkbox" value="{&quot;SSOL_ID_DOCUMENTO&quot;:&quot;902256&quot;,&quot;ATENDENTE&quot;:&quot;AP24PS - DIONEZ INGLES SILVA&quot;,&quot;NOME_ATENDENTE&quot;:&quot;DIONEZ INGLES SILVA&quot;,&quot;DOCM_NR_DOCUMENTO&quot;:&quot;2015310000176001760160000005&quot;,&quot;DOCM_CD_MATRICULA_CADASTRO&quot;:&quot;AP20201&quot;,&quot;DOCM_DS_ASSUNTO_DOC&quot;:&quot;INSTALA&amp;Ccedil;&amp;Atilde;O.&quot;,&quot;MASCARA_DOCM&quot;:&quot;2015\/AP-OPQ\/SEPJU\/5&quot;,&quot;NOME_USARIO_CADASTRO&quot;:&quot;KELEN BARBOSA MENDES NOBRE&quot;,&quot;MOFA_ID_MOVIMENTACAO&quot;:&quot;1615208&quot;,&quot;MOFA_DH_FASE&quot;:&quot;23\/10\/2015 10:14:24&quot;,&quot;MOFA_ID_FASE&quot;:&quot;1013&quot;,&quot;DATA_ATUAL&quot;:&quot;23\/10\/2015 13:38:22&quot;,&quot;MOVI_ID_MOVIMENTACAO&quot;:&quot;1615208&quot;,&quot;MOVI_DH_ENCAMINHAMENTO&quot;:&quot;23\/10\/2015 10:14:01&quot;,&quot;MODE_ID_CAIXA_ENTRADA&quot;:&quot;18&quot;,&quot;MODE_SG_SECAO_UNID_DESTINO&quot;:&quot;AP&quot;,&quot;MODE_CD_SECAO_UNID_DESTINO&quot;:&quot;269&quot;,&quot;TEMPO_TOTAL&quot;:&quot;204,35&quot;,&quot;MOVIMENTACAO&quot;:&quot;23\/10\/2015 10:14:01&quot;,&quot;SNAS_ID_NIVEL&quot;:&quot;18&quot;,&quot;SNAT_CD_NIVEL&quot;:&quot;2&quot;,&quot;SSER_ID_SERVICO&quot;:&quot;369&quot;,&quot;SSER_DS_SERVICO&quot;:&quot;CAIXAS DE SOM&quot;,&quot;SESP_DH_LIMITE_ESP&quot;:null,&quot;ESPERA_FLAG&quot;:null,&quot;VINCULADA&quot;:&quot;0&quot;,&quot;STATUS_EXTENSAO&quot;:null,&quot;STATUSVIDEO&quot;:null}"/>
+                        </td>
+                        <td>
+                                                    </td>
+                        <td>
+                            <a href="#" class="tooltip"
+                               title="INSTALA&Ccedil;&Atilde;O.">2015/AP-OPQ/SEPJU/5                        </td>
+                        <td>0D 3h 24m 20s</td>
+                        <td>AP20201 - KELEN BARBOSA MENDES NOBRE</td>
+                        <td>CAIXAS DE SOM</td>
+                        <td>DIONEZ INGLES SILVA</td>
+                                                <td>
+                                                    </td>
+                                                <td></td>
+                    </tr>
+                                                        <tr name="rowList" value="902092">
+                        <td class="tempoUltrapassado" title="Solicitação com o tempo de atendimento ultrapassado"                                                        >
+                            <input class="nav_grid_check_box nav_check_boxes"
+                                   id="902092" name="solicitacao[]"
+                                   type="checkbox" value="{&quot;SSOL_ID_DOCUMENTO&quot;:&quot;902092&quot;,&quot;ATENDENTE&quot;:&quot;AP23PS - ADERVAN FRANS GUIMARAES MIRA JUNIOR&quot;,&quot;NOME_ATENDENTE&quot;:&quot;ADERVAN FRANS GUIMARAES MIRA JUNIOR&quot;,&quot;DOCM_NR_DOCUMENTO&quot;:&quot;2015310000181001810160000054&quot;,&quot;DOCM_CD_MATRICULA_CADASTRO&quot;:&quot;AP20175&quot;,&quot;DOCM_DS_ASSUNTO_DOC&quot;:&quot;&amp;nbsp;\r\nSolicito, gentilmente, a libera&amp;ccedil;&amp;atilde;o de acesso &amp;agrave; &amp;quot;altera&amp;ccedil;&amp;atilde;o de cadastro&amp;quot; para a servidora Kelen Barbosa Mendes Nobre, Ap.20.201, tendo em vista tal necessidade ser imperiosa para fluidez dos trabalhos.&quot;,&quot;MASCARA_DOCM&quot;:&quot;2015\/AP-OPQ\/SECVA-VARA1\/54&quot;,&quot;NOME_USARIO_CADASTRO&quot;:&quot;CARLOS EDUARDO REZENDE FERREIRA LIMA&quot;,&quot;MOFA_ID_MOVIMENTACAO&quot;:&quot;1614966&quot;,&quot;MOFA_DH_FASE&quot;:&quot;23\/10\/2015 11:42:19&quot;,&quot;MOFA_ID_FASE&quot;:&quot;1028&quot;,&quot;DATA_ATUAL&quot;:&quot;23\/10\/2015 13:38:22&quot;,&quot;MOVI_ID_MOVIMENTACAO&quot;:&quot;1614966&quot;,&quot;MOVI_DH_ENCAMINHAMENTO&quot;:&quot;22\/10\/2015 18:30:35&quot;,&quot;MODE_ID_CAIXA_ENTRADA&quot;:&quot;18&quot;,&quot;MODE_SG_SECAO_UNID_DESTINO&quot;:&quot;AP&quot;,&quot;MODE_CD_SECAO_UNID_DESTINO&quot;:&quot;269&quot;,&quot;TEMPO_TOTAL&quot;:&quot;1147,78&quot;,&quot;MOVIMENTACAO&quot;:&quot;22\/10\/2015 18:30:35&quot;,&quot;SNAS_ID_NIVEL&quot;:&quot;18&quot;,&quot;SNAT_CD_NIVEL&quot;:&quot;2&quot;,&quot;SSER_ID_SERVICO&quot;:&quot;396&quot;,&quot;SSER_DS_SERVICO&quot;:&quot;CADASTRO \/ PERMISS\u00c3O NO PERGAMUM&quot;,&quot;SESP_DH_LIMITE_ESP&quot;:null,&quot;ESPERA_FLAG&quot;:null,&quot;VINCULADA&quot;:&quot;0&quot;,&quot;STATUS_EXTENSAO&quot;:null,&quot;STATUSVIDEO&quot;:null}"/>
+                        </td>
+                        <td>
+                                                    </td>
+                        <td>
+                            <a href="#" class="tooltip"
+                               title="&nbsp;
+Solicito, gentilmente, a libera&ccedil;&atilde;o de acesso &agrave; &quot;altera&ccedil;&atilde;o de cadastro&quot; para a servidora Kelen Barbosa Mendes Nobre, Ap.20.201, tendo em vista tal necessidade ser imperiosa para fluidez dos trabalhos.">2015/AP-OPQ/SECVA-VARA1/54                        </td>
+                        <td>0D 8h 7m 46s</td>
+                        <td>AP20175 - CARLOS EDUARDO REZENDE FERREIRA LIMA</td>
+                        <td>CADASTRO / PERMISSÃO NO PERGAMUM</td>
+                        <td>ADERVAN FRANS GUIMARAES MIRA JUNIOR</td>
+                                                <td>
+                                                    </td>
+                                                <td></td>
+                    </tr>
+                                                        <tr name="rowList" value="878262">
+                        <td class="tempoUltrapassado" title="Solicitação com o tempo de atendimento ultrapassado"                                                        >
+                            <input class="nav_grid_check_box nav_check_boxes"
+                                   id="878262" name="solicitacao[]"
+                                   type="checkbox" value="{&quot;SSOL_ID_DOCUMENTO&quot;:&quot;878262&quot;,&quot;ATENDENTE&quot;:&quot;AP58PS - ANAIDE CONCEICAO DOS SANTOS&quot;,&quot;NOME_ATENDENTE&quot;:&quot;ANAIDE CONCEICAO DOS SANTOS&quot;,&quot;DOCM_NR_DOCUMENTO&quot;:&quot;2015310000196001960160000074&quot;,&quot;DOCM_CD_MATRICULA_CADASTRO&quot;:&quot;AP20060&quot;,&quot;DOCM_DS_ASSUNTO_DOC&quot;:&quot;Reparar falha\/erro que est&amp;aacute; ocorrendo quando o magistrado vai autorizar as RPV&amp;#039;s no ORACLE, conforme tela de erro anexa.&quot;,&quot;MASCARA_DOCM&quot;:&quot;2015\/AP-LJI\/SEPOD-VARA1\/74&quot;,&quot;NOME_USARIO_CADASTRO&quot;:&quot;JOAQUIM DA SILVA OLIVEIRA&quot;,&quot;MOFA_ID_MOVIMENTACAO&quot;:&quot;1601783&quot;,&quot;MOFA_DH_FASE&quot;:&quot;20\/10\/2015 19:01:56&quot;,&quot;MOFA_ID_FASE&quot;:&quot;1038&quot;,&quot;DATA_ATUAL&quot;:&quot;23\/10\/2015 13:38:22&quot;,&quot;MOVI_ID_MOVIMENTACAO&quot;:&quot;1601783&quot;,&quot;MOVI_DH_ENCAMINHAMENTO&quot;:&quot;08\/10\/2015 17:48:39&quot;,&quot;MODE_ID_CAIXA_ENTRADA&quot;:&quot;18&quot;,&quot;MODE_SG_SECAO_UNID_DESTINO&quot;:&quot;AP&quot;,&quot;MODE_CD_SECAO_UNID_DESTINO&quot;:&quot;269&quot;,&quot;TEMPO_TOTAL&quot;:&quot;21349,71&quot;,&quot;MOVIMENTACAO&quot;:&quot;08\/10\/2015 17:48:39&quot;,&quot;SNAS_ID_NIVEL&quot;:&quot;18&quot;,&quot;SNAT_CD_NIVEL&quot;:&quot;2&quot;,&quot;SSER_ID_SERVICO&quot;:&quot;7280&quot;,&quot;SSER_DS_SERVICO&quot;:&quot;JEF VIRTUAL - RPV&quot;,&quot;SESP_DH_LIMITE_ESP&quot;:null,&quot;ESPERA_FLAG&quot;:null,&quot;VINCULADA&quot;:&quot;0&quot;,&quot;STATUS_EXTENSAO&quot;:null,&quot;STATUSVIDEO&quot;:null}"/>
+                        </td>
+                        <td>
+                                                    </td>
+                        <td>
+                            <a href="#" class="tooltip"
+                               title="Reparar falha/erro que est&aacute; ocorrendo quando o magistrado vai autorizar as RPV&#039;s no ORACLE, conforme tela de erro anexa.">2015/AP-LJI/SEPOD-VARA1/74                        </td>
+                        <td>9D 8h 49m 43s</td>
+                        <td>AP20060 - JOAQUIM DA SILVA OLIVEIRA</td>
+                        <td>JEF VIRTUAL - RPV</td>
+                        <td>ANAIDE CONCEICAO DOS SANTOS</td>
+                                                <td>
+                                                    </td>
+                                                <td></td>
+                    </tr>
+                                                </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="8">Total: 7</td>
+                </tr>
+                <tr>
+                    <td colspan="8">
+
+
+<div style="margin-top: 6px; margin-bottom: 6px;">
+        <div class="paginationControl" style="text-align:center">
+                    <span class="disabled">Primeira</span> 
+            <span class="disabled">&lt; Anterior</span> 
+        
+                                    <span class="disabled">1</span>
+                    
+                    <span class="disabled">Próxima &gt;</span>
+            <span class="disabled">Última </span>
+                                
+            
+            <script type="text/javascript">
+                $(function(){
+                    $(".PerPage").change(
+                        function(){
+							
+                            var this_per_page = $(this);
+                            var options = this_per_page.find("option:selected");
+                            window.location.href = options.attr('url');
+                            return;
+                        }
+                    );
+                });
+            </script>
+            
+            <label> 
+                <select class="PerPage" title="Número de registros por página" id="paginaContador" >
+                                        <option 
+                            selected="selected"  
+                            url="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/itemsperpage/50"
+                    >
+                            50                    </option>
+                                        <option 
+                              
+                            url="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/itemsperpage/150 "
+                    >
+                            150                    </option>
+                                        <option 
+                              
+                            url="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/itemsperpage/250 "
+                    >
+                            250                    </option>
+                    <!--                    <option 
+                              
+                            url="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/itemsperpage/120 "
+                    >
+                            120                    </option>
+                                        <option 
+                              
+                            url="/app/e-Admin/sosti/atendimentosecoes/caixaunidadecentral/itemsperpage/240 "
+                    >
+                            240                    </option>-->
+                </select>
+            </label>
+    </div>
+</div>
+</td>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="painel">
+                            <a class="" href="/app/e-Admin/sosti/atendentecaixa/list/">Atendentes</a>
+                        <input type="submit" title="Baixar a solicitação" name="acao" value="Baixar"/>
+			<input type="submit" title="Cancelar solicitação" name="acao" value="Cancelar"/>
+			                <input type="submit" title="Criar Nova Categoria / Categorizar e Descategorização de Solicitações de TI" name="acao" value="Categorias"/>
+                        <input type="submit" title="Encaminhar a solicitação" name="acao" value="Encaminhar"/>
+<!--            <input type="submit" title="Colocar a solicitação em spera" name="acao" value="Espera"/>-->
+            <input type="submit" title="Extensão de prazo para solicitações de TI" name="acao" value="Extensão de Prazo" />
+            <input type="submit" title="Dar parecer" name="acao" value="Parecer"/>
+            <a class="ui-button ui-widget ui-state-default ui-corner-left estiloBotao"   href="/app/e-Admin/sosti/respostapadrao/list/idGrupo/38">Resposta Padrão</a>             <input type="submit" title="Vincular de TI" name="acao" value="Vincular"/>
+            <input type="submit" title="Desvincular de TI" name="acao" value="Desvincular"/>
+            <input type="submit" title="Pedir Informação para Solicitação de TI" name="acao" value="Solicitar Informação"/>
+            <input type="submit" title="Trocar o serviço da solicitação de TI" name="acao" value="Trocar Serviço"/>
+            <input type="submit" title="Gerar PDF" name="acao" value="PDF"/>
+            <input type="submit" title="Gerar Excel" name="acao" value="Excel"/>
+            <input type="submit" class="desvincular" title="Desvincular Atendente" name="acao" value="Desvincular Atendente"/>
+            
+        <!--            <input name="" type="button" onClick='javascript:location.href="/sosti/helpdesk/atendimentointerno"' value="Nova">-->
+        </div>
+        </div>
+    <input name="controller" id="controller" type="hidden"  value="atendimentosecoes"/>        
+    <input name="action" id="action" type="hidden"  value="caixaunidadecentral"/>
+    <input name="title" id="action" type="hidden"  value="CAIXA DE ATENDIMENTO DA SEÇÃO CENTRALIZADO"/> 
+</form>
+ <div>
+    <table class="legenda ui-widget-content" style="margin-top:1.4em">
+             <thead>
+                 <tr>
+                     <th colspan="2">Legenda de Cores dos Status da Caixa de Atendimento</th>
+                 </tr>
+             </thead>
+             <tbody>
+                 <tr>
+                     <td class="pedidoInformacao" title="Pedido de informação para solicitação de TI"></td>
+                     <td>Pedido de informação para solicitação de TI</td>
+                 </tr>
+				  <tr>
+                     <td class="pedidoCancelamento" title="Pedido de cancelamento de solicitação"></td>
+                     <td>Pedido de cancelamento de solicitação</td>
+                 </tr>
+                 <tr>
+                     <td class="respostaPedidoInformacao" title="Resposta ao pedido de informação para solicitação de TI"></td>
+                     <td>Resposta ao pedido de informação para solicitação de TI</td>
+                 </tr>
+                 <tr>
+                     <td class="espera" title="Solicitação colocada em espera"></td>
+                     <td>Solicitação colocada em espera</td>
+                 </tr>
+                 <tr>
+                     <td class="tempoUltrapassado" title="Solicitação com o tempo de atendimento ultrapassado"></td>
+                     <td>Solicitação com o tempo de atendimento ultrapassado</td>
+                 </tr>
+                 <tr>
+                     <td class="recusada" title="Solicitação recusada"></td>
+                     <td>Solicitação recusada</td>
+                 </tr>
+				  <tr>
+                     <td class="videorealizada" title="Videoconferência realizada"></td>
+                     <td>Videoconferência realizada</td>
+                 </tr>
+                 <tr>
+                     <td class="videoconferenciaamanha" title="Videoconferência agendada para amanhã"></td>
+                     <td>Verificar videoconferência agendada para amanhã</td>
+                 </tr>
+                 <tr>
+                     <td class="extensaoprazoamanha" title="Solicitação com extensão de prazo vencendo amanhã"></td>
+                     <td>Solicitação com extensão de prazo vencendo amanhã</td>
+                 </tr>
+                 <tr>
+                     <td class="emhomologacao" title="Solicitação em Homologação"></td>
+                     <td>Solicitação em homologação</td>
+                 </tr>
+                 <tr>
+                     <td class="homologada" title="Solicitação Homologada"></td>
+                     <td>Solicitação homologada</td>
+                 </tr>
+                 <tr>
+                     <td class="naohomologada" title="Solicitação não Homologada"></td>
+                     <td>Solicitação não homologada</td>
+                 </tr>
+             </tbody>
+         </table></div>
+<div id="dialog-documentos_detalhe">
+    <img style="display: none; position: absolute; z-index: 5000; top: 5px; left: 15px;" class="loading" id="load" alt="" src="public/img/loading.gif" />
+    <div id="dialog-documentos_conteudo"></div>
+</div>
+<script>
+    $(".plus-vinc").click(function (e) {
+        e.preventDefault();
+        var id = $(this).attr('class').replace('plus-vinc ', '');
+        var tr = $(".vinculados." + id);
+        tr.find('td').slideToggle(300);
+        if ($(this).find('img').attr('src') == "/app/e-Admin/img/a-plus-icon.png")
+            $(this).find('img').attr('src', "/app/e-Admin/img/a-minus-icon.png");
+        else
+            $(this).find('img').attr('src', "/app/e-Admin/img/a-plus-icon.png");
+    });
+</script>                </div><!--conteudo-->
+                <!--<div id="filtro"></div>filtro-->
+            </div><!--container-->
+        </div><!-- geral -->
+        <div id="rodape">
+            <div id="rodapeDados">
+                <h3>Informa&ccedil;&otilde;es:</h3>
+                                                <ul>
+                                            <li >Com a entrada em produção do sistema SEI, a partir de 08.09.2014, o sistema e-Sisad terá os módulos de Cadastro de Documentos e Autuação de processos indisponível para o TRF1 e SJDF, para as demais seccionais, a mudança ocorrerá a partir do mês de outubro de 2014.</li>
+                                            <li >Com a entrada em produção do sistema SEI, o sistema de processos da Corregedoria Regional, terá bloqueada a AUTUAÇÃO de novos processos fisicos a partir do dia 08.09.2014.</li>
+                                            <li >Com a entrada em produção do sistema SEI, o sistema SISPRA será bloqueado para autuação de novos processos a partir do dia 08.09.2014 no TRF1 e SJDF.</li>
+                                    </ul>
+           </div><!--rodapeDados-->
+           <div id="rodapeinfo">
+               SJAP - SECAO JUDICIARIA DO AMAPA - 3100               <br/>
+               MACAPA - AP - CENTRO - CEP: 68906430 
+               <br/>
+               SEINF - SEÇÃO DE TECNOLOGIA DA INFORMACAO - 269               <br/>
+                - SEINF  
+                
+               <p style="margin-top: 4px;">&copy;2015 Tribunal Regional Federal da 1&ordf; Regi&atilde;o - SECIN/DISAD</p>
+               <div style="color: #0F1D29;">172.16.1.129 </div>
+               
+               <p>Consulta respondida em 1.167 segundos.</p>
+           </div>
+       </div><!--rodape-->
+       <script type="text/javascript" src="/app/e-Admin/js/contadorsessao.js"></script>
+<script type="text/javascript" src="/app/e-Admin/js/jquery.cookie.js"></script>    </body>
+</html>
