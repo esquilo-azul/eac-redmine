@@ -1,3 +1,7 @@
+<% content_for :header_tags do -%>
+  <%= javascript_include_tag('cocoon') %>
+<% end -%> 
+
 <div class="contextual">
   <%= link_to l(:label_ponto_carga_horaria_plural), ponto_carga_horarias_path %>
 </div>
@@ -22,6 +26,17 @@
     <p>
       <%= f.number_field :minutos_descontinuo %>
     </p>
+
+    <h3>Funcionários</h3>
+
+    <div>
+      <%= f.fields_for :funcionarios do |funcionario| %>
+        <%= render 'funcionario_fields', :f => funcionario %>
+      <% end %>
+      <div class="links">
+        <%= link_to_add_association 'Adicionar', f, :funcionarios %>
+      </div>
+    </div>
   </div>
   <%= submit_tag l(:button_create) %>
 <% end %>

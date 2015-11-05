@@ -13,6 +13,7 @@
       <th><%= l(:field_minutos_continuo)%></th>
       <th><%= l(:field_minutos_descontinuo)%></th>
       <th><%= l(:field_autor)%></th>
+      <th><%= l(:field_funcionarios)%></th>
     </tr>
   </thead>
   <tbody>
@@ -24,6 +25,7 @@
         <td><%= pch.minutos_continuo %></td>
         <td><%= pch.minutos_descontinuo %></td>
         <td><%= pch.autor %></td>
+        <td><%= render 'funcionarios_column', funcionarios: pch.funcionarios %></td>
       </tr>
     <% end %>
   </tbody>
