@@ -1,0 +1,27 @@
+<div class="contextual">
+  <%= link_to l(:label_ponto_carga_horaria_plural), ponto_carga_horarias_path %>
+</div>
+
+<h2><%= l(:label_ponto_carga_horaria_new)%></h2>
+
+<%= labelled_form_for @ponto_carga_horaria do |f| %>
+  <%= error_messages_for 'ponto_carga_horaria' %>
+  <div class="box tabular">
+    <p>
+      <%= f.text_field :descricao %>
+    </p>  
+    <p>
+      <%= f.date_select :data_inicial %>
+    </p>
+    <p>
+      <%= f.date_select :data_final, include_blank: true %>
+    </p>
+    <p>
+      <%= f.number_field :minutos_continuo %>
+    </p>
+    <p>
+      <%= f.number_field :minutos_descontinuo %>
+    </p>
+  </div>
+  <%= submit_tag l(:button_create) %>
+<% end %>

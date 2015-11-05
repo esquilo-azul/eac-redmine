@@ -1,5 +1,6 @@
 RedmineApp::Application.routes.draw do
   resources(:ponto_cancelamentos) { as_routes }
+  resources(:ponto_carga_horarias, only: %w(index new create))
   resources(:ponto_entradas) do
     as_routes
     member do

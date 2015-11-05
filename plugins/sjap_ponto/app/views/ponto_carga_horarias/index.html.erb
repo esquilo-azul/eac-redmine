@@ -1,0 +1,30 @@
+<div class="contextual">
+  <%= link_to l(:label_ponto_carga_horaria_new), new_ponto_carga_horaria_path, :class => 'icon icon-add' %>
+</div>
+
+<h2><%= l(:label_ponto_carga_horaria_plural)%></h2>
+
+<table class="list">
+  <thead>
+    <tr>
+      <th><%= l(:field_descricao)%></th>
+      <th><%= l(:field_data_inicial)%></th>
+      <th><%= l(:field_data_final)%></th>
+      <th><%= l(:field_minutos_continuo)%></th>
+      <th><%= l(:field_minutos_descontinuo)%></th>
+      <th><%= l(:field_autor)%></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @ponto_carga_horarias.each do |pch| %>
+      <tr class="<%= cycle("odd", "even") %>">
+        <td><%= pch.descricao %></td>
+        <td><%= pch.data_inicial %></td>
+        <td><%= pch.data_final %></td>
+        <td><%= pch.minutos_continuo %></td>
+        <td><%= pch.minutos_descontinuo %></td>
+        <td><%= pch.autor %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

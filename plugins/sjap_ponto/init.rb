@@ -17,5 +17,6 @@ Redmine::Plugin.register :sjap_ponto do
     menu.push :ponto_entradas, { controller: 'ponto_entradas', action: 'index' }, caption: :label_ponto_entrada_plural, if: proc { UserRole.user_has_role('ponto_entrada_read') }
     menu.push :ponto_cancelamentos, { controller: 'ponto_cancelamentos', action: 'index' }, caption: :label_ponto_cancelamento_plural, if: proc { UserRole.user_has_role('ponto_cancelamento_read') }
     menu.push :frequencia_relatorio, { controller: 'frequencia_relatorios', action: 'index' }, caption: :label_frequencia_relatorio_plural, if: proc { UserRole.user_has_role('frequencia_relatorio_read') }
+    menu.push :ponto_carga_horaria, { controller: 'ponto_carga_horarias', action: 'index' }, caption: :label_ponto_carga_horaria_plural, if: proc { UserRole.user_has_role('ponto_carga_horaria_read') }
   end
 end
