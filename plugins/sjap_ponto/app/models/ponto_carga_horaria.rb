@@ -1,6 +1,7 @@
 class PontoCargaHoraria < ActiveRecord::Base
   belongs_to :autor, class_name: 'User'
   has_many :funcionarios, class_name: 'PontoCargaHorariaFuncionario', inverse_of: :ponto_carga_horaria
+  has_one :cancelamento, class_name: 'PontoCargaHorariaCancelamento', inverse_of: :ponto_carga_horaria
   accepts_nested_attributes_for :funcionarios, reject_if: :all_blank, allow_destroy: true
   validates :descricao, :data_inicial, :minutos_continuo, :minutos_descontinuo, :autor,
             presence: true
@@ -18,5 +19,13 @@ class PontoCargaHoraria < ActiveRecord::Base
   def funcionarios_minimum
     return unless funcionarios.empty?
     errors.add(:funcionarios, 'Necessario ao menos um funcionário')
+  end
+
+  def to_s
+    "#{descricao} / " + if data_final
+                          "De #{data_inicial} ate #{data_final}"
+                        else
+                          "A partir de #{data_inicial}"
+    end
   end
 end

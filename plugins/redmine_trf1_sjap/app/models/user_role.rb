@@ -5,6 +5,7 @@ class UserRole < ActiveRecord::Base
     ponto_cancelamento_read
     ponto_cancelamento_create
     ponto_carga_horaria_read
+    ponto_carga_horaria_cancelamento
     ponto_entrada_create
     ponto_entrada_read
   )

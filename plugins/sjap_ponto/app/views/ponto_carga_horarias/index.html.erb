@@ -2,6 +2,10 @@
   <%= link_to l(:label_ponto_carga_horaria_new), new_ponto_carga_horaria_path, :class => 'icon icon-add' %>
 </div>
 
+<%
+can_cancel = UserRole.user_has_role('ponto_carga_horaria_cancelamento')
+%>
+
 <h2><%= l(:label_ponto_carga_horaria_plural)%></h2>
 
 <table class="list">
@@ -14,6 +18,10 @@
       <th><%= l(:field_minutos_descontinuo)%></th>
       <th><%= l(:field_autor)%></th>
       <th><%= l(:field_funcionarios)%></th>
+      <th><%= l(:field_cancelamento)%></th>        
+      <% if UserRole.user_has_role('ponto_carga_horaria_cancelamento')  %>
+        <th>Ações</th>
+      <% end %>
     </tr>
   </thead>
   <tbody>
@@ -26,6 +34,16 @@
         <td><%= pch.minutos_descontinuo %></td>
         <td><%= pch.autor %></td>
         <td><%= render 'funcionarios_column', funcionarios: pch.funcionarios %></td>
+        <td><%= render 'cancelamento_column', cancelamento: pch.cancelamento %></td>
+        <% if UserRole.user_has_role('ponto_carga_horaria_cancelamento') &&  %>
+          <td>
+            <% if pch.cancelamento %>
+              -
+            <% else %>
+              <%= link_to('Cancelar', cancelamento_ponto_carga_horaria_path(pch)) %>
+            <% end %>
+          </td>
+        <% end %>
       </tr>
     <% end %>
   </tbody>

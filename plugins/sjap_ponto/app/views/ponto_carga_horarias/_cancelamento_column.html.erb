@@ -1,0 +1,7 @@
+<% if cancelamento %>
+  Data: <%= I18n.localize(cancelamento.created_at, :format => :short) %><br/>
+  Motivo: <%= cancelamento.motivo %><br/>
+  Autor: <%= cancelamento.autor %>
+<% else %>
+  -
+<% end %>
