@@ -30,6 +30,18 @@ Style/Documentation:
 
 Style/AsciiComments:
   Enabled: false
+  
+Metrics/AbcSize:
+  Exclude:
+    - 'plugins/sjap_ponto/db/migrate/**/*'
+    - 'plugins/sjap_ponto/test/**/*'
 
 Metrics/LineLength:
   Max: 100
+  Exclude:
+    - 'plugins/sjap_ponto/db/migrate/**/*'
+
+Metrics/MethodLength:
+  Exclude:
+    - 'plugins/sjap_ponto/db/migrate/**/*'
+    - 'plugins/sjap_ponto/test/**/*'

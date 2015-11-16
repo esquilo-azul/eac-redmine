@@ -7,7 +7,8 @@ class PontoCargaHorariasController < ApplicationController
   def index
     @funcionario = nil
     @funcionario = Funcionario.find(params['funcionario']) unless params['funcionario'].blank?
-    @ponto_carga_horarias = index_query.order(data_inicial: :desc, data_final: :asc, created_at: :desc).all
+    @ponto_carga_horarias = index_query.order(data_inicial: :desc, data_final: :asc,
+                                              created_at: :desc).all
   end
 
   def new
@@ -31,7 +32,8 @@ class PontoCargaHorariasController < ApplicationController
   end
 
   def cancelamento_post
-    @ponto_carga_horaria_cancelamento = PontoCargaHorariaCancelamento.new(ponto_carga_horaria_cancelamento_params)
+    @ponto_carga_horaria_cancelamento = PontoCargaHorariaCancelamento.new(
+      ponto_carga_horaria_cancelamento_params)
     @ponto_carga_horaria_cancelamento.ponto_carga_horaria = PontoCargaHoraria.find(params[:id])
     if @ponto_carga_horaria_cancelamento.save
       redirect_to ponto_carga_horarias_url, notice: 'Carga horária foi cancelada com sucesso'
@@ -61,7 +63,8 @@ class PontoCargaHorariasController < ApplicationController
   def index_query
     query = PontoCargaHoraria
     if @funcionario
-      query = query.includes(:funcionarios).where(ponto_carga_horaria_funcionarios: { funcionario_id: @funcionario.id })
+      query = query.includes(:funcionarios).where(ponto_carga_horaria_funcionarios:
+          { funcionario_id: @funcionario.id })
     end
     query
   end

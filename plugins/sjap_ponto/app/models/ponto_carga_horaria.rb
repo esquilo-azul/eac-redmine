@@ -1,7 +1,9 @@
 class PontoCargaHoraria < ActiveRecord::Base
   belongs_to :autor, class_name: 'User'
-  has_many :funcionarios, class_name: 'PontoCargaHorariaFuncionario', inverse_of: :ponto_carga_horaria
-  has_one :cancelamento, class_name: 'PontoCargaHorariaCancelamento', inverse_of: :ponto_carga_horaria
+  has_many :funcionarios, class_name: 'PontoCargaHorariaFuncionario',
+                          inverse_of: :ponto_carga_horaria
+  has_one :cancelamento, class_name: 'PontoCargaHorariaCancelamento',
+                         inverse_of: :ponto_carga_horaria
   accepts_nested_attributes_for :funcionarios, reject_if: :all_blank, allow_destroy: true
   validates :descricao, :data_inicial, :minutos_continuo, :minutos_descontinuo, :autor,
             presence: true
@@ -26,11 +28,12 @@ class PontoCargaHoraria < ActiveRecord::Base
                           "De #{data_inicial} ate #{data_final}"
                         else
                           "A partir de #{data_inicial}"
-    end
+                        end
   end
 
   def self.find_by_funcionario_and_data(funcionario, data)
-    validos = ativo.where(['? >= data_inicial', data]).includes(:funcionarios).where(ponto_carga_horaria_funcionarios: { funcionario_id: funcionario.id })
+    validos = ativo.where(['? >= data_inicial', data]).includes(:funcionarios).where(
+      ponto_carga_horaria_funcionarios: { funcionario_id: funcionario.id })
     fechado = validos.where(['? <= data_final', data]).order(data_final: :asc).first
     return fechado if fechado
     validos.where(data_final: nil).order(data_inicial: :desc).first
@@ -84,7 +87,8 @@ class PontoCargaHoraria < ActiveRecord::Base
 
     def ponto_entradas
       cache_value(__method__) do
-        PontoEntrada.where(funcionario: funcionario, data_hora: data.beginning_of_day..data.end_of_day).order(data_hora: :asc)
+        PontoEntrada.where(funcionario: funcionario, data_hora:
+            data.beginning_of_day..data.end_of_day).order(data_hora: :asc)
       end
     end
 
