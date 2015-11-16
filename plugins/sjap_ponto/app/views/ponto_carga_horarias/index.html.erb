@@ -8,6 +8,16 @@ can_cancel = UserRole.user_has_role('ponto_carga_horaria_cancelamento')
 
 <h2><%= l(:label_ponto_carga_horaria_plural)%></h2>
 
+<%= form_tag(ponto_carga_horarias_path, :method => :get) do %>
+  <fieldset>
+    <legend><%= l(:label_filter_plural) %></legend>
+    <label for='funcionario'><%= l(:field_funcionario) %>:</label>
+    <%= select_tag 'funcionario',  funcionario_options_for_select(@funcionario), :class => "small", :onchange => "this.form.submit(); return false;"  %>
+    <%= submit_tag l(:button_apply), :class => "small", :name => nil %>
+    <%= link_to l(:button_clear), ponto_carga_horarias_path, :class => 'icon icon-reload' %>
+  </fieldset>
+<% end %>
+
 <table class="list">
   <thead>
     <tr>
