@@ -2,7 +2,9 @@ function EsostiAlerta() {
 }
 
 EsostiAlerta.ESOSTI_ALERTA_DATA_PATH = undefined;
-EsostiAlerta.unidades_filter_options = null;
+// "18" é o código para o filtro "AP"
+EsostiAlerta.unidades_filter_options = {'18': true};
+EsostiAlerta.__failedRequests = 0;
 
 EsostiAlerta.start = function () {
   EsostiAlerta.from_unidades_filter_options();
@@ -13,12 +15,15 @@ EsostiAlerta.start = function () {
     unidades: EsostiAlerta.unidades_filter_options,
   }).success(function (data) {
     $('#resultContainer').html(data);
+    EsostiAlerta.__failedRequests = 0;
+    EsostiAlerta.__updateFailRequestDisplay();
     EsostiAlerta.on_new_data();
-  }).always(function (data) {
-    EsostiAlerta.__countdownTime = 15;
   }).always(function (data) {
     EsostiAlerta.__countdownTime = $('#intervalo').val();
     EsostiAlerta.__countdown();
+  }).fail(function (data) {
+    EsostiAlerta.__failedRequests++;
+    EsostiAlerta.__updateFailRequestDisplay();
   });
 };
 
@@ -78,4 +83,15 @@ EsostiAlerta.select_all_unidades = function (check) {
   EsostiAlerta.unidades_check_boxes().each(function () {
     this.checked = check;
   });
+}
+
+EsostiAlerta.__updateFailRequestDisplay = function() {
+  var display = $('#failDisplay')  
+  if (EsostiAlerta.__failedRequests >= 3) {
+    display.html("Falha ocorrendo há " + EsostiAlerta.__failedRequests + "tentativa(s)");
+    display.show();
+  }
+  else {
+    display.hide();
+  }
 }

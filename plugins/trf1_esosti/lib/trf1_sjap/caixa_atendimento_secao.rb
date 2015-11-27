@@ -13,6 +13,7 @@ module Trf1Sjap
       unless solicitacoes_table.nil?
         columns = solicitacoes_columns
         for line in solicitacoes_lines
+          next if line.at_xpath('@value').blank?
           line_cells = line.xpath('td')
           data.append(id: line.at_xpath('@value').text.strip.to_i,
                       numero: column_cell_text(line_cells[columns[:numero]]),
@@ -85,9 +86,11 @@ module Trf1Sjap
     def column_cell_text(cell)
       link_text = cell.at_xpath('a/text()')
       if !link_text.nil? && link_text.to_s.strip.length > 0
-        return link_text.to_s.strip
+        t = link_text.to_s
+      else
+        t = cell.text.to_s
       end
-      cell.text.to_s.strip
+      t.gsub(/[^[:print:]]/, ' ').split.join(' ').strip
     end
   end
 end

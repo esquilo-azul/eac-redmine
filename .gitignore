@@ -40,6 +40,7 @@
 /config/secrets.yml
 /log/esosti_solicitacao_detalhes/
 /log/esosti_caixa_atendimento_secao/
+/log/esosti_caixa_atendimento_central/
 /log/esosti_sync.rb.pid
 /config/install-settings.sh
 /nbproject

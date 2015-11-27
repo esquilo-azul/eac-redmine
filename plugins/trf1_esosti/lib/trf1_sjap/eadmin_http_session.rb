@@ -71,6 +71,7 @@ module Trf1Sjap
       else
         page_content = request(:get, url)
       end
+      log_caixa_atendimento_central_html(page_content)
       fail UserNotLogged.new unless loggedUser?(page_content)
       Trf1::Esosti::CaixaUnidadeCentralParser.new(page_content)
     end
@@ -89,6 +90,12 @@ module Trf1Sjap
 
     def log_caixa_atendimento_secao_html(html)
       log_file = "#{Rails.root}/log/esosti_caixa_atendimento_secao/#{@usuario}-#{@banco}.html"
+      FileUtils.mkdir_p(File.dirname(log_file))
+      File.write(log_file, html)
+    end
+
+    def log_caixa_atendimento_central_html(html)
+      log_file = "#{Rails.root}/log/esosti_caixa_atendimento_central/#{@usuario}-#{@banco}.html"
       FileUtils.mkdir_p(File.dirname(log_file))
       File.write(log_file, html)
     end
