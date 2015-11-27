@@ -2,7 +2,8 @@ function EsostiAlerta() {
 }
 
 EsostiAlerta.ESOSTI_ALERTA_DATA_PATH = undefined;
-EsostiAlerta.unidades_filter_options = null;
+// "18" é o código para o filtro "AP"
+EsostiAlerta.unidades_filter_options = {'18': true};
 EsostiAlerta.__failedRequests = 0;
 
 EsostiAlerta.start = function () {
