@@ -9,7 +9,7 @@ class FrequenciaRelatoriosController < ApplicationController
       @frequencia_relatorio = FrequenciaRelatorio.new(frequencia_relatorio_params)
       @datas = @frequencia_relatorio.datas
     else
-      @frequencia_relatorio = FrequenciaRelatorio.new
+      @frequencia_relatorio = FrequenciaRelatorio.new(default_frequencia_relatorio_params)
       @datas = nil
     end
     @meses = meses
@@ -25,6 +25,11 @@ class FrequenciaRelatoriosController < ApplicationController
 
   def funcionarios
     Funcionario.order(nome: :asc).all.collect { |p| [p.nome, p.id] }
+  end
+
+  def default_frequencia_relatorio_params
+    now = Time.zone.now
+    { ano: now.year, mes: now.month }
   end
 
   def meses
