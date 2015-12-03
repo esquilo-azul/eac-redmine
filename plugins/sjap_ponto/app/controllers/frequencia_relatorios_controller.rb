@@ -20,12 +20,13 @@ class FrequenciaRelatoriosController < ApplicationController
   private
 
   def frequencia_relatorio_params
-    params.require(:frequencia_relatorio).permit(:ano, :mes, funcionario_id: [])
+    params.require(:frequencia_relatorio).permit(:inicio_ano, :inicio_mes, :fim_ano, :fim_mes,
+                                                 funcionario_id: [])
   end
 
   def default_frequencia_relatorio_params
     now = Time.zone.now
-    { ano: now.year, mes: now.month }
+    { inicio_ano: now.year, inicio_mes: now.month, fim_ano: now.year, fim_mes: now.month }
   end
 
   def meses

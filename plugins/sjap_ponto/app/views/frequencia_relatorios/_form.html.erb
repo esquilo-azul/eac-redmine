@@ -7,10 +7,14 @@
       <%= multi_funcionario_input f, :funcionario_id %>
     </p>
     <p>
-      <%= f.select :ano, @anos %>
+      <label>Mês inicial: </label>
+      <%= f.select :inicio_mes, @meses, no_label: true %> / 
+      <%= f.select :inicio_ano, @anos, no_label: true%>
     </p>
     <p>
-      <%= f.select :mes, @meses %>
+      <label>Mês final: </label>
+      <%= f.select :fim_mes, @meses, no_label: true %> / 
+      <%= f.select :fim_ano, @anos, no_label: true%>
     </p>
   </div>
   <%= submit_tag 'Consultar' %>
