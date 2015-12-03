@@ -4,7 +4,7 @@
 }
 
 .FuncionariosHelper .funcionarios_container {
-  display: table;
+  display: none;
 }
 
 .FuncionariosHelper .funcionarios_container .row {
@@ -15,8 +15,9 @@
   display: table-cell;
 }
 
-.FuncionariosHelper .select a {
+.FuncionariosHelper .select a, .FuncionariosHelper .show_hide_control {
   color: blue;
-  margin-left: 1em;
+  margin-left: 0.5em;
   text-decoration: underline;
+  font-weight: normal;
 }

@@ -29,8 +29,8 @@ module FuncionariosHelper
     
     def select_line
       view.content_tag(:span, class: 'select') do
-        ActiveSupport::SafeBuffer.new('Selecionar: ') << 
-        view.content_tag(:a, 'Todos', href: '#', class: 'select_all') <<
+        ActiveSupport::SafeBuffer.new('Selecionar: ') <<
+          view.content_tag(:a, 'Todos', href: '#', class: 'select_all') <<
           view.content_tag(:a, 'Nenhum', href: '#', class: 'unselect_all')
       end
     end
@@ -46,11 +46,17 @@ module FuncionariosHelper
     end
 
     def funcionarios_group_container(letter, funcionarios)
-      view.content_tag(:span, class: 'funcionarios_group_container') do
-        b = view.content_tag(:span, letter, class: 'letter')
-        b << view.content_tag(:span, class: 'funcionarios_container') do
-          funcionarios_rows(funcionarios)
-        end
+      view.content_tag(:span, class: 'funcionarios_group_container show_hide_parent') do
+        letter_line(letter) <<
+          view.content_tag(:span, funcionarios_rows(funcionarios),
+                           class: 'funcionarios_container show_hide_container')
+      end
+    end
+
+    def letter_line(letter)
+      view.content_tag(:span, class: 'letter') do
+        ActiveSupport::SafeBuffer.new(letter) <<
+          view.content_tag(:a, '[+]', href: '#', class: 'show_hide_control')
       end
     end
 

@@ -17,9 +17,15 @@ function FuncionariosHelper(root_id, result_input_name) {
     });
     THIS.__root().find(".select_all").click(function () {
       THIS.__multiCheckBoxes().prop('checked', true);
+      THIS.__root().find('.show_hide_control').each(function (i, c) {
+        THIS.__showHideGroup(c, true);
+      });
     });
     THIS.__root().find(".unselect_all").click(function () {
       THIS.__multiCheckBoxes().prop('checked', false);
+    });
+    THIS.__root().find(".show_hide_control").click(function () {
+      THIS.__showHideGroupToogle(this);
     });
     THIS.update();
   });
@@ -89,4 +95,26 @@ FuncionariosHelper.prototype.__multiIds = function () {
     }
   });
   return ids;
+}
+
+FuncionariosHelper.prototype.__showHideContainer = function (control) {
+  return $($(control).closest('.show_hide_parent').find('.show_hide_container'));
+}
+
+FuncionariosHelper.prototype.__showHideGroupToogle = function (control) {
+  this.__showHideGroup(
+          control,
+          !this.__showHideContainer(control).is(":visible")
+          );
+}
+
+FuncionariosHelper.prototype.__showHideGroup = function (control, show) {
+  if (show) {
+    $(control).text('[-]');
+    this.__showHideContainer(control).css('display', 'table');
+  }
+  else {
+    $(control).text('[+]');
+    this.__showHideContainer(control).css('display', 'none');
+  }
 }
