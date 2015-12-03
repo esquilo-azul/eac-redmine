@@ -6,7 +6,7 @@ class PontoCargaHorariasController < ApplicationController
     end
 
     def create
-      @ponto_carga_horaria = PontoCargaHoraria.new(ponto_carga_horaria_params)
+      @ponto_carga_horaria = ponto_carga_horaria_submited
       if @ponto_carga_horaria.save
         redirect_to ponto_carga_horarias_url, notice: 'Carga horária foi salva com sucesso'
       else
@@ -17,12 +17,20 @@ class PontoCargaHorariasController < ApplicationController
 
     private
 
-    def ponto_carga_horaria_params
-      params.require(:ponto_carga_horaria).permit(
-        :descricao, :data_inicial, :data_final,
-        :minutos_continuo, :minutos_descontinuo,
-        funcionarios_attributes: [:id, :funcionario, :funcionario_id, :_destroy]
-      ).merge(autor: User.current)
+    def ponto_carga_horaria_submited
+      pch = PontoCargaHoraria.new(
+        params.require(:ponto_carga_horaria).permit(
+          :descricao, :data_inicial, :data_final,
+          :minutos_continuo, :minutos_descontinuo
+        ).merge(autor: User.current)
+      )
+      funcionarios_id = params[:ponto_carga_horaria][:funcionario_id]
+      if funcionarios_id.is_a?(Array)
+        funcionarios_id.each do |id|
+          pch.funcionarios << PontoCargaHorariaFuncionario.new(funcionario_id: id)
+        end
+      end
+      pch
     end
 
     def build_funcionarios_list
