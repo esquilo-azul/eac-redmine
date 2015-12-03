@@ -1,5 +1,5 @@
-<p>Funcionário: <%= @frequencia_relatorio.funcionario %></p>
-<p>Mês/ano: <%= @frequencia_relatorio.mes %>/<%= @frequencia_relatorio.ano %></p>
+<p>Funcionário: <%= folha.funcionario %></p>
+<p>Mês/ano: <%= folha.mes %>/<%= folha.ano %></p>
 
 <table class="list">
   <thead>
@@ -14,7 +14,7 @@
     </tr>
   </thead>
   <tbody>
-    <% @datas.each do |d| %>
+    <% folha.dias.each do |d| %>
       <tr class="<%= cycle("odd", "even") %>">
         <td style="text-align: center"><%= format_dia(d) %></td>
         <td style="text-align: center"><%= format_dia_semana(d) %></td>
@@ -29,9 +29,9 @@
   <tfoot>
     <tr>
       <th colspan="4" style="text-align: center">Total </th>
-      <th style="text-align: center"><%= format_horas_executadas_total(@datas) %></th>
-      <th style="text-align: center"><%= format_horas_devidas_total(@datas) %></th>
-      <th style="text-align: center"><%= format_horas_saldo_total(@datas) %></th>
+      <th style="text-align: center"><%= format_horas_executadas_total(folha.dias) %></th>
+      <th style="text-align: center"><%= format_horas_devidas_total(folha.dias) %></th>
+      <th style="text-align: center"><%= format_horas_saldo_total(folha.dias) %></th>
     </tr>
   </tfoot>
 </table>

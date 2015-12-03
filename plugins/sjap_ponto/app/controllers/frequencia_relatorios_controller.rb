@@ -1,5 +1,6 @@
 class FrequenciaRelatoriosController < ApplicationController
   include Sjap::RolesAuthorization
+  helper :funcionarios
 
   layout 'trf1_sjap'
   before_filter { |c| c.require_role('frequencia_relatorio_read') }
@@ -7,24 +8,19 @@ class FrequenciaRelatoriosController < ApplicationController
   def index
     if request.post?
       @frequencia_relatorio = FrequenciaRelatorio.new(frequencia_relatorio_params)
-      @datas = @frequencia_relatorio.datas
+      @folhas = @frequencia_relatorio.folhas
     else
       @frequencia_relatorio = FrequenciaRelatorio.new(default_frequencia_relatorio_params)
-      @datas = nil
+      @folhas = nil
     end
     @meses = meses
     @anos = anos
-    @funcionarios = funcionarios
   end
 
   private
 
   def frequencia_relatorio_params
-    params.require(:frequencia_relatorio).permit(:funcionario_id, :ano, :mes)
-  end
-
-  def funcionarios
-    Funcionario.order(nome: :asc).all.collect { |p| [p.nome, p.id] }
+    params.require(:frequencia_relatorio).permit(:ano, :mes, funcionario_id: [])
   end
 
   def default_frequencia_relatorio_params

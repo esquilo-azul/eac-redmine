@@ -3,7 +3,9 @@
 <h3>Busca</h3>
 <%= render :partial => 'form' %>
 
-<% if @datas  %>
+<% if @folhas %>
   <h3>Frequência de funcionário</h3>
-  <%= render :partial => 'funcionario_relatorio' %>
+  <% @folhas.each do |f| %>
+    <%= render :partial => 'funcionario_relatorio', locals: {folha: f} %>
+  <% end %>
 <% end %>

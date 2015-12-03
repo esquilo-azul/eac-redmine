@@ -5,30 +5,34 @@ class FrequenciaRelatorio
 
   validates :funcionario_id, :ano, :mes, presence: true
 
-  def datas
+  def folhas
     return nil unless valid?
-    dias.collect { |d| build_dia(d) }
+    funcionario_id.map { |id| Folha.new(Funcionario.find(id), ano, mes) }
   end
 
-  def funcionario
-    Funcionario.find(funcionario_id)
-  end
+  class Folha
+    attr_reader :funcionario, :ano, :mes
 
-  private
+    def initialize(funcionario, ano, mes)
+      @funcionario = funcionario
+      @ano = ano
+      @mes = mes
+    end
 
-  def dias
-    1..mes_ultimo_dia
-  end
+    def dias
+      (1..mes_ultimo_dia).collect { |d| build_dia(d) }
+    end
 
-  def data(dia)
-    Date.civil(ano.to_i, mes.to_i, dia)
-  end
+    def data(dia)
+      Date.civil(ano.to_i, mes.to_i, dia)
+    end
 
-  def mes_ultimo_dia
-    data(-1).strftime('%d').to_i
-  end
+    def mes_ultimo_dia
+      data(-1).strftime('%d').to_i
+    end
 
-  def build_dia(dia)
-    PontoCargaHoraria.build_dia(funcionario, data(dia))
+    def build_dia(dia)
+      PontoCargaHoraria.build_dia(funcionario, data(dia))
+    end
   end
 end

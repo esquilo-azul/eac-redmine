@@ -2,7 +2,8 @@
   <%= error_messages_for 'frequencia_relatorio' %>
   <div class="box tabular">
     <p>
-      <%= f.select :funcionario_id, @funcionarios, {include_blank: '-- Não selecionado --'}%>
+      <label>Funcionário</label>
+      <%= multi_funcionario_input f, :funcionario_id %>
     </p>
     <p>
       <%= f.select :ano, @anos %>
