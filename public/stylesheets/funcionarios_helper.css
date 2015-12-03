@@ -14,3 +14,9 @@
 .FuncionariosHelper .funcionario {
   display: table-cell;
 }
+
+.FuncionariosHelper .select a {
+  color: blue;
+  margin-left: 1em;
+  text-decoration: underline;
+}

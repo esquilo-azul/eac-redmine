@@ -15,6 +15,12 @@ function FuncionariosHelper(root_id, result_input_name) {
     THIS.__root().find('input:radio[name="multi_funcionario_type"]').change(function () {
       THIS.update();
     });
+    THIS.__root().find(".select_all").click(function () {
+      THIS.__multiCheckBoxes().prop('checked', true);
+    });
+    THIS.__root().find(".unselect_all").click(function () {
+      THIS.__multiCheckBoxes().prop('checked', false);
+    });
     THIS.update();
   });
 }
@@ -61,13 +67,17 @@ FuncionariosHelper.prototype.__addValuesToForm = function (form) {
   });
 }
 
+FuncionariosHelper.prototype.__multiCheckBoxes = function () {
+  return this.__root().find('.funcionario > input[type="checkbox"]');
+}
+
 FuncionariosHelper.prototype.__singleIds = function () {
   return [this.__root().find('.single_container select').val()];
 }
 
 FuncionariosHelper.prototype.__multiIds = function () {
   var ids = [];
-  this.__root().find('.funcionario > input[type="checkbox"]').each(function () {
+  this.__multiCheckBoxes().each(function () {
     if ($(this).is(':checked')) {
       var id = /\d+$/.exec($(this).attr('name'))
       if (id) {

@@ -19,11 +19,19 @@ module FuncionariosHelper
   module Multi
     def multi_input
       view.content_tag(:span, class: 'multi_container') do
-        b = ActiveSupport::SafeBuffer.new
+        b = select_line
         funcionarios_grouped.each do |k, v|
           b << funcionarios_group_container(k, v)
         end
         b
+      end
+    end
+    
+    def select_line
+      view.content_tag(:span, class: 'select') do
+        ActiveSupport::SafeBuffer.new('Selecionar: ') << 
+        view.content_tag(:a, 'Todos', href: '#', class: 'select_all') <<
+          view.content_tag(:a, 'Nenhum', href: '#', class: 'unselect_all')
       end
     end
 
