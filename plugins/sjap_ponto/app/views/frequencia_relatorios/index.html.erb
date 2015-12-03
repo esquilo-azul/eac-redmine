@@ -3,6 +3,10 @@
 <h3>Busca</h3>
 <%= render :partial => 'form' %>
 
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'funcionario_relatorio_folha', plugin: 'sjap_ponto' %>
+<% end %>
+
 <% if @folhas %>
   <h3>Frequência de funcionário</h3>
   <% @folhas.each do |f| %>
