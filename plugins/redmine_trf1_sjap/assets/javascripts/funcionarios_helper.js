@@ -27,6 +27,11 @@ function FuncionariosHelper(root_id, result_input_name) {
     THIS.__root().find(".show_hide_control").click(function () {
       THIS.__showHideGroupToogle(this);
     });
+    THIS.__root().find('.show_hide_control').each(function (i, c) {
+      if (THIS.__showHideContainer(c).find('.funcionario > input[type="checkbox"]:checked').length > 0) {
+        THIS.__showHideGroup(c, true);
+      }
+    });
     THIS.update();
   });
 }
