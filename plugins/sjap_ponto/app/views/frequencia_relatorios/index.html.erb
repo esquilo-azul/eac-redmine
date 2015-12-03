@@ -1,14 +1,26 @@
 <h2>Relatório de frequência</h2>
 
-<h3>Busca</h3>
-<%= render :partial => 'form' %>
+<% if @folhas %>
+  <a href="#" id="botao_nova_consulta">Nova consulta</a>
+  <span id="nova_consulta" style="display: none">
+    <%= render :partial => 'form' %>
+  </span>
+  <script>
+    $('#botao_nova_consulta').click(function(){
+      $('#botao_nova_consulta').hide();
+      $('#nova_consulta').show();
+    });
+  </script>
+<% else %>
+  <%= render :partial => 'form' %>
+<% end %>
 
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag 'funcionario_relatorio_folha', plugin: 'sjap_ponto' %>
 <% end %>
 
 <% if @folhas %>
-  <h3>Frequência de funcionário</h3>
+  <h3 style="margin-top: 2.0em">Frequência de funcionário</h3>
   <% @folhas.each do |f| %>
     <%= render :partial => 'funcionario_relatorio', locals: {folha: f} %>
   <% end %>
