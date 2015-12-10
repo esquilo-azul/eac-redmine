@@ -5,7 +5,8 @@ class PontoCargaHorariaTest < ActiveSupport::TestCase
 
   test 'data_final_greater_than_data_inicial' do
     p = PontoCargaHoraria.new(descricao: 'Teste', autor: users(:users_001), minutos_continuo: 420,
-                              minutos_descontinuo: 480, data_inicial: DateTime.new(2015, 11, 5), data_final: nil)
+                              minutos_descontinuo: 480, data_inicial: DateTime.new(2015, 11, 5), data_final: nil,
+                              funcionarios: [PontoCargaHorariaFuncionario.new(funcionario: create_funcionario)])
     assert p.valid?, p.errors.messages
 
     p.data_final = DateTime.new(2015, 11, 5)
@@ -55,7 +56,7 @@ class PontoCargaHorariaTest < ActiveSupport::TestCase
       descricao: descricao,
       minutos_continuo: 420,
       minutos_descontinuo: 480,
-      funcionarios_attributes: { '0' => { funcionario: funcionario, '_destroy' => 'false' } }
+      funcionarios: [PontoCargaHorariaFuncionario.new(funcionario: funcionario)]
     )
     assert_equal true, ch.save, ch.errors.messages
     ch
