@@ -9,7 +9,7 @@ class PontoEntradasController < ApplicationController
     conf.actions.swap :search, :field_search
     conf.field_search.columns = :funcionario, :data_hora
     conf.create.columns.exclude :autor, :terminal, :metodo, :cancelamento
-    conf.actions.exclude :update, :delete
+    conf.actions.exclude :update, :delete, :create
     conf.action_links.add :cancela_input, type: :member, label: 'Cancelar'
   end
 
@@ -19,10 +19,6 @@ class PontoEntradasController < ApplicationController
 
   def cancela_input_authorized?(record)
     authorize_cancela?(record)
-  end
-
-  def create_authorized?
-    UserRole.user_has_role('ponto_entrada_create')
   end
 
   def list_authorized?
@@ -48,11 +44,6 @@ class PontoEntradasController < ApplicationController
       @record = @ponto if save_result
       self.successful = save_result
     end
-  end
-
-  def before_create_save(record)
-    record.metodo = 'MANUAL'
-    record.autor = User.current
   end
 
   private

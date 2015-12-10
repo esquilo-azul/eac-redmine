@@ -13,11 +13,11 @@ class PontoEntrada < ActiveRecord::Base
 
   def autor_usuario_logado
     if metodo == 'MANUAL'
-      return if User.current && autor == User.current
-      errors.add(:autor, 'Autor não é o usuário logado.')
+      return if User.current
+      errors.add(:autor, '"Autor" deve estar presente.')
     elsif metodo == 'TERMINAL'
       return unless autor
-      errors.add(:autor, 'Autor deve ser nulo.')
+      errors.add(:autor, '"Autor" deve ser nulo.')
     end
   end
 

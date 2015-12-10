@@ -6,6 +6,7 @@ RedmineApp::Application.routes.draw do
       post 'cancelamento_post'
     end
   end
+  resources(:ponto_entrada_manual, only: [:new, :create])
   resources(:ponto_entradas) do
     as_routes
     member do
