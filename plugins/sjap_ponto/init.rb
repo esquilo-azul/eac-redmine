@@ -9,7 +9,9 @@ Redmine::Plugin.register :sjap_ponto do
   version '0.0.1'
   url 'http://172.18.4.200/redmine/projects/redmine'
   author_url 'http://172.18.4.200/redmine/projects/seinf-ap'
-  settings default: { 'terminais_replicate_pause' => 60 * 5 }, partial: 'settings/sjap_ponto'
+  settings default: { 'terminais_replicate_pause' => 60 * 5,
+                      'ponto_entrada_manual_time_zone' => 'America/Belem' },
+           partial: 'settings/sjap_ponto'
 
   Redmine::MenuManager.map :sjap_ponto do |menu|
     menu.push :ponto_terminals, { controller: 'ponto_terminals', action: 'index' },
