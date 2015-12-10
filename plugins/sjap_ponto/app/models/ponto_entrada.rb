@@ -20,4 +20,10 @@ class PontoEntrada < ActiveRecord::Base
       errors.add(:autor, 'Autor deve ser nulo.')
     end
   end
+
+  def to_s
+    b = (funcionario ? "#{funcionario}" : 'FUNC. DESCONHECIDO')
+    b << ' - '
+    b << (data_hora ? "#{format_time(data_hora)}" : 'DATA/HORA DESCONHECIDA')
+  end
 end
