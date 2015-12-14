@@ -4,24 +4,26 @@ module Sjap
   module Ponto
     class PontoTerminalEntradaClear
       def self.run
-        tpes = terminal_ponto_entradas
-        total = tpes.count
-        Rails.logger.debug "Total: #{tpes.count}"
         ActiveRecord::Base.transaction do
-          count = 0
-          tpes.each do |tpe|
-            pe = tpe.exportado
-            tpe.exportado = nil
-            Trf1Sjap::ModelUtils.save_or_raise(tpe)
-            Trf1Sjap::ModelUtils.destroy_or_raise(pe)
-            count += 1
-            Rails.logger.debug "Removidos: #{count}/#{total}"
-          end
+          remove_ponto_entradas
+          remove_ponto_terminal_entradas
         end
       end
 
-      def self.terminal_ponto_entradas
-        PontoTerminalEntrada.where(exportado_type: 'PontoEntrada')
+      def self.remove_ponto_entradas
+        count = PontoEntrada.delete_all <<EOT
+id in (select exportado_id from ponto_terminal_entradas where exportado_type='PontoEntrada')
+and id not in (select ponto_entrada_id from ponto_cancelamentos)
+EOT
+        Rails.logger.debug "Removido de ponto_entradas: #{count}"
+      end
+
+      def self.remove_ponto_terminal_entradas
+        count = PontoTerminalEntrada.delete_all <<EOT
+exportado_type='PontoEntrada' and
+id not in (select id from ponto_entradas)
+EOT
+        Rails.logger.debug "Removido de ponto_terminal_entradas: #{count}"
       end
     end
   end
