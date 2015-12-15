@@ -16,6 +16,7 @@ module Sjap
               Sjap::Ponto::Mte::AfdRegistroParser::TIPO_MARCACAO_PONTO
           end
           replicate(session, :funcionarios, :funcionario) { |_l| true }
+          session.logout
         end
 
         def self.run_all

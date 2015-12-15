@@ -23,6 +23,14 @@ module Sjap
           logged_user?(content)
         end
 
+        def logout
+          @http_client.get_content(
+            server_url,
+            'pgCode' => '7',
+            'opType' => '2'
+          )
+        end
+
         def pontos
           export(8, 5)
         end
