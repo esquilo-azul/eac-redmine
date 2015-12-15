@@ -55,7 +55,7 @@ module Sjap
               p = PontoEntrada.new
               p.metodo = 'TERMINAL'
               p.terminal = tpe.ponto_terminal
-              p.data_hora = adf_registro_to_time(r, tpe.ponto_terminal.fuso_horario)
+              p.data_hora = adf_registro_to_time(r, tpe.ponto_terminal)
               p.funcionario = funcionario
               p.motivo = ''
               Trf1Sjap::ModelUtils.save_or_raise(p)
@@ -72,15 +72,14 @@ module Sjap
           pis.gsub(/^0+/, '')
         end
 
-        def self.adf_registro_to_time(r, time_zone_offset)
-          Time.new(
+        def self.adf_registro_to_time(r, ponto_terminal)
+          ponto_terminal.build_time(
             r[:data][4, 4].to_i,
             r[:data][2, 2].to_i,
             r[:data][0, 2].to_i,
             r[:horario][0, 2].to_i,
             r[:horario][2, 2].to_i,
-            0,
-            time_zone_offset
+            0
           )
         end
       end
