@@ -35,7 +35,6 @@
 *.rbc
 
 /.bundle
-/Gemfile.lock
 /Gemfile.local
 /config/secrets.yml
 /log/esosti_solicitacao_detalhes/
