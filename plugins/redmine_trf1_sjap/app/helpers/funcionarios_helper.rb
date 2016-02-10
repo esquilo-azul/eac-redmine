@@ -26,7 +26,7 @@ module FuncionariosHelper
         b
       end
     end
-    
+
     def select_line
       view.content_tag(:span, class: 'select') do
         ActiveSupport::SafeBuffer.new('Selecionar: ') <<

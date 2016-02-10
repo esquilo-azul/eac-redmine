@@ -56,7 +56,7 @@ module Trf1Sjap
     # Produz uma lista de campos-mensagens, em ordem de preferência,
     # que podem receber uma mensagem de falha.
     def build_self_columns_messages(column, message, default_column,
-        default_column_message_prefix)
+                                    default_column_message_prefix)
       r = { column => message }
       m = /^(.+)_id$/.match(column)
       if m

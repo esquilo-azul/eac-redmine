@@ -10,7 +10,7 @@ module Trf1Sjap
     FASE_ITEM_NOME = 'Fase'
 
     def initialize(pageContent)
-      @doc = Nokogiri::HTML(pageContent) { |c| c.noblanks }
+      @doc = Nokogiri::HTML(pageContent, &:noblanks)
     end
 
     def descricao

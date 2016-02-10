@@ -2,7 +2,7 @@ module Trf1
   module Esosti
     class CaixaUnidadeCentralParser < Trf1Sjap::CaixaAtendimentoSecao
       def initialize(content)
-        @doc = Nokogiri::HTML(content) { |c| c.noblanks }
+        @doc = Nokogiri::HTML(content, &:noblanks)
       end
 
       def data

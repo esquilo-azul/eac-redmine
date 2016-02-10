@@ -23,6 +23,6 @@ Redmine::Plugin.register :trf1_esosti do
 
   Redmine::MenuManager.map :trf1_esosti do |menu|
     menu.push :esosti_fases, { controller: 'esosti_fases', action: 'index' }, caption: :label_esosti_fase_plural, if: proc { User.current.admin? }
-    menu.push :esosti_alerta, { controller: 'eadmin', action: 'esosti_alerta'}, :caption => 'Alerta e-Sosti'
+    menu.push :esosti_alerta, { controller: 'eadmin', action: 'esosti_alerta' }, caption: 'Alerta e-Sosti'
   end
 end
