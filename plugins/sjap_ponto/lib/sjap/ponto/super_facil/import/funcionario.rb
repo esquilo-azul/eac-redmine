@@ -12,6 +12,7 @@ module Sjap
               r = Sjap::Ponto::SuperFacil::FuncionarioParser.parse_line(pte.chave)
               matricula = ('ap' + r[:matricula]).upcase.strip
               pis = sanitize_pis(r[:pis])
+              return false unless pis.to_s.length <= 11
               pte.exportado = find_funcionario(matricula, pis, r[:nome])
               pte.save!
             end
