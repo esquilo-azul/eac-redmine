@@ -45,11 +45,11 @@ module Sjap
           Nokogiri::HTML(page_content).at_xpath('//h1/text()').to_s == 'MENU'
         end
 
-        def export(pgCode, opType)
+        def export(pg_code, op_type)
           content = @http_client.get_content(
             server_url,
-            'pgCode' => pgCode.to_s,
-            'opType' => opType.to_s
+            'pgCode' => pg_code.to_s,
+            'opType' => op_type.to_s
           )
           content.force_encoding('iso-8859-1').encode('utf-8')
         end
