@@ -12,7 +12,7 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-	if [ ! -f "$SUDOER_FILE" ]; then
+	if [ $("$INSTALL_ROOT/lib/linux/sudo_file_exists.sh" "root" "$SUDOER_FILE") -ne '0' ]; then
 		return 1
 	fi
 	export rails_user="$("$INSTALL_ROOT/lib/rails/user.sh")"
