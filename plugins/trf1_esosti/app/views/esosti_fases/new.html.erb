@@ -1,6 +1,0 @@
-<h2><%= l(:label_esosti_fase_new)%></h2>
-d<%= labelled_form_for @esosti_fase do |f| %>
-	<%= render :partial => 'form', :locals => {:f => f} %>
-	<%= submit_tag l(:button_create) %>
-<% end %>
-<%= link_to 'Voltar', esosti_fases_path %>

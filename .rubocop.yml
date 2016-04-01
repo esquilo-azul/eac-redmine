@@ -39,9 +39,9 @@ Metrics/AbcSize:
 Metrics/LineLength:
   Max: 100
   Exclude:
-    - 'plugins/sjap_ponto/db/migrate/**/*'
+    - 'plugins/*/db/migrate/**/*'    
 
 Metrics/MethodLength:
   Exclude:
-    - 'plugins/sjap_ponto/db/migrate/**/*'
-    - 'plugins/sjap_ponto/test/**/*'
+    - 'plugins/*/db/migrate/**/*'
+    - 'plugins/*/test/**/*'

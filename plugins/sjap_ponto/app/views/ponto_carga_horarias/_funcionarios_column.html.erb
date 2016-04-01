@@ -1,5 +1,0 @@
-<% if funcionarios.empty?  %>
-  <em>-</em>
-<% else %>
-  <%= funcionarios.map {|f| f.funcionario.nome}.join(", ") %>
-<% end %>

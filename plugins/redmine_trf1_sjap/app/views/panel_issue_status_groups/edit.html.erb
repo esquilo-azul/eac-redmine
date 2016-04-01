@@ -1,5 +1,0 @@
-<h2><%= link_to l(:label_panel_issue_status_groups), panel_issue_status_groups_path %> &#187; <%=h @panel_issue_status_group %></h2>
-<%= labelled_form_for @panel_issue_status_group do |f| %>
-  <%= render :partial => 'form', :locals => {:f => f} %>
-  <%= submit_tag l(:button_save) %>
-<% end %>

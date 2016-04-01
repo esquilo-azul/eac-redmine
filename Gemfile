@@ -110,10 +110,3 @@ end
 Dir.glob File.expand_path("../plugins/*/{Gemfile,PluginGemfile}", __FILE__) do |file|
   eval_gemfile file
 end
-
-# Customização do TRF1
-gem "httpclient"
-gem 'nokogiri'
-gem 'highline'
-gem "daemons-rails"
-gem 'unicode_utils'
