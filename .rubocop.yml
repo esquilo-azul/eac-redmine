@@ -1,5 +1,4 @@
 AllCops:
-  RunRailsCops: true
   Exclude:
     - 'app/**/*'
     - 'bin/**/*'
@@ -24,6 +23,9 @@ AllCops:
     - 'script/**/*'
     - 'test/**/*'
     - 'tmp/**/*'
+
+Rails:
+  Enabled: true
   
 Style/Documentation:
   Enabled: false
