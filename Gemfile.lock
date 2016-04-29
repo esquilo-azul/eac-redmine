@@ -42,6 +42,8 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.1)
+    active_scaffold (3.4.33)
+      rails (>= 3.2.18, < 5)
     activejob (4.2.1)
       activesupport (= 4.2.1)
       globalid (>= 0.3.0)
@@ -176,6 +178,13 @@ GEM
     rubypants (0.2.0)
     rubyzip (1.1.7)
     rugged (0.24.0)
+    sass (3.4.22)
+    sass-rails (5.0.4)
+      railties (>= 4.0.0, < 5.0)
+      sass (~> 3.1)
+      sprockets (>= 2.8, < 4.0)
+      sprockets-rails (>= 2.0, < 4.0)
+      tilt (>= 1.1, < 3)
     selenium-webdriver (2.47.1)
       childprocess (~> 0.5)
       multi_json (~> 1.0)
@@ -212,6 +221,7 @@ DEPENDENCIES
   RedCloth
   actionpack-action_caching
   actionpack-xml_parser
+  active_scaffold
   activerecord-jdbc-adapter (~> 1.3.2)
   activerecord-jdbcpostgresql-adapter
   asciidoctor
@@ -245,6 +255,7 @@ DEPENDENCIES
   rmagick (~> 2.13.4)
   rubocop
   ruby-openid (~> 2.3.0)
+  sass-rails (~> 5.0)
   selenium-webdriver
   simplecov (~> 0.9.1)
   tzinfo-data
