@@ -16,4 +16,5 @@ end
 Rails.configuration.to_prepare do
   EacBase::EventManager.add_listener(Issue, :create, 'Avm::Listeners::IssueAutoUndefine')
   EacBase::EventManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoUndefine')
+  EacBase::EventManager.add_listener(IssueRelation, :create, 'Avm::Listeners::IssueAutoUndefine')
 end
