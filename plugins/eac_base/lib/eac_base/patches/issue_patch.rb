@@ -1,4 +1,4 @@
-module Notityme
+module EacBase
   module Patches
     module IssuePatch
       def self.included(base)
@@ -13,14 +13,13 @@ module Notityme
 
       module InstanceMethods
         def issue_create_event
-          return unless Notifyme::Settings.issue_create_event_notify
-          Thread.new { Notifyme::Events::Issue::Create.new(self).notify }
+          EacBase::EventManager.trigger(Issue, :create, self)
         end
       end
     end
   end
 end
 
-unless Issue.included_modules.include? Notityme::Patches::IssuePatch
-  Issue.send(:include, Notityme::Patches::IssuePatch)
+unless Issue.included_modules.include? EacBase::Patches::IssuePatch
+  Issue.send(:include, EacBase::Patches::IssuePatch)
 end

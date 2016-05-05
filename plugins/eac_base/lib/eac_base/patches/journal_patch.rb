@@ -1,4 +1,4 @@
-module Notityme
+module EacBase
   module Patches
     module JournalPatch
       def self.included(base)
@@ -13,14 +13,14 @@ module Notityme
 
       module InstanceMethods
         def journal_create_event
-          return unless journalized_type == 'Issue' && Notifyme::Settings.issue_update_event_notify
-          Thread.new { Notifyme::Events::Issue::Update.new(self).notify }
+          return unless journalized_type == 'Issue'
+          EacBase::EventManager.trigger(Issue, :update, self)
         end
       end
     end
   end
 end
 
-unless Journal.included_modules.include? Notityme::Patches::JournalPatch
-  Journal.send(:include, Notityme::Patches::JournalPatch)
+unless Journal.included_modules.include? EacBase::Patches::JournalPatch
+  Journal.send(:include, EacBase::Patches::JournalPatch)
 end
