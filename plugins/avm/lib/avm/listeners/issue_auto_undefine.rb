@@ -2,6 +2,7 @@ module Avm
   module Listeners
     class IssueAutoUndefine
       include IssueCreate
+      include IssueUpdate
 
       attr_reader :event
 
@@ -15,7 +16,7 @@ module Avm
       end
 
       def check_conditions
-        %w(issue_created_undefined).any? do |m|
+        %w(issue_created_undefined issue_updated_undefined).any? do |m|
           issues = send(m)
           next unless issues
           issues.each do |issue|
