@@ -8,6 +8,14 @@ module Avm
           raise "Situação de tarefa indefida não configurada. Acesse /settings/plugin/avm."
         end
       end
+
+      def admin_user(raise_if_empty = true)
+        if Setting.plugin_avm['admin_user_id'].present?
+          User.find(Setting.plugin_avm['admin_user_id'])
+        elsif raise_if_empty
+          raise "Usuário administrador não configurado. Acesse /settings/plugin/avm."
+        end
+      end
     end
   end
 end
