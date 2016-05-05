@@ -12,3 +12,7 @@ Redmine::Plugin.register :avm do
 
   settings(default: {}, partial: 'settings/avm')
 end
+
+Rails.configuration.to_prepare do
+  EacBase::EventManager.add_listener(Issue, :create, 'Avm::Listeners::IssueAutoUndefine')
+end
