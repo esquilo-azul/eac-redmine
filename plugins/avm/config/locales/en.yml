@@ -1,0 +1,2 @@
+en:
+  issue_undefine_message: 'This issue was undefined because it has undefined dependencies: %{undefined_dependencies_ids}.'

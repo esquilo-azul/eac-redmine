@@ -2,6 +2,8 @@
 
 require 'redmine'
 
+require 'avm/patches/issue_patch'
+
 Redmine::Plugin.register :avm do
   name 'Agora Vai! Methodology'
   author 'Eduardo Henrique Bogoni'

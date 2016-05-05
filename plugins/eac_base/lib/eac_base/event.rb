@@ -7,5 +7,9 @@ module EacBase
       @action = action
       @data = data
     end
+
+    def to_s
+      "#{entity}::#{action}|#{data.class}(#{data.id})"
+    end
   end
 end

@@ -1,0 +1,2 @@
+pt-BR:
+  issue_undefine_message: 'Esta tarefa foi indefinida porque possui dependências indefinidas: %{undefined_dependencies_ids}.'
