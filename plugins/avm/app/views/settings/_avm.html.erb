@@ -1,0 +1,6 @@
+<p>
+  <label>Usuário administrador</label>
+  <select name="settings[admin_user_id]">
+    <%= options_for_select(User.all.order('firstname','lastname').collect {|u| [ u.to_s, u.id ] }, settings['admin_user_id'] ) %>
+  </select>
+</p>

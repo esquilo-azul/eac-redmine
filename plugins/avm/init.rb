@@ -7,4 +7,6 @@ Redmine::Plugin.register :avm do
   author 'Eduardo Henrique Bogoni'
   description ''
   version '0.1.0'
+
+  settings(default: {}, partial: 'settings/avm')
 end
