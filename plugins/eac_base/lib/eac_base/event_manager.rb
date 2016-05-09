@@ -8,8 +8,10 @@ module EacBase
 
       def trigger(entity, action, data)
         event = EacBase::Event.new(entity, action, data)
+        Rails.logger.debug("Event triggered: #{event}")
         listeners(entity, action).each do |l|
-          Thread.new { run_listener(l.constantize.new(event)) }
+          Rails.logger.debug("Listener found: #{l}")
+          delay.run_listener(l.constantize.new(event))
         end
       end
 
@@ -18,6 +20,7 @@ module EacBase
       def run_listener(listener)
         previous_locale = I18n.locale
         begin
+          Rails.logger.info("Running listener: #{listener}")
           I18n.locale = Setting.default_language
           listener.run
         rescue => ex
