@@ -85,6 +85,11 @@ GEM
       daemons
       multi_json (~> 1.0)
     dalli (2.7.6)
+    delayed_job (4.1.1)
+      activesupport (>= 3.0, < 5.0)
+    delayed_job_active_record (4.1.0)
+      activerecord (>= 3.0, < 5)
+      delayed_job (>= 3.0, < 5)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     docile (1.1.5)
@@ -255,6 +260,7 @@ DEPENDENCIES
   creole
   daemons-rails
   dalli
+  delayed_job_active_record
   github-markup
   gitlab-grack!
   gitolite-rugged!
