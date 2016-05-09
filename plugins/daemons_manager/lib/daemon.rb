@@ -1,13 +1,24 @@
 class Daemon
-  def self.all
-    @@all ||= Daemons::Rails::Monitoring.statuses.each_with_index.map { |v, i| Daemon.new(v[0], i) }
-  end
-
-  def self.find(id)
-    all.each do |d|
-      return d if d.id == id.to_s
+  class << self
+    def all
+      @all ||= Daemons::Rails::Monitoring.statuses.each_with_index.map do |v, i|
+        Daemon.new(v[0], i)
+      end
     end
-    fail ActiveRecord::RecordNotFound
+
+    def find(id)
+      all.each do |d|
+        return d if d.id == id.to_s
+      end
+      raise ActiveRecord::RecordNotFound
+    end
+
+    def find_by_name(name)
+      all.each do |d|
+        return d if d.name == name
+      end
+      raise "Daemon not found (Name: \"#{name}\")"
+    end
   end
 
   def initialize(name, id)
@@ -45,14 +56,13 @@ class Daemon
   end
 
   def autostart
-    return false unless ActiveRecord::Base.connection.table_exists? Setting.table_name
-    Setting.plugin_daemons_manager[autostart_key]
+    return false unless configuration
+    configuration.autostart
   end
 
-  def toogle_autostart
-    all = Setting.plugin_daemons_manager
-    all[autostart_key] = !autostart
-    Setting.plugin_daemons_manager = all
+  def sleep_time
+    return 60 unless configuration
+    configuration.sleep_time
   end
 
   def to_s
@@ -61,7 +71,8 @@ class Daemon
 
   private
 
-  def autostart_key
-    "daemons.#{@controller.app_name}.autostart"
+  def configuration
+    return false unless ActiveRecord::Base.connection.table_exists? DaemonConfiguration.table_name
+    DaemonConfiguration.find_by_daemon(name)
   end
 end

@@ -26,10 +26,6 @@ class DaemonsController < ApplicationController
     redirect_to daemons_url, notice: "Daemon não encontrado com o ID=#{params[:id]}"
   end
 
-  def toogle_autostart
-    daemon_action(:toogle_autostart, 'Inicialização automática modificada')
-  end
-
   private
 
   def daemon_action(method, success_message)

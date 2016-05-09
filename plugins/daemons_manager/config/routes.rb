@@ -4,5 +4,5 @@ RedmineApp::Application.routes.draw do
   get '/daemons/:id/stop', to: 'daemons#stop', as: 'stop_daemon'
   get '/daemons/:id/restart', to: 'daemons#restart', as: 'restart_daemon'
   get '/daemons/:id/log', to: 'daemons#log', as: 'log_daemon'
-  get '/daemons/:id/toogle_autostart', to: 'daemons#toogle_autostart', as: 'toogle_autostart_daemon'
+  resources(:daemon_configurations) { as_routes }
 end

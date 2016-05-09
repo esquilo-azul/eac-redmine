@@ -16,12 +16,14 @@ Redmine::Plugin.register :daemons_manager do
   end
 end
 
-if defined?($server_mode) && $server_mode
-  Daemon.all.each do |daemon|
-    Rails.logger.info "Daemon #{daemon.name} autostart: #{daemon.autostart}"
-    next unless daemon.autostart
-    Rails.logger.info "Inicialização daemon #{daemon.name}..."
-    daemon.start
-    Rails.logger.info "Daemon #{daemon.name} inicializado."
+Rails.configuration.to_prepare do
+  if Rails.const_defined? 'Server'
+    Daemon.all.each do |daemon|
+      Rails.logger.info "Daemon #{daemon.name} autostart: #{daemon.autostart}"
+      next unless daemon.autostart
+      Rails.logger.info "Inicialização daemon #{daemon.name}..."
+      daemon.start
+      Rails.logger.info "Daemon #{daemon.name} inicializado."
+    end
   end
 end
