@@ -10,5 +10,15 @@ namespace :eac_base do
         )
       end
     end
+    namespace :issue do
+      desc 'Envia notificações da criação de um Issue'
+      task :create, [:issue_id] => :environment do |_t, args|
+        EacBase::EventManager.trigger(
+          Issue,
+          :create,
+          Issue.find(args.issue_id)
+        )
+      end
+    end
   end
 end
