@@ -19,6 +19,15 @@ namespace :eac_base do
           Issue.find(args.issue_id)
         )
       end
+
+      desc 'Envia notificações da alteração de um Issue'
+      task :update, [:journal_id] => :environment do |_t, args|
+        EacBase::EventManager.trigger(
+          Issue,
+          :update,
+          Journal.find(args.journal_id)
+        )
+      end
     end
   end
 end
