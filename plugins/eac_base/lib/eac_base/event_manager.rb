@@ -1,6 +1,8 @@
 module EacBase
   class EventManager
     class << self
+      attr_accessor :delay_disabled
+
       def add_listener(entity, action, listener)
         return if listeners(entity, action).include?(listener)
         listeners(entity, action) << listener
@@ -11,11 +13,19 @@ module EacBase
         Rails.logger.debug("Event triggered: #{event}")
         listeners(entity, action).each do |l|
           Rails.logger.debug("Listener found: #{l}")
-          delay.run_listener(l.constantize.new(event))
+          run_delayed_listener(l.constantize.new(event))
         end
       end
 
       private
+
+      def run_delayed_listener(listener)
+        if delay_disabled
+          run_listener(listener)
+        else
+          delay.run_listener(listener)
+        end
+      end
 
       def run_listener(listener)
         previous_locale = I18n.locale
