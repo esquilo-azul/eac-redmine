@@ -11,5 +11,19 @@ namespace :avm do
         Avm::Issue::Undefine.new(i).run
       end
     end
+
+    desc 'Verifica auto-desbloqueio de uma tarefa'
+    task unblock: :environment do |_t, _args|
+      Issue.where(status: Avm::Settings.issue_status_blocked).each do |i|
+        Avm::Issue::Unblock.new(i).run
+      end
+    end
+
+    desc 'Verifica auto-desbloqueio de todas as tarefas'
+    task unblock_all: :environment do |_t, _args|
+      Issue.where(status: Avm::Settings.issue_status_blocked).each do |i|
+        Avm::Issue::Unblock.new(i).run
+      end
+    end
   end
 end
