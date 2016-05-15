@@ -8,12 +8,17 @@ module EacBase
           unloadable
 
           after_create :issue_relation_create_event
+          after_destroy :issue_relation_destroy_event
         end
       end
 
       module InstanceMethods
         def issue_relation_create_event
           EacBase::EventManager.trigger(IssueRelation, :create, self)
+        end
+
+        def issue_relation_destroy_event
+          EacBase::EventManager.trigger(IssueRelation, :delete, self)
         end
       end
     end
