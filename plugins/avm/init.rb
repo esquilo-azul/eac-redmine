@@ -19,4 +19,5 @@ Rails.configuration.to_prepare do
   EacBase::EventManager.add_listener(IssueRelation, :create, 'Avm::Listeners::IssueAutoUndefine')
   EacBase::EventManager.add_listener(IssueRelation, :delete, 'Avm::Listeners::IssueAutoUnblock')
   EacBase::EventManager.add_listener(Issue, :delete, 'Avm::Listeners::IssueAutoUnblock')
+  EacBase::EventManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoUnblock')
 end

@@ -48,6 +48,24 @@ module Avm
         end
         assert_equal Avm::Settings.issue_status_unblocked, blocked.status
       end
+
+      test 'unblock by issue blocking closed' do
+        blocking.init_journal(Avm::Settings.admin_user, '')
+        blocking.status = issue_statuses(:issue_statuses_005)
+        blocking.save!
+        blocked.reload
+        blocked.dependencies.each { |d| assert d.closed?, "#{d} is not closed" }
+        assert_equal Avm::Settings.issue_status_unblocked, blocked.status
+      end
+
+      test 'unblock by issue blocking' do
+        test_unblock_by_issue_blocking_closed
+        blocked.init_journal(Avm::Settings.admin_user, '')
+        blocked.status = Avm::Settings.issue_status_blocked
+        blocked.save!
+        blocked.reload
+        assert_equal Avm::Settings.issue_status_unblocked, blocked.status
+      end
     end
   end
 end
