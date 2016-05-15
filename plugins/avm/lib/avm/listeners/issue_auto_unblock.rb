@@ -1,6 +1,7 @@
 module Avm
   module Listeners
     class IssueAutoUnblock
+      include IssueDelete
       include IssueRelationDelete
 
       attr_reader :event
@@ -15,7 +16,7 @@ module Avm
       end
 
       def check_conditions
-        %w(issue_relation_deleted).any? do |m|
+        %w(issue_relation_deleted issue_deleted).any? do |m|
           issues = send(m)
           next unless issues
           issues.each do |issue|

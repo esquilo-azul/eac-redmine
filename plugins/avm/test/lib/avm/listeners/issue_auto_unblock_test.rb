@@ -33,6 +33,21 @@ module Avm
         end
         assert_equal Avm::Settings.issue_status_unblocked, blocked.status
       end
+
+      test 'unblock by issue delete' do
+        blocked = issues(:issues_009)
+        blocking = issues(:issues_010)
+        blocked.status = Avm::Settings.issue_status_blocked
+        blocked.save!
+        assert blocked.relations_to.where(issue_from: blocking).any?
+        assert_equal Avm::Settings.issue_status_blocked, blocked.status
+        blocking.destroy!
+        blocked.reload
+        blocked.dependencies.each do |d|
+          assert d.closed?, "#{d} is not closed"
+        end
+        assert_equal Avm::Settings.issue_status_unblocked, blocked.status
+      end
     end
   end
 end
