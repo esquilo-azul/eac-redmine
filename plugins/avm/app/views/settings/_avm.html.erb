@@ -18,3 +18,10 @@
     <%= options_for_select([['-','']] + IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['issue_status_blocked_id'] ) %>
   </select>
 </p>
+
+<p>
+  <label>Situação de tarefa desbloqueada.</label>
+  <select name="settings[issue_status_unblocked_id]">
+    <%= options_for_select([['-','']] + IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['issue_status_unblocked_id'] ) %>
+  </select>
+</p>

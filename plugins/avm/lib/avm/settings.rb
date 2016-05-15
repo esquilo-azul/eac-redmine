@@ -9,6 +9,10 @@ module Avm
         issue_status('issue_status_blocked_id', 'bloqueada', raise_if_empty)
       end
 
+      def issue_status_unblocked(raise_if_empty = true)
+        issue_status('issue_status_unblocked_id', 'desbloqueada', raise_if_empty)
+      end
+
       def admin_user(raise_if_empty = true)
         if Setting.plugin_avm['admin_user_id'].present?
           User.find(Setting.plugin_avm['admin_user_id'])
