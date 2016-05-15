@@ -10,7 +10,7 @@ function task_condition {
 export -f task_condition
 
 function task_dependencies {
-	echo postgresql_user
+	echo postgresql_user_superuser
 }
 export -f task_dependencies
 
