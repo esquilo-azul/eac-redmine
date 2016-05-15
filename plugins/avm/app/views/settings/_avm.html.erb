@@ -4,21 +4,18 @@
     <%= options_for_select(User.all.order('firstname','lastname').collect {|u| [ u.to_s, u.id ] }, settings['admin_user_id'] ) %>
   </select>
 </p>
-
 <p>
   <label>Situação de tarefa indefinda.</label>
   <select name="settings[issue_status_undefined_id]">
     <%= options_for_select([['-','']] + IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['issue_status_undefined_id'] ) %>
   </select>
 </p>
-
 <p>
   <label>Situação de tarefa bloqueada.</label>
   <select name="settings[issue_status_blocked_id]">
     <%= options_for_select([['-','']] + IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['issue_status_blocked_id'] ) %>
   </select>
 </p>
-
 <p>
   <label>Situação de tarefa desbloqueada.</label>
   <select name="settings[issue_status_unblocked_id]">
