@@ -1,3 +1,4 @@
 en:
   issue_unblock_message: 'This issue was unblocked bacause has no open dependencies.'
   issue_undefine_message: 'This issue was undefined because it has undefined dependencies: %{undefined_dependencies_ids}.'
+  label_issue_status_assigns: Issue status assigns

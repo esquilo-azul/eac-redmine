@@ -11,6 +11,11 @@ Redmine::Plugin.register :avm do
   version '0.1.0'
 
   settings(default: {}, partial: 'settings/avm')
+
+  Redmine::MenuManager.map :admin_menu do |menu|
+    menu.push :issue_status_assigns, { controller: 'issue_status_assigns', action: 'index' },
+              caption: :label_issue_status_assigns
+  end
 end
 
 Rails.configuration.to_prepare do

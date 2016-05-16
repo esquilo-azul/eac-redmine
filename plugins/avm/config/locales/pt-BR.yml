@@ -1,3 +1,4 @@
 pt-BR:
   issue_unblock_message: 'Esta tarefa foi desbloqueada porque não possui dependências abertas.'
   issue_undefine_message: 'Esta tarefa foi indefinida porque possui dependências indefinidas: %{undefined_dependencies_ids}.'
+  label_issue_status_assigns: Atribuição por situações de tarefa
