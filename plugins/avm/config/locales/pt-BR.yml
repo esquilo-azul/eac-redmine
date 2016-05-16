@@ -1,4 +1,10 @@
 pt-BR:
+  issue_assign_message: |
+    Atribuído para *%{user}* porque:
+
+    # A tarefa está na situação *%{issue_status}*;
+    # Nessa situação o responsável esperado é o *%{issue_field}*;
+    # *%{user}* é o *%{issue_field}* da tarefa.
   issue_unblock_message: 'Esta tarefa foi desbloqueada porque não possui dependências abertas.'
   issue_undefine_message: 'Esta tarefa foi indefinida porque possui dependências indefinidas: %{undefined_dependencies_ids}.'
   label_issue_status_assigns: Atribuição por situações de tarefa

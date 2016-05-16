@@ -25,5 +25,12 @@ namespace :avm do
         Avm::Issue::Unblock.new(i).run
       end
     end
+
+    desc 'Verifica auto-atribuição de todas as tarefas'
+    task assign_all: :environment do |_t, _args|
+      Issue.all.each do |i|
+        Avm::Issue::Assign.new(i).run
+      end
+    end
   end
 end
