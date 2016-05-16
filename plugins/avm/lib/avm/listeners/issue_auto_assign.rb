@@ -8,8 +8,15 @@ module Avm
       end
 
       def run
-        return unless event.entity == ::Issue && event.action == :create
-        Avm::Issue::Assign.new(event.data).run
+        issue = issue_to_check
+        Avm::Issue::Assign.new(issue).run if issue
+      end
+
+      private
+
+      def issue_to_check
+        return event.data if event.issue_create?
+        return event.data.issue if event.issue_update?
       end
     end
   end

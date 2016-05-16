@@ -11,5 +11,13 @@ module EacBase
     def to_s
       "#{entity}::#{action}|#{data.class}(#{data.id})"
     end
+
+    def issue_create?
+      entity == ::Issue && action == :create
+    end
+
+    def issue_update?
+      entity == ::Issue && action == :update
+    end
   end
 end
