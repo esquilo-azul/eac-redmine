@@ -6,6 +6,7 @@ require 'eac_base/patches/issue_patch'
 require 'eac_base/patches/issue_relation_patch'
 require 'eac_base/patches/journal_patch'
 require 'eac_base/event_manager'
+require 'eac_base/patches/hooks/redmine_patch'
 
 Redmine::Plugin.register :eac_base do
   name 'Esquilo Azul Company - Base'

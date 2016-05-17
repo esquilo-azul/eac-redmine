@@ -29,5 +29,16 @@ namespace :eac_base do
         )
       end
     end
+    namespace :repository do
+      desc 'Ativa evento de recebimento de conteúdo por repositório'
+      task :receive, [:repository_id] => :environment do |_t, args|
+        EacBase::EventManager.delay_disabled = true
+        EacBase::EventManager.trigger(
+          Repository,
+          :receive,
+          Repository.find(args.repository_id)
+        )
+      end
+    end
   end
 end
