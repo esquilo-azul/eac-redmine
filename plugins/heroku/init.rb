@@ -17,3 +17,7 @@ Redmine::Plugin.register :heroku do
               caption: :label_heroku_applications
   end
 end
+
+Rails.configuration.to_prepare do
+  EacBase::EventManager.add_listener(Repository, :receive, 'Heroku::Listeners::Repository::Receive')
+end
