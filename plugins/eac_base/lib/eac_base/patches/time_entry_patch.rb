@@ -8,12 +8,17 @@ module EacBase
           unloadable
 
           after_create :time_entry_create_event
+          after_destroy :time_entry_destroy_event
         end
       end
 
       module InstanceMethods
         def time_entry_create_event
           EacBase::EventManager.trigger(TimeEntry, :create, self)
+        end
+
+        def time_entry_destroy_event
+          EacBase::EventManager.trigger(TimeEntry, :delete, EacBase::RemovedRecord.new(self))
         end
       end
     end
