@@ -222,7 +222,7 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
-    telegram-bot-ruby (0.5.0)
+    telegram-bot-ruby (0.5.2)
       faraday
       virtus
     thor (0.19.1)
