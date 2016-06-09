@@ -9,6 +9,7 @@ export redmine_git_hosting_ssh_key_name=redmine_git_hosting_id
 export server_address=localhost
 export smtp_tls=false
 export smtp_server=localhost
+export smtp_domain=example.com
 export smtp_port=25
 export smtp_authentication=:plain
 export smtp_username=redmine
