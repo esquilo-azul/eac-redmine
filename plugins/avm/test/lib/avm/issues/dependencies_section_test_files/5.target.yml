@@ -1,0 +1,9 @@
+---
+:dependencies_section: "#123 - dependency one\r\ndependency two: #456\r\nother dependencies:
+  #234 #34 #10\r\n"
+:dependencies_section_dependencies:
+- 10
+- 34
+- 123
+- 234
+- 456

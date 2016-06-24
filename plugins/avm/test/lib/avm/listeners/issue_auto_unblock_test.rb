@@ -1,4 +1,4 @@
-require 'test_helper'
+require_relative '../../../test_helper'
 
 module Avm
   module Listeners
@@ -7,11 +7,6 @@ module Avm
       attr_reader :blocked, :blocking
 
       setup do
-        EacBase::EventManager.delay_disabled = true
-        Setting.plugin_avm['issue_status_undefined_id'] = 1
-        Setting.plugin_avm['issue_status_blocked_id'] = 4
-        Setting.plugin_avm['issue_status_unblocked_id'] = 2
-        Setting.plugin_avm['admin_user_id'] = 1
         @blocked = issues(:issues_009)
         @blocking = issues(:issues_010)
         @blocked.status = Avm::Settings.issue_status_blocked

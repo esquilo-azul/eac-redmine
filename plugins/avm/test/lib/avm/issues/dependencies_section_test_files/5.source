@@ -1,0 +1,7 @@
+There is a dependencies section.
+
+h3. Dependencies
+
+#123 - dependency one
+dependency two: #456
+other dependencies: #234 #34 #10

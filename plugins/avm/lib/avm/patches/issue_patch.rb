@@ -23,6 +23,21 @@ module Avm
             r.relation_type == IssueRelation::TYPE_BLOCKS
           end.map(&:issue_to)
         end
+
+        def dependencies_section
+          ['h\1\.', '----', '$'].each do |e|
+            m = /h([0-9])\.\s*#{Regexp.escape(Avm::Settings.dependencies_section_title)}(.+)#{e}/m
+                .match(description)
+            return m[2].strip + "\r\n" if m
+          end
+          nil
+        end
+
+        def dependencies_section_dependencies
+          s = dependencies_section
+          return [] unless s
+          s.scan(/\#([0-9]+)/).map { |x| x[0].to_i }
+        end
       end
     end
   end
