@@ -21,6 +21,12 @@ module Avm
         end
       end
 
+      def dependencies_section_title
+        v = Setting.plugin_avm[__method__]
+        return v if v.present?
+        raise "Setting.plugin_avm[#{__method__}] is empty"
+      end
+
       private
 
       def issue_status(key, message, raise_if_empty)

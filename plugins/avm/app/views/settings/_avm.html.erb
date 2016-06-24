@@ -22,3 +22,8 @@
     <%= options_for_select([['-','']] + IssueStatus.all.collect {|p| [ p.name, p.id ] }, settings['issue_status_unblocked_id'] ) %>
   </select>
 </p>
+<p>
+  <label>Título da seção de dependências.</label>
+  <%= text_field_tag 'settings[dependencies_section_title]',
+    settings['dependencies_section_title'] %>
+</p>

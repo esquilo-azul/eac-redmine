@@ -10,7 +10,7 @@ Redmine::Plugin.register :avm do
   description ''
   version '0.1.0'
 
-  settings(default: {}, partial: 'settings/avm')
+  settings(default: { dependencies_section_title: 'Dependencies' }, partial: 'settings/avm')
 
   Redmine::MenuManager.map :admin_menu do |menu|
     menu.push :issue_status_assigns, { controller: 'issue_status_assigns', action: 'index' },
