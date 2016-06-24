@@ -27,3 +27,8 @@
   <%= text_field_tag 'settings[dependencies_section_title]',
     settings['dependencies_section_title'] %>
 </p>
+<p>
+  <label>Mensagem para seção de dependências não encontrada.</label>
+  <%= text_area_tag 'settings[no_dependencies_section_message]',
+    settings['no_dependencies_section_message'] %>
+</p>

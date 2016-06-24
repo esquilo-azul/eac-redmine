@@ -10,7 +10,12 @@ Redmine::Plugin.register :avm do
   description ''
   version '0.1.0'
 
-  settings(default: { dependencies_section_title: 'Dependencies' }, partial: 'settings/avm')
+  settings(default: { dependencies_section_title: 'Dependencies',
+                      no_dependencies_section_message: <<EOS
+Dependencies section not found.
+Customize this message in plugin AVM's configuration.
+EOS
+    }, partial: 'settings/avm')
 
   Redmine::MenuManager.map :admin_menu do |menu|
     menu.push :issue_status_assigns, { controller: 'issue_status_assigns', action: 'index' },

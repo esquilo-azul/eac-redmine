@@ -22,9 +22,11 @@ module Avm
       end
 
       def dependencies_section_title
-        v = Setting.plugin_avm[__method__]
-        return v if v.present?
-        raise "Setting.plugin_avm[#{__method__}] is empty"
+        required_text(__method__)
+      end
+
+      def no_dependencies_section_message
+        required_text(__method__)
       end
 
       private
@@ -35,6 +37,12 @@ module Avm
         elsif raise_if_empty
           raise "Situação de tarefa #{message} não configurada. Acesse /settings/plugin/avm."
         end
+      end
+
+      def required_text(key)
+        v = Setting.plugin_avm[key]
+        return v if v.present?
+        raise "Setting.plugin_avm[#{key}] is empty"
       end
     end
   end
