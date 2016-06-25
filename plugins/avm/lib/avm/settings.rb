@@ -29,6 +29,10 @@ module Avm
         required_text(__method__)
       end
 
+      def dependencies_section_missing_dependencies_message
+        required_text(__method__)
+      end
+
       private
 
       def issue_status(key, message, raise_if_empty)

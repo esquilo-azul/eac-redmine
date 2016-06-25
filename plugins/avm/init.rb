@@ -11,8 +11,12 @@ Redmine::Plugin.register :avm do
   version '0.1.0'
 
   settings(default: { dependencies_section_title: 'Dependencies',
-                      no_dependencies_section_message: <<EOS
+                      no_dependencies_section_message: <<EOS,
 Dependencies section not found.
+Customize this message in plugin AVM's configuration.
+EOS
+                      dependencies_section_missing_dependencies_message: <<EOS
+Missing dependencies found dependencies section: %{ids}.
 Customize this message in plugin AVM's configuration.
 EOS
     }, partial: 'settings/avm')
