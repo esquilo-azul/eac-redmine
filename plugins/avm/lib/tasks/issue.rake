@@ -32,5 +32,13 @@ namespace :avm do
         Avm::Issue::Assign.new(i).run
       end
     end
+
+    desc 'Verifica a seção de dependências de todas as tarefas'
+    task dependencies_section_check_all: :environment do |_t, _args|
+      Issue.where(closed_on: nil)
+           .where.not(status: Avm::Settings.issue_status_undefined).each do |i|
+        Avm::Issue::DependenciesSectionCheck.new(i).run
+      end
+    end
   end
 end
