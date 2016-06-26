@@ -36,4 +36,8 @@ Rails.configuration.to_prepare do
   EacBase::EventManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoUnblock')
   EacBase::EventManager.add_listener(Issue, :create, 'Avm::Listeners::IssueAutoAssign')
   EacBase::EventManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoAssign')
+  EacBase::EventManager.add_listener(Issue, :update,
+                                     'Avm::Listeners::IssueDependenciesSectionCheck')
+  EacBase::EventManager.add_listener(IssueRelation, :create,
+                                     'Avm::Listeners::IssueDependenciesSectionCheck')
 end

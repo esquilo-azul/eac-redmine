@@ -19,5 +19,9 @@ module EacBase
     def issue_update?
       entity == ::Issue && action == :update
     end
+
+    def issue_relation_create?
+      entity == ::IssueRelation && action == :create
+    end
   end
 end
