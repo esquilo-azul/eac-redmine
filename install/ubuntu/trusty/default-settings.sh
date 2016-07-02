@@ -14,3 +14,4 @@ export smtp_port=25
 export smtp_authentication=:plain
 export smtp_username=redmine
 export smtp_password=redmine
+export git_repositories_hierarchical_organisation=true

@@ -78,3 +78,17 @@ do
 done
 
 source "$INSTALL_ROOT/lib/rvm/source.sh"
+
+if [ "$git_repositories_hierarchical_organisation" != 'false' -a "$git_repositories_hierarchical_organisation" != 'true' ]; then
+  if [ -n "$git_repositories_hierarchical_organisation" ]; then
+    export git_repositories_hierarchical_organisation='true'
+  else
+    export git_repositories_hierarchical_organisation='false'
+  fi
+fi
+
+if [ "$git_repositories_hierarchical_organisation" == 'true' ]; then
+  export git_repositories_unique_repo_identifier='false'
+else
+  export git_repositories_unique_repo_identifier='true'
+fi
