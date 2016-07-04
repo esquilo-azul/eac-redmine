@@ -2,16 +2,9 @@ module Heroku
   class Workcopy
     module GitExtension
       def update
-        if directory.exist?
-          if origin_url == app.repository.ssh_url
-            fetch_remote
-            return
-          end
-          directory.rm
-        else
-          directory.parent.mkdir_p
-        end
-        clone_remote
+        app.repository.clone_to(directory)
+        raise "Diretório não existe: \"#{directory}\"" unless directory.exist?
+        raise "Diretório vazio: \"#{directory}\"" unless directory.content?
       end
 
       def source_updated?
@@ -36,16 +29,6 @@ module Heroku
       def app_version
         directory.execute!(['git', '--no-pager', 'log', '--pretty=format:%h | %s | %an | %ad',
                             '--max-count=1', source_branch_revision]).strip
-      end
-
-      private
-
-      def clone_remote
-        directory.parent.execute!(['git', 'clone', origin_url, directory.basename])
-      end
-
-      def fetch_remote
-        directory.execute!(['git', 'fetch', '-p', 'origin'])
       end
     end
   end

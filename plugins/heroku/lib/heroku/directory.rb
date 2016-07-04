@@ -43,6 +43,10 @@ module Heroku
       File.basename(self)
     end
 
+    def content?
+      !(Dir.entries(self) - %w( . .. )).empty?
+    end
+
     private
 
     def debug_execute(args)

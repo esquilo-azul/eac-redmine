@@ -11,6 +11,8 @@ module Heroku
       end
 
       module InstanceMethods
+        include Cloneable
+
         def to_label_with_project
           "#{project ? project.identifier : '?'}:#{to_label_without_project}"
         end
