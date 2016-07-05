@@ -1,4 +1,4 @@
-module EacBase
+module EventsManager
   module Patches
     module IssuePatch
       def self.included(base)
@@ -14,17 +14,17 @@ module EacBase
 
       module InstanceMethods
         def issue_create_event
-          EacBase::EventManager.trigger(Issue, :create, self)
+          EventsManager::EventManager.trigger(Issue, :create, self)
         end
 
         def issue_destroy_event
-          EacBase::EventManager.trigger(Issue, :delete, self)
+          EventsManager::EventManager.trigger(Issue, :delete, self)
         end
       end
     end
   end
 end
 
-unless Issue.included_modules.include? EacBase::Patches::IssuePatch
-  Issue.send(:include, EacBase::Patches::IssuePatch)
+unless Issue.included_modules.include? EventsManager::Patches::IssuePatch
+  Issue.send(:include, EventsManager::Patches::IssuePatch)
 end

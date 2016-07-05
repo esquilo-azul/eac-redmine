@@ -2,7 +2,6 @@
 
 require 'redmine'
 
-require 'eac_base/patches/issue_patch'
 require 'eac_base/patches/issue_relation_patch'
 require 'eac_base/patches/journal_patch'
 require 'eac_base/patches/time_entry_patch'
