@@ -1,4 +1,4 @@
-module EacBase
+module EventsManager
   module Patches
     module TimeEntryPatch
       def self.included(base)
@@ -15,21 +15,23 @@ module EacBase
 
       module InstanceMethods
         def time_entry_create_event
-          EacBase::EventManager.trigger(TimeEntry, :create, self)
+          EventsManager::EventManager.trigger(TimeEntry, :create, self)
         end
 
         def time_entry_destroy_event
-          EacBase::EventManager.trigger(TimeEntry, :delete, EventsManager::RemovedRecord.new(self))
+          EventsManager::EventManager.trigger(TimeEntry, :delete,
+                                              EventsManager::RemovedRecord.new(self))
         end
 
         def time_entry_update_event
-          EacBase::EventManager.trigger(TimeEntry, :update, EventsManager::UpdatedRecord.new(self))
+          EventsManager::EventManager.trigger(TimeEntry, :update,
+                                              EventsManager::UpdatedRecord.new(self))
         end
       end
     end
   end
 end
 
-unless TimeEntry.included_modules.include? EacBase::Patches::TimeEntryPatch
-  TimeEntry.send(:include, EacBase::Patches::TimeEntryPatch)
+unless TimeEntry.included_modules.include? EventsManager::Patches::TimeEntryPatch
+  TimeEntry.send(:include, EventsManager::Patches::TimeEntryPatch)
 end

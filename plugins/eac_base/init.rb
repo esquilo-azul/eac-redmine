@@ -2,7 +2,6 @@
 
 require 'redmine'
 
-require 'eac_base/patches/time_entry_patch'
 require 'eac_base/event_manager'
 require 'eac_base/patches/hooks/redmine_patch'
 
