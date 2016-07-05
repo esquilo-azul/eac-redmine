@@ -1,4 +1,4 @@
-namespace :eac_base do
+namespace :events_manager do
   namespace :events do
     namespace :issue_relation do
       desc 'Envia notificações da criação de um IssueRelation'
