@@ -1,4 +1,4 @@
-module EacBase
+module EventsManager
   module Patches
     module JournalPatch
       def self.included(base)
@@ -14,13 +14,13 @@ module EacBase
       module InstanceMethods
         def journal_create_event
           return unless journalized_type == 'Issue'
-          EacBase::EventManager.trigger(Issue, :update, self)
+          EventsManager::EventManager.trigger(Issue, :update, self)
         end
       end
     end
   end
 end
 
-unless Journal.included_modules.include? EacBase::Patches::JournalPatch
-  Journal.send(:include, EacBase::Patches::JournalPatch)
+unless Journal.included_modules.include? EventsManager::Patches::JournalPatch
+  Journal.send(:include, EventsManager::Patches::JournalPatch)
 end
