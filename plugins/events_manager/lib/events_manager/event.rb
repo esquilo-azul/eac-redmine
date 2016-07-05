@@ -1,4 +1,4 @@
-module EacBase
+module EventsManager
   class Event
     attr_reader :entity, :action, :data
 

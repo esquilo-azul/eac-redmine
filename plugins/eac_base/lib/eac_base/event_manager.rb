@@ -9,7 +9,7 @@ module EacBase
       end
 
       def trigger(entity, action, data)
-        event = EacBase::Event.new(entity, action, data)
+        event = EventsManager::Event.new(entity, action, data)
         Rails.logger.debug("Event triggered: #{event}")
         listeners(entity, action).each do |l|
           Rails.logger.debug("Listener found: #{l}")
