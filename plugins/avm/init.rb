@@ -28,16 +28,16 @@ EOS
 end
 
 Rails.configuration.to_prepare do
-  EacBase::EventManager.add_listener(Issue, :create, 'Avm::Listeners::IssueAutoUndefine')
-  EacBase::EventManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoUndefine')
-  EacBase::EventManager.add_listener(IssueRelation, :create, 'Avm::Listeners::IssueAutoUndefine')
-  EacBase::EventManager.add_listener(IssueRelation, :delete, 'Avm::Listeners::IssueAutoUnblock')
-  EacBase::EventManager.add_listener(Issue, :delete, 'Avm::Listeners::IssueAutoUnblock')
-  EacBase::EventManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoUnblock')
-  EacBase::EventManager.add_listener(Issue, :create, 'Avm::Listeners::IssueAutoAssign')
-  EacBase::EventManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoAssign')
-  EacBase::EventManager.add_listener(Issue, :update,
-                                     'Avm::Listeners::IssueDependenciesSectionCheck')
-  EacBase::EventManager.add_listener(IssueRelation, :create,
-                                     'Avm::Listeners::IssueDependenciesSectionCheck')
+  EventsManager.add_listener(Issue, :create, 'Avm::Listeners::IssueAutoUndefine')
+  EventsManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoUndefine')
+  EventsManager.add_listener(IssueRelation, :create, 'Avm::Listeners::IssueAutoUndefine')
+  EventsManager.add_listener(IssueRelation, :delete, 'Avm::Listeners::IssueAutoUnblock')
+  EventsManager.add_listener(Issue, :delete, 'Avm::Listeners::IssueAutoUnblock')
+  EventsManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoUnblock')
+  EventsManager.add_listener(Issue, :create, 'Avm::Listeners::IssueAutoAssign')
+  EventsManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoAssign')
+  EventsManager.add_listener(Issue, :update,
+                             'Avm::Listeners::IssueDependenciesSectionCheck')
+  EventsManager.add_listener(IssueRelation, :create,
+                             'Avm::Listeners::IssueDependenciesSectionCheck')
 end

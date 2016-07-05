@@ -19,5 +19,5 @@ Redmine::Plugin.register :heroku do
 end
 
 Rails.configuration.to_prepare do
-  EacBase::EventManager.add_listener(Repository, :receive, 'Heroku::Listeners::Repository::Receive')
+  EventsManager.add_listener(Repository, :receive, 'Heroku::Listeners::Repository::Receive')
 end

@@ -2,8 +2,6 @@
 
 require 'redmine'
 
-require 'eac_base/event_manager'
-
 Redmine::Plugin.register :eac_base do
   name 'Esquilo Azul Company - Base'
   author 'Eduardo Henrique Bogoni'
