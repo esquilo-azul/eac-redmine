@@ -1,4 +1,4 @@
-module EacBase
+module EventsManager
   class UpdatedRecord
     attr_reader :record, :changes
 

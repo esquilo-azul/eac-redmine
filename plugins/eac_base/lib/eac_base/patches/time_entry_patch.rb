@@ -23,7 +23,7 @@ module EacBase
         end
 
         def time_entry_update_event
-          EacBase::EventManager.trigger(TimeEntry, :update, EacBase::UpdatedRecord.new(self))
+          EacBase::EventManager.trigger(TimeEntry, :update, EventsManager::UpdatedRecord.new(self))
         end
       end
     end
