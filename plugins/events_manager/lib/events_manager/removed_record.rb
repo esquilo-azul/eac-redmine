@@ -1,4 +1,4 @@
-module EacBase
+module EventsManager
   class RemovedRecord
     def initialize(record)
       @attributes = record.attributes

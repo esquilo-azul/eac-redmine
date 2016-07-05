@@ -19,7 +19,7 @@ module EacBase
         end
 
         def time_entry_destroy_event
-          EacBase::EventManager.trigger(TimeEntry, :delete, EacBase::RemovedRecord.new(self))
+          EacBase::EventManager.trigger(TimeEntry, :delete, EventsManager::RemovedRecord.new(self))
         end
 
         def time_entry_update_event
