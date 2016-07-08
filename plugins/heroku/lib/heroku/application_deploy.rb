@@ -99,7 +99,7 @@ module Heroku
     end
 
     def telegram_notify(b)
-      Notifyme::Notify.telegram_message(b.to_s)
+      Notifyme::Notify.notify(content_type: :plain, content: b.to_s)
     end
 
     def workcopy
