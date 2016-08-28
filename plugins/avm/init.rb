@@ -3,6 +3,7 @@
 require 'redmine'
 
 require 'avm/patches/issue_patch'
+require 'avm/patches/test_case_patch'
 
 Redmine::Plugin.register :avm do
   name 'Agora Vai! Methodology'
