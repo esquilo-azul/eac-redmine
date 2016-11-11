@@ -33,3 +33,7 @@ gem 'asciidoctor'
 
 # Rack parser for Hrack
 gem 'rack-parser', require: 'rack/parser'
+
+# Redmine with Git
+gem 'faker'
+gem 'sshkey'
