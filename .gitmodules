@@ -1,3 +1,0 @@
-[submodule "plugins/redmine_bootstrap_kit"]
-	path = plugins/redmine_bootstrap_kit
-	url = https://github.com/jbox-web/redmine_bootstrap_kit.git
