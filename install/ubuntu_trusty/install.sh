@@ -11,7 +11,8 @@ export -f trigger_apache_restart
 function trigger_redmine_git_hosting_rescue {
 	"$REDMINE_ROOT/bin/rake" redmine_git_hosting:install_hook_parameters \
     redmine_git_hosting:migration_tools:update_repositories_type \
-    redmine_git_hosting:install_hook_files redmine_git_hosting:fetch_changesets
+    redmine_git_hosting:install_hook_files redmine_git_hosting:fetch_changesets \
+    redmine_git_hosting:rescue
 }
 export -f trigger_redmine_git_hosting_rescue
 
