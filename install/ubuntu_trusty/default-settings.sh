@@ -1,0 +1,17 @@
+export postgresql_database=redmine
+export postgresql_database_test=redmine_test
+export postgresql_user=redmine
+export postgresql_password=redmine
+export gitolite_user=git
+export gitolite_user_home=/var/lib/git
+export rvm_ruby=ruby-2.2.3
+export redmine_git_hosting_ssh_key_name=redmine_git_hosting_id
+export server_address=localhost
+export smtp_tls=false
+export smtp_server=localhost
+export smtp_domain=example.com
+export smtp_port=25
+export smtp_authentication=:plain
+export smtp_username=redmine
+export smtp_password=redmine
+export git_repositories_hierarchical_organisation=true
