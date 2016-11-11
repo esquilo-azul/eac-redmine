@@ -40,3 +40,5 @@
 /Gemfile.lock
 /Gemfile.local
 
+# redmine_with_git
+/config/install.sh
