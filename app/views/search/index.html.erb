@@ -26,6 +26,7 @@
       <label><%= radio_button_tag 'attachments', '1', @search_attachments == '1' %> <%= l(:label_search_attachments_yes) %></label>
       <label><%= radio_button_tag 'attachments', 'only', @search_attachments == 'only' %> <%= l(:label_search_attachments_only) %></label>
     </p>
+    <%= call_hook(:view_search_index_options_content_bottom) %>
   </div>
 </fieldset>
 <%= hidden_field_tag 'options', '', :id => 'show-options' %>
@@ -42,7 +43,7 @@
     <dl id="search-results">
       <% @results.each do |e| %>
         <dt class="<%= e.event_type %>">
-          <%= content_tag('span', h(e.project), :class => 'project') unless @project == e.project %>
+          <%= content_tag('span', e.project, :class => 'project') unless @project == e.project %>
           <%= link_to(highlight_tokens(e.event_title.truncate(255), @tokens), e.event_url) %>
         </dt>
         <dd><span class="description"><%= highlight_tokens(e.event_description, @tokens) %></span>
@@ -52,7 +53,7 @@
 <% end %>
 
 <% if @result_pages %>
-<p class="pagination"><%= pagination_links_full @result_pages, @result_count, :per_page_links => false %></p>
+<span class="pagination"><%= pagination_links_full @result_pages, @result_count, :per_page_links => false %></span>
 <% end %>
 
 <% html_title(l(:label_search)) -%>

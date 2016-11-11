@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -30,35 +30,47 @@ class AccountTest < Redmine::IntegrationTest
     assert_template "my/account"
   end
 
+  def test_login_should_set_session_token
+    assert_difference 'Token.count' do
+      log_user('jsmith', 'jsmith')
+
+      assert_equal 2, session[:user_id]
+      assert_not_nil session[:tk]
+    end
+  end
+
   def test_autologin
     user = User.find(1)
-    Setting.autologin = "7"
     Token.delete_all
 
-    # User logs in with 'autologin' checked
-    post '/login', :username => user.login, :password => 'admin', :autologin => 1
-    assert_redirected_to '/my/page'
-    token = Token.first
-    assert_not_nil token
-    assert_equal user, token.user
-    assert_equal 'autologin', token.action
-    assert_equal user.id, session[:user_id]
-    assert_equal token.value, cookies['autologin']
-
-    # Session is cleared
-    reset!
-    User.current = nil
-    # Clears user's last login timestamp
-    user.update_attribute :last_login_on, nil
-    assert_nil user.reload.last_login_on
-
-    # User comes back with user's autologin cookie
-    cookies[:autologin] = token.value
-    get '/my/page'
-    assert_response :success
-    assert_template 'my/page'
-    assert_equal user.id, session[:user_id]
-    assert_not_nil user.reload.last_login_on
+    with_settings :autologin => '7' do
+      assert_difference 'Token.count', 2 do
+        # User logs in with 'autologin' checked
+        post '/login', :username => user.login, :password => 'admin', :autologin => 1
+        assert_redirected_to '/my/page'
+      end
+      token = Token.where(:action => 'autologin').order(:id => :desc).first
+      assert_not_nil token
+      assert_equal user, token.user
+      assert_equal 'autologin', token.action
+      assert_equal user.id, session[:user_id]
+      assert_equal token.value, cookies['autologin']
+  
+      # Session is cleared
+      reset!
+      User.current = nil
+      # Clears user's last login timestamp
+      user.update_attribute :last_login_on, nil
+      assert_nil user.reload.last_login_on
+  
+      # User comes back with user's autologin cookie
+      cookies[:autologin] = token.value
+      get '/my/page'
+      assert_response :success
+      assert_template 'my/page'
+      assert_equal user.id, session[:user_id]
+      assert_not_nil user.reload.last_login_on
+    end
   end
 
   def test_autologin_should_use_autologin_cookie_name
@@ -66,12 +78,13 @@ class AccountTest < Redmine::IntegrationTest
     Redmine::Configuration.stubs(:[]).with('autologin_cookie_name').returns('custom_autologin')
     Redmine::Configuration.stubs(:[]).with('autologin_cookie_path').returns('/')
     Redmine::Configuration.stubs(:[]).with('autologin_cookie_secure').returns(false)
+    Redmine::Configuration.stubs(:[]).with('sudo_mode_timeout').returns(15)
 
     with_settings :autologin => '7' do
-      assert_difference 'Token.count' do
+      assert_difference 'Token.count', 2 do
         post '/login', :username => 'admin', :password => 'admin', :autologin => 1
+        assert_response 302
       end
-      assert_response 302
       assert cookies['custom_autologin'].present?
       token = cookies['custom_autologin']
 
@@ -81,7 +94,7 @@ class AccountTest < Redmine::IntegrationTest
       get '/my/page'
       assert_response :success
 
-      assert_difference 'Token.count', -1 do
+      assert_difference 'Token.count', -2 do
         post '/logout'
       end
       assert cookies['custom_autologin'].blank?
@@ -118,7 +131,7 @@ class AccountTest < Redmine::IntegrationTest
     assert_equal 'Password was successfully updated.', flash[:notice]
 
     log_user('jsmith', 'newpass123')
-    assert_equal 0, Token.count
+    assert_equal false, Token.exists?(token.id), "Password recovery token was not deleted"
   end
 
   def test_user_with_must_change_passwd_should_be_forced_to_change_its_password
@@ -131,6 +144,21 @@ class AccountTest < Redmine::IntegrationTest
 
     get '/issues'
     assert_redirected_to '/my/password'
+  end
+
+  def test_flash_message_should_use_user_language_when_redirecting_user_for_password_change
+    user = User.find_by_login('jsmith')
+    user.must_change_passwd = true
+    user.language = 'it'
+    user.save!
+
+    post '/login', :username => 'jsmith', :password => 'jsmith'
+    assert_redirected_to '/my/page'
+    follow_redirect!
+    assert_redirected_to '/my/password'
+    follow_redirect!
+
+    assert_select 'div.error', :text => /richiesto che sia cambiata/
   end
 
   def test_user_with_must_change_passwd_should_be_able_to_change_its_password
@@ -148,6 +176,40 @@ class AccountTest < Redmine::IntegrationTest
     assert_response :success
 
     assert_equal false, User.find_by_login('jsmith').must_change_passwd?
+  end
+
+  def test_user_with_expired_password_should_be_forced_to_change_its_password
+    User.find_by_login('jsmith').update_attribute :passwd_changed_on, 14.days.ago
+
+    with_settings :password_max_age => 7 do
+      post '/login', :username => 'jsmith', :password => 'jsmith'
+      assert_redirected_to '/my/page'
+      follow_redirect!
+      assert_redirected_to '/my/password'
+
+      get '/issues'
+      assert_redirected_to '/my/password'
+    end
+  end
+
+  def test_user_with_expired_password_should_be_able_to_change_its_password
+    User.find_by_login('jsmith').update_attribute :passwd_changed_on, 14.days.ago
+
+    with_settings :password_max_age => 7 do
+      post '/login', :username => 'jsmith', :password => 'jsmith'
+      assert_redirected_to '/my/page'
+      follow_redirect!
+      assert_redirected_to '/my/password'
+      follow_redirect!
+      assert_response :success
+      post '/my/password', :password => 'jsmith', :new_password => 'newpassword', :new_password_confirmation => 'newpassword'
+      assert_redirected_to '/my/account'
+      follow_redirect!
+      assert_response :success
+
+      assert_equal false, User.find_by_login('jsmith').must_change_passwd?
+    end
+
   end
 
   def test_register_with_automatic_activation

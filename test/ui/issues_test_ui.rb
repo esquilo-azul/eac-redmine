@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,10 +18,10 @@
 require File.expand_path('../base', __FILE__)
 
 class Redmine::UiTest::IssuesTest < Redmine::UiTest::Base
-  fixtures :projects, :users, :roles, :members, :member_roles,
+  fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles,
            :trackers, :projects_trackers, :enabled_modules, :issue_statuses, :issues,
            :enumerations, :custom_fields, :custom_values, :custom_fields_trackers,
-           :watchers
+           :watchers, :journals, :journal_details
 
   def test_create_issue
     log_user('jsmith', 'jsmith')
@@ -150,15 +150,30 @@ class Redmine::UiTest::IssuesTest < Redmine::UiTest::Base
     end
   end
 
-  def test_create_issue_start_due_date_default
+  def test_default_due_date_proposed_in_date_picker
     log_user('jsmith', 'jsmith')
     visit '/projects/ecookbook/issues/new'
+
+    # Future start date: due date should default to start date
+    fill_in 'Start date', :with => '2027-04-01'
+    fill_in 'Due date', :with => ''
+    page.first('p#due_date_area img').click
+    page.first("td.ui-datepicker-days-cell-over a").click
+    assert_equal '2027-04-01', page.find('input#issue_due_date').value
+
+    # Passed start date: due date should default to today
     fill_in 'Start date', :with => '2012-04-01'
     fill_in 'Due date', :with => ''
     page.first('p#due_date_area img').click
     page.first("td.ui-datepicker-days-cell-over a").click
-    assert_equal '2012-04-01', page.find('input#issue_due_date').value
+    assert_equal Date.today.to_s, page.find('input#issue_due_date').value
+  end
 
+  def test_default_start_date_proposed_in_date_picker
+    log_user('jsmith', 'jsmith')
+    visit '/projects/ecookbook/issues/new'
+
+    # Passed due date: start date should default to due date
     fill_in 'Start date', :with => ''
     fill_in 'Due date', :with => '2012-04-01'
     page.first('p#start_date_area img').click
@@ -227,6 +242,17 @@ class Redmine::UiTest::IssuesTest < Redmine::UiTest::Base
     assert page.first('#sidebar').has_no_content?(user.name)
   end
 
+  def test_watch_should_update_watchers_list
+    user = User.find(2)
+    log_user('jsmith', 'jsmith')
+    visit '/issues/1'
+    assert page.first('#sidebar').has_content?('Watchers (0)')
+
+    page.first('a.issue-1-watcher').click
+    assert page.first('#sidebar').has_content?('Watchers (1)')
+    assert page.first('#sidebar').has_content?(user.name)
+  end
+
   def test_watch_issue_via_context_menu
     log_user('jsmith', 'jsmith')
     visit '/issues'
@@ -263,5 +289,25 @@ class Redmine::UiTest::IssuesTest < Redmine::UiTest::Base
     end
     assert Issue.find(1).watched_by?(User.find_by_login('jsmith'))
     assert Issue.find(4).watched_by?(User.find_by_login('jsmith'))
+  end
+
+  def test_issue_list_with_default_totalable_columns
+    log_user('admin', 'admin')
+    with_settings :issue_list_default_totals => ['estimated_hours'] do
+      visit '/projects/ecookbook/issues'
+      # Check that the page shows the Estimated hours total
+      assert page.has_css?('p.query-totals')
+      assert page.has_css?('span.total-for-estimated-hours')
+      # Open the Options of the form (necessary for having the totalable columns options clickable) 
+      page.all('legend')[1].click
+      # Deselect the default totalable column (none should be left) 
+      page.first('input[name="t[]"][value="estimated_hours"]').click
+      within('#query_form') do
+        click_link 'Apply'
+      end
+      # Check that Totals are not present in the reloaded page
+      assert !page.has_css?('p.query-totals')
+      assert !page.has_css?('span.total-for-estimated-hours')
+    end
   end
 end

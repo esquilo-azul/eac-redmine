@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -59,8 +59,8 @@ module Redmine
             @month_from = 1
           end
         else
-          @month_from ||= Date.today.month
-          @year_from ||= Date.today.year
+          @month_from ||= User.current.today.month
+          @year_from ||= User.current.today.year
         end
         zoom = (options[:zoom] || User.current.pref[:gantt_zoom]).to_i
         @zoom = (zoom > 0 && zoom < 5) ? zoom : 2
@@ -428,9 +428,9 @@ module Redmine
         lines(:image => gc, :top => top, :zoom => zoom,
               :subject_width => subject_width, :format => :image)
         # today red line
-        if Date.today >= @date_from and Date.today <= date_to
+        if User.current.today >= @date_from and User.current.today <= date_to
           gc.stroke('red')
-          x = (Date.today - @date_from + 1) * zoom + subject_width
+          x = (User.current.today - @date_from + 1) * zoom + subject_width
           gc.line(x, headers_height, x, headers_height + g_height - 1)
         end
         gc.draw(imgl)
@@ -442,7 +442,7 @@ module Redmine
         pdf = ::Redmine::Export::PDF::ITCPDF.new(current_language)
         pdf.SetTitle("#{l(:label_gantt)} #{project}")
         pdf.alias_nb_pages
-        pdf.footer_date = format_date(Date.today)
+        pdf.footer_date = format_date(User.current.today)
         pdf.AddPage("L")
         pdf.SetFontStyle('B', 12)
         pdf.SetX(15)
@@ -460,6 +460,10 @@ module Redmine
           if self.months < 3
             show_days = true
             headers_height = 3 * header_height
+            if self.months < 2
+              show_day_num = true
+              headers_height = 4 * header_height
+            end
           end
         end
         g_width = PDF.right_pane_width
@@ -504,6 +508,25 @@ module Redmine
             week_f = week_f + 7
           end
         end
+        # Day numbers headers
+        if show_day_num
+          left = subject_width
+          height = header_height
+          day_num = self.date_from
+          wday = self.date_from.cwday
+          pdf.SetFontStyle('B', 7)
+          (self.date_to - self.date_from + 1).to_i.times do
+            width = zoom
+            pdf.SetY(y_start + header_height * 2)
+            pdf.SetX(left)
+            pdf.SetTextColor(non_working_week_days.include?(wday) ? 150 : 0)
+            pdf.RDMCell(width, height, day_num.day.to_s, "LTR", 0, "C")
+            left = left + width
+            day_num = day_num + 1
+            wday = wday + 1
+            wday = 1 if wday > 7
+          end
+        end
         # Days headers
         if show_days
           left = subject_width
@@ -512,8 +535,9 @@ module Redmine
           pdf.SetFontStyle('B', 7)
           (self.date_to - self.date_from + 1).to_i.times do
             width = zoom
-            pdf.SetY(y_start + 2 * header_height)
+            pdf.SetY(y_start + header_height * (show_day_num ? 3 : 2))
             pdf.SetX(left)
+            pdf.SetTextColor(non_working_week_days.include?(wday) ? 150 : 0)
             pdf.RDMCell(width, height, day_name(wday).first, "LTR", 0, "C")
             left = left + width
             wday = wday + 1
@@ -522,6 +546,7 @@ module Redmine
         end
         pdf.SetY(y_start)
         pdf.SetX(15)
+        pdf.SetTextColor(0)
         pdf.RDMCell(subject_width + g_width - 15, headers_height, "", 1)
         # Tasks
         top = headers_height + y_start
@@ -567,8 +592,8 @@ module Redmine
                 coords[:bar_progress_end] = self.date_to - self.date_from + 1
               end
             end
-            if progress_date < Date.today
-              late_date = [Date.today, end_date].min
+            if progress_date < User.current.today
+              late_date = [User.current.today, end_date].min
               if late_date > self.date_from && late_date > start_date
                 if late_date < self.date_to
                   coords[:bar_late_end] = late_date - self.date_from + 1

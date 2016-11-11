@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -174,7 +174,7 @@ class TimelogController < ApplicationController
   end
 
   def bulk_update
-    attributes = parse_params_for_bulk_time_entry_attributes(params)
+    attributes = parse_params_for_bulk_update(params[:time_entry])
 
     unsaved_time_entry_ids = []
     @time_entries.each do |time_entry|
@@ -270,12 +270,5 @@ private
       scope = scope.on_issue(@issue)
     end
     scope
-  end
-
-  def parse_params_for_bulk_time_entry_attributes(params)
-    attributes = (params[:time_entry] || {}).reject {|k,v| v.blank?}
-    attributes.keys.each {|k| attributes[k] = '' if attributes[k] == 'none'}
-    attributes[:custom_field_values].reject! {|k,v| v.blank?} if attributes[:custom_field_values]
-    attributes
   end
 end

@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -116,6 +116,23 @@ class Setting < ActiveRecord::Base
     @cached_settings[name] = nil
     setting.save
     setting.value
+  end
+
+	# Updates multiple settings from params and sends a security notification if needed
+  def self.set_all_from_params(settings)
+    settings = (settings || {}).dup.symbolize_keys
+    changes = []
+    settings.each do |name, value|
+      previous_value = Setting[name]
+      set_from_params name, value
+      if available_settings[name.to_s]['security_notifications'] && Setting[name] != previous_value
+        changes << name
+      end
+    end
+    if changes.any?
+      Mailer.security_settings_updated(changes)
+    end
+    true
   end
 
   # Sets a setting value from params

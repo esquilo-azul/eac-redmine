@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -48,7 +48,7 @@ class PrincipalTest < ActiveSupport::TestCase
     Role.non_member.update! :users_visibility => 'members_of_visible_projects'
     user = User.generate!
 
-    expected = Project.visible(user).map(&:member_principals).flatten.map(&:principal).uniq << user
+    expected = Project.visible(user).map {|p| p.memberships.active}.flatten.map(&:principal).uniq << user
     assert_equal expected.map(&:id).sort, Principal.visible(user).pluck(:id).sort
   end
 

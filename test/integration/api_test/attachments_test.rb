@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -79,6 +79,24 @@ class Redmine::ApiTest::AttachmentsTest < Redmine::ApiTest::Base
     skip unless convert_installed?
     get '/attachments/thumbnail/16', {}, credentials('jsmith')
     assert_response :success
+  end
+
+  test "Destroy /attachments/:id.xml should return ok and deleted Attachment" do
+    assert_difference 'Attachment.count', -1 do
+      delete '/attachments/7.xml', {}, credentials('jsmith')
+      assert_response :ok
+      assert_equal '', response.body
+    end
+    assert_nil Attachment.find_by_id(7)
+  end
+
+  test "Destroy /attachments/:id.json should return ok and deleted Attachment" do
+    assert_difference 'Attachment.count', -1 do
+      delete '/attachments/7.json', {}, credentials('jsmith')
+      assert_response :ok
+      assert_equal '', response.body
+    end
+    assert_nil Attachment.find_by_id(7)
   end
 
   test "POST /uploads.xml should return the token" do

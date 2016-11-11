@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -105,13 +105,13 @@ class TimeEntryActivityTest < ActiveSupport::TestCase
 
   def test_destroying_a_system_activity_should_reassign_children_activities
     project = Project.generate!
-    system_activity = TimeEntryActivity.create!(:name => 'Activity')
-    project_activity = TimeEntryActivity.create!(:name => 'Activity', :project => project, :parent_id => system_activity.id)
+    entries = []
 
-    entries = [
-      TimeEntry.generate!(:project => project, :activity => system_activity),
-      TimeEntry.generate!(:project => project, :activity => project_activity)
-    ]
+    system_activity = TimeEntryActivity.create!(:name => 'Activity')
+    entries << TimeEntry.generate!(:project => project, :activity => system_activity)
+    
+    project_activity = TimeEntryActivity.create!(:name => 'Activity', :project => project, :parent_id => system_activity.id)
+    entries << TimeEntry.generate!(:project => project.reload, :activity => project_activity)
 
     assert_difference 'TimeEntryActivity.count', -2 do
       assert_nothing_raised do
@@ -119,5 +119,12 @@ class TimeEntryActivityTest < ActiveSupport::TestCase
       end
     end
     assert entries.all? {|entry| entry.reload.activity.name == 'Development'}
+  end
+
+  def test_project_activity_without_parent_should_not_disable_system_activities
+    project = Project.find(1)
+    activity = TimeEntryActivity.create!(:name => 'Csutom', :project => project)
+    assert_include activity, project.activities
+    assert_include TimeEntryActivity.find(9), project.activities
   end
 end

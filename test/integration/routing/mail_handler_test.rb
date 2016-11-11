@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@ require File.expand_path('../../../test_helper', __FILE__)
 
 class RoutingMailHandlerTest < Redmine::RoutingTest
   def test_mail_handler
+    should_route 'GET /mail_handler' => 'mail_handler#new'
     should_route 'POST /mail_handler' => 'mail_handler#index'
   end
 end

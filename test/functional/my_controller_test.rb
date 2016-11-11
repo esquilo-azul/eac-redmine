@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -117,6 +117,24 @@ class MyControllerTest < ActionController::TestCase
     assert user.groups.empty?
   end
 
+  def test_update_account_should_send_security_notification
+    ActionMailer::Base.deliveries.clear
+    post :account,
+      :user => {
+        :mail => 'foobar@example.com'
+      }
+
+    assert_not_nil (mail = ActionMailer::Base.deliveries.last)
+    assert_mail_body_match '0.0.0.0', mail
+    assert_mail_body_match I18n.t(:mail_body_security_notification_change_to, field: I18n.t(:field_mail), value: 'foobar@example.com'), mail
+    assert_select_email do
+      assert_select 'a[href^=?]', 'http://localhost:3000/my/account', :text => 'My account'
+    end
+    # The old email address should be notified about the change for security purposes
+    assert [mail.bcc, mail.cc].flatten.include?(User.find(2).mail)
+    assert [mail.bcc, mail.cc].flatten.include?('foobar@example.com')
+  end
+
   def test_my_account_should_show_destroy_link
     get :account
     assert_select 'a[href="/my/account/destroy"]'
@@ -185,24 +203,25 @@ class MyControllerTest < ActionController::TestCase
     assert User.try_to_login('jsmith', 'secret123')
   end
 
-  def test_change_password_kills_other_sessions
-    @request.session[:ctime] = (Time.now - 30.minutes).utc.to_i
-
-    jsmith = User.find(2)
-    jsmith.passwd_changed_on = Time.now
-    jsmith.save!
-
-    get 'account'
-    assert_response 302
-    assert flash[:error].match(/Your session has expired/)
-  end
-
   def test_change_password_should_redirect_if_user_cannot_change_its_password
     User.find(2).update_attribute(:auth_source_id, 1)
 
     get :password
     assert_not_nil flash[:error]
     assert_redirected_to '/my/account'
+  end
+
+  def test_change_password_should_send_security_notification
+    ActionMailer::Base.deliveries.clear
+    post :password, :password => 'jsmith',
+                    :new_password => 'secret123',
+                    :new_password_confirmation => 'secret123'
+
+    assert_not_nil (mail = ActionMailer::Base.deliveries.last)
+    assert_mail_body_no_match 'secret123', mail # just to be sure: pw should never be sent!
+    assert_select_email do
+      assert_select 'a[href^=?]', 'http://localhost:3000/my/password', :text => 'Change password'
+    end
   end
 
   def test_page_layout
@@ -251,6 +270,12 @@ class MyControllerTest < ActionController::TestCase
     assert User.find(2).rss_token
     assert_match /reset/, flash[:notice]
     assert_redirected_to '/my/account'
+  end
+
+  def test_show_api_key
+    get :show_api_key
+    assert_response :success
+    assert_select 'pre', User.find(2).api_key
   end
 
   def test_reset_api_key_with_existing_key

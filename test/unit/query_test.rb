@@ -1,5 +1,7 @@
+# encoding: utf-8
+#
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -142,15 +144,14 @@ class QueryTest < ActiveSupport::TestCase
   def test_query_should_allow_shared_versions_for_a_project_query
     subproject_version = Version.find(4)
     query = IssueQuery.new(:project => Project.find(1), :name => '_')
-    query.add_filter('fixed_version_id', '=', [subproject_version.id.to_s])
-
-    assert query.statement.include?("#{Issue.table_name}.fixed_version_id IN ('4')")
+    filter = query.available_filters["fixed_version_id"]
+    assert_not_nil filter
+    assert_include subproject_version.id.to_s, filter[:values].map(&:last)
   end
 
   def test_query_with_multiple_custom_fields
     query = IssueQuery.find(1)
     assert query.valid?
-    assert query.statement.include?("#{CustomValue.table_name}.value IN ('MySQL')")
     issues = find_issues_with_query(query)
     assert_equal 1, issues.length
     assert_equal Issue.find(3), issues.first
@@ -182,6 +183,7 @@ class QueryTest < ActiveSupport::TestCase
   end
 
   def test_operator_none_for_string_custom_field
+    CustomField.find(2).update_attribute :default_value, ""
     query = IssueQuery.new(:project => Project.find(1), :name => '_')
     query.add_filter('cf_2', '!*', [''])
     assert query.has_filter?('cf_2')
@@ -231,6 +233,22 @@ class QueryTest < ActiveSupport::TestCase
     issues = find_issues_with_query(query)
     assert_equal 1, issues.size
     assert_equal 2, issues.first.id
+  end
+
+  def test_operator_is_on_issue_id_should_accept_comma_separated_values
+    query = IssueQuery.new(:name => '_')
+    query.add_filter("issue_id", '=', ['1,3'])
+    issues = find_issues_with_query(query)
+    assert_equal 2, issues.size
+    assert_equal [1,3], issues.map(&:id).sort
+  end
+
+  def test_operator_between_on_issue_id_should_return_range
+    query = IssueQuery.new(:name => '_')
+    query.add_filter("issue_id", '><', ['2','3'])
+    issues = find_issues_with_query(query)
+    assert_equal 2, issues.size
+    assert_equal [2,3], issues.map(&:id).sort
   end
 
   def test_operator_is_on_integer_custom_field
@@ -323,6 +341,16 @@ class QueryTest < ActiveSupport::TestCase
     issues = find_issues_with_query(query)
     assert !issues.map(&:id).include?(1)
     assert issues.map(&:id).include?(3)
+  end
+
+  def test_operator_is_on_string_custom_field_with_utf8_value
+    f = IssueCustomField.create!(:name => 'filter', :field_format => 'string', :is_filter => true, :is_for_all => true, :trackers => Tracker.all)
+    CustomValue.create!(:custom_field => f, :customized => Issue.find(1), :value => 'Kiá»ƒm')
+
+    query = IssueQuery.new(:name => '_')
+    query.add_filter("cf_#{f.id}", '=', ['Kiá»ƒm'])
+    issues = find_issues_with_query(query)
+    assert_equal [1], issues.map(&:id).sort
   end
 
   def test_operator_is_on_is_private_field
@@ -592,12 +620,32 @@ class QueryTest < ActiveSupport::TestCase
   end
 
   def test_operator_contains
-    query = IssueQuery.new(:project => Project.find(1), :name => '_')
-    query.add_filter('subject', '~', ['uNable'])
-    assert query.statement.include?("LOWER(#{Issue.table_name}.subject) LIKE '%unable%'")
+    issue = Issue.generate!(:subject => 'AbCdEfG')
+
+    query = IssueQuery.new(:name => '_')
+    query.add_filter('subject', '~', ['cdeF'])
     result = find_issues_with_query(query)
-    assert result.empty?
-    result.each {|issue| assert issue.subject.downcase.include?('unable') }
+    assert_include issue, result
+    result.each {|issue| assert issue.subject.downcase.include?('cdef') }
+  end
+
+  def test_operator_contains_with_utf8_string
+    issue = Issue.generate!(:subject => 'Subject contains Kiểm')
+
+    query = IssueQuery.new(:name => '_')
+    query.add_filter('subject', '~', ['Kiểm'])
+    result = find_issues_with_query(query)
+    assert_include issue, result
+    assert_equal 1, result.size
+  end
+
+  def test_operator_does_not_contain
+    issue = Issue.generate!(:subject => 'AbCdEfG')
+
+    query = IssueQuery.new(:name => '_')
+    query.add_filter('subject', '!~', ['cdeF'])
+    result = find_issues_with_query(query)
+    assert_not_include issue, result
   end
 
   def test_range_for_this_week_with_week_starting_on_monday
@@ -623,13 +671,6 @@ class QueryTest < ActiveSupport::TestCase
     query.add_filter('due_date', 'w', [''])
     assert_match /issues\.due_date > '#{quoted_date "2011-04-23"} 23:59:59(\.\d+)?' AND issues\.due_date <= '#{quoted_date "2011-04-30"} 23:59:59(\.\d+)?/,
       query.statement
-  end
-
-  def test_operator_does_not_contains
-    query = IssueQuery.new(:project => Project.find(1), :name => '_')
-    query.add_filter('subject', '!~', ['uNable'])
-    assert query.statement.include?("LOWER(#{Issue.table_name}.subject) NOT LIKE '%unable%'")
-    find_issues_with_query(query)
   end
 
   def test_filter_assigned_to_me
@@ -706,7 +747,7 @@ class QueryTest < ActiveSupport::TestCase
   end
 
   def test_filter_on_custom_field_should_ignore_projects_with_field_disabled
-    field = IssueCustomField.generate!(:trackers => Tracker.all, :project_ids => [1, 3, 4], :is_filter => true)
+    field = IssueCustomField.generate!(:trackers => Tracker.all, :project_ids => [1, 3, 4], :is_for_all => false, :is_filter => true)
     Issue.generate!(:project_id => 3, :tracker_id => 2, :custom_field_values => {field.id.to_s => 'Foo'})
     Issue.generate!(:project_id => 4, :tracker_id => 2, :custom_field_values => {field.id.to_s => 'Foo'})
 
@@ -842,6 +883,34 @@ class QueryTest < ActiveSupport::TestCase
     assert_not_include 3, ids
   end
 
+  def test_filter_on_relations_with_any_open_issues
+    IssueRelation.delete_all
+    # Issue 1 is blocked by 8, which is closed
+    IssueRelation.create!(:relation_type => "blocked", :issue_from => Issue.find(1), :issue_to => Issue.find(8))
+    # Issue 2 is blocked by 3, which is open
+    IssueRelation.create!(:relation_type => "blocked", :issue_from => Issue.find(2), :issue_to => Issue.find(3))
+
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"blocked" => {:operator => "*o", :values => ['']}}
+    ids = find_issues_with_query(query).map(&:id)
+    assert_equal [], ids & [1]
+    assert_include 2, ids
+  end
+
+  def test_filter_on_relations_with_no_open_issues
+    IssueRelation.delete_all
+    # Issue 1 is blocked by 8, which is closed
+    IssueRelation.create!(:relation_type => "blocked", :issue_from => Issue.find(1), :issue_to => Issue.find(8))
+    # Issue 2 is blocked by 3, which is open
+    IssueRelation.create!(:relation_type => "blocked", :issue_from => Issue.find(2), :issue_to => Issue.find(3))
+
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"blocked" => {:operator => "!o", :values => ['']}}
+    ids = find_issues_with_query(query).map(&:id)
+    assert_equal [], ids & [2]
+    assert_include 1, ids
+  end
+
   def test_filter_on_relations_with_no_issues
     IssueRelation.delete_all
     IssueRelation.create!(:relation_type => "relates", :issue_from => Issue.find(1), :issue_to => Issue.find(2))
@@ -879,12 +948,92 @@ class QueryTest < ActiveSupport::TestCase
     assert_equal [issue1], find_issues_with_query(query)
   end
 
+  def test_filter_on_parent
+    Issue.delete_all
+    parent = Issue.generate_with_descendants!
+    
+
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"parent_id" => {:operator => '=', :values => [parent.id.to_s]}}
+    assert_equal parent.children.map(&:id).sort, find_issues_with_query(query).map(&:id).sort
+
+    query.filters = {"parent_id" => {:operator => '~', :values => [parent.id.to_s]}}
+    assert_equal parent.descendants.map(&:id).sort, find_issues_with_query(query).map(&:id).sort
+
+    query.filters = {"parent_id" => {:operator => '*', :values => ['']}}
+    assert_equal parent.descendants.map(&:id).sort, find_issues_with_query(query).map(&:id).sort
+
+    query.filters = {"parent_id" => {:operator => '!*', :values => ['']}}
+    assert_equal [parent.id], find_issues_with_query(query).map(&:id).sort
+  end
+
+  def test_filter_on_invalid_parent_should_return_no_results
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"parent_id" => {:operator => '=', :values => '99999999999'}}
+    assert_equal [], find_issues_with_query(query).map(&:id).sort
+
+    query.filters = {"parent_id" => {:operator => '~', :values => '99999999999'}}
+    assert_equal [], find_issues_with_query(query)
+  end
+
+  def test_filter_on_child
+    Issue.delete_all
+    parent = Issue.generate_with_descendants!
+    child, leaf = parent.children.sort_by(&:id)
+    grandchild = child.children.first
+    
+
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"child_id" => {:operator => '=', :values => [grandchild.id.to_s]}}
+    assert_equal [child.id], find_issues_with_query(query).map(&:id).sort
+
+    query.filters = {"child_id" => {:operator => '~', :values => [grandchild.id.to_s]}}
+    assert_equal [parent, child].map(&:id).sort, find_issues_with_query(query).map(&:id).sort
+
+    query.filters = {"child_id" => {:operator => '*', :values => ['']}}
+    assert_equal [parent, child].map(&:id).sort, find_issues_with_query(query).map(&:id).sort
+
+    query.filters = {"child_id" => {:operator => '!*', :values => ['']}}
+    assert_equal [grandchild, leaf].map(&:id).sort, find_issues_with_query(query).map(&:id).sort
+  end
+
+  def test_filter_on_invalid_child_should_return_no_results
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"child_id" => {:operator => '=', :values =>  '99999999999'}}
+    assert_equal [], find_issues_with_query(query)
+
+    query.filters = {"child_id" => {:operator => '~', :values =>  '99999999999'}}
+    assert_equal [].map(&:id).sort, find_issues_with_query(query)
+  end
+
   def test_statement_should_be_nil_with_no_filters
     q = IssueQuery.new(:name => '_')
     q.filters = {}
 
     assert q.valid?
     assert_nil q.statement
+  end
+
+  def test_available_filters_as_json_should_include_missing_assigned_to_id_values
+    user = User.generate!
+    with_current_user User.find(1) do
+      q = IssueQuery.new
+      q.filters = {"assigned_to_id" => {:operator => '=', :values => user.id.to_s}}
+
+      filters = q.available_filters_as_json
+      assert_include [user.name, user.id.to_s], filters['assigned_to_id']['values']
+    end
+  end
+
+  def test_available_filters_as_json_should_include_missing_author_id_values
+    user = User.generate!
+    with_current_user User.find(1) do
+      q = IssueQuery.new
+      q.filters = {"author_id" => {:operator => '=', :values => user.id.to_s}}
+
+      filters = q.available_filters_as_json
+      assert_include [user.name, user.id.to_s], filters['author_id']['values']
+    end
   end
 
   def test_default_columns
@@ -989,7 +1138,7 @@ class QueryTest < ActiveSupport::TestCase
   end
 
   def test_sortable_columns_should_sort_assignees_according_to_user_format_setting
-    with_settings :user_format => 'lastname_coma_firstname' do
+    with_settings :user_format => 'lastname_comma_firstname' do
       q = IssueQuery.new
       assert q.sortable_columns.has_key?('assigned_to')
       assert_equal %w(users.lastname users.firstname users.id), q.sortable_columns['assigned_to']
@@ -997,7 +1146,7 @@ class QueryTest < ActiveSupport::TestCase
   end
 
   def test_sortable_columns_should_sort_authors_according_to_user_format_setting
-    with_settings :user_format => 'lastname_coma_firstname' do
+    with_settings :user_format => 'lastname_comma_firstname' do
       q = IssueQuery.new
       assert q.sortable_columns.has_key?('author')
       assert_equal %w(authors.lastname authors.firstname authors.id), q.sortable_columns['author']
@@ -1073,6 +1222,137 @@ class QueryTest < ActiveSupport::TestCase
     values = issues.collect {|i| begin; Kernel.Float(i.custom_value_for(c.custom_field).to_s); rescue; nil; end}.compact
     assert !values.empty?
     assert_equal values.sort, values
+  end
+
+  def test_set_totalable_names
+    q = IssueQuery.new
+    q.totalable_names = ['estimated_hours', :spent_hours, '']
+    assert_equal [:estimated_hours, :spent_hours], q.totalable_columns.map(&:name)
+  end
+
+  def test_totalable_columns_should_default_to_settings
+    with_settings :issue_list_default_totals => ['estimated_hours'] do
+      q = IssueQuery.new
+      assert_equal [:estimated_hours], q.totalable_columns.map(&:name)
+    end
+  end
+
+  def test_available_totalable_columns_should_include_estimated_hours
+    q = IssueQuery.new
+    assert_include :estimated_hours, q.available_totalable_columns.map(&:name)
+  end
+
+  def test_available_totalable_columns_should_include_spent_hours
+    User.current = User.find(1)
+
+    q = IssueQuery.new
+    assert_include :spent_hours, q.available_totalable_columns.map(&:name)
+  end
+
+  def test_available_totalable_columns_should_include_int_custom_field
+    field = IssueCustomField.generate!(:field_format => 'int', :is_for_all => true)
+    q = IssueQuery.new
+    assert_include "cf_#{field.id}".to_sym, q.available_totalable_columns.map(&:name)
+  end
+
+  def test_available_totalable_columns_should_include_float_custom_field
+    field = IssueCustomField.generate!(:field_format => 'float', :is_for_all => true)
+    q = IssueQuery.new
+    assert_include "cf_#{field.id}".to_sym, q.available_totalable_columns.map(&:name)
+  end
+
+  def test_total_for_estimated_hours
+    Issue.delete_all
+    Issue.generate!(:estimated_hours => 5.5)
+    Issue.generate!(:estimated_hours => 1.1)
+    Issue.generate!
+
+    q = IssueQuery.new
+    assert_equal 6.6, q.total_for(:estimated_hours)
+  end
+
+  def test_total_by_group_for_estimated_hours
+    Issue.delete_all
+    Issue.generate!(:estimated_hours => 5.5, :assigned_to_id => 2)
+    Issue.generate!(:estimated_hours => 1.1, :assigned_to_id => 3)
+    Issue.generate!(:estimated_hours => 3.5)
+
+    q = IssueQuery.new(:group_by => 'assigned_to')
+    assert_equal(
+      {nil => 3.5, User.find(2) => 5.5, User.find(3) => 1.1},
+      q.total_by_group_for(:estimated_hours)
+    )
+  end
+
+  def test_total_for_spent_hours
+    TimeEntry.delete_all
+    TimeEntry.generate!(:hours => 5.5)
+    TimeEntry.generate!(:hours => 1.1)
+
+    q = IssueQuery.new
+    assert_equal 6.6, q.total_for(:spent_hours)
+  end
+
+  def test_total_by_group_for_spent_hours
+    TimeEntry.delete_all
+    TimeEntry.generate!(:hours => 5.5, :issue_id => 1)
+    TimeEntry.generate!(:hours => 1.1, :issue_id => 2)
+    Issue.where(:id => 1).update_all(:assigned_to_id => 2)
+    Issue.where(:id => 2).update_all(:assigned_to_id => 3)
+
+    q = IssueQuery.new(:group_by => 'assigned_to')
+    assert_equal(
+      {User.find(2) => 5.5, User.find(3) => 1.1},
+      q.total_by_group_for(:spent_hours)
+    )
+  end
+
+  def test_total_by_project_group_for_spent_hours
+    TimeEntry.delete_all
+    TimeEntry.generate!(:hours => 5.5, :issue_id => 1)
+    TimeEntry.generate!(:hours => 1.1, :issue_id => 2)
+    Issue.where(:id => 1).update_all(:assigned_to_id => 2)
+    Issue.where(:id => 2).update_all(:assigned_to_id => 3)
+
+    q = IssueQuery.new(:group_by => 'project')
+    assert_equal(
+      {Project.find(1) => 6.6},
+      q.total_by_group_for(:spent_hours)
+    )
+  end
+
+  def test_total_for_int_custom_field
+    field = IssueCustomField.generate!(:field_format => 'int', :is_for_all => true)
+    CustomValue.create!(:customized => Issue.find(1), :custom_field => field, :value => '2')
+    CustomValue.create!(:customized => Issue.find(2), :custom_field => field, :value => '7')
+    CustomValue.create!(:customized => Issue.find(3), :custom_field => field, :value => '')
+
+    q = IssueQuery.new
+    assert_equal 9, q.total_for("cf_#{field.id}")
+  end
+
+  def test_total_by_group_for_int_custom_field
+    field = IssueCustomField.generate!(:field_format => 'int', :is_for_all => true)
+    CustomValue.create!(:customized => Issue.find(1), :custom_field => field, :value => '2')
+    CustomValue.create!(:customized => Issue.find(2), :custom_field => field, :value => '7')
+    Issue.where(:id => 1).update_all(:assigned_to_id => 2)
+    Issue.where(:id => 2).update_all(:assigned_to_id => 3)
+
+    q = IssueQuery.new(:group_by => 'assigned_to')
+    assert_equal(
+      {User.find(2) => 2, User.find(3) => 7},
+      q.total_by_group_for("cf_#{field.id}")
+    )
+  end
+
+  def test_total_for_float_custom_field
+    field = IssueCustomField.generate!(:field_format => 'float', :is_for_all => true)
+    CustomValue.create!(:customized => Issue.find(1), :custom_field => field, :value => '2.3')
+    CustomValue.create!(:customized => Issue.find(2), :custom_field => field, :value => '7')
+    CustomValue.create!(:customized => Issue.find(3), :custom_field => field, :value => '')
+
+    q = IssueQuery.new
+    assert_equal 9.3, q.total_for("cf_#{field.id}")
   end
 
   def test_invalid_query_should_raise_query_statement_invalid_error
@@ -1330,7 +1610,6 @@ class QueryTest < ActiveSupport::TestCase
     setup_member_of_group
     @query.add_filter('member_of_group', '=', [@group.id.to_s])
 
-    assert_query_statement_includes @query, "#{Issue.table_name}.assigned_to_id IN ('#{@user_in_group.id}','#{@second_user_in_group.id}','#{@group.id}')"
     assert_find_issues_with_query_is_successful @query
   end
 
@@ -1338,8 +1617,6 @@ class QueryTest < ActiveSupport::TestCase
     setup_member_of_group
     @query.add_filter('member_of_group', '!*', [''])
 
-    # Users not in a group
-    assert_query_statement_includes @query, "#{Issue.table_name}.assigned_to_id IS NULL OR #{Issue.table_name}.assigned_to_id NOT IN ('#{@user_in_group.id}','#{@second_user_in_group.id}','#{@user_in_group2.id}','#{@group.id}','#{@group2.id}')"
     assert_find_issues_with_query_is_successful @query
   end
 
@@ -1347,8 +1624,6 @@ class QueryTest < ActiveSupport::TestCase
     setup_member_of_group
     @query.add_filter('member_of_group', '*', [''])
 
-    # Only users in a group
-    assert_query_statement_includes @query, "#{Issue.table_name}.assigned_to_id IN ('#{@user_in_group.id}','#{@second_user_in_group.id}','#{@user_in_group2.id}','#{@group.id}','#{@group2.id}')"
     assert_find_issues_with_query_is_successful @query
   end
 
@@ -1453,4 +1728,50 @@ class QueryTest < ActiveSupport::TestCase
     c = QueryColumn.new('foo', :caption => lambda {'Foo'})
     assert_equal 'Foo', c.caption
   end
+
+  def test_date_clause_should_respect_user_time_zone_with_local_default
+    @query = IssueQuery.new(:name => '_')
+
+    # user is in Hawaii (-10)
+    User.current = users(:users_001)
+    User.current.pref.update_attribute :time_zone, 'Hawaii'
+
+    # assume timestamps are stored in server local time
+    local_zone = Time.zone
+
+    from = Date.parse '2016-03-20'
+    to = Date.parse '2016-03-22'
+    assert c = @query.send(:date_clause, 'table', 'field', from, to, false)
+
+    # the dates should have been interpreted in the user's time zone and
+    # converted to local time
+    # what we get exactly in the sql depends on the local time zone, therefore
+    # it's computed here.
+    f = User.current.time_zone.local(from.year, from.month, from.day).yesterday.end_of_day.in_time_zone(local_zone)
+    t = User.current.time_zone.local(to.year, to.month, to.day).end_of_day.in_time_zone(local_zone)
+    assert_equal "table.field > '#{Query.connection.quoted_date f}' AND table.field <= '#{Query.connection.quoted_date t}'", c
+  end
+
+  def test_date_clause_should_respect_user_time_zone_with_utc_default
+    @query = IssueQuery.new(:name => '_')
+
+    # user is in Hawaii (-10)
+    User.current = users(:users_001)
+    User.current.pref.update_attribute :time_zone, 'Hawaii'
+
+    # assume timestamps are stored as utc
+    ActiveRecord::Base.default_timezone = :utc
+
+    from = Date.parse '2016-03-20'
+    to = Date.parse '2016-03-22'
+    assert c = @query.send(:date_clause, 'table', 'field', from, to, false)
+    # the dates should have been interpreted in the user's time zone and
+    # converted to utc. March 20 in Hawaii begins at 10am UTC.
+    f = Time.new(2016, 3, 20, 9, 59, 59, 0).end_of_hour
+    t = Time.new(2016, 3, 23, 9, 59, 59, 0).end_of_hour
+    assert_equal "table.field > '#{Query.connection.quoted_date f}' AND table.field <= '#{Query.connection.quoted_date t}'", c
+  ensure
+    ActiveRecord::Base.default_timezone = :local # restore Redmine default
+  end
+
 end

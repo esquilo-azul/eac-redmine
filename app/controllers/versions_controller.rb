@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -36,11 +36,11 @@ class VersionsController < ApplicationController
         @with_subprojects = params[:with_subprojects].nil? ? Setting.display_subprojects_issues? : (params[:with_subprojects] == '1')
         project_ids = @with_subprojects ? @project.self_and_descendants.collect(&:id) : [@project.id]
 
-        @versions = @project.shared_versions || []
-        @versions += @project.rolled_up_versions.visible if @with_subprojects
+        @versions = @project.shared_versions.preload(:custom_values)
+        @versions += @project.rolled_up_versions.visible.preload(:custom_values) if @with_subprojects
         @versions = @versions.uniq.sort
         unless params[:completed]
-          @completed_versions = @versions.select {|version| version.closed? || version.completed? }
+          @completed_versions = @versions.select(&:completed?)
           @versions -= @completed_versions
         end
 
@@ -146,7 +146,7 @@ class VersionsController < ApplicationController
   end
 
   def destroy
-    if @version.fixed_issues.empty?
+    if @version.deletable?
       @version.destroy
       respond_to do |format|
         format.html { redirect_back_or_default settings_project_path(@project, :tab => 'versions') }

@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@ class RoutingAdminTest < Redmine::RoutingTest
     should_route 'GET /admin/projects' => 'admin#projects'
     should_route 'GET /admin/plugins' => 'admin#plugins'
     should_route 'GET /admin/info' => 'admin#info'
-    should_route 'GET /admin/test_email' => 'admin#test_email'
+    should_route 'POST /admin/test_email' => 'admin#test_email'
     should_route 'POST /admin/default_configuration' => 'admin#default_configuration'
   end
 end

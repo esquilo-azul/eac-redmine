@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,8 +22,10 @@ module SettingsHelper
     tabs = [{:name => 'general', :partial => 'settings/general', :label => :label_general},
             {:name => 'display', :partial => 'settings/display', :label => :label_display},
             {:name => 'authentication', :partial => 'settings/authentication', :label => :label_authentication},
+            {:name => 'api', :partial => 'settings/api', :label => :label_api},
             {:name => 'projects', :partial => 'settings/projects', :label => :label_project_plural},
             {:name => 'issues', :partial => 'settings/issues', :label => :label_issue_tracking},
+            {:name => 'attachments', :partial => 'settings/attachments', :label => :label_attachment_plural},
             {:name => 'notifications', :partial => 'settings/notifications', :label => :field_mail_notification},
             {:name => 'mail_handler', :partial => 'settings/mail_handler', :label => :label_incoming_emails},
             {:name => 'repositories', :partial => 'settings/repositories', :label => :label_repository_plural}
@@ -79,7 +81,12 @@ module SettingsHelper
 
   def setting_label(setting, options={})
     label = options.delete(:label)
-    label != false ? label_tag("settings_#{setting}", l(label || "setting_#{setting}"), options[:label_options]).html_safe : ''
+    if label == false
+      ''
+    else
+      text = label.is_a?(String) ? label : l(label || "setting_#{setting}")
+      label_tag("settings_#{setting}", text, options[:label_options])
+    end
   end
 
   # Renders a notification field for a Redmine::Notifiable option
@@ -104,6 +111,25 @@ module SettingsHelper
     content_tag(:label, tag + text, options)
   end
 
+  def session_lifetime_options
+    options = [[l(:label_disabled), 0]]
+    options += [4, 8, 12].map {|hours|
+      [l('datetime.distance_in_words.x_hours', :count => hours), (hours * 60).to_s]
+    }
+    options += [1, 7, 30, 60, 365].map {|days|
+      [l('datetime.distance_in_words.x_days', :count => days), (days * 24 * 60).to_s]
+    }
+    options
+  end
+
+  def session_timeout_options
+    options = [[l(:label_disabled), 0]]
+    options += [1, 2, 4, 8, 12, 24, 48].map {|hours|
+      [l('datetime.distance_in_words.x_hours', :count => hours), (hours * 60).to_s]
+    }
+    options
+  end
+
   def link_copied_issue_options
     options = [
       [:general_text_Yes, 'yes'],
@@ -124,5 +150,43 @@ module SettingsHelper
     ]
 
     options.map {|label, value| [l(label), value.to_s]}
+  end
+
+  def parent_issue_dates_options
+    options = [
+      [:label_parent_task_attributes_derived, 'derived'],
+      [:label_parent_task_attributes_independent, 'independent']
+    ]
+
+    options.map {|label, value| [l(label), value.to_s]}
+  end
+
+  def parent_issue_priority_options
+    options = [
+      [:label_parent_task_attributes_derived, 'derived'],
+      [:label_parent_task_attributes_independent, 'independent']
+    ]
+
+    options.map {|label, value| [l(label), value.to_s]}
+  end
+
+  def parent_issue_done_ratio_options
+    options = [
+      [:label_parent_task_attributes_derived, 'derived'],
+      [:label_parent_task_attributes_independent, 'independent']
+    ]
+
+    options.map {|label, value| [l(label), value.to_s]}
+  end
+
+  # Returns the options for the date_format setting
+  def date_format_setting_options(locale)
+    Setting::DATE_FORMATS.map do |f|
+      today = ::I18n.l(User.current.today, :locale => locale, :format => f)
+      format = f.gsub('%', '').gsub(/[dmY]/) do
+        {'d' => 'dd', 'm' => 'mm', 'Y' => 'yyyy'}[$&]
+      end
+      ["#{today} (#{format})", f]
+    end
   end
 end

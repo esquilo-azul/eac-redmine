@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -197,7 +197,7 @@ class BoardsControllerTest < ActionController::TestCase
 
   def test_update_position
     @request.session[:user_id] = 2
-    put :update, :project_id => 1, :id => 2, :board => { :move_to => 'highest'}
+    put :update, :project_id => 1, :id => 2, :board => { :position => 1}
     assert_redirected_to '/projects/ecookbook/settings/boards'
     board = Board.find(2)
     assert_equal 1, board.position

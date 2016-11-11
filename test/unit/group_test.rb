@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -157,5 +157,13 @@ class GroupTest < ActiveSupport::TestCase
       group.users << User.find(1)
     end
     assert_equal 0, group.reload.users.count
+  end
+
+  def test_sorted_scope_should_sort_groups_alphabetically
+    Group.delete_all
+    b = Group.generate!(:name => 'B')
+    a = Group.generate!(:name => 'A')
+
+    assert_equal %w(A B), Group.sorted.to_a.map(&:name)
   end
 end

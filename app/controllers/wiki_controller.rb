@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -58,6 +58,25 @@ class WikiController < ApplicationController
   def date_index
     load_pages_for_index
     @pages_by_date = @pages.group_by {|p| p.updated_on.to_date}
+  end
+
+  def new
+    @page = WikiPage.new(:wiki => @wiki, :title => params[:title])
+    unless User.current.allowed_to?(:edit_wiki_pages, @project)
+      render_403
+      return
+    end
+    if request.post?
+      @page.title = '' unless editable?
+      @page.validate
+      if @page.errors[:title].blank?
+        path = project_wiki_page_path(@project, @page.title)
+        respond_to do |format|
+          format.html { redirect_to path }
+          format.js   { render :js => "window.location = #{path.to_json}" }
+        end
+      end
+    end
   end
 
   # display a page (in editing mode if it doesn't exist)
@@ -152,7 +171,7 @@ class WikiController < ApplicationController
     @content.author = User.current
 
     if @page.save_with_content(@content)
-      attachments = Attachment.attach_files(@page, params[:attachments])
+      attachments = Attachment.attach_files(@page, params[:attachments] || (params[:wiki_page] && params[:wiki_page][:uploads]))
       render_attachment_warning_if_needed(@page)
       call_hook(:controller_wiki_edit_after_save, { :params => params, :page => @page})
 
@@ -266,9 +285,12 @@ class WikiController < ApplicationController
   def destroy_version
     return render_403 unless editable?
 
-    @content = @page.content_for_version(params[:version])
-    @content.destroy
-    redirect_to_referer_or history_project_wiki_page_path(@project, @page.title)
+    if content = @page.content.versions.find_by_version(params[:version])
+      content.destroy
+      redirect_to_referer_or history_project_wiki_page_path(@project, @page.title)
+    else
+      render_404
+    end
   end
 
   # Export wiki to a single pdf or html file

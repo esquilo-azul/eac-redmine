@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -162,6 +162,25 @@ class Redmine::ApiTest::WikiPagesTest < Redmine::ApiTest::Base
     assert_equal 'API create', page.content.comments
     assert_equal 'jsmith', page.content.author.login
     assert_nil page.parent
+  end
+
+  test "PUT /projects/:project_id/wiki/:title.xml with attachment" do
+    set_tmp_attachments_directory
+    attachment = Attachment.create!(:file => uploaded_test_file("testfile.txt", "text/plain"), :author_id => 2)
+    assert_difference 'WikiPage.count' do
+      assert_difference 'WikiContent::Version.count' do
+        put '/projects/ecookbook/wiki/New_page_from_API.xml',
+            {:wiki_page => {:text => 'New content from API with Attachments', :comments => 'API create with Attachments',
+                            :uploads => [:token => attachment.token, :filename => 'testfile.txt', :content_type => "text/plain"]}},
+            credentials('jsmith')
+        assert_response 201
+      end
+    end
+
+    page = WikiPage.order('id DESC').first
+    assert_equal 'New_page_from_API', page.title
+    assert_include attachment, page.attachments
+    assert_equal attachment.filename, page.attachments.first.filename
   end
 
   test "PUT /projects/:project_id/wiki/:title.xml with parent" do

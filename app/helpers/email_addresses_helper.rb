@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,17 +22,17 @@ module EmailAddressesHelper
   # Returns a link to enable or disable notifications for the address
   def toggle_email_address_notify_link(address)
     if address.notify?
-      link_to image_tag('email.png'),
+      link_to l(:label_disable_notifications),
         user_email_address_path(address.user, address, :notify => '0'),
-        :method => :put,
+        :method => :put, :remote => true,
         :title => l(:label_disable_notifications),
-        :remote => true
+        :class => 'icon-only icon-email'
     else
-      link_to image_tag('email_disabled.png'),
+      link_to l(:label_enable_notifications),
         user_email_address_path(address.user, address, :notify => '1'),
-        :method => :put,
+        :method => :put, :remote => true,
         :title => l(:label_enable_notifications),
-        :remote => true
+        :class => 'icon-only icon-email-disabled'
     end
   end
 end

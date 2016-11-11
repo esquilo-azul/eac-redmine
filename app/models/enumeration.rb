@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@ class Enumeration < ActiveRecord::Base
 
   belongs_to :project
 
-  acts_as_list :scope => 'type = \'#{type}\''
+  acts_as_positioned :scope => :parent_id
   acts_as_customizable
   acts_as_tree
 
@@ -129,11 +129,42 @@ class Enumeration < ActiveRecord::Base
     return new == previous
   end
 
-private
+  private
+
   def check_integrity
     raise "Cannot delete enumeration" if self.in_use?
   end
 
+  # Overrides Redmine::Acts::Positioned#set_default_position so that enumeration overrides
+  # get the same position as the overriden enumeration
+  def set_default_position
+    if position.nil? && parent
+      self.position = parent.position
+    end
+    super
+  end
+
+  # Overrides Redmine::Acts::Positioned#update_position so that overrides get the same
+  # position as the overriden enumeration
+  def update_position
+    super
+    if position_changed?
+      self.class.where.not(:parent_id => nil).update_all(
+        "position = coalesce((
+          select position
+          from (select id, position from enumerations) as parent
+          where parent_id = parent.id), 1)"
+      )
+    end
+  end
+
+  # Overrides Redmine::Acts::Positioned#remove_position so that enumeration overrides
+  # get the same position as the overriden enumeration
+  def remove_position
+    if parent_id.blank?
+      super
+    end
+  end
 end
 
 # Force load the subclasses in development mode

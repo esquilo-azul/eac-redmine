@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@ class WikiControllerTest < ActionController::TestCase
   fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles,
            :enabled_modules, :wikis, :wiki_pages, :wiki_contents,
            :wiki_content_versions, :attachments,
-           :issues, :issue_statuses
+           :issues, :issue_statuses, :trackers
 
   def setup
     User.current = nil
@@ -183,6 +183,64 @@ class WikiControllerTest < ActionController::TestCase
     assert_select 'textarea[name=?]', 'content[text]'
   end
 
+  def test_get_new
+    @request.session[:user_id] = 2
+
+    get :new, :project_id => 'ecookbook'
+    assert_response :success
+    assert_template 'new'
+  end
+
+  def test_get_new_xhr
+    @request.session[:user_id] = 2
+
+    xhr :get, :new, :project_id => 'ecookbook'
+    assert_response :success
+    assert_template 'new'
+  end
+
+  def test_post_new_with_valid_title_should_redirect_to_edit
+    @request.session[:user_id] = 2
+
+    post :new, :project_id => 'ecookbook', :title => 'New Page'
+    assert_redirected_to '/projects/ecookbook/wiki/New_Page'
+  end
+
+  def test_post_new_xhr_with_valid_title_should_redirect_to_edit
+    @request.session[:user_id] = 2
+
+    xhr :post, :new, :project_id => 'ecookbook', :title => 'New Page'
+    assert_response :success
+    assert_equal 'window.location = "/projects/ecookbook/wiki/New_Page"', response.body
+  end
+
+  def test_post_new_with_invalid_title_should_display_errors
+    @request.session[:user_id] = 2
+
+    post :new, :project_id => 'ecookbook', :title => 'Another page'
+    assert_response :success
+    assert_template 'new'
+    assert_select_error 'Title has already been taken'
+  end
+
+  def test_post_new_with_protected_title_should_display_errors
+    Role.find(1).remove_permission!(:protect_wiki_pages)
+    @request.session[:user_id] = 2
+
+    post :new, :project_id => 'ecookbook', :title => 'Sidebar'
+    assert_response :success
+    assert_select_error /Title/
+  end
+
+  def test_post_new_xhr_with_invalid_title_should_display_errors
+    @request.session[:user_id] = 2
+
+    xhr :post, :new, :project_id => 'ecookbook', :title => 'Another page'
+    assert_response :success
+    assert_template 'new'
+    assert_include 'Title has already been taken', response.body
+  end
+
   def test_create_page
     @request.session[:user_id] = 2
     assert_difference 'WikiPage.count' do
@@ -319,7 +377,7 @@ class WikiControllerTest < ActionController::TestCase
           put :update, :project_id => 1,
             :id => 'Another_page',
             :content => {
-              :comments => 'a' * 300,  # failure here, comment is too long
+              :comments => 'a' * 1300,  # failure here, comment is too long
               :text => 'edited'
             },
             :wiki_page => {
@@ -754,6 +812,18 @@ class WikiControllerTest < ActionController::TestCase
         end
       end
     end
+  end
+
+  def test_destroy_invalid_version_should_respond_with_404
+    @request.session[:user_id] = 2
+    assert_no_difference 'WikiContent::Version.count' do
+      assert_no_difference 'WikiContent.count' do
+        assert_no_difference 'WikiPage.count' do
+          delete :destroy_version, :project_id => 'ecookbook', :id => 'CookBook_documentation', :version => 99
+        end
+      end
+    end
+    assert_response 404
   end
 
   def test_index

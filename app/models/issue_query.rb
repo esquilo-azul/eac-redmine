@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -34,7 +34,11 @@ class IssueQuery < Query
     QueryColumn.new(:fixed_version, :sortable => lambda {Version.fields_for_order_statement}, :groupable => true),
     QueryColumn.new(:start_date, :sortable => "#{Issue.table_name}.start_date"),
     QueryColumn.new(:due_date, :sortable => "#{Issue.table_name}.due_date"),
-    QueryColumn.new(:estimated_hours, :sortable => "#{Issue.table_name}.estimated_hours"),
+    QueryColumn.new(:estimated_hours, :sortable => "#{Issue.table_name}.estimated_hours", :totalable => true),
+    QueryColumn.new(:total_estimated_hours,
+      :sortable => "COALESCE((SELECT SUM(estimated_hours) FROM #{Issue.table_name} subtasks" +
+        " WHERE subtasks.root_id = #{Issue.table_name}.root_id AND subtasks.lft >= #{Issue.table_name}.lft AND subtasks.rgt <= #{Issue.table_name}.rgt), 0)",
+      :default_order => 'desc'),
     QueryColumn.new(:done_ratio, :sortable => "#{Issue.table_name}.done_ratio", :groupable => true),
     QueryColumn.new(:created_on, :sortable => "#{Issue.table_name}.created_on", :default_order => 'desc'),
     QueryColumn.new(:closed_on, :sortable => "#{Issue.table_name}.closed_on", :default_order => 'desc'),
@@ -195,19 +199,16 @@ class IssueQuery < Query
       :type => :list_optional, :values => role_values
     ) unless role_values.empty?
 
-    if versions.any?
-      add_available_filter "fixed_version_id",
-        :type => :list_optional,
-        :values => versions.sort.collect{|s| ["#{s.project.name} - #{s.name}", s.id.to_s] }
-    end
+    add_available_filter "fixed_version_id",
+      :type => :list_optional,
+      :values => versions.sort.collect{|s| ["#{s.project.name} - #{s.name}", s.id.to_s] }
 
-    if categories.any?
-      add_available_filter "category_id",
-        :type => :list_optional,
-        :values => categories.collect{|s| [s.name, s.id.to_s] }
-    end
+    add_available_filter "category_id",
+      :type => :list_optional,
+      :values => categories.collect{|s| [s.name, s.id.to_s] }
 
     add_available_filter "subject", :type => :text
+    add_available_filter "description", :type => :text
     add_available_filter "created_on", :type => :date_past
     add_available_filter "updated_on", :type => :date_past
     add_available_filter "closed_on", :type => :date_past
@@ -241,6 +242,10 @@ class IssueQuery < Query
     IssueRelation::TYPES.each do |relation_type, options|
       add_available_filter relation_type, :type => :relation, :label => options[:name]
     end
+    add_available_filter "parent_id", :type => :tree, :label => :field_parent_issue
+    add_available_filter "child_id", :type => :tree, :label => :label_subtask_plural
+
+    add_available_filter "issue_id", :type => :integer, :label => :label_issue
 
     Tracker.disabled_core_fields(trackers).each {|field|
       delete_available_filter field
@@ -256,14 +261,20 @@ class IssueQuery < Query
                            ).visible.collect {|cf| QueryCustomFieldColumn.new(cf) }
 
     if User.current.allowed_to?(:view_time_entries, project, :global => true)
-      index = nil
-      @available_columns.each_with_index {|column, i| index = i if column.name == :estimated_hours}
+      index = @available_columns.find_index {|column| column.name == :total_estimated_hours}
       index = (index ? index + 1 : -1)
-      # insert the column after estimated_hours or at the end
+      # insert the column after total_estimated_hours or at the end
       @available_columns.insert index, QueryColumn.new(:spent_hours,
         :sortable => "COALESCE((SELECT SUM(hours) FROM #{TimeEntry.table_name} WHERE #{TimeEntry.table_name}.issue_id = #{Issue.table_name}.id), 0)",
         :default_order => 'desc',
-        :caption => :label_spent_time
+        :caption => :label_spent_time,
+        :totalable => true
+      )
+      @available_columns.insert index+1, QueryColumn.new(:total_spent_hours,
+        :sortable => "COALESCE((SELECT SUM(hours) FROM #{TimeEntry.table_name} JOIN #{Issue.table_name} subtasks ON subtasks.id = #{TimeEntry.table_name}.issue_id" +
+          " WHERE subtasks.root_id = #{Issue.table_name}.root_id AND subtasks.lft >= #{Issue.table_name}.lft AND subtasks.rgt <= #{Issue.table_name}.rgt), 0)",
+        :default_order => 'desc',
+        :caption => :label_total_spent_time
       )
     end
 
@@ -288,36 +299,41 @@ class IssueQuery < Query
     end
   end
 
+  def base_scope
+    Issue.visible.joins(:status, :project).where(statement)
+  end
+
   # Returns the issue count
   def issue_count
-    Issue.visible.joins(:status, :project).where(statement).count
+    base_scope.count
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
 
   # Returns the issue count by group or nil if query is not grouped
   def issue_count_by_group
-    r = nil
-    if grouped?
-      begin
-        # Rails3 will raise an (unexpected) RecordNotFound if there's only a nil group value
-        r = Issue.visible.
-          joins(:status, :project).
-          where(statement).
-          joins(joins_for_order_statement(group_by_statement)).
-          group(group_by_statement).
-          count
-      rescue ActiveRecord::RecordNotFound
-        r = {nil => issue_count}
-      end
-      c = group_by_column
-      if c.is_a?(QueryCustomFieldColumn)
-        r = r.keys.inject({}) {|h, k| h[c.custom_field.cast_value(k)] = r[k]; h}
-      end
+    grouped_query do |scope|
+      scope.count
     end
-    r
-  rescue ::ActiveRecord::StatementInvalid => e
-    raise StatementInvalid.new(e.message)
+  end
+
+  # Returns sum of all the issue's estimated_hours
+  def total_for_estimated_hours(scope)
+    map_total(scope.sum(:estimated_hours)) {|t| t.to_f.round(2)}
+  end
+
+  # Returns sum of all the issue's time entries hours
+  def total_for_spent_hours(scope)
+    total = if group_by_column.try(:name) == :project
+      # TODO: remove this when https://github.com/rails/rails/issues/21922 is fixed
+      # We have to do a custom join without the time_entries.project_id column
+      # that would trigger a ambiguous column name error
+      scope.joins("JOIN (SELECT issue_id, hours FROM #{TimeEntry.table_name}) AS joined_time_entries ON joined_time_entries.issue_id = #{Issue.table_name}.id").
+        sum("joined_time_entries.hours")
+    else
+      scope.joins(:time_entries).sum("#{TimeEntry.table_name}.hours")
+    end
+    map_total(total) {|t| t.to_f.round(2)}
   end
 
   # Returns the issues
@@ -344,6 +360,9 @@ class IssueQuery < Query
 
     if has_column?(:spent_hours)
       Issue.load_visible_spent_hours(issues)
+    end
+    if has_column?(:total_spent_hours)
+      Issue.load_visible_total_spent_hours(issues)
     end
     if has_column?(:relations)
       Issue.load_visible_relations(issues)
@@ -451,6 +470,61 @@ class IssueQuery < Query
     "#{Issue.table_name}.is_private #{op} (#{va})"
   end
 
+  def sql_for_parent_id_field(field, operator, value)
+    case operator
+    when "="
+      "#{Issue.table_name}.parent_id = #{value.first.to_i}"
+    when "~"
+      root_id, lft, rgt = Issue.where(:id => value.first.to_i).pluck(:root_id, :lft, :rgt).first
+      if root_id && lft && rgt
+        "#{Issue.table_name}.root_id = #{root_id} AND #{Issue.table_name}.lft > #{lft} AND #{Issue.table_name}.rgt < #{rgt}"
+      else
+        "1=0"
+      end
+    when "!*"
+      "#{Issue.table_name}.parent_id IS NULL"
+    when "*"
+      "#{Issue.table_name}.parent_id IS NOT NULL"
+    end
+  end
+
+  def sql_for_child_id_field(field, operator, value)
+    case operator
+    when "="
+      parent_id = Issue.where(:id => value.first.to_i).pluck(:parent_id).first
+      if parent_id
+        "#{Issue.table_name}.id = #{parent_id}"
+      else
+        "1=0"
+      end
+    when "~"
+      root_id, lft, rgt = Issue.where(:id => value.first.to_i).pluck(:root_id, :lft, :rgt).first
+      if root_id && lft && rgt
+        "#{Issue.table_name}.root_id = #{root_id} AND #{Issue.table_name}.lft < #{lft} AND #{Issue.table_name}.rgt > #{rgt}"
+      else
+        "1=0"
+      end
+    when "!*"
+      "#{Issue.table_name}.rgt - #{Issue.table_name}.lft = 1"
+    when "*"
+      "#{Issue.table_name}.rgt - #{Issue.table_name}.lft > 1"
+    end
+  end
+
+  def sql_for_issue_id_field(field, operator, value)
+    if operator == "="
+      # accepts a comma separated list of ids
+      ids = value.first.to_s.scan(/\d+/).map(&:to_i)
+      if ids.present?
+        "#{Issue.table_name}.id IN (#{ids.join(",")})"
+      else
+        "1=0"
+      end
+    else
+      sql_for_field("id", operator, value, Issue.table_name, "id")
+    end
+  end
+
   def sql_for_relations(field, operator, value, options={})
     relation_options = IssueRelation::TYPES[field]
     return relation_options unless relation_options
@@ -473,6 +547,9 @@ class IssueQuery < Query
         op = (operator == "!p" ? 'NOT IN' : 'IN')
         comp = (operator == "=!p" ? '<>' : '=')
         "#{Issue.table_name}.id #{op} (SELECT DISTINCT #{IssueRelation.table_name}.#{join_column} FROM #{IssueRelation.table_name}, #{Issue.table_name} relissues WHERE #{IssueRelation.table_name}.relation_type = '#{self.class.connection.quote_string(relation_type)}' AND #{IssueRelation.table_name}.#{target_join_column} = relissues.id AND relissues.project_id #{comp} #{value.first.to_i})"
+      when "*o", "!o"
+        op = (operator == "!o" ? 'NOT IN' : 'IN')
+        "#{Issue.table_name}.id #{op} (SELECT DISTINCT #{IssueRelation.table_name}.#{join_column} FROM #{IssueRelation.table_name}, #{Issue.table_name} relissues WHERE #{IssueRelation.table_name}.relation_type = '#{self.class.connection.quote_string(relation_type)}' AND #{IssueRelation.table_name}.#{target_join_column} = relissues.id AND relissues.status_id IN (SELECT id FROM #{IssueStatus.table_name} WHERE is_closed=#{self.class.connection.quoted_false}))"
       end
 
     if relation_options[:sym] == field && !options[:reverse]
@@ -481,6 +558,11 @@ class IssueQuery < Query
     end
     "(#{sql})"
   end
+
+  def find_assigned_to_id_filter_values(values)
+    Principal.visible.where(:id => values).map {|p| [p.name, p.id.to_s]}
+  end
+  alias :find_author_id_filter_values :find_assigned_to_id_filter_values
 
   IssueRelation::TYPES.keys.each do |relation_type|
     alias_method "sql_for_#{relation_type}_field".to_sym, :sql_for_relations

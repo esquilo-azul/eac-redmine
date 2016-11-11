@@ -47,9 +47,18 @@ module RedmineApp
     # Do not include all helpers
     config.action_controller.include_all_helpers = false
 
+    # Do not supress errors in after_rollback and after_commit callbacks
+    config.active_record.raise_in_transactional_callbacks = true
+
     # XML parameter parser removed from core in Rails 4.0
     # and extracted to actionpack-xml_parser gem
     config.middleware.insert_after ActionDispatch::ParamsParser, ActionDispatch::XmlParamsParser
+
+    # Sets the Content-Length header on responses with fixed-length bodies
+    config.middleware.use Rack::ContentLength
+
+    # Verify validity of user sessions
+    config.redmine_verify_sessions = true
 
     # Specific cache for search results, the default file store cache is not
     # a good option as it could grow fast. A memory store (32MB max) is used
@@ -62,12 +71,10 @@ module RedmineApp
     # Configure log level here so that additional environment file
     # can change it (environments/ENV.rb would take precedence over it)
     config.log_level = Rails.env.production? ? :info : :debug
-    
-    config.after_initialize do
-      ActiveRecord::Base.logger = nil
-    end
 
-    config.session_store :cookie_store, :key => '_redmine_session'
+    config.session_store :cookie_store,
+      :key => '_redmine_session',
+      :path => config.relative_url_root || '/'
 
     if File.exists?(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
       instance_eval File.read(File.join(File.dirname(__FILE__), 'additional_environment.rb'))

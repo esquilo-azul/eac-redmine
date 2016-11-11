@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -363,10 +363,14 @@ class Repository < ActiveRecord::Base
   end
 
   def self.factory(klass_name, *args)
-    klass = "Repository::#{klass_name}".constantize
-    klass.new(*args)
-  rescue
-    nil
+    repository_class(klass_name).new(*args) rescue nil
+  end
+
+  def self.repository_class(class_name)
+    class_name = class_name.to_s.camelize
+    if Redmine::Scm::Base.all.include?(class_name)
+      "Repository::#{class_name}".constantize
+    end
   end
 
   def self.scm_adapter_class
@@ -506,9 +510,5 @@ class Repository < ActiveRecord::Base
     self.class.connection.delete("DELETE FROM #{ci} WHERE #{ci}.changeset_id IN (SELECT #{cs}.id FROM #{cs} WHERE #{cs}.repository_id = #{id})")
     self.class.connection.delete("DELETE FROM #{cp} WHERE #{cp}.changeset_id IN (SELECT #{cs}.id FROM #{cs} WHERE #{cs}.repository_id = #{id})")
     self.class.connection.delete("DELETE FROM #{cs} WHERE #{cs}.repository_id = #{id}")
-    clear_extra_info_of_changesets
-  end
-
-  def clear_extra_info_of_changesets
   end
 end

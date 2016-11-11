@@ -4,9 +4,18 @@ module ActiveRecord
   class Base
     include Redmine::I18n
     # Translate attribute names for validation errors display
-    def self.human_attribute_name(attr, *args)
-      attr = attr.to_s.sub(/_id$/, '').sub(/^.+\./, '')
-      l("field_#{name.underscore.gsub('/', '_')}_#{attr}", :default => ["field_#{attr}".to_sym, attr])
+    def self.human_attribute_name(attr, options = {})
+      prepared_attr = attr.to_s.sub(/_id$/, '').sub(/^.+\./, '')
+      class_prefix = name.underscore.gsub('/', '_')
+
+      redmine_default = [
+        :"field_#{class_prefix}_#{prepared_attr}",
+        :"field_#{prepared_attr}"
+      ]
+
+      options[:default] = redmine_default + Array(options[:default])
+
+      super
     end
   end
 
@@ -43,7 +52,7 @@ module ActionView
   class Resolver
     def find_all(name, prefix=nil, partial=false, details={}, key=nil, locals=[])
       cached(key, [name, prefix, partial], details, locals) do
-        if details[:formats] & [:xml, :json]
+        if (details[:formats] & [:xml, :json]).any?
           details = details.dup
           details[:formats] = details[:formats].dup + [:api]
         end

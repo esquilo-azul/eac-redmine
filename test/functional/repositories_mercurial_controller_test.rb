@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -265,10 +265,7 @@ class RepositoriesMercurialControllerTest < ActionController::TestCase
     end
 
     def test_entry_binary_force_download
-      get :entry, :id => PRJ_ID, :rev => 1,
-          :path => repository_path_hash(['images', 'edit.png'])[:param]
-      assert_response :success
-      assert_equal 'image/png', @response.content_type
+      # TODO: add a binary file which is not an image to the test repo
     end
 
     def test_directory_entry

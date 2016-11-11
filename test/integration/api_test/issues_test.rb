@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -169,16 +169,23 @@ class Redmine::ApiTest::IssuesTest < Redmine::ApiTest::Base
   end
 
   test "GET /issues/:id.xml with journals" do
-    get '/issues/1.xml?include=journals'
+    Journal.find(2).update_attribute(:private_notes, true)
+
+    get '/issues/1.xml?include=journals', {}, credentials('jsmith')
 
     assert_select 'issue journals[type=array]' do
       assert_select 'journal[id="1"]' do
+        assert_select 'private_notes', :text => 'false'
         assert_select 'details[type=array]' do
           assert_select 'detail[name=status_id]' do
             assert_select 'old_value', :text => '1'
             assert_select 'new_value', :text => '2'
           end
         end
+      end
+      assert_select 'journal[id="2"]' do
+        assert_select 'private_notes', :text => 'true'
+        assert_select 'details[type=array]'
       end
     end
   end
@@ -336,6 +343,84 @@ class Redmine::ApiTest::IssuesTest < Redmine::ApiTest::Base
     end
   end
 
+  test "GET /issues/:id.xml should not disclose associated changesets from projects the user has no access to" do
+    project = Project.generate!(:is_public => false)
+    repository = Repository::Subversion.create!(:project => project, :url => "svn://localhost")
+    Issue.find(1).changesets << Changeset.generate!(:repository => repository)
+    assert Issue.find(1).changesets.any?
+
+    get '/issues/1.xml?include=changesets', {}, credentials('jsmith')
+
+    # the user jsmith has no permission to view the associated changeset
+    assert_select 'issue changesets[type=array]' do
+      assert_select 'changeset', 0
+    end
+  end
+
+  test "GET /issues/:id.xml should contains total_estimated_hours and total_spent_hours" do
+    parent = Issue.find(3)
+    child = Issue.generate!(:parent_issue_id => parent.id, :estimated_hours => 3.0)
+    TimeEntry.create!(:project => child.project, :issue => child, :user => child.author, :spent_on => child.author.today,
+                      :hours => '2.5', :comments => '', :activity_id => TimeEntryActivity.first.id)
+    get '/issues/3.xml'
+
+    assert_equal 'application/xml', response.content_type
+    assert_select 'issue' do
+      assert_select 'estimated_hours',       parent.estimated_hours.to_s
+      assert_select 'total_estimated_hours', (parent.estimated_hours.to_f + 3.0).to_s
+      assert_select 'spent_hours',           parent.spent_hours.to_s
+      assert_select 'total_spent_hours',     (parent.spent_hours.to_f + 2.5).to_s
+    end
+  end
+
+  test "GET /issues/:id.xml should contains total_estimated_hours, and should not contains spent_hours and total_spent_hours when permission does not exists" do
+    parent = Issue.find(3)
+    child = Issue.generate!(:parent_issue_id => parent.id, :estimated_hours => 3.0)
+    # remove permission!
+    Role.anonymous.remove_permission! :view_time_entries
+    #Role.all.each { |role| role.remove_permission! :view_time_entries }
+    get '/issues/3.xml'
+
+    assert_equal 'application/xml', response.content_type
+    assert_select 'issue' do
+      assert_select 'estimated_hours',       parent.estimated_hours.to_s
+      assert_select 'total_estimated_hours', (parent.estimated_hours.to_f + 3.0).to_s
+      assert_select 'spent_hours',           false
+      assert_select 'total_spent_hours',     false
+    end
+  end
+
+  test "GET /issues/:id.json should contains total_estimated_hours and total_spent_hours" do
+    parent = Issue.find(3)
+    child = Issue.generate!(:parent_issue_id => parent.id, :estimated_hours => 3.0)
+    TimeEntry.create!(:project => child.project, :issue => child, :user => child.author, :spent_on => child.author.today,
+                      :hours => '2.5', :comments => '', :activity_id => TimeEntryActivity.first.id)
+    get '/issues/3.json'
+
+    assert_equal 'application/json', response.content_type
+    json = ActiveSupport::JSON.decode(response.body)
+    assert_equal parent.estimated_hours, json['issue']['estimated_hours']
+    assert_equal (parent.estimated_hours.to_f + 3.0), json['issue']['total_estimated_hours']
+    assert_equal parent.spent_hours, json['issue']['spent_hours']
+    assert_equal (parent.spent_hours.to_f + 2.5), json['issue']['total_spent_hours']
+  end
+
+  test "GET /issues/:id.json should contains total_estimated_hours, and should not contains spent_hours and total_spent_hours when permission does not exists" do
+    parent = Issue.find(3)
+    child = Issue.generate!(:parent_issue_id => parent.id, :estimated_hours => 3.0)
+    # remove permission!
+    Role.anonymous.remove_permission! :view_time_entries
+    #Role.all.each { |role| role.remove_permission! :view_time_entries }
+    get '/issues/3.json'
+
+    assert_equal 'application/json', response.content_type
+    json = ActiveSupport::JSON.decode(response.body)
+    assert_equal parent.estimated_hours, json['issue']['estimated_hours']
+    assert_equal (parent.estimated_hours.to_f + 3.0), json['issue']['total_estimated_hours']
+    assert_equal nil, json['issue']['spent_hours']
+    assert_equal nil, json['issue']['total_spent_hours']
+  end
+
   test "POST /issues.xml should create an issue with the attributes" do
 
 payload = <<-XML
@@ -406,6 +491,16 @@ JSON
     assert_equal 'API test', issue.subject
   end
 
+  test "POST /issues.json should accept project identifier as project_id" do
+    assert_difference('Issue.count') do
+      post '/issues.json',
+        {:issue => {:project_id => 'subproject1', :tracker_id => 2, :subject => 'Foo'}},
+        credentials('jsmith')
+
+      assert_response :created
+    end
+  end
+
   test "POST /issues.json without tracker_id should accept custom fields" do
     field = IssueCustomField.generate!(
       :field_format => 'list',
@@ -433,6 +528,28 @@ JSON
     assert_response :created
     issue = Issue.order('id DESC').first
     assert_equal ["V1", "V3"], issue.custom_field_value(field).sort
+  end
+
+  test "POST /issues.json with omitted custom field should set default value" do
+    field = IssueCustomField.generate!(:default_value => "Default")
+
+    issue = new_record(Issue) do
+      post '/issues.json',
+        {:issue => {:project_id => 1, :subject => 'API', :custom_field_values => {}}},
+        credentials('jsmith')
+    end
+    assert_equal "Default", issue.custom_field_value(field)
+  end
+
+  test "POST /issues.json with custom field set to blank should not set default value" do
+    field = IssueCustomField.generate!(:default_value => "Default")
+
+    issue = new_record(Issue) do
+      post '/issues.json',
+        {:issue => {:project_id => 1, :subject => 'API', :custom_field_values => {field.id.to_s => ""}}},
+        credentials('jsmith')
+    end
+    assert_equal "", issue.custom_field_value(field)
   end
 
   test "POST /issues.json with failure should return errors" do
@@ -499,6 +616,73 @@ JSON
     issue = Issue.find(3)
     assert_equal 2, issue.project_id
     assert_equal 'Project changed', issue.subject
+  end
+
+  test "PUT /issues/:id.xml with notes only" do
+    assert_difference('Journal.count') do
+      put '/issues/6.xml',
+        {:issue => {:notes => 'Notes only'}},
+        credentials('jsmith')
+    end
+
+    journal = Journal.last
+    assert_equal "Notes only", journal.notes
+  end
+
+  test "PUT /issues/:id.json with omitted custom field should not change blank value to default value" do
+    field = IssueCustomField.generate!(:default_value => "Default")
+    issue = Issue.generate!(:project_id => 1, :tracker_id => 1, :custom_field_values => {field.id.to_s => ""})
+    assert_equal "", issue.reload.custom_field_value(field)
+
+    assert_difference('Journal.count') do
+      put "/issues/#{issue.id}.json",
+        {:issue => {:custom_field_values => {}, :notes => 'API'}},
+        credentials('jsmith')
+    end
+
+    assert_equal "", issue.reload.custom_field_value(field)
+  end
+
+  test "PUT /issues/:id.json with custom field set to blank should not change blank value to default value" do
+    field = IssueCustomField.generate!(:default_value => "Default")
+    issue = Issue.generate!(:project_id => 1, :tracker_id => 1, :custom_field_values => {field.id.to_s => ""})
+    assert_equal "", issue.reload.custom_field_value(field)
+
+    assert_difference('Journal.count') do
+      put "/issues/#{issue.id}.json",
+        {:issue => {:custom_field_values => {field.id.to_s => ""}, :notes => 'API'}},
+        credentials('jsmith')
+    end
+
+    assert_equal "", issue.reload.custom_field_value(field)
+  end
+
+  test "PUT /issues/:id.json with tracker change and omitted custom field specific to that tracker should set default value" do
+    field = IssueCustomField.generate!(:default_value => "Default", :tracker_ids => [2])
+    issue = Issue.generate!(:project_id => 1, :tracker_id => 1)
+
+    assert_difference('Journal.count') do
+      put "/issues/#{issue.id}.json",
+        {:issue => {:tracker_id => 2, :custom_field_values => {}, :notes => 'API'}},
+        credentials('jsmith')
+    end
+
+    assert_equal 2, issue.reload.tracker_id
+    assert_equal "Default", issue.reload.custom_field_value(field)
+  end
+
+  test "PUT /issues/:id.json with tracker change and custom field specific to that tracker set to blank should not set default value" do
+    field = IssueCustomField.generate!(:default_value => "Default", :tracker_ids => [2])
+    issue = Issue.generate!(:project_id => 1, :tracker_id => 1)
+
+    assert_difference('Journal.count') do
+      put "/issues/#{issue.id}.json",
+        {:issue => {:tracker_id => 2, :custom_field_values => {field.id.to_s => ""}, :notes => 'API'}},
+        credentials('jsmith')
+    end
+
+    assert_equal 2, issue.reload.tracker_id
+    assert_equal "", issue.reload.custom_field_value(field)
   end
 
   test "PUT /issues/:id.xml with failed update" do

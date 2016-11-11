@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -26,6 +26,14 @@ module RoutesHelper
       project_issues_path(project, *args)
     else
       issues_path(*args)
+    end
+  end
+
+  def _new_project_issue_path(project, *args)
+    if project
+      new_project_issue_path(project, *args)
+    else
+      new_issue_path(*args)
     end
   end
 
@@ -65,5 +73,9 @@ module RoutesHelper
     else
       new_time_entry_path(*args)
     end
+  end
+
+  def board_path(board, *args)
+    project_board_path(board.project, board, *args)
   end
 end

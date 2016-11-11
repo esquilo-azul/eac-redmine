@@ -165,6 +165,7 @@
 #  class RedCloth::Textile.new( str )
 
 class RedCloth3 < String
+    include Redmine::Helpers::URL
 
     VERSION = '3.0.4'
     DEFAULT_RULES = [:textile, :markdown]
@@ -384,7 +385,7 @@ class RedCloth3 < String
                 (?!\-\-)
                 (#{QTAGS_JOIN}|)      # oqs
                 (#{rcq})              # qtag
-                (\w|[^\s].*?[^\s])    # content
+                ([[:word:]]|[^\s].*?[^\s])    # content
                 (?!\-\-)
                 #{rcq}
                 (#{QTAGS_JOIN}|)      # oqa
@@ -393,7 +394,7 @@ class RedCloth3 < String
                 /(#{rcq})
                 (#{C})
                 (?::(\S+))?
-                (\w|[^\s\-].*?[^\s\-])
+                ([[:word:]]|[^\s\-].*?[^\s\-])
                 #{rcq}/xm 
             end
         [rc, ht, re, rtype]
@@ -525,7 +526,7 @@ class RedCloth3 < String
             tatts = pba( tatts, 'table' )
             tatts = shelve( tatts ) if tatts
             rows = []
-            fullrow.gsub!(/([^|])\n/, "\\1<br />")
+            fullrow.gsub!(/([^|\s])\s*\n/, "\\1<br />")
             fullrow.each_line do |row|
                 ratts, row = pba( $1, 'tr' ), $2 if row =~ /^(#{A}#{C}\. )(.*)/m
                 cells = []
@@ -960,6 +961,8 @@ class RedCloth3 < String
             href, alt_title = check_refs( href ) if href
             url, url_title = check_refs( url )
 
+            return m unless uri_with_safe_scheme?(url)
+
             out = ''
             out << "<a#{ shelve( " href=\"#{ href }\"" ) }>" if href
             out << "<img#{ shelve( atts ) } />"
@@ -970,7 +973,7 @@ class RedCloth3 < String
                 if stln == "<p>"
                     out = "<p style=\"float:#{ algn }\">#{ out }"
                 else
-                    out = "#{ stln }<div style=\"float:#{ algn }\">#{ out }</div>"
+                    out = "#{ stln }<span style=\"float:#{ algn }\">#{ out }</span>"
                 end
             else
                 out = stln + out

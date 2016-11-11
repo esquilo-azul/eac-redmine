@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -26,6 +26,13 @@ class DocumentTest < ActiveSupport::TestCase
   def test_create
     doc = Document.new(:project => Project.find(1), :title => 'New document', :category => Enumeration.find_by_name('User documentation'))
     assert doc.save
+  end
+
+  def test_create_with_long_title
+    title = 'x'*255
+    doc = Document.new(:project => Project.find(1), :title => title, :category => DocumentCategory.first)
+    assert_save doc
+    assert_equal title, doc.reload.title
   end
 
   def test_create_should_send_email_notification

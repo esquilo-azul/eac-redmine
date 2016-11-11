@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -62,8 +62,8 @@ class QueriesHelperTest < ActionView::TestCase
   def test_filters_options_for_select_should_group_relations_filters
     with_locale 'en' do
       options = filters_options_for_select(IssueQuery.new)
-      assert_select_in options, 'optgroup[label=?]', 'Related issues', 1
-      assert_select_in options, 'optgroup[label=?] > option', 'Related issues', 9
+      assert_select_in options, 'optgroup[label=?]', 'Relations', 1
+      assert_select_in options, 'optgroup[label=?] > option', 'Relations', 11
       assert_select_in options, 'optgroup > option[value=relates]', :text => 'Related to'
     end
   end

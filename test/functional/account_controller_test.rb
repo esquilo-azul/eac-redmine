@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -63,6 +63,7 @@ class AccountControllerTest < ActionController::TestCase
     # request.uri is "test.host" in test environment
     back_urls = [
       'http://test.host/issues/show/1',
+      'http://test.host/',
       '/'
     ]
     back_urls.each do |back_url|
@@ -108,7 +109,16 @@ class AccountControllerTest < ActionController::TestCase
       'http://test.host/fake/issues',
       'http://test.host/redmine/../fake',
       'http://test.host/redmine/../fake/issues',
-      'http://test.host/redmine/%2e%2e/fake'
+      'http://test.host/redmine/%2e%2e/fake',
+      '//test.foo/fake',
+      'http://test.host//fake',
+      'http://test.host/\n//fake',
+      '//bar@test.foo',
+      '//test.foo',
+      '////test.foo',
+      '@test.foo',
+      'fake@test.foo',
+      '.test.foo'
     ]
     back_urls.each do |back_url|
       post :login, :username => 'jsmith', :password => 'jsmith', :back_url => back_url
@@ -237,6 +247,18 @@ class AccountControllerTest < ActionController::TestCase
     end
   end
 
+  def test_get_register_should_show_hide_mail_preference
+    get :register
+    assert_select 'input[name=?][checked=checked]', 'pref[hide_mail]'
+  end
+
+  def test_get_register_should_show_hide_mail_preference_with_setting_turned_off
+    with_settings :default_users_hide_mail => '0' do
+      get :register
+      assert_select 'input[name=?]:not([checked=checked])', 'pref[hide_mail]'
+    end
+  end
+
   # See integration/account_test.rb for the full test
   def test_post_register_with_registration_on
     with_settings :self_registration => '3' do
@@ -277,6 +299,22 @@ class AccountControllerTest < ActionController::TestCase
     end
   end
 
+  def test_post_register_should_create_user_with_hide_mail_preference
+    with_settings :default_users_hide_mail => '0' do
+      user = new_record(User) do
+        post :register, :user => {
+          :login => 'register',
+          :password => 'secret123', :password_confirmation => 'secret123',
+          :firstname => 'John', :lastname => 'Doe',
+          :mail => 'register@example.com'
+        }, :pref => {
+          :hide_mail => '1'
+        }
+      end
+      assert_equal true, user.pref.hide_mail
+    end
+  end
+
   def test_get_lost_password_should_display_lost_password_form
     get :lost_password
     assert_response :success
@@ -288,10 +326,8 @@ class AccountControllerTest < ActionController::TestCase
     ActionMailer::Base.deliveries.clear
     assert_difference 'ActionMailer::Base.deliveries.size' do
       assert_difference 'Token.count' do
-        with_settings :host_name => 'mydomain.foo', :protocol => 'http' do
-          post :lost_password, :mail => 'JSmith@somenet.foo'
-          assert_redirected_to '/login'
-        end
+        post :lost_password, :mail => 'JSmith@somenet.foo'
+        assert_redirected_to '/login'
       end
     end
 
@@ -300,7 +336,7 @@ class AccountControllerTest < ActionController::TestCase
     assert_equal 'recovery', token.action
 
     assert_select_email do
-      assert_select "a[href=?]", "http://mydomain.foo/account/lost_password?token=#{token.value}"
+      assert_select "a[href=?]", "http://localhost:3000/account/lost_password?token=#{token.value}"
     end
   end
 
@@ -362,6 +398,7 @@ class AccountControllerTest < ActionController::TestCase
   end
 
   def test_post_lost_password_with_token_should_change_the_user_password
+    ActionMailer::Base.deliveries.clear
     user = User.find(2)
     token = Token.create!(:action => 'recovery', :user => user)
 
@@ -370,6 +407,10 @@ class AccountControllerTest < ActionController::TestCase
     user.reload
     assert user.check_password?('newpass123')
     assert_nil Token.find_by_id(token.id), "Token was not deleted"
+    assert_not_nil (mail = ActionMailer::Base.deliveries.last)
+    assert_select_email do
+      assert_select 'a[href^=?]', 'http://localhost:3000/my/password', :text => 'Change password'
+    end
   end
 
   def test_post_lost_password_with_token_for_non_active_user_should_fail

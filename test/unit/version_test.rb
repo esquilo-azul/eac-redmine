@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -138,6 +138,11 @@ class VersionTest < ActiveSupport::TestCase
     assert_equal false, version.completed?
   end
 
+  def test_completed_should_be_true_when_closed
+    version = Version.create!(:project_id => 1, :status => 'closed', :name => 'Closed')
+    assert_equal true, version.completed?
+  end
+
   test "#behind_schedule? should be false if there are no issues assigned" do
     version = Version.generate!(:effective_date => Date.yesterday)
     assert_equal false, version.behind_schedule?
@@ -233,6 +238,27 @@ class VersionTest < ActiveSupport::TestCase
     # Project 2 issue remains
     project_2_issue.reload
     assert_equal @version, project_2_issue.fixed_version
+  end
+
+  def test_deletable_should_return_true_when_not_referenced
+    version = Version.generate!
+
+    assert_equal true, version.deletable?
+  end
+
+  def test_deletable_should_return_false_when_referenced_by_an_issue
+    version = Version.generate!
+    Issue.generate!(:fixed_version => version)
+
+    assert_equal false, version.deletable?
+  end
+
+  def test_deletable_should_return_false_when_referenced_by_a_custom_field
+    version = Version.generate!
+    field = IssueCustomField.generate!(:field_format => 'version')
+    value = CustomValue.create!(:custom_field => field, :customized => Issue.first, :value => version.id)
+
+    assert_equal false, version.deletable?
   end
 
   private

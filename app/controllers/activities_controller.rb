@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@ class ActivitiesController < ApplicationController
       begin; @date_to = params[:from].to_date + 1; rescue; end
     end
 
-    @date_to ||= Date.today + 1
+    @date_to ||= User.current.today + 1
     @date_from = @date_to - @days
     @with_subprojects = params[:with_subprojects].nil? ? Setting.display_subprojects_issues? : (params[:with_subprojects] == '1')
     if params[:user_id].present?
@@ -37,8 +37,21 @@ class ActivitiesController < ApplicationController
     @activity = Redmine::Activity::Fetcher.new(User.current, :project => @project,
                                                              :with_subprojects => @with_subprojects,
                                                              :author => @author)
+    pref = User.current.pref
     @activity.scope_select {|t| !params["show_#{t}"].nil?}
-    @activity.scope = (@author.nil? ? :default : :all) if @activity.scope.empty?
+    if @activity.scope.present?
+      if params[:submit].present?
+        pref.activity_scope = @activity.scope
+        pref.save
+      end
+    else
+      if @author.nil?
+        scope = pref.activity_scope & @activity.event_types
+        @activity.scope = scope.present? ? scope : :default
+      else
+        @activity.scope = :all
+      end
+    end
 
     events = @activity.events(@date_from, @date_to)
 

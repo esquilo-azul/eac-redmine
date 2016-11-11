@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -47,20 +47,25 @@ class User < Principal
         :order => %w(lastname firstname id),
         :setting_order => 4
       },
-    :lastname_coma_firstname => {
-        :string => '#{lastname}, #{firstname}',
+    :lastnamefirstname => {
+        :string => '#{lastname}#{firstname}',
         :order => %w(lastname firstname id),
         :setting_order => 5
+      },
+    :lastname_comma_firstname => {
+        :string => '#{lastname}, #{firstname}',
+        :order => %w(lastname firstname id),
+        :setting_order => 6
       },
     :lastname => {
         :string => '#{lastname}',
         :order => %w(lastname id),
-        :setting_order => 6
+        :setting_order => 7
       },
     :username => {
         :string => '#{login}',
         :order => %w(login id),
-        :setting_order => 7
+        :setting_order => 8
       },
   }
 
@@ -92,6 +97,8 @@ class User < Principal
 
   attr_accessor :password, :password_confirmation, :generate_password
   attr_accessor :last_before_login_on
+  attr_accessor :remote_ip
+
   # Prevents unauthorized assignments
   attr_protected :login, :admin, :password, :password_confirmation, :hashed_password
 
@@ -112,11 +119,14 @@ class User < Principal
     end
   end
 
+  self.valid_statuses = [STATUS_ACTIVE, STATUS_REGISTERED, STATUS_LOCKED]
+
   before_validation :instantiate_email_address
   before_create :set_mail_notification
   before_save   :generate_password_if_needed, :update_hashed_password
   before_destroy :remove_references_before_destroy
-  after_save :update_notified_project_ids, :destroy_tokens
+  after_save :update_notified_project_ids, :destroy_tokens, :deliver_security_notification
+  after_destroy :deliver_security_notification
 
   scope :in_group, lambda {|group|
     group_id = group.is_a?(Group) ? group.id : group.to_i
@@ -130,7 +140,7 @@ class User < Principal
   scope :having_mail, lambda {|arg|
     addresses = Array.wrap(arg).map {|a| a.to_s.downcase}
     if addresses.any?
-      joins(:email_addresses).where("LOWER(address) IN (?)", addresses).uniq
+      joins(:email_addresses).where("LOWER(#{EmailAddress.table_name}.address) IN (?)", addresses).uniq
     else
       none
     end
@@ -157,6 +167,7 @@ class User < Principal
     @notified_projects_ids_changed = false
     @builtin_role = nil
     @visible_project_ids = nil
+    @managed_roles = nil
     base_reload(*args)
   end
 
@@ -323,8 +334,19 @@ class User < Principal
     return auth_source.allow_password_changes?
   end
 
+  # Returns true if the user password has expired
+  def password_expired?
+    period = Setting.password_max_age.to_i
+    if period.zero?
+      false
+    else
+      changed_on = self.passwd_changed_on || Time.at(0)
+      changed_on < period.days.ago
+    end
+  end
+
   def must_change_password?
-    must_change_passwd? && change_password_allowed?
+    (must_change_passwd? || password_expired?) && change_password_allowed?
   end
 
   def generate_password?
@@ -380,6 +402,26 @@ class User < Principal
       create_api_token(:action => 'api')
     end
     api_token.value
+  end
+
+  # Generates a new session token and returns its value
+  def generate_session_token
+    token = Token.create!(:user_id => id, :action => 'session')
+    token.value
+  end
+
+  # Returns true if token is a valid session token for the user whose id is user_id
+  def self.verify_session_token(user_id, token)
+    return false if user_id.blank? || token.blank?
+
+    scope = Token.where(:user_id => user_id, :value => token.to_s, :action => 'session')
+    if Setting.session_lifetime?
+      scope = scope.where("created_on > ?", Setting.session_lifetime.to_i.minutes.ago)
+    end
+    if Setting.session_timeout?
+      scope = scope.where("updated_on > ?", Setting.session_timeout.to_i.minutes.ago)
+    end
+    scope.update_all(:updated_on => Time.now) == 1
   end
 
   # Return an array of project ids for which the user has explicitly turned mail notifications on
@@ -470,7 +512,7 @@ class User < Principal
     if time_zone.nil?
       Date.today
     else
-      Time.now.in_time_zone(time_zone).to_date
+      time_zone.today
     end
   end
 
@@ -512,7 +554,7 @@ class User < Principal
     # No role on archived projects
     return [] if project.nil? || project.archived?
     if membership = membership(project)
-      membership.roles.dup
+      membership.roles.to_a
     elsif project.is_public?
       project.override_roles(builtin_role)
     else
@@ -553,6 +595,15 @@ class User < Principal
   # Returns the ids of visible projects
   def visible_project_ids
     @visible_project_ids ||= Project.visible(self).pluck(:id)
+  end
+
+  # Returns the roles that the user is allowed to manage for the given project
+  def managed_roles(project)
+    if admin?
+      @managed_roles ||= Role.givable.to_a
+    else
+      membership(project).try(:managed_roles) || []
+    end
   end
 
   # Returns true if user is arg or belongs to arg
@@ -623,14 +674,19 @@ class User < Principal
     allowed_to?(action, nil, options.reverse_merge(:global => true), &block)
   end
 
+  def allowed_to_view_all_time_entries?(context)
+    allowed_to?(:view_time_entries, context) do |role, user|
+      role.time_entries_visibility == 'all'
+    end
+  end
+
   # Returns true if the user is allowed to delete the user's own account
   def own_account_deletable?
     Setting.unsubscribe? &&
       (!admin? || User.active.where("admin = ? AND id <> ?", true, id).exists?)
   end
 
-  safe_attributes 'login',
-    'firstname',
+  safe_attributes 'firstname',
     'lastname',
     'mail',
     'mail_notification',
@@ -738,8 +794,8 @@ class User < Principal
   # This helps to keep the account secure in case the associated email account
   # was compromised.
   def destroy_tokens
-    if hashed_password_changed?
-      tokens = ['recovery', 'autologin']
+    if hashed_password_changed? || (status_changed? && !active?)
+      tokens = ['recovery', 'autologin', 'session']
       Token.where(:user_id => id, :action => tokens).delete_all
     end
   end
@@ -783,10 +839,42 @@ class User < Principal
     Redmine::Utils.random_hex(16)
   end
 
+  # Send a security notification to all admins if the user has gained/lost admin privileges
+  def deliver_security_notification
+    options = {
+      field: :field_admin,
+      value: login,
+      title: :label_user_plural,
+      url: {controller: 'users', action: 'index'}
+    }
+
+    deliver = false
+    if (admin? && id_changed? && active?) ||    # newly created admin
+       (admin? && admin_changed? && active?) || # regular user became admin
+       (admin? && status_changed? && active?)   # locked admin became active again
+
+       deliver = true
+       options[:message] = :mail_body_security_notification_add
+
+    elsif (admin? && destroyed? && active?) ||      # active admin user was deleted
+          (!admin? && admin_changed? && active?) || # admin is no longer admin
+          (admin? && status_changed? && !active?)   # admin was locked
+
+          deliver = true
+          options[:message] = :mail_body_security_notification_remove
+    end
+
+    if deliver
+      users = User.active.where(admin: true).to_a
+      Mailer.security_notification(users, options).deliver
+    end
+  end
 end
 
 class AnonymousUser < User
   validate :validate_anonymous_uniqueness, :on => :create
+
+  self.valid_statuses = [STATUS_ANONYMOUS]
 
   def validate_anonymous_uniqueness
     # There should be only one AnonymousUser in the database

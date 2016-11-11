@@ -61,6 +61,7 @@ roles_001:
     - :view_changesets
     - :manage_related_issues
     - :manage_project_activities
+    - :import_issues
 
   position: 1
 roles_002: 
@@ -181,7 +182,7 @@ roles_004:
     - :browse_repository
     - :view_changesets
 
-  position: 4
+  position: 1
 roles_005: 
   name: Anonymous
   id: 5
@@ -202,5 +203,5 @@ roles_005:
     - :browse_repository
     - :view_changesets
 
-  position: 5
+  position: 1
 

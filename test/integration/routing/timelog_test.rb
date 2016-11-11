@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -23,6 +23,7 @@ class RoutingTimelogsTest < Redmine::RoutingTest
     should_route 'GET /time_entries.csv' => 'timelog#index', :format => 'csv'
     should_route 'GET /time_entries.atom' => 'timelog#index', :format => 'atom'
     should_route 'GET /time_entries/new' => 'timelog#new'
+    should_route 'POST /time_entries/new' => 'timelog#new'
     should_route 'POST /time_entries' => 'timelog#create'
 
     should_route 'GET /time_entries/22/edit' => 'timelog#edit', :id => '22'

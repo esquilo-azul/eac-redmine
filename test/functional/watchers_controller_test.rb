@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -133,6 +133,13 @@ class WatchersControllerTest < ActionController::TestCase
     assert_match /ajax-modal/, response.body
   end
 
+  def test_new_with_multiple_objects
+    @request.session[:user_id] = 2
+    xhr :get, :new, :object_type => 'issue', :object_id => ['1', '2']
+    assert_response :success
+    assert_match /ajax-modal/, response.body
+  end
+
   def test_new_for_new_record_with_project_id
     @request.session[:user_id] = 2
     xhr :get, :new, :project_id => 1
@@ -161,7 +168,7 @@ class WatchersControllerTest < ActionController::TestCase
     assert Issue.find(2).watched_by?(User.find(4))
   end
 
-  def test_create_multiple
+  def test_create_with_mutiple_users
     @request.session[:user_id] = 2
     assert_difference('Watcher.count', 2) do
       xhr :post, :create, :object_type => 'issue', :object_id => '2',
@@ -171,6 +178,21 @@ class WatchersControllerTest < ActionController::TestCase
       assert_match /ajax-modal/, response.body
     end
     assert Issue.find(2).watched_by?(User.find(4))
+    assert Issue.find(2).watched_by?(User.find(7))
+  end
+
+  def test_create_with_mutiple_objects
+    @request.session[:user_id] = 2
+    assert_difference('Watcher.count', 4) do
+      xhr :post, :create, :object_type => 'issue', :object_id => ['1', '2'],
+          :watcher => {:user_ids => ['4', '7']}
+      assert_response :success
+      assert_match /watchers/, response.body
+      assert_match /ajax-modal/, response.body
+    end
+    assert Issue.find(1).watched_by?(User.find(4))
+    assert Issue.find(2).watched_by?(User.find(4))
+    assert Issue.find(1).watched_by?(User.find(7))
     assert Issue.find(2).watched_by?(User.find(7))
   end
 
@@ -259,7 +281,7 @@ class WatchersControllerTest < ActionController::TestCase
     assert response.body.blank?
   end
 
-  def test_remove_watcher
+  def test_destroy
     @request.session[:user_id] = 2
     assert_difference('Watcher.count', -1) do
       xhr :delete, :destroy, :object_type => 'issue', :object_id => '2', :user_id => '3'
@@ -267,5 +289,27 @@ class WatchersControllerTest < ActionController::TestCase
       assert_match /watchers/, response.body
     end
     assert !Issue.find(2).watched_by?(User.find(3))
+  end
+
+  def test_destroy_locked_user
+    user = User.find(3)
+    user.lock!
+    assert user.reload.locked?
+
+    @request.session[:user_id] = 2
+    assert_difference('Watcher.count', -1) do
+      xhr :delete, :destroy, :object_type => 'issue', :object_id => '2', :user_id => '3'
+      assert_response :success
+      assert_match /watchers/, response.body
+    end
+    assert !Issue.find(2).watched_by?(User.find(3))
+  end
+
+  def test_destroy_invalid_user_should_respond_with_404
+    @request.session[:user_id] = 2
+    assert_no_difference('Watcher.count') do
+      delete :destroy, :object_type => 'issue', :object_id => '2', :user_id => '999'
+      assert_response 404
+    end
   end
 end

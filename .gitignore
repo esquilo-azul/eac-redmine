@@ -6,6 +6,7 @@
 /config/configuration.yml
 /config/database.yml
 /config/email.yml
+/config/secrets.yml
 /config/initializers/session_store.rb
 /config/initializers/secret_token.rb
 /coverage
@@ -36,13 +37,6 @@
 
 /.bundle
 /Gemfile.local
-/config/secrets.yml
-/log/esosti_solicitacao_detalhes/
-/log/esosti_caixa_atendimento_secao/
-/log/esosti_caixa_atendimento_central/
-/log/esosti_sync.rb.pid
-/config/install-settings.sh
-/nbproject
-/log/*.pid
-/log/cef_id_consulta_solicitacoes/*
-/nbproject
+
+# redmine_with_git
+/config/install.sh

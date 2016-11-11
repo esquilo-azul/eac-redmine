@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -57,7 +57,7 @@ class Redmine::ApiTest::IssueRelationsTest < Redmine::ApiTest::Base
     end
 
     assert_response :unprocessable_entity
-    assert_select 'errors error', :text => /relation_type is not included in the list/
+    assert_select 'errors error', :text => /Relation type is not included in the list/
   end
 
   test "GET /relations/:id.xml should return the relation" do

@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -39,6 +39,11 @@ class Role < ActiveRecord::Base
     ['own', :label_issues_visibility_own]
   ]
 
+  TIME_ENTRIES_VISIBILITY_OPTIONS = [
+    ['all', :label_time_entries_visibility_all],
+    ['own', :label_time_entries_visibility_own]
+  ]
+
   USERS_VISIBILITY_OPTIONS = [
     ['all', :label_users_visibility_all],
     ['members_of_visible_projects', :label_users_visibility_members_of_visible_projects]
@@ -59,11 +64,16 @@ class Role < ActiveRecord::Base
   end
   has_and_belongs_to_many :custom_fields, :join_table => "#{table_name_prefix}custom_fields_roles#{table_name_suffix}", :foreign_key => "role_id"
 
+  has_and_belongs_to_many :managed_roles, :class_name => 'Role',
+    :join_table => "#{table_name_prefix}roles_managed_roles#{table_name_suffix}",
+    :association_foreign_key => "managed_role_id"
+
   has_many :member_roles, :dependent => :destroy
   has_many :members, :through => :member_roles
-  acts_as_list
+  acts_as_positioned :scope => :builtin
 
   serialize :permissions, ::Role::PermissionsAttributeCoder
+  store :settings, :accessors => [:permissions_all_trackers, :permissions_tracker_ids]
   attr_protected :builtin
 
   validates_presence_of :name
@@ -75,6 +85,9 @@ class Role < ActiveRecord::Base
   validates_inclusion_of :users_visibility,
     :in => USERS_VISIBILITY_OPTIONS.collect(&:first),
     :if => lambda {|role| role.respond_to?(:users_visibility) && role.users_visibility_changed?}
+  validates_inclusion_of :time_entries_visibility,
+    :in => TIME_ENTRIES_VISIBILITY_OPTIONS.collect(&:first),
+    :if => lambda {|role| role.respond_to?(:time_entries_visibility) && role.time_entries_visibility_changed?}
 
   # Copies attributes from another role, arg can be an id or a Role
   def copy_from(arg, options={})
@@ -176,6 +189,63 @@ class Role < ActiveRecord::Base
     setable_permissions
   end
 
+  def permissions_tracker_ids(*args)
+    if args.any?
+      Array(permissions_tracker_ids[args.first.to_s]).map(&:to_i)
+    else
+      super || {}
+    end
+  end
+
+  def permissions_tracker_ids=(arg)
+    h = arg.to_hash
+    h.values.each {|v| v.reject!(&:blank?)}
+    super(h)
+  end
+
+  # Returns true if tracker_id belongs to the list of
+  # trackers for which permission is given 
+  def permissions_tracker_ids?(permission, tracker_id)
+    permissions_tracker_ids(permission).include?(tracker_id)
+  end
+
+  def permissions_all_trackers
+    super || {}
+  end
+
+  def permissions_all_trackers=(arg)
+    super(arg.to_hash)
+  end
+
+  # Returns true if permission is given for all trackers
+  def permissions_all_trackers?(permission)
+    permissions_all_trackers[permission.to_s].to_s != '0'
+  end
+
+  # Returns true if permission is given for the tracker
+  # (explicitly or for all trackers)
+  def permissions_tracker?(permission, tracker)
+    permissions_all_trackers?(permission) ||
+      permissions_tracker_ids?(permission, tracker.try(:id))
+  end
+
+  # Sets the trackers that are allowed for a permission.
+  # tracker_ids can be an array of tracker ids or :all for
+  # no restrictions.
+  #
+  # Examples:
+  #   role.set_permission_trackers :add_issues, [1, 3]
+  #   role.set_permission_trackers :add_issues, :all
+  def set_permission_trackers(permission, tracker_ids)
+    h = {permission.to_s => (tracker_ids == :all ? '1' : '0')}
+    self.permissions_all_trackers = permissions_all_trackers.merge(h)
+
+    h = {permission.to_s => (tracker_ids == :all ? [] : tracker_ids)}
+    self.permissions_tracker_ids = permissions_tracker_ids.merge(h)
+
+    self
+  end
+
   # Find all the roles that can be given to a project member
   def self.find_all_givable
     Role.givable.to_a
@@ -211,10 +281,10 @@ private
   def self.find_or_create_system_role(builtin, name)
     role = where(:builtin => builtin).first
     if role.nil?
-      role = create(:name => name, :position => 0) do |r|
+      role = create(:name => name) do |r|
         r.builtin = builtin
       end
-      raise "Unable to create the #{name} role." if role.new_record?
+      raise "Unable to create the #{name} role (#{role.errors.full_messages.join(',')})." if role.new_record?
     end
     role
   end

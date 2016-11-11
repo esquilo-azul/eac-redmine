@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2015  Jean-Philippe Lang
+# Copyright (C) 2006-2016  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -152,7 +152,7 @@ class TrackersControllerTest < ActionController::TestCase
 
   def test_move_lower
    tracker = Tracker.find_by_position(1)
-   put :update, :id => 1, :tracker => { :move_to => 'lower' }
+   put :update, :id => 1, :tracker => { :position => '2' }
    assert_equal 2, tracker.reload.position
   end
 
