@@ -40,3 +40,6 @@
 
 # redmine_with_git
 /config/install.sh
+
+# eac_redmine
+/log/*.pid
