@@ -16,6 +16,8 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_execute {
-	"$REDMINE_ROOT/bin/bundle" exec rake db:migrate redmine_git_hosting:migration_tools:fix_migration_numbers redmine:plugins:migrate
+  "$INSTALL_ROOT/lib/rails/rake.sh" db:migrate \
+    redmine_git_hosting:migration_tools:fix_migration_numbers \
+    redmine:plugins:migrate
 }
 export -f task_execute
