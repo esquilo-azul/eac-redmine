@@ -17,8 +17,10 @@ module Heroku
 
     def execute!(args)
       status, out, err = execute(args)
-      raise "\"#{args}\" failed\nDirectory: #{self}\nStatus: #{status}\nSTDOUT: #{out}\n" \
-        "STDERR: #{err}\n" if status.to_i != 0
+      if status.to_i != 0
+        raise "\"#{args}\" failed\nDirectory: #{self}\nStatus: #{status}\nSTDOUT: #{out}\n" \
+          "STDERR: #{err}\n"
+      end
       out
     end
 
@@ -44,7 +46,7 @@ module Heroku
     end
 
     def content?
-      !(Dir.entries(self) - %w( . .. )).empty?
+      !(Dir.entries(self) - %w(. ..)).empty?
     end
 
     private

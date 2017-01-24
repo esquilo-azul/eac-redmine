@@ -16,7 +16,7 @@ module Heroku
 
       def heroku_set_remote
         status, out, err = directory.execute(['heroku', 'git:remote', '-a', app.name])
-        return true if status.to_i == 0
+        return true if status.to_i.zero?
         Rails.logger.debug("OUT: #{out}")
         Rails.logger.debug("ERR: #{err}")
         false

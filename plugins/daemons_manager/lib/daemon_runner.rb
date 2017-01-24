@@ -19,7 +19,7 @@ class DaemonRunner
   private
 
   def daemon
-    @daemon ||= Daemon.find_by_name(@daemon_file)
+    @daemon ||= Daemon.find_by(name: @daemon_file)
   end
 
   def init_running

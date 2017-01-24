@@ -17,7 +17,7 @@ module Avm
         if Setting.plugin_avm['admin_user_id'].present?
           User.find(Setting.plugin_avm['admin_user_id'])
         elsif raise_if_empty
-          raise "Usuário administrador não configurado. Acesse /settings/plugin/avm."
+          raise 'Usuário administrador não configurado. Acesse /settings/plugin/avm.'
         end
       end
 

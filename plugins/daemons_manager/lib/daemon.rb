@@ -73,6 +73,6 @@ class Daemon
 
   def configuration
     return false unless ActiveRecord::Base.connection.table_exists? DaemonConfiguration.table_name
-    DaemonConfiguration.find_by_daemon(name)
+    DaemonConfiguration.find_by(daemon: name)
   end
 end
