@@ -16,6 +16,8 @@ export -f task_condition
 function task_execute {
 	set -u
 	set -e
+  sudo apt-get install -y openssh-server
+  sudo service ssh start
 	local tempdir=$(sudo -u "$("$INSTALL_ROOT/lib/rails/user.sh")" mktemp -d)
 	local publickey_temp="$tempdir/$(basename "$("$INSTALL_ROOT/lib/redmine_git_hosting/ssh_key.sh")")".pub
 	sudo -u "$("$INSTALL_ROOT/lib/rails/user.sh")" chmod 777 "$tempdir" -R

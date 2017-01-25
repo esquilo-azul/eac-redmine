@@ -3,4 +3,4 @@
 set -u
 set -e
 
-(cd $REDMINE_ROOT; bundle exec rake secret 2> /dev/null)
+"$INSTALL_ROOT/lib/rails/rake.sh" secret 2> /dev/null

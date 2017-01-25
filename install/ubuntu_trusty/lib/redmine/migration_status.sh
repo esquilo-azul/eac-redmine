@@ -3,7 +3,7 @@
 set +e
 
 function migration_status {
-	"$REDMINE_ROOT/bin/bundle" exec rake db:migrate:status 2> /dev/null
+  "$INSTALL_ROOT/lib/rails/rake.sh" db:migrate:status 2> /dev/null
 }
 
 migration_status | grep '^\s*down\s' > /dev/null 2> /dev/null
