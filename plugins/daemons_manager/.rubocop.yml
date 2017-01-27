@@ -5,6 +5,10 @@ Style/GlobalVars:
 Rails:
   Enabled: true
   
+Rails/DynamicFindBy:
+  Exclude:
+    - lib/daemon_runner.rb
+
 Style/Documentation:
   Enabled: false
 
