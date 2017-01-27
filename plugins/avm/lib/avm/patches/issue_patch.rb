@@ -7,12 +7,12 @@ module Avm
 
       module InstanceMethods
         def undefined?
-          status == Avm::Settings.issue_status_undefined
+          status == ::Avm::Settings.issue_status_undefined
         end
 
         def dependencies
           children.all + relations_to.select do |r|
-            r.relation_type == IssueRelation::TYPE_BLOCKS
+            r.relation_type == ::IssueRelation::TYPE_BLOCKS
           end.map(&:issue_from)
         end
 
@@ -20,13 +20,13 @@ module Avm
           rd = []
           rd << parent if parent
           rd + relations_from.select do |r|
-            r.relation_type == IssueRelation::TYPE_BLOCKS
+            r.relation_type == ::IssueRelation::TYPE_BLOCKS
           end.map(&:issue_to)
         end
 
         def dependencies_section
           ['h\1\.', '----', '$'].each do |e|
-            m = /h([0-9])\.\s*#{Regexp.escape(Avm::Settings.dependencies_section_title)}(.+)#{e}/m
+            m = /h([0-9])\.\s*#{Regexp.escape(::Avm::Settings.dependencies_section_title)}(.+)#{e}/m
                 .match(description)
             return m[2].strip + "\r\n" if m
           end
@@ -43,6 +43,6 @@ module Avm
   end
 end
 
-unless Issue.included_modules.include? Avm::Patches::IssuePatch
-  Issue.send(:include, Avm::Patches::IssuePatch)
+unless ::Issue.included_modules.include? ::Avm::Patches::IssuePatch
+  ::Issue.send(:include, ::Avm::Patches::IssuePatch)
 end
