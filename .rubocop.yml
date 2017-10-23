@@ -38,6 +38,10 @@ Metrics/AbcSize:
     - 'plugins/*/db/migrate/**/*'
     - 'plugins/*/test/**/*'
 
+Metrics/ClassLength:
+  Exclude:
+    - 'plugins/*/test/**/*'
+
 Metrics/LineLength:
   Max: 100
   Exclude:
