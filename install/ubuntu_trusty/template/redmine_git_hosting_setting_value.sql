@@ -14,8 +14,8 @@ gitolite_recycle_bin_expiration_time: 24.0
 gitolite_log_level: info
 git_config_username: Redmine Git Hosting
 git_config_email: redmine@example.net
-ssh_server_domain: ${server_address}
-http_server_domain: ${server_address}
+ssh_server_domain: ${address_host}
+http_server_domain: ${address_host}
 https_server_domain: ''
 http_server_subdir: ''
 show_repositories_url: 'true'
@@ -25,7 +25,7 @@ download_revision_enabled: 'true'
 gitolite_overwrite_existing_hooks: 'true'
 gitolite_hooks_are_asynchronous: 'false'
 gitolite_hooks_debug: 'false'
-gitolite_hooks_url: "http://${server_address}/redmine"
+gitolite_hooks_url: "http://${address_host}/redmine"
 gitolite_cache_max_time: '86400'
 gitolite_cache_max_size: '16'
 gitolite_cache_max_elements: '2000'
