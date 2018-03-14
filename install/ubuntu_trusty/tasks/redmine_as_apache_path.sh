@@ -4,7 +4,7 @@ set -u
 set -e
 
 function task_dependencies {
-  echo passenger_apache_configuration
+  echo development passenger_apache_configuration redmine_public_link
 }
 export -f task_dependencies
 

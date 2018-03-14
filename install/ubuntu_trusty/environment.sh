@@ -5,7 +5,7 @@ set -e
 
 export INSTALL_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 export REDMINE_ROOT=$(dirname "$(dirname "$INSTALL_ROOT")")
-export TASK='all'
+export TASK=''
 
 SAMPLE_SETTINGS="$INSTALL_ROOT/default-settings.sh"
 DEFAULT_SETTINGS="$REDMINE_ROOT/config/install.sh"
