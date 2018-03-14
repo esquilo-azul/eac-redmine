@@ -16,7 +16,7 @@ git_config_username: Redmine Git Hosting
 git_config_email: redmine@example.net
 ssh_server_domain: ${address_host}
 http_server_domain: ${address_host}
-https_server_domain: ''
+https_server_domain: ${address_host}
 http_server_subdir: ''
 show_repositories_url: 'true'
 gitolite_daemon_by_default: 'false'
