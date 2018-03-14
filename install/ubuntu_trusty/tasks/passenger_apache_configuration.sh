@@ -17,7 +17,7 @@ function passenger_conf {
 }
 
 function task_dependencies {
-  echo passenger_apache_library
+  echo passenger_apache_library apache
 }
 export -f task_dependencies
 
