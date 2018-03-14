@@ -14,7 +14,7 @@ HELP=''
 
 while [[ $# > 0 ]]
 do
-  key="$1"  
+  key="$1"
   case $key in
       -h|--help)
       HELP='1'
@@ -60,21 +60,21 @@ fi
 SETTINGS=("$SAMPLE_SETTINGS")
 
 if [ -f "$DEFAULT_SETTINGS" ]; then
-	SETTINGS+=("$DEFAULT_SETTINGS")
+  SETTINGS+=("$DEFAULT_SETTINGS")
 fi
 
 if [ -n "$SETTINGS_FILE" ]; then
-	if [ -f "$SETTINGS_FILE" ]; then
-		SETTINGS+=("$SETTINGS_FILE")
-	else
-		echo "\"$SETTINGS_FILE\" não existe."
-		exit 1	
-	fi
+  if [ -f "$SETTINGS_FILE" ]; then
+    SETTINGS+=("$SETTINGS_FILE")
+  else
+    echo "\"$SETTINGS_FILE\" não existe."
+    exit 1
+  fi
 fi
 
 for S in "${SETTINGS[@]}"
 do
-	source "$S"
+  source "$S"
 done
 
 source "$INSTALL_ROOT/lib/rvm/source.sh"

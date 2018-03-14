@@ -4,14 +4,14 @@ set -u
 set -e
 
 function task_condition {
-	return $("$INSTALL_ROOT/lib/redmine/migration_status.sh")
+  return $("$INSTALL_ROOT/lib/redmine/migration_status.sh")
 }
 export -f task_condition
 
 #
 
 function task_dependencies {
-	echo redmine_bundle redmine_database_configuration redmine_secret_key_base redmine_database
+  echo redmine_bundle redmine_database_configuration redmine_secret_key_base redmine_database
 }
 export -f task_dependencies
 

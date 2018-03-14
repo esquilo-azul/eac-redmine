@@ -3,28 +3,28 @@
 set -u
 set -e
 
-function settingSetted {	
-	TEST=$("$INSTALL_ROOT/lib/postgresql/execute_sql.sh" "select 1 from settings where name='$1'")
-	if [ -n "$TEST" -a "$TEST" == '1' ]; then
-		return 0
-	else
-		return 1
-	fi
+function settingSetted {
+  TEST=$("$INSTALL_ROOT/lib/postgresql/execute_sql.sh" "select 1 from settings where name='$1'")
+  if [ -n "$TEST" -a "$TEST" == '1' ]; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 function createSetting {
-	"$INSTALL_ROOT/lib/postgresql/execute_sql.sh" 'insert into settings(name,value,updated_on) values ('\'"$1"\'', '\'"$2"\'', current_timestamp)'
+  "$INSTALL_ROOT/lib/postgresql/execute_sql.sh" 'insert into settings(name,value,updated_on) values ('\'"$1"\'', '\'"$2"\'', current_timestamp)'
 }
 
-function updateSetting {	
-	"$INSTALL_ROOT/lib/postgresql/execute_sql.sh" 'update settings set value='\'"$2"\'', updated_on=current_timestamp where name='\'"$1"\'
+function updateSetting {
+  "$INSTALL_ROOT/lib/postgresql/execute_sql.sh" 'update settings set value='\'"$2"\'', updated_on=current_timestamp where name='\'"$1"\'
 }
 
 setting_name=$1
 setting_value=$2
 
 if settingSetted "$setting_name"; then
-	updateSetting "$setting_name" "$setting_value"
+  updateSetting "$setting_name" "$setting_value"
 else
-	createSetting "$setting_name" "$setting_value"
+  createSetting "$setting_name" "$setting_value"
 fi

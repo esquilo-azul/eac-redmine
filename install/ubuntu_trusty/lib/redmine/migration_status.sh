@@ -7,11 +7,11 @@ function migration_status {
 }
 
 migration_status | grep '^\s*down\s' > /dev/null 2> /dev/null
-down=$?	
+down=$?
 migration_status | grep '^\s*up\s' > /dev/null 2> /dev/null
 up=$?
 if [ "$down" -eq 0 -o "$up" -ne 0 ]; then
-	echo 1
+  echo 1
 else
-	echo 0
+  echo 0
 fi

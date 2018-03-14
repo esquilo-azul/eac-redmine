@@ -2,7 +2,7 @@
 
 DIR=$(echo ~/.rvm/gems/$rvm_ruby/gems/passenger-*)
 if [ -d "$DIR" ]; then
-	echo $DIR
+  echo $DIR
 else
-	echo ''
+  echo ''
 fi

@@ -6,7 +6,7 @@ set -h
 GEM=$1
 TEST=$(gem list --local | grep -io '^[0-9a-z\-]\+' | grep -i "^$GEM\$")
 if [ -z "$TEST" ]; then
-	echo '1'
+  echo '1'
 else
-	echo '0'
+  echo '0'
 fi

@@ -2,11 +2,11 @@
 
 set -e
 set -u
-			
+
 FILE=$("$INSTALL_ROOT/lib/passenger/root.sh")'/buildout/apache2/mod_passenger.so'
 
 if [ -f "$FILE" ]; then
-	echo $FILE
+  echo $FILE
 else
-	echo ''
+  echo ''
 fi

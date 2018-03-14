@@ -4,9 +4,9 @@ set -u
 set -e
 
 function put_on_file {
-	file=$(mktemp)
-	"$1" > "$file"
-	echo $file	
+  file=$(mktemp)
+  "$1" > "$file"
+  echo $file
 }
 
 file1=$(put_on_file "$1")

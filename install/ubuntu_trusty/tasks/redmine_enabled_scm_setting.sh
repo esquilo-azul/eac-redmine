@@ -4,30 +4,30 @@ set -u
 set -e
 
 function enabled_scm_setting_template {
-	cat "$INSTALL_ROOT/template/redmine_enabled_scm_setting_value"
+  cat "$INSTALL_ROOT/template/redmine_enabled_scm_setting_value"
 }
 export -f enabled_scm_setting_template
 
 function enabled_scm_setting_current {
-	"$INSTALL_ROOT/lib/redmine/get_setting_value.sh" 'enabled_scm'
+  "$INSTALL_ROOT/lib/redmine/get_setting_value.sh" 'enabled_scm'
 }
 export -f enabled_scm_setting_current
 
 function task_dependencies {
-	echo redmine_database_schema redmine_git_hosting_settings gitolite_rc
+  echo redmine_database_schema redmine_git_hosting_settings gitolite_rc
 }
 
 export -f task_dependencies
 
 function task_condition {
-	return $("$INSTALL_ROOT/lib/text/diff-commands.sh" 'enabled_scm_setting_template' 'enabled_scm_setting_current')
+  return $("$INSTALL_ROOT/lib/text/diff-commands.sh" 'enabled_scm_setting_template' 'enabled_scm_setting_current')
 }
 export -f task_condition
 
 function task_execute {
-	set -u
-	set -e
-	local setting_value=$(enabled_scm_setting_template | "$INSTALL_ROOT/lib/text/escape_single_quotes.sh")
-	"$INSTALL_ROOT/lib/redmine/set_setting_value.sh" 'enabled_scm' "$setting_value"
+  set -u
+  set -e
+  local setting_value=$(enabled_scm_setting_template | "$INSTALL_ROOT/lib/text/escape_single_quotes.sh")
+  "$INSTALL_ROOT/lib/redmine/set_setting_value.sh" 'enabled_scm' "$setting_value"
 }
 export -f task_execute

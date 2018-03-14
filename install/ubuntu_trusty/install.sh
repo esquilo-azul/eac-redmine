@@ -4,7 +4,7 @@ set -u
 set -e
 
 function trigger_apache_restart {
-	sudo service apache2 restart
+  sudo service apache2 restart
 }
 export -f trigger_apache_restart
 
