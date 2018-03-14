@@ -19,7 +19,7 @@ function task_condition {
 export -f task_condition
 
 function task_execute {
-  "$INSTALL_ROOT/lib/text/template.sh" "$INSTALL_ROOT/template/redmine_apache_site.conf" | sudo tee /etc/apache2/conf-available/redmine.conf > /dev/null
+  "$INSTALL_ROOT/lib/text/template.sh" "$INSTALL_ROOT/template/redmine_as_apache_path.conf" | sudo tee /etc/apache2/conf-available/redmine.conf > /dev/null
   sudo a2enconf redmine
 }
 export -f task_execute
