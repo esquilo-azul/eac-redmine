@@ -4,7 +4,6 @@ set -u
 set -e
 
 function task_dependencies {
-  echo redmine_database_schema redmine_database_test redmine_apache_site redmine_public_link \
-    redmine_git_hosting redmine_enabled_scm_setting redmine_host_name_setting expect
+  echo development redmine_apache_site redmine_public_link
 }
 export -f task_dependencies
