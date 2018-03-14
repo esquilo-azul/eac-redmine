@@ -6,6 +6,7 @@ export gitolite_user=git
 export gitolite_user_home=/var/lib/git
 export rvm_ruby=ruby-2.2.3
 export redmine_git_hosting_ssh_key_name=redmine_git_hosting_id
+export address_https=false
 export address_host=localhost
 export address_path=/redmine
 export smtp_tls=false

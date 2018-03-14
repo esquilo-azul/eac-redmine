@@ -101,3 +101,4 @@ function set_by_boolean {
 
 set_by_boolean git_repositories_hierarchical_organisation git_repositories_unique_repo_identifier \
   false true
+set_by_boolean address_https address_scheme https http
