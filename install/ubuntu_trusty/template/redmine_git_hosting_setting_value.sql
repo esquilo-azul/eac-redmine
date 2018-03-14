@@ -25,7 +25,7 @@ download_revision_enabled: 'true'
 gitolite_overwrite_existing_hooks: 'true'
 gitolite_hooks_are_asynchronous: 'false'
 gitolite_hooks_debug: 'false'
-gitolite_hooks_url: "http://${address_host}/redmine"
+gitolite_hooks_url: "http://${address_host}${address_path}"
 gitolite_cache_max_time: '86400'
 gitolite_cache_max_size: '16'
 gitolite_cache_max_elements: '2000'

@@ -4,7 +4,7 @@ set -u
 set -e
 
 function host_name_setting_template {
-  echo "$address_host/redmine"
+  echo "${address_host}${address_path}"
 }
 export -f host_name_setting_template
 
