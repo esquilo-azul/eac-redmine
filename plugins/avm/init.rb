@@ -11,16 +11,7 @@ Redmine::Plugin.register :avm do
   description ''
   version '0.1.1'
 
-  settings(default: { dependencies_section_title: 'Dependencies',
-                      no_dependencies_section_message: <<EOS,
-Dependencies section not found.
-Customize this message in plugin AVM's configuration.
-EOS
-                      dependencies_section_missing_dependencies_message: <<EOS
-Missing dependencies found dependencies section: %{ids}.
-Customize this message in plugin AVM's configuration.
-EOS
-    }, partial: 'settings/avm')
+  settings(partial: 'settings/avm')
 
   Redmine::MenuManager.map :admin_menu do |menu|
     menu.push :issue_status_assigns, { controller: 'issue_status_assigns', action: 'index' },
@@ -41,4 +32,15 @@ Rails.configuration.to_prepare do
                              'Avm::Listeners::IssueDependenciesSectionCheck')
   EventsManager.add_listener(IssueRelation, :create,
                              'Avm::Listeners::IssueDependenciesSectionCheck')
+
+  ::RedminePluginsHelper::Settings.default(:avm, dependencies_section_title: 'Dependencies',
+                                                 no_dependencies_section_message: <<EOS.strip_heredoc,
+                                                   Dependencies section not found.
+                                                   Customize this message in plugin AVM's configuration.
+EOS
+                                                 dependencies_section_missing_dependencies_message: <<EOS.strip_heredoc
+                                                   Missing dependencies found dependencies section: %{ids}.
+                                                   Customize this message in plugin AVM's configuration.
+EOS
+                                          )
 end
