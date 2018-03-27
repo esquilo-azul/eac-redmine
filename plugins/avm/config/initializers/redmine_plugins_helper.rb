@@ -8,4 +8,5 @@ EOS
                                                    Missing dependencies found dependencies section: %{ids}.
                                                    Customize this message in plugin AVM's configuration.
 EOS
+        motivation_section_title: 'Motivation'
 )
