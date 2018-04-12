@@ -10,3 +10,6 @@ EventsManager.add_listener(Issue, :update,
                            'Avm::Listeners::IssueDependenciesSectionCheck')
 EventsManager.add_listener(IssueRelation, :create,
                            'Avm::Listeners::IssueDependenciesSectionCheck')
+[[Issue, :create], [Issue, :update], [IssueRelation, :create]].each do |v|
+  EventsManager.add_listener(v.first, v.last, 'Avm::Listeners::IssueMotivationCheck')
+end
