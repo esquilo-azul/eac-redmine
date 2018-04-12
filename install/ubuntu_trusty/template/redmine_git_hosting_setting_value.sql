@@ -15,8 +15,8 @@ gitolite_log_level: info
 git_config_username: Redmine Git Hosting
 git_config_email: redmine@example.net
 ssh_server_domain: ${address_host}
-http_server_domain: ${address_host}
-https_server_domain: ${address_host}
+http_server_domain: ${address_server}
+https_server_domain: ${address_server}
 http_server_subdir: ''
 show_repositories_url: 'true'
 gitolite_daemon_by_default: 'false'
@@ -25,7 +25,7 @@ download_revision_enabled: 'true'
 gitolite_overwrite_existing_hooks: 'true'
 gitolite_hooks_are_asynchronous: 'false'
 gitolite_hooks_debug: 'false'
-gitolite_hooks_url: "${address_scheme}://${address_host}${address_path}"
+gitolite_hooks_url: "${address_scheme}://${address_server}${address_path}"
 gitolite_cache_max_time: '86400'
 gitolite_cache_max_size: '16'
 gitolite_cache_max_elements: '2000'
