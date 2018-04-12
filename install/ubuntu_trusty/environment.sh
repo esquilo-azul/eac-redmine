@@ -92,7 +92,8 @@ function sanitize_boolean_var {
 }
 
 function set_by_boolean {
-  if [ "$(sanitize_boolean_var $1)" == 'true' ]; then
+  local value="${!1}"
+  if [ "$(sanitize_boolean_var "$value")" == 'true' ]; then
     export $2=$3
   else
     export $2=$4
