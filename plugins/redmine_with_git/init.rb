@@ -3,12 +3,12 @@
 require 'redmine'
 
 Redmine::Plugin.register :redmine_with_git do
-  name 'Redmine + Git'
-  author 'Eduardo Henrique Bogoni'
-  description 'Redmine + Git'
+  name 'RedmineWithGit'
+  author 'Esquilo Azul Company'
+  description 'Utilities for Redmine + plugin redmine_git_hosting.'
   version '0.1.0'
-  url 'http://172.18.4.200/redmine/projects/redmine'
-  author_url 'http://172.18.4.200/redmine/projects/seinf-ap'
+  url 'https://github.com/esquilo-azul/redmine_with_git'
+  author_url 'https://github.com/esquilo-azul'
 
   Redmine::MenuManager.map :admin_menu do |menu|
     menu.push :redmine_with_git, { controller: 'redmine_with_git', action: 'index', id: nil },
