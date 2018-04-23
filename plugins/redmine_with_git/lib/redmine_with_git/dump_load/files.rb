@@ -4,7 +4,7 @@ module RedmineWithGit
       private
 
       def files_path
-        Rails.root.join('files')
+        Rails.root.join('files').realpath.to_s
       end
     end
   end
