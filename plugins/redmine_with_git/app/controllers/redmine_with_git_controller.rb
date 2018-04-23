@@ -41,6 +41,8 @@ class RedmineWithGitController < ApplicationController
   end
 
   def import_params
-    params[::RedmineWithGit::Tableless::Load.model_name.param_key].permit(:path)
+    ps = params[::RedmineWithGit::Tableless::Load.model_name.param_key]
+    return {} unless ps.present?
+    ps.permit(:path)
   end
 end
