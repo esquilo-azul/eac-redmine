@@ -98,6 +98,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
+    colorize (0.8.1)
     concurrent-ruby (1.0.2)
     creole (0.5.0)
     css_parser (1.4.7)
@@ -115,6 +116,7 @@ GEM
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     docile (1.1.5)
+    docopt (0.6.1)
     eac_rails_utils (0.1.14)
       activemodel-associations (>= 0.1.2)
       bootstrap-sass (>= 3.3.6)
@@ -123,6 +125,10 @@ GEM
       ofx-parser (>= 1.1.0)
       rails (~> 4.2.1)
       virtus (>= 1.0.5)
+    eac_ruby_utils (0.1.2)
+      colorize (~> 0.8.1)
+      docopt (~> 0.6.1)
+      net-ssh (~> 4.2)
     equalizer (0.0.11)
     erubis (2.7.0)
     execjs (2.7.0)
@@ -179,6 +185,7 @@ GEM
       jquery-rails
       rails (>= 3.2.0)
     net-ldap (0.12.1)
+    net-ssh (4.2.0)
     nokogiri (1.6.8.1)
       mini_portile2 (~> 2.1.0)
     ofx-parser (1.1.0)
@@ -319,6 +326,7 @@ DEPENDENCIES
   dalli
   delayed_job_active_record
   eac_rails_utils (~> 0.1, >= 0.1.14)
+  eac_ruby_utils (~> 0.1, >= 0.1.2)
   faker
   github-markup
   gitlab-grack!
@@ -362,4 +370,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   1.15.4
+   1.16.1
