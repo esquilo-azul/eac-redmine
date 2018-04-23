@@ -1,6 +1,6 @@
 module RedmineWithGit
   module Tableless
-    class Load < ::RedmineSjap::TablelessModel
+    class Load < ::RedmineWithGit::TablelessModel
       attribute :path, String
 
       def save
