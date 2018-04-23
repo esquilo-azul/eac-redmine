@@ -6,7 +6,7 @@ Redmine::Plugin.register :redmine_with_git do
   name 'RedmineWithGit'
   author 'Esquilo Azul Company'
   description 'Utilities for Redmine + plugin redmine_git_hosting.'
-  version '0.1.0'
+  version '0.1.1'
   url 'https://github.com/esquilo-azul/redmine_with_git'
   author_url 'https://github.com/esquilo-azul'
 
