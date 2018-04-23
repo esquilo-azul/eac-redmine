@@ -17,7 +17,7 @@ module RedmineWithGit
       end
 
       def env
-        RedmineWithGit::Envs.local
+        ::EacRubyUtils::Envs.local
       end
 
       def path_type
