@@ -3,7 +3,7 @@
 set -u
 set -e
 
-SUDOER_FILE="/etc/sudoers.d/$("$INSTALL_ROOT/lib/rails/user.sh")"
+SUDOER_FILE="/etc/sudoers.d/$("$INSTALL_ROOT/lib/rails/user.sh")_redmine_with_git"
 
 function task_dependencies {
   echo gitolite_user
