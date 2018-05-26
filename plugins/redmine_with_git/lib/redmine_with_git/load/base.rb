@@ -21,12 +21,14 @@ module RedmineWithGit
 
       def run_clear
         Rails.logger.info "Clearing resource \"#{resource_name}\"..."
+        before_clear
         clear_command.execute!
       end
 
       def run_load
         Rails.logger.info "Loading \"#{path}\" to resource \"#{resource_name}\"..."
         load_command.execute!(input_file: path)
+        after_load
       end
 
       def end_banner
@@ -40,6 +42,10 @@ module RedmineWithGit
       def tar_extract_command(target_dir, compression = true)
         env.command('tar', (compression ? '-xz' : '-x'), '-C', target_dir)
       end
+
+      def before_clear; end
+
+      def after_load; end
     end
   end
 end

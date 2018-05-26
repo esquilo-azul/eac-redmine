@@ -5,12 +5,24 @@ module RedmineWithGit
 
       private
 
+      def before_clear
+        raise(<<EOS) unless ::RedminePluginsHelper.settings_table_exist?
+Settings table does not exist.
+EOS
+        @redmine_git_hosting_setting = ::Setting.plugin_redmine_git_hosting
+      end
+
       def clear_command
         psql_sql_command(psql_sql_command(drop_all_tables_sql).execute!)
       end
 
       def load_command
         psql_command.prepend(uncompress_args + ['@ESC_|'])
+      end
+
+      def after_load
+        ::Setting.plugin_redmine_git_hosting = @redmine_git_hosting_setting if
+        @redmine_git_hosting_setting
       end
 
       def psql_command
