@@ -11,7 +11,7 @@ function task_condition {
 export -f task_condition
 
 function task_dependencies {
-  echo postgresql locales
+  echo postgresql
 }
 export -f task_dependencies
 
