@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -u
-set -h
+set -e
 
 INSTALL=''
 for PKG in $@; do

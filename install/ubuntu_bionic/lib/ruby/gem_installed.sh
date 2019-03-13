@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -u
-set -h
+set -e
 
 GEM=$1
 TEST=$(gem list --local | grep -io '^[0-9a-z\-]\+' | grep -i "^$GEM\$")
