@@ -14,5 +14,5 @@ done
 
 if [ ! -z "$INSTALL" ]; then
     echo "Será necessário instalar os seguintes pacotes debian: $INSTALL"
-    sudo apt-get -y install $INSTALL
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y install $INSTALL
 fi
