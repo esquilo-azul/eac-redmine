@@ -4,7 +4,7 @@ set -u
 set -e
 
 function task_condition {
-  if [ ! -f "/etc/postgresql/9.3/main/postgresql.conf" ]; then
+  if [ ! -f "/etc/postgresql/${postgresql_version}/main/postgresql.conf" ]; then
     return 1
   fi
 }
@@ -16,6 +16,6 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_execute {
-  sudo pg_createcluster 9.3 main --start
+  sudo pg_createcluster "${postgresql_version}" main --start
 }
 export -f task_execute
