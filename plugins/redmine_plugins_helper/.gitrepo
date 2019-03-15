@@ -1,12 +1,89 @@
 ; DO NOT EDIT (unless you know what you are doing)
+
+
+
+
+
+
+
 ;
+
+
+
+
+
+
+
 ; This subdirectory is a git "subrepo", and this file is maintained by the
+
+
+
+
+
+
+
 ; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+
+
+
+
+
+
+
 ;
+
+
+
+
+
+
+
 [subrepo]
+
+
+
+
+
+
+
 	remote = https://github.com/esquilo-azul/redmine_plugins_helper
+
+
+
+
+
+
+
 	branch = master
-	commit = 068a90ce124adbcd3c7620a9904403b55e3198a4
-	parent = ba4913cca6819d1986f50d645b1b01699f6ad608
+
+
+
+
+
+
+
+	commit = 383179c58e09ceb68b32f9ec488a27e5cbe94df6
+
+
+
+
+
+
+
+	parent = 8ddef05508b2c445b0b47cfbf3e20da8f28863ef
+
+
+
+
+
+
+
 	method = merge
+
+
+
+
+
+
+
 	cmdver = 0.4.0
