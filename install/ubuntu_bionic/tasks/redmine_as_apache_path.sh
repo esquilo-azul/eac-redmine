@@ -4,6 +4,8 @@ set -u
 set -e
 
 TEMPLATE="$INSTALL_ROOT/template/redmine_as_apache_path.conf"
+AVAILABLE_PATH="/etc/apache2/conf-available/${instance_id}.conf"
+ENABLED_PATH="/etc/apache2/conf-enabled/${instance_id}.conf"
 
 function task_dependencies {
   echo redmine_as_apache_base redmine_public_link
@@ -11,19 +13,19 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-  if [ ! -f /etc/apache2/conf-available/redmine.conf ]; then
+  if [ ! -f "$AVAILABLE_PATH" ]; then
     return 1
   fi
-  if [ ! -f /etc/apache2/conf-enabled/redmine.conf ]; then
+  if [ ! -f "$ENABLED_PATH" ]; then
     return 1
   fi
-  return $("$INSTALL_ROOT/lib/text/template.sh" "$TEMPLATE" | "$INSTALL_ROOT/lib/text/diff-stdin-file.sh" "/etc/apache2/conf-available/redmine.conf" )
+  return $("$INSTALL_ROOT/lib/text/template.sh" "$TEMPLATE" | "$INSTALL_ROOT/lib/text/diff-stdin-file.sh" "$AVAILABLE_PATH" )
 }
 export -f task_condition
 
 function task_execute {
-  "$INSTALL_ROOT/lib/text/template.sh" "$TEMPLATE" | sudo tee /etc/apache2/conf-available/redmine.conf > /dev/null
-  sudo a2enconf redmine
+  "$INSTALL_ROOT/lib/text/template.sh" "$TEMPLATE" | sudo tee "$AVAILABLE_PATH" > /dev/null
+  sudo a2enconf "$instance_id"
 }
 export -f task_execute
 

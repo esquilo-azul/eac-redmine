@@ -77,6 +77,11 @@ do
   source "$S"
 done
 
+export instance_id="$("${INSTALL_ROOT}/lib/text/replace-non-alpha-numbers.sh" "$address_path")"
+if [ -z "$instance_id" ]; then
+  export instance_id="$("${INSTALL_ROOT}/lib/text/replace-non-alpha-numbers.sh" "$REDMINE_ROOT")"
+fi
+
 source "$INSTALL_ROOT/lib/rvm/source.sh"
 
 function sanitize_boolean_var {
