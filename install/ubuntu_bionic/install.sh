@@ -9,10 +9,7 @@ function trigger_apache_restart {
 export -f trigger_apache_restart
 
 function trigger_redmine_git_hosting_rescue {
-  "$INSTALL_ROOT/lib/rails/rake.sh" redmine_git_hosting:install_hook_parameters \
-    redmine_git_hosting:migration_tools:update_repositories_type \
-    redmine_git_hosting:install_hook_files redmine_git_hosting:fetch_changesets \
-    redmine_git_hosting:rescue
+  "$INSTALL_ROOT/lib/rails/rake.sh" redmine_with_git:rescue
 }
 export -f trigger_redmine_git_hosting_rescue
 
