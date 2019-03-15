@@ -1,11 +1,11 @@
 module RedmineWithGit
   module DumpLoad
     module All
-      DATABASE = 'database.gz'
-      FILES = 'files.tar.gz'
-      GIT = 'git.tar.gz'
+      DATABASE = 'database.gz'.freeze
+      FILES = 'files.tar.gz'.freeze
+      GIT = 'git.tar.gz'.freeze
 
-      RESOURCES = %w(database files git)
+      RESOURCES = %w(database files git).freeze
 
       private
 

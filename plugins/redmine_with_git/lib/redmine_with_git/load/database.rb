@@ -1,3 +1,5 @@
+require_dependency 'redmine_plugins_helper'
+
 module RedmineWithGit
   module Load
     class Database < ::RedmineWithGit::Load::Base

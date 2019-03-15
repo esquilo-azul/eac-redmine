@@ -1,6 +1,6 @@
 module RedmineWithGit
   module Tableless
-    class Load < ::RedmineWithGit::TablelessModel
+    class Load < ::EacRailsUtils::TablelessModel
       attribute :path, String
 
       validates :path, presence: true

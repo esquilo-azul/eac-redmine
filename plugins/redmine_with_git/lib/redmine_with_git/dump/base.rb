@@ -44,8 +44,8 @@ module RedmineWithGit
       end
 
       def validate_exported
-        fail "File \"#{path}\" was not generated" unless ::File.exist?(path)
-        fail "File \"#{path}\" has zero size" unless ::File.size(path) > 0
+        raise "File \"#{path}\" was not generated" unless ::File.exist?(path)
+        raise "File \"#{path}\" has zero size" unless ::File.size(path) > 0
       end
     end
   end
