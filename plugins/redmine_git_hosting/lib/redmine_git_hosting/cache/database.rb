@@ -50,7 +50,7 @@ module RedmineGitHosting
 
 
       def apply_cache_limit
-        GitCache.order(created_at: :desc).last.destroy if max_cache_elements >= 0 && GitCache.count > max_cache_elements
+        GitCache.find(:last, order: 'created_at DESC').destroy if max_cache_elements >= 0 && GitCache.count > max_cache_elements
       end
 
     end

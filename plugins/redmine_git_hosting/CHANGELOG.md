@@ -1,5 +1,38 @@
 ## CHANGELOG
 
+### 1.2.3 - 2017-07-17
+
+* Merge [#640](https://github.com/jbox-web/redmine_git_hosting/pull/640) ([Views] Fix typo while rendering partial repositories/download_revision)
+* Merge [#646](https://github.com/jbox-web/redmine_git_hosting/pull/646) (Fix compatibility with Redmine 3.3)
+* Merge [#663](https://github.com/jbox-web/redmine_git_hosting/pull/663) ([Core] Fix installation of Gitolite3 hooks)
+* Improve custom Gitolite hook loading (see `custom_hooks.rb.example` at the root of the project)
+* Fix plugin icon with Redmine 3.4.x
+* Fix author url in sub-uri mode
+* Check if hook's permissions has changed
+* Catch Errno::ENOENT exceptions when installing custom hooks
+* Add logs for well installed Gitolite hooks
+
+### 1.2.2 - 2016-12-31
+
+* Fix [#472](https://github.com/jbox-web/redmine_git_hosting/issues/472) ([Views] 404 on the "My public keys" link in the user panel)
+* Fix [#526](https://github.com/jbox-web/redmine_git_hosting/issues/526) ([Core] Plugin breaks if gitolite user == redmine user)
+* Fix [#551](https://github.com/jbox-web/redmine_git_hosting/issues/551) ([Core] Make Sidekiq truly optional)
+* Fix [#576](https://github.com/jbox-web/redmine_git_hosting/issues/576) ([Models] Can't add Git Config Key)
+* Fix [#630](https://github.com/jbox-web/redmine_git_hosting/issues/630) ([Core] Use "gitolite query-rc" to get Gitolite variables)
+* Fix [#632](https://github.com/jbox-web/redmine_git_hosting/issues/632) ([Core] Mirroring does not work on git push)
+* Merge [#581](https://github.com/jbox-web/redmine_git_hosting/pull/581) (Fix [#472](https://github.com/jbox-web/redmine_git_hosting/issues/472) by amelentjev)
+* Merge [#621](https://github.com/jbox-web/redmine_git_hosting/pull/621) ([Routes] Mount grack under http_server_subdir)
+* Merge [#624](https://github.com/jbox-web/redmine_git_hosting/pull/624) ([Translations] Add Spanish translation)
+* Merge [#634](https://github.com/jbox-web/redmine_git_hosting/pull/634) ([Views] Added missing mandatory param for partial repositories/download_revision)
+* Merge [#636](https://github.com/jbox-web/redmine_git_hosting/pull/636) ([Doc] "Remove user ID from Gitolite identifier" requires a restart)
+* Fix repo url in Gitolite hooks
+* Fix nil data case when loading custom settings from empty file
+* Allow to load plugin settings from a file in Redmine root (should ease deployment and upgrades)
+* Fix wrong Repository Git objects count
+* Add Russian translation
+* Rename `redmine_git_hosting:restore_defaults` task to `redmine_git_hosting:update_settings`
+* Add Rake task `redmine_git_hosting:dump_settings` to dump plugin settings in console
+
 ### 1.2.1 - 2016-07-25
 
 * Fix [#524](https://github.com/jbox-web/redmine_git_hosting/issues/524) ([DB] Index too long)

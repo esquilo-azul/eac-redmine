@@ -33,7 +33,12 @@ module RedmineGitHosting
 
 
     def settings
-      default_settings.merge(local_settings)
+      default_settings.merge(global_settings).merge(local_settings)
+    end
+
+
+    def global_settings
+      load_setting_file(global_settings_file)
     end
 
 
@@ -49,6 +54,11 @@ module RedmineGitHosting
 
     def default_settings_file
       plugin_lib_dir('default_settings.yml')
+    end
+
+
+    def global_settings_file
+      Rails.root.join("#{plugin_name}.yml")
     end
 
 
@@ -114,7 +124,8 @@ module RedmineGitHosting
 
       def load_setting_file(file)
         return {} unless File.exists?(file)
-        YAML::load(ERB.new(IO.read(file)).result).symbolize_keys
+        data = YAML::load(ERB.new(IO.read(file)).result) || {}
+        data.symbolize_keys
       end
 
 
