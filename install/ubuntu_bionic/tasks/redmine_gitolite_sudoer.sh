@@ -12,12 +12,12 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-  if [ $("$INSTALL_ROOT/lib/linux/sudo_file_exists.sh" "root" "$SUDOER_FILE") -ne '0' ]; then
+  if [ "$("$INSTALL_ROOT/lib/linux/sudo_file_exists.sh" "root" "$SUDOER_FILE")" != '0' ]; then
     return 1
   fi
   export rails_user="$("$INSTALL_ROOT/lib/rails/user.sh")"
   result=$("$INSTALL_ROOT/lib/text/template.sh" "$INSTALL_ROOT/template/redmine_user_sudoer" | sudo "$INSTALL_ROOT/lib/text/diff-stdin-file.sh" "$SUDOER_FILE")
-  if [ $result -ne 0 ]; then
+  if [ "$result" != '0' ]; then
     return 1
   fi
   if [ "$(sudo stat -c "%a" "$SUDOER_FILE")" != '440' ]; then
