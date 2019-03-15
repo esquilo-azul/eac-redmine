@@ -22,7 +22,7 @@ function task_execute {
   local publickey_temp="$tempdir/$(basename "$("$INSTALL_ROOT/lib/redmine_git_hosting/ssh_key.sh")")".pub
   sudo -u "$("$INSTALL_ROOT/lib/rails/user.sh")" chmod 777 "$tempdir" -R
   sudo -u "$("$INSTALL_ROOT/lib/rails/user.sh")" cp "$("$INSTALL_ROOT/lib/redmine_git_hosting/ssh_key.sh")".pub "$publickey_temp"
-  sudo -u "$gitolite_user" -H gl-setup -q "$publickey_temp"
+  sudo -u "$gitolite_user" -H gitolite setup --pubkey "$publickey_temp"
   sudo -u "$("$INSTALL_ROOT/lib/rails/user.sh")" rm -rf "$tempdir"
 }
 export -f task_execute

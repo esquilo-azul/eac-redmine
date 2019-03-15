@@ -15,7 +15,10 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-  if [ "$(gitolite_rc_template | "$INSTALL_ROOT/lib/text/diff-stdin-file.sh" "$gitolite_user_home/.gitolite.rc" )" -ne 0 ]; then
+  temprc="$(sudo -u "$gitolite_user" mktemp)"
+  sudo -u "$gitolite_user" cp "$gitolite_user_home/.gitolite.rc" "$temprc"
+  sudo -u "$gitolite_user" chmod 777 "$temprc"
+  if [ "$(gitolite_rc_template | "$INSTALL_ROOT/lib/text/diff-stdin-file.sh" "$temprc" )" -ne 0 ]; then
     return 1
   fi
 }

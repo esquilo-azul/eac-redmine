@@ -1,90 +1,197 @@
 # configuration variables for gitolite
 
-# PLEASE READ THE DOCUMENTATION BEFORE EDITING OR ASKING QUESTIONS
-# ( http://github.com/sitaramc/gitolite/blob/pu/doc/gitolite.rc.mkd )
-#   ( or http://sitaramc.github.com/gitolite/doc/gitolite.rc.html )
+# This file is in perl syntax.  But you do NOT need to know perl to edit it --
+# just mind the commas, use single quotes unless you know what you're doing,
+# and make sure the brackets and braces stay matched up!
 
-# this file is in perl syntax.  However, you do NOT need to know perl to edit
-# it; it should be fairly self-explanatory and easy to maintain
+# (Tip: perl allows a comma after the last item in a list also!)
 
-# ------------------------------------------------------------------------------
-# DO NOT TOUCH THIS SECTION!
-# ------------------------------------------------------------------------------
+# HELP for commands can be had by running the command with "-h".
 
-$GL_ADMINDIR=$ENV{HOME} . "/.gitolite";
-$GL_CONF="$GL_ADMINDIR/conf/gitolite.conf";
-$GL_KEYDIR="$GL_ADMINDIR/keydir";
-$GL_CONF_COMPILED="$GL_ADMINDIR/conf/gitolite.conf-compiled.pm";
+# HELP for all the other FEATURES can be found in the documentation (look for
+# "list of non-core programs shipped with gitolite" in the master index) or
+# directly in the corresponding source file.
 
-# DO NOT CHANGE THE NEXT FOUR LINES UNLESS YOU REALLY KNOW WHAT YOU'RE DOING.
-# These variables are set automatically by the install method you choose.
-#            (PACKAGE MAINTAINERS: PLEASE READ doc/packaging.mkd)
-$GL_PACKAGE_CONF = "/usr/share/gitolite/conf";
-$GL_PACKAGE_HOOKS = "/usr/share/gitolite/hooks";
+%RC = (
 
-# ------------------------------------------------------------------------------
-# most often used/changed variables
-# ------------------------------------------------------------------------------
-$GL_WILDREPOS = 0;
-$PROJECTS_LIST = $ENV{HOME} . "/projects.list";
-# $WEB_INTERFACE = "gitweb";
-# $GITWEB_URI_ESCAPE = 0;
-$REPO_UMASK = 0077;
+    # ------------------------------------------------------------------
 
-# ------------------------------------------------------------------------------
-# variables with an efficiency/performance impact
-# ------------------------------------------------------------------------------
-$GL_BIG_CONFIG = 0;
-$GL_NO_DAEMON_NO_GITWEB = 0;
-# $GL_NICE_VALUE = 0;
-# $BIG_INFO_CAP = 20;
+    # default umask gives you perms of '0700'; see the rc file docs for
+    # how/why you might change this
+    UMASK                           =>  0077,
 
-# ------------------------------------------------------------------------------
-# VARIABLES WITH A SECURITY IMPACT.  READ DOCS BEFORE CHANGING THESE!
-# http://github.com/sitaramc/gitolite/blob/pu/doc/gitolite.rc.mkd#_variables_with_a_security_impact
-# (or http://sitaramc.github.com/gitolite/doc/gitolite.rc.html#_variables_with_a_security_impact)
-# ------------------------------------------------------------------------------
-# $GL_ALL_READ_ALL = 0;
-$GIT_PATH="";
-$GL_GITCONFIG_KEYS = '.*';
-$GL_NO_CREATE_REPOS = 0;
-$GL_NO_SETUP_AUTHKEYS = 0;
-# $GL_WILDREPOS_DEFPERMS = 'R @all';
-$HTPASSWD_FILE = "";
-$RSYNC_BASE = "";
-$SVNSERVE = "";
-# $UPDATE_CHAINS_TO = "hooks/update.secondary";
-# $ADMIN_POST_UPDATE_CHAINS_TO = "hooks/post-update.secondary";
-# $GL_ADC_PATH = "";
-# $GL_GET_MEMBERSHIPS_PGM = "/usr/local/bin/expand-ldap-user-to-groups"
-# $GL_HTTP_ANON_USER = "mob";
-# $GL_REF_OR_FILENAME_PATT=qr(^[0-9a-zA-Z][0-9a-zA-Z._\@/+ :,-]*$);
+    # look for "git-config" in the documentation
+    GIT_CONFIG_KEYS                 =>  '.*',
 
-# ------------------------------------------------------------------------------
-# less used/changed variables
-# ------------------------------------------------------------------------------
-# $GL_ALL_INCLUDES_SPECIAL = 0;
-# $GL_SLAVE_MODE = 0;
-# $ENV{GL_SLAVES} = 'gitolite@server2 gitolite@server3';
-# PLEASE USE SINGLE QUOTES ABOVE, NOT DOUBLE QUOTES
-$GL_WILDREPOS_PERM_CATS = "READERS WRITERS";
-# $GL_SITE_INFO = "XYZ.COM DEVELOPERS: PLEASE SEE http://xyz.com/gitolite/help first";
-# $GL_HOSTNAME = "frodo";       # read doc/mirroring.mkd COMPLETELY before setting this
+    # comment out if you don't need all the extra detail in the logfile
+    LOG_EXTRA                       =>  1,
+    # logging options
+    # 1. leave this section as is for 'normal' gitolite logging (default)
+    # 2. uncomment this line to log ONLY to syslog:
+    # LOG_DEST                      => 'syslog',
+    # 3. uncomment this line to log to syslog and the normal gitolite log:
+    # LOG_DEST                      => 'syslog,normal',
+    # 4. prefixing "repo-log," to any of the above will **also** log just the
+    #    update records to "gl-log" in the bare repo directory:
+    # LOG_DEST                      => 'repo-log,normal',
+    # LOG_DEST                      => 'repo-log,syslog',
+    # LOG_DEST                      => 'repo-log,syslog,normal',
+    # syslog 'facility': defaults to 'local0', uncomment if needed.  For example:
+    # LOG_FACILITY                  => 'local4',
 
-# ------------------------------------------------------------------------------
-# rarely changed variables
-# ------------------------------------------------------------------------------
-$GL_LOGT="$GL_ADMINDIR/logs/gitolite-%y-%m.log";
-# $GL_PERFLOGT="$GL_ADMINDIR/logs/perf-gitolite-%y-%m.log";
+    # roles.  add more roles (like MANAGER, TESTER, ...) here.
+    #   WARNING: if you make changes to this hash, you MUST run 'gitolite
+    #   compile' afterward, and possibly also 'gitolite trigger POST_COMPILE'
+    ROLES => {
+        READERS                     =>  1,
+        WRITERS                     =>  1,
+    },
 
-# ------------------------------------------------------------------------------
-# variables that should NOT be changed after the install step completes
-# ------------------------------------------------------------------------------
-$REPO_BASE="repositories";
+    # enable caching (currently only Redis).  PLEASE RTFM BEFORE USING!!!
+    # CACHE                         =>  'Redis',
 
-# ------------------------------------------------------------------------------
-# DO NOT TOUCH ANY THING AFTER THIS LINE
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------
+
+    # rc variables used by various features
+
+    # the 'info' command prints this as additional info, if it is set
+        # SITE_INFO                 =>  'Please see http://blahblah/gitolite for more help',
+
+    # the CpuTime feature uses these
+        # display user, system, and elapsed times to user after each git operation
+        # DISPLAY_CPU_TIME          =>  1,
+        # display a warning if total CPU times (u, s, cu, cs) crosses this limit
+        # CPU_TIME_WARN_LIMIT       =>  0.1,
+
+    # the Mirroring feature needs this
+        # HOSTNAME                  =>  "foo",
+
+    # TTL for redis cache; PLEASE SEE DOCUMENTATION BEFORE UNCOMMENTING!
+        # CACHE_TTL                 =>  600,
+
+    # ------------------------------------------------------------------
+
+    # suggested locations for site-local gitolite code (see cust.html)
+
+        # this one is managed directly on the server
+        # LOCAL_CODE                =>  "$ENV{HOME}/local",
+        LOCAL_CODE                =>  "$ENV{HOME}/local",
+
+        # or you can use this, which lets you put everything in a subdirectory
+        # called "local" in your gitolite-admin repo.  For a SECURITY WARNING
+        # on this, see http://gitolite.com/gitolite/non-core.html#pushcode
+        # LOCAL_CODE                =>  "$rc{GL_ADMIN_BASE}/local",
+
+    # ------------------------------------------------------------------
+
+    # List of commands and features to enable
+
+    ENABLE => [
+
+        # COMMANDS
+
+            # These are the commands enabled by default
+            'help',
+            'desc',
+            'info',
+            'perms',
+            'writable',
+
+            # Uncomment or add new commands here.
+            # 'create',
+            # 'fork',
+            # 'mirror',
+            # 'readme',
+            # 'sskm',
+            # 'D',
+
+        # These FEATURES are enabled by default.
+
+            # essential (unless you're using smart-http mode)
+            'ssh-authkeys',
+
+            # creates git-config entries from gitolite.conf file entries like 'config foo.bar = baz'
+            'git-config',
+
+            # creates git-daemon-export-ok files; if you don't use git-daemon, comment this out
+            'daemon',
+
+            # creates projects.list file; if you don't use gitweb, comment this out
+            'gitweb',
+
+        # These FEATURES are disabled by default; uncomment to enable.  If you
+        # need to add new ones, ask on the mailing list :-)
+
+        # user-visible behaviour
+
+            # prevent wild repos auto-create on fetch/clone
+            # 'no-create-on-read',
+            # no auto-create at all (don't forget to enable the 'create' command!)
+            # 'no-auto-create',
+
+            # access a repo by another (possibly legacy) name
+            # 'Alias',
+
+            # give some users direct shell access.  See documentation in
+            # sts.html for details on the following two choices.
+            # "Shell $ENV{HOME}/.gitolite.shell-users",
+            # 'Shell alice bob',
+
+            # set default roles from lines like 'option default.roles-1 = ...', etc.
+            # 'set-default-roles',
+
+            # show more detailed messages on deny
+            # 'expand-deny-messages',
+
+            # show a message of the day
+            # 'Motd',
+
+        # system admin stuff
+
+            # enable mirroring (don't forget to set the HOSTNAME too!)
+            # 'Mirroring',
+
+            # allow people to submit pub files with more than one key in them
+            # 'ssh-authkeys-split',
+
+            # selective read control hack
+            # 'partial-copy',
+
+            # manage local, gitolite-controlled, copies of read-only upstream repos
+            # 'upstream',
+
+            # updates 'description' file instead of 'gitweb.description' config item
+            # 'cgit',
+
+            # allow repo-specific hooks to be added
+            # 'repo-specific-hooks',
+
+        # performance, logging, monitoring...
+
+            # be nice
+            # 'renice 10',
+
+            # log CPU times (user, system, cumulative user, cumulative system)
+            # 'CpuTime',
+
+        # syntactic_sugar for gitolite.conf and included files
+
+            # allow backslash-escaped continuation lines in gitolite.conf
+            # 'continuation-lines',
+
+            # create implicit user groups from directory names in keydir/
+            # 'keysubdirs-as-groups',
+
+            # allow simple line-oriented macros
+            # 'macros',
+
+        # Kindergarten mode
+
+            # disallow various things that sensible people shouldn't be doing anyway
+            # 'Kindergarten',
+    ],
+
+);
 
 # ------------------------------------------------------------------------------
 # per perl rules, this should be the last line in such a file:
