@@ -9,6 +9,6 @@ function task_condition {
 export -f task_condition
 
 function task_execute {
-  sudo apt-get install -y gitolite
+  "$INSTALL_ROOT/lib/apt/assert_installed.sh" gitolite
 }
 export -f task_execute

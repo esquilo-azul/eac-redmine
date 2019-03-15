@@ -9,6 +9,6 @@ function task_condition {
 export -f task_condition
 
 function task_execute {
-  sudo apt-get install -y apache2
+  "$INSTALL_ROOT/lib/apt/assert_installed.sh" apache2
 }
 export -f task_execute
