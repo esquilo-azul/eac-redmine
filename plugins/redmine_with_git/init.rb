@@ -1,12 +1,14 @@
-# coding: utf-8
-
 require 'redmine'
+require 'redmine_with_git/version'
+
+require 'eac_rails_utils'
+require 'eac_ruby_utils'
 
 Redmine::Plugin.register :redmine_with_git do
   name 'RedmineWithGit'
   author 'Esquilo Azul Company'
   description 'Utilities for Redmine + plugin redmine_git_hosting.'
-  version '0.1.3'
+  version ::RedmineWithGit::VERSION
   url 'https://github.com/esquilo-azul/redmine_with_git'
   author_url 'https://github.com/esquilo-azul'
 
