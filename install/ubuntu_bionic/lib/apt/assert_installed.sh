@@ -5,8 +5,8 @@ set -h
 
 INSTALL=''
 for PKG in $@; do
-    RESULT=`dpkg-query -W '-f=${Status}' "$PKG"`
-    if [ "$RESULT" != 'install ok installed' ] ; then
+    RESULT="$("$INSTALL_ROOT/lib/apt/installed.sh" "$PKG")"
+    if [ "$RESULT" != '0' ] ; then
         echo "Package \"$PKG\" is not installed"
         INSTALL=" $PKG $INSTALL"
     fi
