@@ -17,6 +17,4 @@ Redmine::Plugin.register :redmine_with_git do
               caption: 'Redmine with Git',
               if: proc { User.current.admin? }
   end
-
-  requires_redmine_plugin :redmine_git_hosting, version_or_higher: '1.0.4'
 end
