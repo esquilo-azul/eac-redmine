@@ -1,4 +1,4 @@
-Redmine::Plugin.post_register :redmine_nonproject_modules do
+Redmine::Plugin.post_register :redmine_with_git do
   # Source: https://github.com/esquilo-azul/redmine_plugins_helper
   requires_redmine_plugin(:redmine_plugins_helper, version_or_higher: '0.3.0')
   # Source: https://github.com/jbox-web/redmine_bootstrap_kit.git
