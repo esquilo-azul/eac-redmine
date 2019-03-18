@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -37,7 +37,9 @@ class Repository < ActiveRecord::Base
   # has_many :changesets, :dependent => :destroy is too slow for big repositories
   before_destroy :clear_changesets
 
+  validates_length_of :login, maximum: 60, allow_nil: true
   validates_length_of :password, :maximum => 255, :allow_nil => true
+  validates_length_of :root_url, :url, maximum: 255
   validates_length_of :identifier, :maximum => IDENTIFIER_MAX_LENGTH, :allow_blank => true
   validates_uniqueness_of :identifier, :scope => :project_id
   validates_exclusion_of :identifier, :in => %w(browse show entry raw changes annotate diff statistics graph revisions revision)
@@ -283,7 +285,7 @@ class Repository < ActiveRecord::Base
 
   # Returns an array of committers usernames and associated user_id
   def committers
-    @committers ||= Changeset.where(:repository_id => id).uniq.pluck(:committer, :user_id)
+    @committers ||= Changeset.where(:repository_id => id).distinct.pluck(:committer, :user_id)
   end
 
   # Maps committers username to a user ids

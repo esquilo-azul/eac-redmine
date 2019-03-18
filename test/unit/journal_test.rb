@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -201,7 +201,7 @@ class JournalTest < ActiveSupport::TestCase
 
   def test_custom_field_should_return_nil_for_non_cf_detail
     d = JournalDetail.new(:property => 'subject')
-    assert_equal nil, d.custom_field
+    assert_nil d.custom_field
   end
 
   def test_visible_details_should_include_relations_to_visible_issues_only

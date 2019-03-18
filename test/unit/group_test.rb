@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -130,7 +130,7 @@ class GroupTest < ActiveSupport::TestCase
     assert group.destroy
     assert group.destroyed?
 
-    assert_equal nil, Issue.find(1).assigned_to_id
+    assert_nil Issue.find(1).assigned_to_id
   end
 
   def test_builtin_groups_should_be_created_if_missing

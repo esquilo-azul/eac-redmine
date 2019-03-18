@@ -34,7 +34,7 @@ module RedmineApp
     config.encoding = "utf-8"
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password, :senha]
+    config.filter_parameters += [:password]
 
     # Enable the asset pipeline
     config.assets.enabled = false
@@ -47,7 +47,7 @@ module RedmineApp
     # Do not include all helpers
     config.action_controller.include_all_helpers = false
 
-    # Do not supress errors in after_rollback and after_commit callbacks
+    # Do not suppress errors in after_rollback and after_commit callbacks
     config.active_record.raise_in_transactional_callbacks = true
 
     # XML parameter parser removed from core in Rails 4.0
@@ -55,7 +55,7 @@ module RedmineApp
     config.middleware.insert_after ActionDispatch::ParamsParser, ActionDispatch::XmlParamsParser
 
     # Sets the Content-Length header on responses with fixed-length bodies
-    config.middleware.use Rack::ContentLength
+    config.middleware.insert_after Rack::Sendfile, Rack::ContentLength
 
     # Verify validity of user sessions
     config.redmine_verify_sessions = true

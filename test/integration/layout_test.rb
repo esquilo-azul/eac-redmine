@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -63,7 +63,7 @@ class LayoutTest < Redmine::IntegrationTest
     Role.anonymous.add_permission! :add_issues
 
     get '/projects/ecookbook/issues/new'
-    assert_select 'head script[src=?]', '/javascripts/jstoolbar/jstoolbar-textile.min.js'
+    assert_select 'head script[src^=?]', '/javascripts/jstoolbar/jstoolbar-textile.min.js?'
   end
 
   def test_calendar_header_tags
@@ -112,26 +112,6 @@ class LayoutTest < Redmine::IntegrationTest
     with_settings :default_language => 'pt-BR' do
       get '/issues'
       assert_include "/javascripts/i18n/datepicker-pt-BR.js", response.body
-    end
-
-    with_settings :default_language => 'zh' do
-      get '/issues'
-      assert_include "/javascripts/i18n/jquery.ui.datepicker-zh-CN.js", response.body
-    end
-
-    with_settings :default_language => 'zh-TW' do
-      get '/issues'
-      assert_include "/javascripts/i18n/jquery.ui.datepicker-zh-TW.js", response.body
-    end
-
-    with_settings :default_language => 'pt' do
-      get '/issues'
-      assert_include "/javascripts/i18n/jquery.ui.datepicker-pt.js", response.body
-    end
-
-    with_settings :default_language => 'pt-BR' do
-      get '/issues'
-      assert_include "/javascripts/i18n/jquery.ui.datepicker-pt-BR.js", response.body
     end
   end
 

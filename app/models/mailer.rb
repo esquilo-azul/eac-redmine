@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -61,7 +61,7 @@ class Mailer < ActionMailer::Base
     to = issue.notified_users
     cc = issue.notified_watchers - to
     issue.each_notification(to + cc) do |users|
-      Mailer.issue_add(issue, to & users, cc & users).deliver
+      issue_add(issue, to & users, cc & users).deliver
     end
   end
 
@@ -95,7 +95,7 @@ class Mailer < ActionMailer::Base
     cc = journal.notified_watchers - to
     journal.each_notification(to + cc) do |users|
       issue.each_notification(users) do |users2|
-        Mailer.issue_edit(journal, to & users2, cc & users2).deliver
+        issue_edit(journal, to & users2, cc & users2).deliver
       end
     end
   end
@@ -311,15 +311,17 @@ class Mailer < ActionMailer::Base
   end
 
   # Notifies user that his password was updated
-  def self.password_updated(user)
+  def self.password_updated(user, options={})
     # Don't send a notification to the dummy email address when changing the password
     # of the default admin account which is required after the first login
     # TODO: maybe not the best way to handle this
     return if user.admin? && user.login == 'admin' && user.mail == 'admin@example.net'
 
-    Mailer.security_notification(user,
+    security_notification(user,
       message: :mail_body_password_updated,
       title: :button_change_password,
+      remote_ip: options[:remote_ip],
+      originator: user,
       url: {controller: 'my', action: 'password'}
     ).deliver
   end
@@ -333,7 +335,6 @@ class Mailer < ActionMailer::Base
   end
 
   def security_notification(recipients, options={})
-    redmine_headers 'Sender' => User.current.login
     @user = Array(recipients).detect{|r| r.is_a? User }
     set_language_if_valid(@user.try :language)
     @message = l(options[:message],
@@ -341,7 +342,11 @@ class Mailer < ActionMailer::Base
       value: options[:value]
     )
     @title = options[:title] && l(options[:title])
+    @originator = options[:originator] || User.current
+    @remote_ip = options[:remote_ip] || @originator.remote_ip
     @url = options[:url] && (options[:url].is_a?(Hash) ? url_for(options[:url]) : options[:url])
+    redmine_headers 'Sender' => @originator.login
+    redmine_headers 'Url' => @url
     mail :to => recipients,
       :subject => "[#{Setting.app_title}] #{l(:mail_subject_security_notification)}"
   end
@@ -359,7 +364,7 @@ class Mailer < ActionMailer::Base
     return unless changes.present?
 
     users = User.active.where(admin: true).to_a
-    Mailer.settings_updated(users, changes).deliver
+    settings_updated(users, changes).deliver
   end
 
   def test_email(user)
@@ -406,7 +411,10 @@ class Mailer < ActionMailer::Base
     end
 
     issues_by_assignee.each do |assignee, issues|
-      reminder(assignee, issues, days).deliver if assignee.is_a?(User) && assignee.active?
+      if assignee.is_a?(User) && assignee.active? && issues.present?
+        visible_issues = issues.select {|i| i.visible?(assignee)}
+        reminder(assignee, visible_issues, days).deliver if visible_issues.present?
+      end
     end
   end
 

@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@ class ContextMenusController < ApplicationController
   helper :watchers
   helper :issues
 
-  before_filter :find_issues, :only => :issues
+  before_action :find_issues, :only => :issues
 
   def issues
     if (@issues.size == 1)
@@ -45,7 +45,7 @@ class ContextMenusController < ApplicationController
 
     @options_by_custom_field = {}
     if @can[:edit]
-      custom_fields = @issues.map(&:editable_custom_fields).reduce(:&).reject(&:multiple?)
+      custom_fields = @issues.map(&:editable_custom_fields).reduce(:&).reject(&:multiple?).select {|field| field.format.bulk_edit_supported}
       custom_fields.each do |field|
         values = field.possible_values_options(@projects)
         if values.present?
@@ -59,7 +59,10 @@ class ContextMenusController < ApplicationController
   end
 
   def time_entries
-    @time_entries = TimeEntry.where(:id => params[:ids]).preload(:project).to_a
+    @time_entries = TimeEntry.where(:id => params[:ids]).
+      preload(:project => :time_entry_activities).
+      preload(:user).to_a
+
     (render_404; return) unless @time_entries.present?
     if (@time_entries.size == 1)
       @time_entry = @time_entries.first
@@ -67,7 +70,7 @@ class ContextMenusController < ApplicationController
 
     @projects = @time_entries.collect(&:project).compact.uniq
     @project = @projects.first if @projects.size == 1
-    @activities = TimeEntryActivity.shared.active
+    @activities = @projects.map(&:activities).reduce(:&)
 
     edit_allowed = @time_entries.all? {|t| t.editable_by?(User.current)}
     @can = {:edit => edit_allowed, :delete => edit_allowed}
@@ -75,7 +78,7 @@ class ContextMenusController < ApplicationController
 
     @options_by_custom_field = {}
     if @can[:edit]
-      custom_fields = @time_entries.map(&:editable_custom_fields).reduce(:&).reject(&:multiple?)
+      custom_fields = @time_entries.map(&:editable_custom_fields).reduce(:&).reject(&:multiple?).select {|field| field.format.bulk_edit_supported}
       custom_fields.each do |field|
         values = field.possible_values_options(@projects)
         if values.present?

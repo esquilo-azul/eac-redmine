@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -61,7 +61,7 @@ module Redmine
 
       # Returns the siblings
       def siblings
-        nested_set_scope.where(:parent_id => parent_id).where("id <> ?", id)
+        nested_set_scope.where(:parent_id => parent_id).where("#{self.class.table_name}.id <> ?", id)
       end
 
       # Returns the ancestors

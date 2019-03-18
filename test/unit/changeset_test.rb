@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -566,7 +566,7 @@ class ChangesetTest < ActiveSupport::TestCase
                       :committer    => nil)
     assert( c.save )
     assert_equal "", c.comments
-    assert_equal nil, c.committer
+    assert_nil c.committer
     assert_equal "UTF-8", c.comments.encoding.to_s
   end
 

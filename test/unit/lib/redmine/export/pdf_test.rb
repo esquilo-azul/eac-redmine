@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -94,9 +94,9 @@ class PdfTest < ActiveSupport::TestCase
       assert a2.readable?
       assert (! a2.visible?)
       aa1 = Redmine::Export::PDF::RDMPdfEncoding::attach(Attachment.all, "Testfile.PNG", "UTF-8")
-      assert_equal nil, aa1
+      assert_nil aa1
       aa2 = Redmine::Export::PDF::RDMPdfEncoding::attach(Attachment.all, "test#{str2}.png", encoding)
-      assert_equal nil, aa2
+      assert_nil aa2
 
       set_tmp_attachments_directory
     end

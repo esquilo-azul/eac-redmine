@@ -1,8 +1,0 @@
----
-trf1_sjap_projects_001:
-  id: '1'
-  project_id: '1'
-  eadmin_matricula: 'ap12345'
-  eadmin_senha: 'abc123'
-  eadmin_banco: 'JFAP'
-  esosti_export_project_id:

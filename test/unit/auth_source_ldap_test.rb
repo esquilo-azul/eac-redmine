@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -95,17 +95,17 @@ class AuthSourceLdapTest < ActiveSupport::TestCase
 
     test '#authenticate with an invalid LDAP user should return nil' do
       auth = AuthSourceLdap.find(1)
-      assert_equal nil, auth.authenticate('nouser','123456')
+      assert_nil auth.authenticate('nouser','123456')
     end
 
     test '#authenticate without a login should return nil' do
       auth = AuthSourceLdap.find(1)
-      assert_equal nil, auth.authenticate('','123456')
+      assert_nil auth.authenticate('','123456')
     end
 
     test '#authenticate without a password should return nil' do
       auth = AuthSourceLdap.find(1)
-      assert_equal nil, auth.authenticate('edavis','')
+      assert_nil auth.authenticate('edavis','')
     end
 
     test '#authenticate without filter should return any user' do

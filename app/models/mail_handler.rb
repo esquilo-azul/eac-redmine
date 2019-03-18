@@ -1,5 +1,5 @@
 # Redmine - project management software
-# Copyright (C) 2006-2016  Jean-Philippe Lang
+# Copyright (C) 2006-2017  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -65,7 +65,7 @@ class MailHandler < ActionMailer::Base
     %w(project status tracker category priority assigned_to fixed_version).each do |option|
       options[:issue][option.to_sym] = env[option] if env[option]
     end
-    %w(allow_override unknown_user no_permission_check no_account_notice default_group project_from_subaddress).each do |option|
+    %w(allow_override unknown_user no_permission_check no_account_notice no_notification default_group project_from_subaddress).each do |option|
       options[option.to_sym] = env[option] if env[option]
     end
     if env['private']
@@ -130,7 +130,7 @@ class MailHandler < ActionMailer::Base
           end
           add_user_to_group(handler_options[:default_group])
           unless handler_options[:no_account_notice]
-            Mailer.account_information(@user, @user.password).deliver
+            ::Mailer.account_information(@user, @user.password).deliver
           end
         else
           if logger
@@ -250,8 +250,8 @@ class MailHandler < ActionMailer::Base
 
     # add To and Cc as watchers before saving so the watchers can reply to Redmine
     add_watchers(issue)
-    add_attachments(issue)
     issue.save!
+    add_attachments(issue)
     if logger
       logger.info "MailHandler: issue ##{issue.id} updated by #{user}"
     end
@@ -296,6 +296,7 @@ class MailHandler < ActionMailer::Base
     if email.attachments && email.attachments.any?
       email.attachments.each do |attachment|
         next unless accept_attachment?(attachment)
+        next unless attachment.body.decoded.size > 0
         obj.attachments << Attachment.create(:container => obj,
                           :file => attachment.body.decoded,
                           :filename => attachment.filename,
@@ -445,19 +446,27 @@ class MailHandler < ActionMailer::Base
   def plain_text_body
     return @plain_text_body unless @plain_text_body.nil?
 
-    parts = if (text_parts = email.all_parts.select {|p| p.mime_type == 'text/plain'}).present?
-              text_parts
-            elsif (html_parts = email.all_parts.select {|p| p.mime_type == 'text/html'}).present?
-              html_parts
-            else
-              [email]
-            end
+    # check if we have any plain-text parts with content
+    @plain_text_body = email_parts_to_text(email.all_parts.select {|p| p.mime_type == 'text/plain'}).presence
 
+    # if not, we try to parse the body from the HTML-parts
+    @plain_text_body ||= email_parts_to_text(email.all_parts.select {|p| p.mime_type == 'text/html'}).presence
+
+    # If there is still no body found, and there are no mime-parts defined,
+    # we use the whole raw mail body
+    @plain_text_body ||= email_parts_to_text([email]).presence if email.all_parts.empty?
+
+    # As a fallback we return an empty plain text body (e.g. if we have only
+    # empty text parts but a non-text attachment)
+    @plain_text_body ||= ""
+  end
+
+  def email_parts_to_text(parts)
     parts.reject! do |part|
       part.attachment?
     end
 
-    @plain_text_body = parts.map do |p|
+    parts.map do |p|
       body_charset = Mail::RubyVer.respond_to?(:pick_encoding) ?
                        Mail::RubyVer.pick_encoding(p.charset).to_s : p.charset
 
@@ -465,8 +474,6 @@ class MailHandler < ActionMailer::Base
       # convert html parts to text
       p.mime_type == 'text/html' ? self.class.html_body_to_text(body) : self.class.plain_text_body_to_text(body)
     end.join("\r\n")
-
-    @plain_text_body
   end
 
   def cleaned_up_text_body
@@ -561,9 +568,18 @@ class MailHandler < ActionMailer::Base
 
   # Removes the email body of text after the truncation configurations.
   def cleanup_body(body)
-    delimiters = Setting.mail_handler_body_delimiters.to_s.split(/[\r\n]+/).reject(&:blank?).map {|s| Regexp.escape(s)}
+    delimiters = Setting.mail_handler_body_delimiters.to_s.split(/[\r\n]+/).reject(&:blank?)
+
+    if Setting.mail_handler_enable_regex_delimiters?
+      begin
+        delimiters = delimiters.map {|s| Regexp.new(s)}
+      rescue RegexpError => e
+        logger.error "MailHandler: invalid regexp delimiter found in mail_handler_body_delimiters setting (#{e.message})" if logger
+      end
+    end
+
     unless delimiters.empty?
-      regex = Regexp.new("^[> ]*(#{ delimiters.join('|') })\s*[\r\n].*", Regexp::MULTILINE)
+      regex = Regexp.new("^[> ]*(#{ Regexp.union(delimiters) })[[:blank:]]*[\r\n].*", Regexp::MULTILINE)
       body = body.gsub(regex, '')
     end
     body.strip
