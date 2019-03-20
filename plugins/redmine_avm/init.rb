@@ -5,11 +5,11 @@ require 'redmine'
 require 'avm/patches/issue_patch'
 require 'avm/patches/test_case_patch'
 
-Redmine::Plugin.register :avm do
+Redmine::Plugin.register :redmine_avm do
   name 'Agora Vai! Methodology'
   author 'Eduardo Henrique Bogoni'
   description ''
-  version '0.2.0'
+  version '0.3.0'
 
   settings(partial: 'settings/avm')
 

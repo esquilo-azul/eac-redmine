@@ -14,8 +14,8 @@ module Avm
       end
 
       def admin_user(raise_if_empty = true)
-        if Setting.plugin_avm['admin_user_id'].present?
-          User.find(Setting.plugin_avm['admin_user_id'])
+        if Setting.plugin_redmine_avm['admin_user_id'].present?
+          User.find(Setting.plugin_redmine_avm['admin_user_id'])
         elsif raise_if_empty
           raise 'Usuário administrador não configurado. Acesse /settings/plugin/avm.'
         end
@@ -44,17 +44,17 @@ module Avm
       private
 
       def issue_status(key, message, raise_if_empty)
-        if Setting.plugin_avm[key].present?
-          IssueStatus.find(Setting.plugin_avm[key])
+        if Setting.plugin_redmine_avm[key].present?
+          IssueStatus.find(Setting.plugin_redmine_avm[key])
         elsif raise_if_empty
           raise "Situação de tarefa #{message} não configurada. Acesse /settings/plugin/avm."
         end
       end
 
       def required_text(key)
-        v = Setting.plugin_avm[key]
+        v = Setting.plugin_redmine_avm[key]
         return v if v.present?
-        raise "Setting.plugin_avm[#{key}] is empty"
+        raise "Setting.plugin_redmine_avm[#{key}] is empty"
       end
     end
   end
