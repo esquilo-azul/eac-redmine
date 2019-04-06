@@ -2,8 +2,6 @@
 
 require 'redmine'
 
-require 'heroku/patches/repository_patch'
-
 Redmine::Plugin.register :heroku do
   name 'Heroku'
   author 'Eduardo Henrique Bogoni'
@@ -19,5 +17,6 @@ Redmine::Plugin.register :heroku do
 end
 
 Rails.configuration.to_prepare do
+  require 'heroku/patches/repository_patch'
   EventsManager.add_listener(Repository, :receive, 'Heroku::Listeners::Repository::Receive')
 end
