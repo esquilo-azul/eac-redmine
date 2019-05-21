@@ -84,8 +84,6 @@ if [ -z "$instance_id" ]; then
   export instance_id="$("${INSTALL_ROOT2}/lib/text/replace-non-alpha-numbers.sh" "$REDMINE_ROOT")"
 fi
 
-source "$INSTALL_ROOT2/lib/rvm/source.sh"
-
 function sanitize_boolean_var {
   if [ "$1" != 'false' -a "$1" != 'true' ]; then
     if [ -n "$1" ]; then
