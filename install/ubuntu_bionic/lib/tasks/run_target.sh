@@ -18,7 +18,7 @@ export -f _function_exists
 function _call_task_function {
   local task=$1
   local function_name=$2
-  local script="$INSTALL_ROOT/tasks/$task.sh"
+  local script="$INSTALL_ROOT2/tasks/$task.sh"
   unset -f $function_name
   if [ ! -f "$script" ]; then
     echo "Script for task \"$task\" does not exist"
@@ -73,12 +73,12 @@ function check_task {
   set -u
   set -e
   local task=$1
-  if [ $("$INSTALL_ROOT/lib/text/valid_check_name.sh" "$task") -ne 0 ]; then
+  if [ $("$INSTALL_ROOT2/lib/text/valid_check_name.sh" "$task") -ne 0 ]; then
     echo "Invalid task name: \"$task\""
     exit 1
   fi
-  if [ $("$INSTALL_ROOT/lib/text/checked.sh" "$CHECKED_TASKS" "$1") -ne 0 ]; then
-    CHECKED_TASKS=$("$INSTALL_ROOT/lib/text/check.sh" "$CHECKED_TASKS" "$1")
+  if [ $("$INSTALL_ROOT2/lib/text/checked.sh" "$CHECKED_TASKS" "$1") -ne 0 ]; then
+    CHECKED_TASKS=$("$INSTALL_ROOT2/lib/text/check.sh" "$CHECKED_TASKS" "$1")
     for dep in $(_call_task_function $task task_dependencies); do
       check_task $dep
     done
@@ -97,7 +97,7 @@ function check_task {
       else
         _task_message_condition $task 0 0
         for trigger in $(_call_task_function $task task_triggers); do
-          TRIGGERS=$("$INSTALL_ROOT/lib/text/check.sh" "$TRIGGERS" "$trigger")
+          TRIGGERS=$("$INSTALL_ROOT2/lib/text/check.sh" "$TRIGGERS" "$trigger")
         done
       fi
     else

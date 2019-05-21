@@ -6,7 +6,7 @@ set -e
 gitolite_rc_file="$gitolite_user_home/.gitolite.rc"
 
 function gitolite_rc_template {
-  "$INSTALL_ROOT/lib/text/template.sh" "$INSTALL_ROOT/template/gitolite.rc"
+  "$INSTALL_ROOT2/lib/text/template.sh" "$INSTALL_ROOT2/template/gitolite.rc"
 }
 
 function task_dependencies {
@@ -18,7 +18,7 @@ function task_condition {
   temprc="$(sudo -u "$gitolite_user" mktemp)"
   sudo -u "$gitolite_user" cp "$gitolite_user_home/.gitolite.rc" "$temprc"
   sudo -u "$gitolite_user" chmod 777 "$temprc"
-  if [ "$(gitolite_rc_template | "$INSTALL_ROOT/lib/text/diff-stdin-file.sh" "$temprc" )" -ne 0 ]; then
+  if [ "$(gitolite_rc_template | "$INSTALL_ROOT2/lib/text/diff-stdin-file.sh" "$temprc" )" -ne 0 ]; then
     return 1
   fi
 }

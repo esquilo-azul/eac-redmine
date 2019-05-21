@@ -4,7 +4,7 @@ set -u
 set -e
 
 function task_condition {
-  return $("$INSTALL_ROOT/lib/redmine/migration_status.sh")
+  return $("$INSTALL_ROOT2/lib/redmine/migration_status.sh")
 }
 export -f task_condition
 
@@ -16,6 +16,6 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_execute {
-  "$INSTALL_ROOT/lib/rails/rake.sh" redmine:migrate
+  "$INSTALL_ROOT2/lib/rails/rake.sh" redmine:migrate
 }
 export -f task_execute

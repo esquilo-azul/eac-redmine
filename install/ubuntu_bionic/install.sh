@@ -9,7 +9,7 @@ function trigger_apache_restart {
 export -f trigger_apache_restart
 
 function trigger_redmine_git_hosting_rescue {
-  "$INSTALL_ROOT/lib/rails/rake.sh" redmine_with_git:rescue
+  "$INSTALL_ROOT2/lib/rails/rake.sh" redmine_with_git:rescue
 }
 export -f trigger_redmine_git_hosting_rescue
 
@@ -20,4 +20,4 @@ if [ -z "$TASK" ]; then
   >&2 echo "<TASK>: development|redmine_as_apache_base|redmine_as_apache_path"
   exit 1
 fi
-"$INSTALL_ROOT/lib/tasks/run_target.sh" $TASK
+"$INSTALL_ROOT2/lib/tasks/run_target.sh" $TASK

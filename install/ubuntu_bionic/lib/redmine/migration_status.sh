@@ -4,7 +4,7 @@ set -e
 set -u
 
 function migration_status() {
-  local content="$("$INSTALL_ROOT/lib/rails/rake.sh" "$1" 2> /dev/null)"
+  local content="$("$INSTALL_ROOT2/lib/rails/rake.sh" "$1" 2> /dev/null)"
   set +e
   echo "$content" | grep '^\s*down\s' > /dev/null 2> /dev/null
   down=$?

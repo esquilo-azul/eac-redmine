@@ -5,14 +5,14 @@ set -e
 
 
 function passenger_load {
-  echo LoadModule passenger_module "$("$INSTALL_ROOT/lib/passenger/apache_library.sh")"
+  echo LoadModule passenger_module "$("$INSTALL_ROOT2/lib/passenger/apache_library.sh")"
 }
 
 function passenger_conf {
   echo "
   <IfModule mod_passenger.c>
-       PassengerRoot $("$INSTALL_ROOT/lib/passenger/root.sh")
-       PassengerDefaultRuby $("$INSTALL_ROOT/lib/ruby/path.sh")
+       PassengerRoot $("$INSTALL_ROOT2/lib/passenger/root.sh")
+       PassengerDefaultRuby $("$INSTALL_ROOT2/lib/ruby/path.sh")
   </IfModule>"
 }
 
@@ -34,10 +34,10 @@ function task_condition {
   if [ ! -f /etc/apache2/mods-enabled/passenger.conf ]; then
     return 1
   fi
-  if [ "$(passenger_load | "$INSTALL_ROOT/lib/text/diff-stdin-file.sh" /etc/apache2/mods-enabled/passenger.load )" -ne 0 ]; then
+  if [ "$(passenger_load | "$INSTALL_ROOT2/lib/text/diff-stdin-file.sh" /etc/apache2/mods-enabled/passenger.load )" -ne 0 ]; then
     return 1
   fi
-  if [ "$(passenger_conf | "$INSTALL_ROOT/lib/text/diff-stdin-file.sh" /etc/apache2/mods-enabled/passenger.conf )" -ne 0 ]; then
+  if [ "$(passenger_conf | "$INSTALL_ROOT2/lib/text/diff-stdin-file.sh" /etc/apache2/mods-enabled/passenger.conf )" -ne 0 ]; then
     return 1
   fi
 }

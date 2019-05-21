@@ -4,7 +4,7 @@ set -u
 set -e
 
 function task_condition {
-  return $("$INSTALL_ROOT/lib/linux/service_running.sh" postgresql)
+  return $("$INSTALL_ROOT2/lib/linux/service_running.sh" postgresql)
 }
 export -f task_condition
 

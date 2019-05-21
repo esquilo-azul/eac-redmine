@@ -9,7 +9,7 @@ in_tmp=$(mktemp)
 cp "$1" "$in_tmp"
 cp "$1" "$out_tmp"
 
-for var in $("$INSTALL_ROOT/lib/text/variables.sh" "$1"); do
+for var in $("$INSTALL_ROOT2/lib/text/variables.sh" "$1"); do
   if [ -z ${!var+x} ]; then
     echo "Variable \"$var\" is unset"
     exit 1

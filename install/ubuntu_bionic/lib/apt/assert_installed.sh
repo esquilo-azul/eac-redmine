@@ -5,7 +5,7 @@ set -e
 
 INSTALL=''
 for PKG in $@; do
-    RESULT="$("$INSTALL_ROOT/lib/apt/installed.sh" "$PKG")"
+    RESULT="$("$INSTALL_ROOT2/lib/apt/installed.sh" "$PKG")"
     if [ "$RESULT" != '0' ] ; then
         echo "Package \"$PKG\" is not installed"
         INSTALL=" $PKG $INSTALL"

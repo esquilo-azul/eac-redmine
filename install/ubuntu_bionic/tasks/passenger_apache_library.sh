@@ -9,7 +9,7 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-  if [ -f "$("$INSTALL_ROOT/lib/passenger/apache_library.sh")" ]; then
+  if [ -f "$("$INSTALL_ROOT2/lib/passenger/apache_library.sh")" ]; then
     return 0
   else
     return 1
@@ -18,7 +18,7 @@ function task_condition {
 export -f task_condition
 
 function task_execute {
-  "$INSTALL_ROOT/lib/apt/assert_installed.sh" libcurl4-openssl-dev libssl-dev apache2-dev libapr1-dev libaprutil1-dev apache2
+  "$INSTALL_ROOT2/lib/apt/assert_installed.sh" libcurl4-openssl-dev libssl-dev apache2-dev libapr1-dev libaprutil1-dev apache2
   passenger-install-apache2-module -a
 }
 export -f task_execute

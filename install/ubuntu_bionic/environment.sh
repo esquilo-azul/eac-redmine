@@ -3,11 +3,11 @@
 set -u
 set -e
 
-export INSTALL_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-export REDMINE_ROOT=$(dirname "$(dirname "$INSTALL_ROOT")")
+export INSTALL_ROOT2=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export REDMINE_ROOT=$(dirname "$(dirname "$INSTALL_ROOT2")")
 export TASK=''
 
-SAMPLE_SETTINGS="$INSTALL_ROOT/default-settings.sh"
+SAMPLE_SETTINGS="$INSTALL_ROOT2/default-settings.sh"
 DEFAULT_SETTINGS="$REDMINE_ROOT/config/install.sh"
 SETTINGS_FILE=''
 HELP=''
@@ -77,12 +77,12 @@ do
   source "$S"
 done
 
-export instance_id="$("${INSTALL_ROOT}/lib/text/replace-non-alpha-numbers.sh" "$address_path")"
+export instance_id="$("${INSTALL_ROOT2}/lib/text/replace-non-alpha-numbers.sh" "$address_path")"
 if [ -z "$instance_id" ]; then
-  export instance_id="$("${INSTALL_ROOT}/lib/text/replace-non-alpha-numbers.sh" "$REDMINE_ROOT")"
+  export instance_id="$("${INSTALL_ROOT2}/lib/text/replace-non-alpha-numbers.sh" "$REDMINE_ROOT")"
 fi
 
-source "$INSTALL_ROOT/lib/rvm/source.sh"
+source "$INSTALL_ROOT2/lib/rvm/source.sh"
 
 function sanitize_boolean_var {
   if [ "$1" != 'false' -a "$1" != 'true' ]; then

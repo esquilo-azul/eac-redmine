@@ -9,7 +9,7 @@ function host_name_setting_template {
 export -f host_name_setting_template
 
 function host_name_setting_current {
-  "$INSTALL_ROOT/lib/redmine/get_setting_value.sh" 'host_name'
+  "$INSTALL_ROOT2/lib/redmine/get_setting_value.sh" 'host_name'
 }
 export -f host_name_setting_current
 
@@ -20,14 +20,14 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-  return $("$INSTALL_ROOT/lib/text/diff-commands.sh" 'host_name_setting_template' 'host_name_setting_current')
+  return $("$INSTALL_ROOT2/lib/text/diff-commands.sh" 'host_name_setting_template' 'host_name_setting_current')
 }
 export -f task_condition
 
 function task_execute {
   set -u
   set -e
-  local setting_value=$(host_name_setting_template | "$INSTALL_ROOT/lib/text/escape_single_quotes.sh")
-  "$INSTALL_ROOT/lib/redmine/set_setting_value.sh" 'host_name' "$setting_value"
+  local setting_value=$(host_name_setting_template | "$INSTALL_ROOT2/lib/text/escape_single_quotes.sh")
+  "$INSTALL_ROOT2/lib/redmine/set_setting_value.sh" 'host_name' "$setting_value"
 }
 export -f task_execute

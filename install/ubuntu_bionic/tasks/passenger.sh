@@ -9,7 +9,7 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-  return $("$INSTALL_ROOT/lib/ruby/gem_installed.sh" passenger)
+  return $("$INSTALL_ROOT2/lib/ruby/gem_installed.sh" passenger)
 }
 export -f task_condition
 
