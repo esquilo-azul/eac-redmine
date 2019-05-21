@@ -20,4 +20,5 @@ if [ -z "$TASK" ]; then
   >&2 echo "<TASK>: development|redmine_as_apache_base|redmine_as_apache_path"
   exit 1
 fi
-"$INSTALL_ROOT2/lib/tasks/run_target.sh" $TASK
+
+"$PLUGIN_ROOT/vendor/taskeiro/taskeiro" --path "$INSTALL_ROOT2/tasks:$(taskeiro_path)" "$TASK"

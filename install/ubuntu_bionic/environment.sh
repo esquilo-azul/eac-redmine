@@ -5,6 +5,8 @@ set -e
 
 export INSTALL_ROOT2=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 export REDMINE_ROOT=$(dirname "$(dirname "$INSTALL_ROOT2")")
+export PLUGIN_ROOT="$REDMINE_ROOT/plugins/redmine_installer"
+export INSTALL_ROOT="$PLUGIN_ROOT/installer"
 export TASK=''
 
 SAMPLE_SETTINGS="$INSTALL_ROOT2/default-settings.sh"
@@ -57,7 +59,7 @@ if [ -n "$HELP" ]; then
   exit
 fi
 
-SETTINGS=("$SAMPLE_SETTINGS")
+SETTINGS=("$INSTALL_ROOT/default-settings.sh" "$SAMPLE_SETTINGS")
 
 if [ -f "$DEFAULT_SETTINGS" ]; then
   SETTINGS+=("$DEFAULT_SETTINGS")
@@ -112,3 +114,6 @@ export address_server="$address_host"
 if [ -n "$address_port" ]; then
   export address_server="$address_server:$address_port"
 fi
+
+# redmine_installer
+source "$INSTALL_ROOT/environment.sh"
