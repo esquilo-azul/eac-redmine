@@ -16,7 +16,7 @@ GIT
       rack (~> 1.6.0)
 
 PATH
-  remote: /home/eduardo/Dropbox/development/projects/eac/eac-redmine/plugins/redmine_with_git
+  remote: plugins/redmine_with_git
   specs:
     redmine_with_git (0.1.4)
       eac_rails_utils (~> 0.2)
@@ -72,9 +72,9 @@ GEM
     addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
     arel (6.0.4)
-    asciidoctor (2.0.6)
+    asciidoctor (2.0.10)
     ast (2.4.0)
-    autoprefixer-rails (9.5.0)
+    autoprefixer-rails (9.6.0)
       execjs
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
@@ -123,15 +123,15 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     docile (1.1.5)
     docopt (0.6.1)
-    eac_rails_utils (0.2.1)
+    eac_rails_utils (0.4.0)
       activemodel-associations (>= 0.1.2)
       bootstrap-sass (>= 3.3.6)
       htmlbeautifier (>= 1.1.1)
       nested_form_fields
       ofx-parser (>= 1.1.0)
-      rails (~> 4.2.1)
+      rails (~> 4.2, >= 4.2.1)
       virtus (>= 1.0.5)
-    eac_ruby_utils (0.3.0)
+    eac_ruby_utils (0.5.2)
       activesupport (~> 4.0)
       colorize (~> 0.8.1)
       docopt (~> 0.6.1)
@@ -143,12 +143,12 @@ GEM
       i18n (>= 0.7)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
-    ffi (1.10.0)
+    ffi (1.11.1)
     github-markup (3.0.4)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     gratr19 (0.4.4.1)
-    haml (5.0.4)
+    haml (5.1.1)
       temple (>= 0.8.0)
       tilt
     haml-rails (1.0.0)
@@ -190,7 +190,7 @@ GEM
     mocha (1.8.0)
       metaclass (~> 0.0.1)
     multi_json (1.13.1)
-    multipart-post (2.0.0)
+    multipart-post (2.1.1)
     nested_form_fields (0.8.2)
       coffee-rails (>= 3.2.1)
       jquery-rails
@@ -204,13 +204,12 @@ GEM
     org-ruby (0.9.12)
       rubypants (~> 0.2)
     parallel (1.17.0)
-    parser (2.6.2.1)
+    parser (2.6.3.0)
       ast (~> 2.4.0)
     pg (0.18.4)
     protected_attributes (1.1.4)
       activemodel (>= 4.0.1, < 5.0)
-    psych (3.1.0)
-    public_suffix (3.0.3)
+    public_suffix (3.1.0)
     rack (1.6.11)
     rack-openid (1.4.2)
       rack (>= 1.1.0)
@@ -254,7 +253,7 @@ GEM
     rbpdf-font (1.19.1)
     rdoc (4.3.0)
     redcarpet (3.4.0)
-    redis (4.1.0)
+    redis (4.1.2)
     request_store (1.0.5)
     rmagick (2.16.0)
     roadie (3.2.2)
@@ -263,20 +262,19 @@ GEM
     roadie-rails (1.1.1)
       railties (>= 3.0, < 5.1)
       roadie (~> 3.1)
-    rubocop (0.67.2)
+    rubocop (0.71.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
-      parser (>= 2.5, != 2.5.1.1)
-      psych (>= 3.1.0)
+      parser (>= 2.6)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 1.6)
+      unicode-display_width (>= 1.4.0, < 1.7)
     ruby-openid (2.3.0)
-    ruby-progressbar (1.10.0)
+    ruby-progressbar (1.10.1)
     ruby_parser (3.13.1)
       sexp_processor (~> 4.9)
     rubypants (0.7.0)
-    rubyzip (1.2.2)
+    rubyzip (1.2.3)
     rugged (0.28.1)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
@@ -296,7 +294,7 @@ GEM
       childprocess (~> 0.5)
       rubyzip (~> 1.0)
       websocket (~> 1.0)
-    sexp_processor (4.12.0)
+    sexp_processor (4.12.1)
     simplecov (0.9.2)
       docile (~> 1.1.0)
       multi_json (~> 1.0)
@@ -310,7 +308,7 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     sshkey (2.0.0)
-    telegram-bot-ruby (0.8.6.1)
+    telegram-bot-ruby (0.10.1)
       faraday
       inflecto
       virtus
@@ -322,7 +320,7 @@ GEM
     tilt (2.0.9)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
-    unicode-display_width (1.5.0)
+    unicode-display_width (1.6.0)
     virtus (1.0.5)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
@@ -401,4 +399,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   1.16.2
+   1.17.1
