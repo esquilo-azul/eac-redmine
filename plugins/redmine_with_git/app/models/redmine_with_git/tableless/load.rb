@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RedmineWithGit
   module Tableless
     class Load < ::EacRailsUtils::TablelessModel
@@ -7,10 +9,11 @@ module RedmineWithGit
 
       def save
         return false unless valid?
+
         ::RedmineWithGit::Load::All.new(path.path)
         true
-      rescue StandardError => ex
-        errors.add(:path, ex.message)
+      rescue StandardError => e
+        errors.add(:path, e.message)
         false
       end
 

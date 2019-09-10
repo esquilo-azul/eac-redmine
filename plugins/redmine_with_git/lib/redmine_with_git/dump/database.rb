@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RedmineWithGit
   module Dump
     class Database < ::RedmineWithGit::Dump::Base

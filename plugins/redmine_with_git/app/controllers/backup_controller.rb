@@ -1,5 +1,15 @@
-class RedmineWithGitController < ApplicationController
-  before_filter :require_admin
+# frozen_string_literal: true
+
+class BackupController < ApplicationController
+  EXPORT_PERMISSION = 'redmine_with_git.backup.export'
+  IMPORT_PERMISSION = 'redmine_with_git.backup.import'
+
+  PERMISSIONS = { or: [EXPORT_PERMISSION, IMPORT_PERMISSION] }.freeze
+
+  layout 'nonproject_modules'
+  require_permission PERMISSIONS, only: [:index]
+  require_permission EXPORT_PERMISSION, only: [:export]
+  require_permission IMPORT_PERMISSION, only: [:import]
 
   accept_api_auth :export, :import
 
@@ -11,7 +21,10 @@ class RedmineWithGitController < ApplicationController
 
   def export
     Tempfile.open('redmine_export') do |file|
-      ::RedmineWithGit::Dump::All.new(file.path, true)
+      ::RedmineWithGit::Dump::All.new(
+        file.path,
+        overwrite: ::RedmineWithGit::Dump::Base::OVERWRITE_ALLOWED
+      )
       send_file(file.path, filename: export_file_name, type: 'application/x-tar',
                            size: file.size)
     end
@@ -30,7 +43,7 @@ class RedmineWithGitController < ApplicationController
 
   def import_respond_to_html
     if @load.errors.empty?
-      redirect_to redmine_with_git_path, notice: 'Backup imported'
+      redirect_to backup_path, notice: 'Backup imported'
     else
       render :index
     end
@@ -42,7 +55,8 @@ class RedmineWithGitController < ApplicationController
 
   def import_params
     ps = params[::RedmineWithGit::Tableless::Load.model_name.param_key]
-    return {} unless ps.present?
+    return {} if ps.blank?
+
     ps.permit(:path)
   end
 end

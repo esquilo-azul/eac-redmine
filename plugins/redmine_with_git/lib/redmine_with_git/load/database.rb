@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency 'redmine_plugins_helper'
 
 module RedmineWithGit
@@ -8,9 +10,10 @@ module RedmineWithGit
       private
 
       def before_clear
-        raise(<<EOS) unless ::RedminePluginsHelper.settings_table_exist?
-Settings table does not exist.
-EOS
+        raise(<<~MESSAGE) unless ::RedminePluginsHelper.settings_table_exist?
+          Settings table does not exist.
+        MESSAGE
+
         @redmine_git_hosting_setting = ::Setting.plugin_redmine_git_hosting
       end
 

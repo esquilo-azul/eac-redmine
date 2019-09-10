@@ -1,0 +1,14 @@
+<div>
+  <%= link_to_function(l(:button_show), "$('#redmine_with_git_api').toggle();")%>
+  <div id='redmine_with_git_api' class="autoscroll" >
+    <% if ::GroupPermission.permission?(::BackupController::EXPORT_PERMISSION) %>
+      <h4>Export CURL command</h4>
+      <%= export_api_curl_command %>
+    <% end %>
+    <% if ::GroupPermission.permission?(::BackupController::IMPORT_PERMISSION) %>
+      <h4>Import CURL command</h4>
+      <%= import_api_curl_command %>
+    <% end %>
+  </div>
+</div>
+<%= javascript_tag("$('#redmine_with_git_api').hide();") %>

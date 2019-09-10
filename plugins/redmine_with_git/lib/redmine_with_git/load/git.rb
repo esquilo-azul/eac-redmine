@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RedmineWithGit
   module Load
     class Git < ::RedmineWithGit::Load::Base

@@ -39,9 +39,10 @@ PATH
 PATH
   remote: plugins/redmine_with_git
   specs:
-    redmine_with_git (0.1.6)
+    redmine_with_git (0.4.0)
+      avm-tools (~> 0.8)
       eac_rails_utils (~> 0.2)
-      eac_ruby_utils (~> 0.1, >= 0.1.2)
+      eac_ruby_utils (~> 0.10, >= 0.10.1)
 
 GEM
   remote: https://rubygems.org/
@@ -103,6 +104,9 @@ GEM
     ast (2.4.0)
     autoprefixer-rails (9.6.1.1)
       execjs
+    avm-tools (0.9.0)
+      eac_launcher (~> 0.6, >= 0.6.1)
+      eac_ruby_utils (~> 0.11)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -136,6 +140,7 @@ GEM
     creole (0.5.0)
     css_parser (1.7.0)
       addressable
+    curb (0.9.10)
     daemons (1.3.1)
     daemons-rails (1.2.1)
       daemons
@@ -150,6 +155,13 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     docile (1.1.5)
     docopt (0.6.1)
+    eac_launcher (0.6.1)
+      activesupport (~> 4.2, >= 4.2.10)
+      colorize (~> 0.8.1)
+      curb (~> 0.9.4)
+      eac_ruby_utils (~> 0.10, >= 0.10.1)
+      git (~> 1.3.0)
+      ruby-progressbar
     eac_rails_utils (0.5.0)
       activemodel-associations (>= 0.1.2)
       bootstrap-sass (>= 3.3.6)
@@ -172,6 +184,7 @@ GEM
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
     ffi (1.11.1)
+    git (1.3.0)
     github-markup (3.0.4)
     globalid (0.4.2)
       activesupport (>= 4.2.0)

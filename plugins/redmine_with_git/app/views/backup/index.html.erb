@@ -1,0 +1,13 @@
+<h2>Redmine With Git</h2>
+<% if ::GroupPermission.permission?(::BackupController::EXPORT_PERMISSION) %>
+  <h3>Export</h3>
+  <%= render partial: 'export' %>
+<% end %>
+<% if ::GroupPermission.permission?(::BackupController::IMPORT_PERMISSION) %>
+  <h3>Import</h3>
+  <%= render partial: 'import' %>
+<% end %>
+<% if Setting.rest_api_enabled? %>
+  <h3>API</h3>
+  <%= render partial: 'api' %>
+<% end %>
