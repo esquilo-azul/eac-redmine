@@ -29,7 +29,7 @@ function task_execute {
   set -u
   set -e
   local setting_value=$(redmine_git_hosting_setting_template | "$INSTALL_ROOT2/lib/text/escape_single_quotes.sh")
-  "$INSTALL_ROOT2/lib/redmine/set_setting_value.sh" 'plugin_redmine_git_hosting' "$setting_value"
+  programeiro /redmine/set_setting_value 'plugin_redmine_git_hosting' "$setting_value"
 }
 export -f task_execute
 
