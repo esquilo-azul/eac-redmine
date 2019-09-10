@@ -16,6 +16,12 @@ GIT
       rack (~> 1.6.0)
 
 PATH
+  remote: .
+  specs:
+    redmine_plugins_helper (0.5.2)
+      sass-rails (~> 5.0)
+
+PATH
   remote: plugins/redmine_avm
   specs:
     redmine_avm (0.3.3)
@@ -31,15 +37,9 @@ PATH
       virtus
 
 PATH
-  remote: .
-  specs:
-    redmine_plugins_helper (0.5.2)
-      sass-rails (~> 5.0)
-
-PATH
   remote: plugins/redmine_with_git
   specs:
-    redmine_with_git (0.4.0)
+    redmine_with_git (0.5.0)
       avm-tools (~> 0.8)
       eac_rails_utils (~> 0.2)
       eac_ruby_utils (~> 0.10, >= 0.10.1)
