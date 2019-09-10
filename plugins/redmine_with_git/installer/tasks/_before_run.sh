@@ -1,2 +1,5 @@
 # Default settings
 export redmine_git_hosting_ssh_key_name=redmine_git_hosting_id
+
+# Task dependencies
+taskeiro_add_dependency redmine_bundle redmine_with_git_bundle_requirements
