@@ -9,7 +9,7 @@ function host_name_setting_template {
 export -f host_name_setting_template
 
 function host_name_setting_current {
-  "$INSTALL_ROOT2/lib/redmine/get_setting_value.sh" 'host_name'
+  programeiro /redmine/get_setting_value 'host_name'
 }
 export -f host_name_setting_current
 

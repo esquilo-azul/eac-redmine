@@ -9,7 +9,7 @@ function enabled_scm_setting_template {
 export -f enabled_scm_setting_template
 
 function enabled_scm_setting_current {
-  "$INSTALL_ROOT2/lib/redmine/get_setting_value.sh" 'enabled_scm'
+  programeiro /redmine/get_setting_value 'enabled_scm'
 }
 export -f enabled_scm_setting_current
 

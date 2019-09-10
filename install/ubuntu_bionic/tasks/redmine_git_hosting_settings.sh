@@ -10,7 +10,7 @@ function redmine_git_hosting_setting_template {
 export -f redmine_git_hosting_setting_template
 
 function redmine_git_hosting_setting_current {
-  "$INSTALL_ROOT/lib/redmine/get_setting_value.sh" 'plugin_redmine_git_hosting'
+  programeiro /redmine/get_setting_value 'plugin_redmine_git_hosting'
 }
 export -f redmine_git_hosting_setting_current
 
