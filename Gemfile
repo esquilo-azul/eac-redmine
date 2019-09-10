@@ -99,7 +99,7 @@ group :test do
   gem "test_after_commit", "~> 0.4.2"
   # For running UI tests
   gem "capybara", '~> 2.13'
-  gem "selenium-webdriver", "~> 2.53.4"
+  gem "selenium-webdriver"
 end
 
 local_gemfile = File.join(File.dirname(__FILE__), "Gemfile.local")
