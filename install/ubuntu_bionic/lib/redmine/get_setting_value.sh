@@ -3,4 +3,4 @@
 set -u
 set -e
 
-"$INSTALL_ROOT2/lib/postgresql/execute_sql.sh" "select value from settings where name='$1'"
+programeiro /postgresql/execute_sql "select value from settings where name='$1'"
