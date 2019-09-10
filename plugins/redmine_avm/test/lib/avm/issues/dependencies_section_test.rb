@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 require 'test_helper'
+require 'aranha/parsers/spec/source_target_fixtures'
 
 module Avm
   module Issues
@@ -6,7 +9,7 @@ module Avm
       fixtures :issues, :issue_relations, :issue_statuses, :projects, :trackers, :users
 
       test 'dependencies section' do
-        EacBase::SourceTargetFixtures.new(fixtures_dir).source_target_files do |s, t|
+        ::Aranha::Spec::SourceTargetFixtures.new(fixtures_dir).source_target_files do |s, t|
           td = YAML.load_file(t)
           issue = issue_with_description(File.read(s))
 
@@ -22,7 +25,7 @@ module Avm
       private
 
       def fixtures_dir
-        File.expand_path('../dependencies_section_test_files', __FILE__)
+        File.expand_path('dependencies_section_test_files', __dir__)
       end
 
       def issue_with_description(description)

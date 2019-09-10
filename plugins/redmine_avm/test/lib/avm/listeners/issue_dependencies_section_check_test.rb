@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 module Avm
@@ -18,46 +20,46 @@ module Avm
       end
 
       test 'dependencies ids with no dependencies section' do
-        assert_status(<<EOF,
-There is not dependencies section.
-EOF
+        assert_status(<<~MESSAGE,
+          There is not dependencies section.
+        MESSAGE
                       Avm::Settings.issue_status_undefined)
       end
 
       test 'dependencies ids with empty dependencies section' do
-        assert_status(<<EOF,
-There is a dependencies section.
+        assert_status(<<~MESSAGE,
+          There is a dependencies section.
 
-h3. Dependencies
+          h3. Dependencies
 
-Here is the dependencies section
-EOF
+          Here is the dependencies section
+        MESSAGE
                       Avm::Settings.issue_status_undefined)
       end
 
       test 'dependencies ids without dependency writed' do
-        assert_status(<<EOF,
-There is a dependencies section.
+        assert_status(<<~MESSAGE,
+          There is a dependencies section.
 
-h3. Dependencies
+          h3. Dependencies
 
-\#123 - dependency one
-dependency two: \#456
-other dependencies: \#234 \#34
-EOF
+          \#123 - dependency one
+          dependency two: \#456
+          other dependencies: \#234 \#34
+        MESSAGE
                       Avm::Settings.issue_status_undefined)
       end
 
       test 'dependencies ids with dependency writed' do
-        assert_status(<<EOF,
-There is a dependencies section.
+        assert_status(<<~MESSAGE,
+          There is a dependencies section.
 
-h3. Dependencies
+          h3. Dependencies
 
-\#123 - dependency one
-dependency two: \#456
-other dependencies: \#10 \#34
-EOF
+          \#123 - dependency one
+          dependency two: \#456
+          other dependencies: \#10 \#34
+        MESSAGE
                       @status)
       end
 

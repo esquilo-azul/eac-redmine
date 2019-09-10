@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IssueStatusAssign < ActiveRecord::Base
   belongs_to :issue_status, dependent: :destroy
   belongs_to :issue_field, class_name: 'CustomField', dependent: :destroy

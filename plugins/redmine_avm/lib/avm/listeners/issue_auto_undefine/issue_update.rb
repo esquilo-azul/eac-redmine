@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   module Listeners
     class IssueAutoUndefine
@@ -34,12 +36,14 @@ module Avm
         def new_integer_value(attr)
           d = journal.detail_for_attribute(attr)
           return nil unless d
+
           d.value.to_i
         end
 
         def old_integer_value(attr)
           d = journal.detail_for_attribute(attr)
           return nil unless d
+
           d.old_value.to_i
         end
       end

@@ -1,4 +1,4 @@
-# coding: utf-8
+# frozen_string_literal: true
 
 require 'redmine'
 
@@ -6,10 +6,11 @@ require 'avm/patches/issue_patch'
 require 'avm/patches/test_case_patch'
 
 Redmine::Plugin.register :redmine_avm do
-  name 'Agora Vai! Methodology'
-  author 'Eduardo Henrique Bogoni'
-  description ''
-  version '0.3.1'
+  name 'Redmine\'s AVM plugin'
+  author ::RedmineNonprojectModules::AUTHOR
+  description ::RedmineAvm::SUMMARY
+  version ::RedmineNonprojectModules::VERSION
+  url ::RedmineNonprojectModules::HOMEPAGE
 
   settings(partial: 'settings/avm')
 

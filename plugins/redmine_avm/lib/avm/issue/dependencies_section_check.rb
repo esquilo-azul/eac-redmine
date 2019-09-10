@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   module Issue
     class DependenciesSectionCheck
@@ -8,12 +10,14 @@ module Avm
       def run
         return if @issue.closed?
         return if @issue.dependencies.empty?
+
         unless @issue.dependencies_section
           Rails.logger.info("\##{@issue.id}: no section found")
           undefine_no_dependencies_secion
           return
         end
         return if all_dependencies_in_dependencies_section?
+
         Rails.logger.info("\##{@issue.id}: missing dependencies in dependency section")
         undefine_no_all_dependencies
       end
@@ -37,8 +41,8 @@ module Avm
       def undefine_no_all_dependencies
         @issue.init_journal(
           Avm::Settings.admin_user,
-          Avm::Settings.dependencies_section_missing_dependencies_message %
-          { ids: no_dependencies_section_ids_string }
+          format(Avm::Settings.dependencies_section_missing_dependencies_message,
+                 ids: no_dependencies_section_ids_string)
         )
         @issue.status = Avm::Settings.issue_status_undefined
         @issue.save!

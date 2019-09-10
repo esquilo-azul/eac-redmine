@@ -16,6 +16,12 @@ GIT
       rack (~> 1.6.0)
 
 PATH
+  remote: plugins/redmine_avm
+  specs:
+    redmine_avm (0.3.3)
+      aranha (~> 0.10, >= 0.10.1)
+
+PATH
   remote: plugins/redmine_nonproject_modules
   specs:
     redmine_nonproject_modules (0.3.1)
@@ -86,6 +92,12 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
+    aranha (0.10.1)
+      active_scaffold (>= 3.4.41.1)
+      eac_ruby_utils (~> 0.10, >= 0.10.1)
+      httpclient (>= 2.6)
+      rails (~> 4.2.10)
+      selenium-webdriver (~> 3.142, >= 3.142.3)
     arel (6.0.4)
     asciidoctor (2.0.10)
     ast (2.4.0)
@@ -182,6 +194,7 @@ GEM
       ruby_parser (~> 3.5)
     htmlbeautifier (1.3.1)
     htmlentities (4.3.4)
+    httpclient (2.8.3)
     i18n (0.7.0)
     ice_nine (0.11.2)
     imgkit (1.6.2)
@@ -360,7 +373,6 @@ DEPENDENCIES
   daemons-rails
   dalli
   delayed_job_active_record
-  eac_rails_utils (~> 0.2)
   faker
   github-markup
   gitlab-grack!
@@ -390,6 +402,7 @@ DEPENDENCIES
   rdoc (~> 4.3)
   redcarpet (~> 3.4.0)
   redis
+  redmine_avm!
   redmine_nonproject_modules!
   redmine_plugins_helper!
   redmine_with_git!

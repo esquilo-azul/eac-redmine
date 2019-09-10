@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 require 'test_helper'
+require 'aranha/parsers/spec/source_target_fixtures'
 
 module Avm
   module Issues
@@ -11,22 +14,18 @@ module Avm
 
       class << self
         def target_source_fixtures
-          r = {}
-          EacBase::SourceTargetFixtures.new(fixtures_dir).source_target_files do |s, t|
-            r[s] = t
-          end
-          r
+          ::Aranha::Spec::SourceTargetFixtures.new(fixtures_dir)
         end
 
         def fixtures_dir
-          File.expand_path('../motivation_test_files', __FILE__)
+          File.expand_path('motivation_test_files', __dir__)
         end
       end
 
-      target_source_fixtures.each do |s, t|
-        test "motivation #{::File.basename(s)}" do
-          td = YAML.load_file(t)
-          update_issues(YAML.load_file(s))
+      target_source_fixtures.source_target_files.each do |st|
+        test "motivation #{::File.basename(st.source)}" do
+          td = YAML.load_file(st.target)
+          update_issues(YAML.load_file(st.source))
 
           %i[blocked blocked].each do |i|
             %i[motivated motivated_by_self motivated_by_relations].each do |m|
@@ -36,6 +35,10 @@ module Avm
             end
           end
         end
+      end
+
+      test 'there are fixtures' do
+        assert self.class.target_source_fixtures.source_target_files.count.positive?
       end
 
       private
@@ -67,6 +70,7 @@ module Avm
         relation = blocked.relations_to.where(issue_from: blocker)
         assert relation.empty?
         return unless blocked_by
+
         IssueRelation.create!(issue_to: blocked, issue_from: blocker,
                               type: IssueRelation::TYPE_BLOCKS)
         relation.destroy_all

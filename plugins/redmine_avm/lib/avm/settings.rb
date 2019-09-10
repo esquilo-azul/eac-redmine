@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   class Settings
     class << self
@@ -54,6 +56,7 @@ module Avm
       def required_text(key)
         v = Setting.plugin_redmine_avm[key]
         return v if v.present?
+
         raise "Setting.plugin_redmine_avm[#{key}] is empty"
       end
     end

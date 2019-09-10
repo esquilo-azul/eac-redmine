@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   module Issue
     class Undefine

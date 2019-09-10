@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   module Listeners
     class IssueAutoUndefine
@@ -6,6 +8,7 @@ module Avm
           return unless @event.entity == IssueRelation && @event.action == :create
           return unless relation.relation_type == IssueRelation::TYPE_BLOCKS
           return unless relation.issue_from.status == Avm::Settings.issue_status_undefined
+
           [relation.issue_to]
         end
 

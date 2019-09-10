@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   module Issue
     class MotivationCheck
@@ -7,6 +9,7 @@ module Avm
 
       def run
         return if motivated?
+
         Rails.logger.info("\##{@issue.id}: unmotivated")
         undefine
       end

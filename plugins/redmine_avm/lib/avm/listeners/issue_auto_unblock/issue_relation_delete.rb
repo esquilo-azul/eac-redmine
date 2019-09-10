@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   module Listeners
     class IssueAutoUnblock
@@ -5,6 +7,7 @@ module Avm
         def issue_relation_deleted
           return unless event.entity == IssueRelation && event.action == :delete
           return unless relation.relation_type == IssueRelation::TYPE_BLOCKS
+
           [relation.issue_to]
         end
 

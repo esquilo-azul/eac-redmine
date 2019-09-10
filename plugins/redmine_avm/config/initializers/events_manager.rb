@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 EventsManager.add_listener(Issue, :create, 'Avm::Listeners::IssueAutoUndefine')
 EventsManager.add_listener(Issue, :update, 'Avm::Listeners::IssueAutoUndefine')
 EventsManager.add_listener(IssueRelation, :create, 'Avm::Listeners::IssueAutoUndefine')

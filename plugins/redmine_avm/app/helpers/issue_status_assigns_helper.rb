@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IssueStatusAssignsHelper
   def options_for_association_conditions(association, record)
     if association.name == :issue_field

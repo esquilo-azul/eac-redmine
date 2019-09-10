@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :avm do
   namespace :issue do
     desc 'Verifica auto-indefinição de uma tarefa'

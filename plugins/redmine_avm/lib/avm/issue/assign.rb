@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   module Issue
     class Assign
@@ -11,6 +13,7 @@ module Avm
         return unless issue_status_assign && issue_has_assign_field?
         return unless issue.assigned_to || issue_status_user
         return if issue.assigned_to == issue_status_user
+
         assign
       end
 

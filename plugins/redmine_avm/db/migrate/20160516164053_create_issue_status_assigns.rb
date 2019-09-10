@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateIssueStatusAssigns < ActiveRecord::Migration
   def change
     create_table :issue_status_assigns do |t|

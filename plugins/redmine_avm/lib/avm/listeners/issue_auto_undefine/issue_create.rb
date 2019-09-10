@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   module Listeners
     class IssueAutoUndefine
@@ -6,6 +8,7 @@ module Avm
           return unless event.entity == Issue && event.action == :create
           return unless issue.status == Avm::Settings.issue_status_undefined
           return unless issue.parent
+
           [issue.parent]
         end
 

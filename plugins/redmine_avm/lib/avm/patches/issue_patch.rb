@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   module Patches
     module IssuePatch
@@ -41,6 +43,7 @@ module Avm
         def dependencies_section_dependencies
           s = dependencies_section
           return [] unless s
+
           s.scan(/\#([0-9]+)/).map { |x| x[0].to_i }
         end
       end

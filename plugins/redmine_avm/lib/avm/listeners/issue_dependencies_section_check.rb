@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Avm
   module Listeners
     class IssueDependenciesSectionCheck
@@ -11,6 +13,7 @@ module Avm
         issue = issue_to_check
         return unless issue
         return if issue.status == Avm::Settings.issue_status_undefined
+
         Avm::Issue::DependenciesSectionCheck.new(issue).run if issue
       end
 
