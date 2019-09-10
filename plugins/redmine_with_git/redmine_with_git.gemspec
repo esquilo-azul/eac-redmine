@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Esquilo Azul Company']
   s.summary     = 'Additional features for RedmineGitHosting.'
 
-  s.files = Dir['{app,config,lib}/**/*', 'init.rb']
+  s.files = Dir['{app,config,installer,lib}/**/*', 'init.rb']
 
   s.add_dependency 'avm-tools', '~> 0.8'
   s.add_dependency 'eac_rails_utils', '~> 0.2'
