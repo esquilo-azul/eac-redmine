@@ -16,6 +16,15 @@ GIT
       rack (~> 1.6.0)
 
 PATH
+  remote: plugins/redmine_nonproject_modules
+  specs:
+    redmine_nonproject_modules (0.3.1)
+      active_scaffold (~> 3.5, >= 3.5.4)
+      activemodel-associations
+      eac_ruby_utils (~> 0.10, >= 0.10.1)
+      virtus
+
+PATH
   remote: .
   specs:
     redmine_plugins_helper (0.5.2)
@@ -343,8 +352,6 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   actionpack-xml_parser
-  active_scaffold (~> 3.5, >= 3.5.4)
-  activemodel-associations
   asciidoctor
   bundler (>= 1.5.0, < 2.0.0)
   capybara (~> 2.13)
@@ -383,6 +390,7 @@ DEPENDENCIES
   rdoc (~> 4.3)
   redcarpet (~> 3.4.0)
   redis
+  redmine_nonproject_modules!
   redmine_plugins_helper!
   redmine_with_git!
   request_store (= 1.0.5)
@@ -391,14 +399,12 @@ DEPENDENCIES
   roadie-rails (~> 1.1.1)
   rubocop
   ruby-openid (~> 2.3.0)
-  sass-rails (~> 5.0)
   selenium-webdriver
   simplecov (~> 0.9.1)
   sshkey
   telegram-bot-ruby
   test_after_commit (~> 0.4.2)
   tzinfo-data
-  virtus
   will_paginate
   wkhtmltoimage-binary
   yard
