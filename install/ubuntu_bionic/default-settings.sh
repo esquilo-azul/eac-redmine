@@ -1,4 +1,3 @@
-export gitolite_user_home=/var/lib/git
 export address_https=false
 export address_host=localhost
 export address_port=

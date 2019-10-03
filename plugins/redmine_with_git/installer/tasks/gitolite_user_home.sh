@@ -6,7 +6,6 @@ set -e
 function task_dependencies {
   echo gitolite_user
 }
-export -f task_dependencies
 
 function task_condition {
   local current_home=$(eval echo ~$gitolite_user)
