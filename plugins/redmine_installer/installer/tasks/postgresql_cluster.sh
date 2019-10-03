@@ -8,14 +8,11 @@ function task_condition {
     return 1
   fi
 }
-export -f task_condition
 
 function task_dependencies {
   echo postgresql
 }
-export -f task_dependencies
 
-function task_execute {
+function task_fix {
   sudo pg_createcluster "${postgresql_version}" main --start
 }
-export -f task_execute
