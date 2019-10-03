@@ -1,4 +1,5 @@
 # Default settings
+export gitolite_user=git
 export redmine_git_hosting_ssh_key_name=redmine_git_hosting_id
 
 # Task dependencies
