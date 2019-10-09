@@ -17,17 +17,13 @@ function task_dependencies {
   echo redmine_database_schema
 }
 
-export -f task_dependencies
-
 function task_condition {
   return $(programeiro /text/diff_commands 'host_name_setting_template' 'host_name_setting_current')
 }
-export -f task_condition
 
-function task_execute {
+function task_fix {
   set -u
   set -e
-  local setting_value=$(host_name_setting_template | "$INSTALL_ROOT2/lib/text/escape_single_quotes.sh")
+  local setting_value=$(host_name_setting_template | programeiro /text/escape_single_quotes)
   programeiro /redmine/set_setting_value 'host_name' "$setting_value"
 }
-export -f task_execute

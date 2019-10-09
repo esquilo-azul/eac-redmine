@@ -27,7 +27,7 @@ export -f task_condition
 function task_execute {
   set -u
   set -e
-  local setting_value=$(enabled_scm_setting_template | "$INSTALL_ROOT2/lib/text/escape_single_quotes.sh")
+  local setting_value=$(enabled_scm_setting_template | programeiro /text/escape_single_quotes)
   programeiro /redmine/set_setting_value 'enabled_scm' "$setting_value"
 }
 export -f task_execute
