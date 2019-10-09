@@ -1,4 +1,0 @@
-export address_https=false
-export address_host=localhost
-export address_port=
-export git_repositories_hierarchical_organisation=true
