@@ -3,11 +3,6 @@
 set -u
 set -e
 
-function trigger_apache_restart {
-  sudo service apache2 restart
-}
-export -f trigger_apache_restart
-
 function trigger_redmine_git_hosting_rescue {
   "$INSTALL_ROOT2/lib/rails/rake.sh" redmine_with_git:rescue
 }
