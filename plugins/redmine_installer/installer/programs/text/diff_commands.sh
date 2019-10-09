@@ -19,4 +19,4 @@ set -e
 
 rm -f "$file1"
 rm -f "$file2"
-echo $result
+exit $result

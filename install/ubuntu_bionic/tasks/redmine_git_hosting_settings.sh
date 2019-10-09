@@ -21,7 +21,8 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-  return $("$INSTALL_ROOT2/lib/text/diff-commands.sh" 'redmine_git_hosting_setting_template' 'redmine_git_hosting_setting_current')
+  return $(programeiro /text/diff_commands 'redmine_git_hosting_setting_template' \
+    'redmine_git_hosting_setting_current')
 }
 export -f task_condition
 

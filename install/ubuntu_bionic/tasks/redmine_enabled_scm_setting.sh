@@ -20,7 +20,7 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-  return $("$INSTALL_ROOT2/lib/text/diff-commands.sh" 'enabled_scm_setting_template' 'enabled_scm_setting_current')
+  return $(programeiro /text/diff_commands 'enabled_scm_setting_template' 'enabled_scm_setting_current')
 }
 export -f task_condition
 
