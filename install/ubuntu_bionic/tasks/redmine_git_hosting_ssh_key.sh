@@ -11,7 +11,7 @@ function task_condition {
 }
 export -f task_condition
 
-function task_execute {
+function task_fix {
   sudo -u "$redmine_user" -H ssh-keygen -t rsa -f "$ssh_key" -N ''
 }
-export -f task_execute
+export -f task_fix

@@ -6,9 +6,7 @@ set -e
 function task_condition {
   programeiro /apt/installed ruby
 }
-export -f task_condition
 
-function task_execute {
+function task_fix {
   programeiro /apt/assert_installed ruby
 }
-export -f task_execute

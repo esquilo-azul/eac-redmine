@@ -12,7 +12,6 @@ function gitolite_rc_template {
 function task_dependencies {
   echo gitolite_setup
 }
-export -f task_dependencies
 
 function task_condition {
   temprc="$(sudo -u "$gitolite_user" mktemp)"
@@ -22,10 +21,8 @@ function task_condition {
     return 1
   fi
 }
-export -f task_condition
 
-function task_execute {
+function task_fix {
   gitolite_rc_template | sudo -u "$gitolite_user" tee "$gitolite_user_home/.gitolite.rc" > /dev/null
   programeiro /redmine/installer/triggers/set 'redmine_git_hosting_rescue'
 }
-export -f task_execute

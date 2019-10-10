@@ -26,11 +26,11 @@ function task_condition {
 }
 export -f task_condition
 
-function task_execute {
+function task_fix {
   set -u
   set -e
   export rails_user="$("$INSTALL_ROOT2/lib/rails/user.sh")"
   programeiro /template/apply "$INSTALL_ROOT2/template/redmine_user_sudoer" | sudo tee "$SUDOER_FILE" > /dev/null
   sudo chmod 440 "$SUDOER_FILE"
 }
-export -f task_execute
+export -f task_fix

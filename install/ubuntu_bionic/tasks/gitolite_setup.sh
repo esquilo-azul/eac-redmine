@@ -6,14 +6,12 @@ set -e
 function task_dependencies {
   echo gitolite_user_home gitolite redmine_git_hosting_ssh_key
 }
-export -f task_dependencies
 
 function task_condition {
   sudo -u "$("$INSTALL_ROOT2/lib/rails/user.sh")" ssh -oBatchMode=yes -oStrictHostKeyChecking=no -i "$($INSTALL_ROOT2/lib/redmine_git_hosting/ssh_key.sh)" -l "$gitolite_user" localhost info
 }
-export -f task_condition
 
-function task_execute {
+function task_fix {
   set -u
   set -e
   programeiro /apt/assert_installed openssh-server
@@ -25,4 +23,3 @@ function task_execute {
   sudo -u "$gitolite_user" -H gitolite setup --pubkey "$publickey_temp"
   sudo -u "$("$INSTALL_ROOT2/lib/rails/user.sh")" rm -rf "$tempdir"
 }
-export -f task_execute

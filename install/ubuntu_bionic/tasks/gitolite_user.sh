@@ -12,7 +12,6 @@ function task_condition {
 }
 export -f task_condition
 
-function task_execute {
+function task_fix {
   sudo useradd --system "$gitolite_user"
 }
-export -f task_execute

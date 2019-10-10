@@ -17,11 +17,9 @@ function task_condition {
     return 1
   fi
 }
-export -f task_condition
 
-function task_execute {
+function task_fix {
   sudo usermod -d "$gitolite_user_home" "$gitolite_user"
   sudo mkdir -p "$gitolite_user_home"
   sudo chown "$gitolite_user:$gitolite_user" "$gitolite_user_home"
 }
-export -f task_execute
