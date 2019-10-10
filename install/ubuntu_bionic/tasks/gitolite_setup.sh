@@ -16,7 +16,7 @@ export -f task_condition
 function task_execute {
   set -u
   set -e
-  "$INSTALL_ROOT2/lib/apt/assert_installed.sh" openssh-server
+  programeiro /apt/assert_installed openssh-server
   sudo service ssh restart
   local tempdir=$(sudo -u "$("$INSTALL_ROOT2/lib/rails/user.sh")" mktemp -d)
   local publickey_temp="$tempdir/$(basename "$("$INSTALL_ROOT2/lib/redmine_git_hosting/ssh_key.sh")")".pub

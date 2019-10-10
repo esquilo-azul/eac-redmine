@@ -9,6 +9,6 @@ function task_condition {
 export -f task_condition
 
 function task_execute {
-  "$INSTALL_ROOT2/lib/apt/assert_installed.sh" expect
+  programeiro /apt/assert_installed expect
 }
 export -f task_execute
