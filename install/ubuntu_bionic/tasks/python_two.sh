@@ -6,7 +6,7 @@ set -e
 PYTHON2_PACKAGE='python-minimal'
 
 function task_condition {
-  return $("$INSTALL_ROOT2/lib/apt/installed.sh" "$PYTHON2_PACKAGE")
+  programeiro /apt/installed "$PYTHON2_PACKAGE"
 }
 export -f task_condition
 

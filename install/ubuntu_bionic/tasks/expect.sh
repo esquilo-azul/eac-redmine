@@ -4,7 +4,7 @@ set -u
 set -e
 
 function task_condition {
-  return $("$INSTALL_ROOT2/lib/apt/installed.sh" expect)
+  programeiro /apt/installed expect
 }
 export -f task_condition
 
