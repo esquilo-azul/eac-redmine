@@ -4,7 +4,7 @@ set -u
 set -e
 
 function trigger_redmine_git_hosting_rescue {
-  "$INSTALL_ROOT2/lib/rails/rake.sh" redmine_with_git:rescue
+  programeiro /rails/rake redmine_with_git:rescue
 }
 export -f trigger_redmine_git_hosting_rescue
 
