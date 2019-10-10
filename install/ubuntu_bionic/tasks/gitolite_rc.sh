@@ -6,7 +6,7 @@ set -e
 gitolite_rc_file="$gitolite_user_home/.gitolite.rc"
 
 function gitolite_rc_template {
-  "$INSTALL_ROOT2/lib/text/template.sh" "$INSTALL_ROOT2/template/gitolite.rc"
+  programeiro /template/apply "$INSTALL_ROOT2/template/gitolite.rc"
 }
 
 function task_dependencies {

@@ -5,7 +5,7 @@ set -e
 
 function redmine_git_hosting_setting_template {
   export redmine_git_hosting_ssh_key=$("$INSTALL_ROOT2/lib/redmine_git_hosting/ssh_key.sh")
-  "$INSTALL_ROOT2/lib/text/template.sh" "$INSTALL_ROOT2/template/redmine_git_hosting_setting_value.sql"
+  programeiro /template/apply "$INSTALL_ROOT2/template/redmine_git_hosting_setting_value.sql"
 }
 export -f redmine_git_hosting_setting_template
 

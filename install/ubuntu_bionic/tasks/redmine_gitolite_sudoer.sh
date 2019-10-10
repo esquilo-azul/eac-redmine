@@ -16,7 +16,7 @@ function task_condition {
     return 1
   fi
   export rails_user="$("$INSTALL_ROOT2/lib/rails/user.sh")"
-  result=$("$INSTALL_ROOT2/lib/text/template.sh" "$INSTALL_ROOT2/template/redmine_user_sudoer" | sudo "$INSTALL_ROOT2/lib/text/diff-stdin-file.sh" "$SUDOER_FILE")
+  result=$(programeiro /template/apply "$INSTALL_ROOT2/template/redmine_user_sudoer" | sudo "$INSTALL_ROOT2/lib/text/diff-stdin-file.sh" "$SUDOER_FILE")
   if [ "$result" != '0' ]; then
     return 1
   fi
@@ -30,7 +30,7 @@ function task_execute {
   set -u
   set -e
   export rails_user="$("$INSTALL_ROOT2/lib/rails/user.sh")"
-  "$INSTALL_ROOT2/lib/text/template.sh" "$INSTALL_ROOT2/template/redmine_user_sudoer" | sudo tee "$SUDOER_FILE" > /dev/null
+  programeiro /template/apply "$INSTALL_ROOT2/template/redmine_user_sudoer" | sudo tee "$SUDOER_FILE" > /dev/null
   sudo chmod 440 "$SUDOER_FILE"
 }
 export -f task_execute
