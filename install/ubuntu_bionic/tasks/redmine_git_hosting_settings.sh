@@ -31,10 +31,6 @@ function task_execute {
   set -e
   local setting_value=$(redmine_git_hosting_setting_template | programeiro /text/escape_single_quotes)
   programeiro /redmine/set_setting_value 'plugin_redmine_git_hosting' "$setting_value"
+  programeiro /redmine/installer/triggers/set 'redmine_git_hosting_rescue'
 }
 export -f task_execute
-
-function task_triggers {
-  echo redmine_git_hosting_rescue
-}
-export f task_triggers

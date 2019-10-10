@@ -3,11 +3,6 @@
 set -u
 set -e
 
-function trigger_redmine_git_hosting_rescue {
-  programeiro /rails/rake redmine_with_git:rescue
-}
-export -f trigger_redmine_git_hosting_rescue
-
 source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/environment.sh"
 
 if [ -z "$TASK" ]; then

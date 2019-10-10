@@ -26,10 +26,6 @@ export -f task_condition
 
 function task_execute {
   gitolite_rc_template | sudo -u "$gitolite_user" tee "$gitolite_user_home/.gitolite.rc" > /dev/null
+  programeiro /redmine/installer/triggers/set 'redmine_git_hosting_rescue'
 }
 export -f task_execute
-
-function task_triggers {
-  echo redmine_git_hosting_rescue
-}
-export f task_triggers

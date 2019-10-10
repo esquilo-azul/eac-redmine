@@ -109,4 +109,9 @@ if [ -n "$address_port" ]; then
 fi
 
 # redmine_installer
+function programeiro_path {
+  "$INSTALL_ROOT2/lib:$(_build_plugins_path "programs")"
+}
+export -f programeiro_path
+
 source "$INSTALL_ROOT/environment.sh"
