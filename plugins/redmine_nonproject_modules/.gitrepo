@@ -7,6 +7,6 @@
 	remote = https://github.com/esquilo-azul/redmine_nonproject_modules
 	branch = master
 	commit = 13b0aedf39002b7ef9845e39146caffa77465d3a
-	parent = 56b36942c43954137738bf13e8a42af699f6a869
+	parent = 63fc6541ddca90c47f0dfae1b02e23b121f45060
 	method = merge
 	cmdver = 0.4.0

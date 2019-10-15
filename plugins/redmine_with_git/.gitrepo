@@ -7,6 +7,6 @@
 	remote = https://github.com/esquilo-azul/redmine_with_git
 	branch = master
 	commit = 337d6ea4ea5ed18c5079a79a2ff124f51d8a5d23
-	parent = b45859379684ab3e27b7295422737e0c1315282c
+	parent = 63fc6541ddca90c47f0dfae1b02e23b121f45060
 	method = merge
 	cmdver = 0.4.0
