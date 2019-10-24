@@ -4,7 +4,7 @@ set -u
 set -e
 
 redmine_user=$(programeiro /rails/user)
-ssh_key=$("$INSTALL_ROOT2/lib/redmine_git_hosting/ssh_key.sh")
+ssh_key=$(programeiro /redmine_git_hosting/ssh_key)
 
 function task_condition {
   return $("$INSTALL_ROOT2/lib/linux/sudo_file_exists.sh" "$redmine_user" "$ssh_key")
