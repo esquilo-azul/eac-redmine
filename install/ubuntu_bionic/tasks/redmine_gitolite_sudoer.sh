@@ -5,6 +5,13 @@ set -e
 
 SUDOER_FILE="/etc/sudoers.d/$(programeiro /rails/user)_redmine_with_git"
 
+function sudoers_file_copy_file() {
+  TMPFILE="$(mktemp)"
+  sudo cp "$SUDOER_FILE" "$TMPFILE"
+  sudo chmod og+r "$TMPFILE"
+  printf "$TMPFILE\n"
+}
+
 function task_dependencies {
   echo gitolite_user
 }
@@ -12,11 +19,13 @@ function task_dependencies {
 export -f task_dependencies
 
 function task_condition {
-  if [ "$("$INSTALL_ROOT2/lib/linux/sudo_file_exists.sh" "root" "$SUDOER_FILE")" != '0' ]; then
+  if [ "$(programeiro /linux/sudo_file_exists "root" "$SUDOER_FILE")" != '0' ]; then
     return 1
   fi
   export rails_user="$(programeiro /rails/user)"
-  result=$(programeiro /template/apply "$INSTALL_ROOT2/template/redmine_user_sudoer" | sudo programeiro /text/diff_stdin_file "$SUDOER_FILE")
+  SUDOERS_FILE_COPY="$(sudoers_file_copy_file)"
+  result=$(programeiro /template/apply "$INSTALL_ROOT2/template/redmine_user_sudoer" | programeiro /text/diff_stdin_file "$SUDOERS_FILE_COPY")
+  sudo rm -f "$SUDOERS_FILE_COPY"
   if [ "$result" != '0' ]; then
     return 1
   fi
