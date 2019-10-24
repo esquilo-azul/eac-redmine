@@ -16,7 +16,7 @@ function task_condition {
     return 1
   fi
   export rails_user="$(programeiro /rails/user)"
-  result=$(programeiro /template/apply "$INSTALL_ROOT2/template/redmine_user_sudoer" | sudo "$INSTALL_ROOT2/lib/text/diff-stdin-file.sh" "$SUDOER_FILE")
+  result=$(programeiro /template/apply "$INSTALL_ROOT2/template/redmine_user_sudoer" | sudo programeiro /text/diff_stdin_file "$SUDOER_FILE")
   if [ "$result" != '0' ]; then
     return 1
   fi

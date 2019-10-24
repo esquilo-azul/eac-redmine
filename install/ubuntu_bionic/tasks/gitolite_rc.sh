@@ -17,7 +17,7 @@ function task_condition {
   temprc="$(sudo -u "$gitolite_user" mktemp)"
   sudo -u "$gitolite_user" cp "$gitolite_user_home/.gitolite.rc" "$temprc"
   sudo -u "$gitolite_user" chmod 777 "$temprc"
-  if [ "$(gitolite_rc_template | "$INSTALL_ROOT2/lib/text/diff-stdin-file.sh" "$temprc" )" -ne 0 ]; then
+  if [ "$(gitolite_rc_template | programeiro /text/diff_stdin_file "$temprc" )" -ne 0 ]; then
     return 1
   fi
 }
