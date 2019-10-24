@@ -8,7 +8,7 @@ function task_dependencies {
 }
 
 function task_condition {
-  sudo -u "$("$INSTALL_ROOT2/lib/rails/user.sh")" ssh -oBatchMode=yes -oStrictHostKeyChecking=no -i "$($INSTALL_ROOT2/lib/redmine_git_hosting/ssh_key.sh)" -l "$gitolite_user" localhost info
+  sudo -u "$(programeiro /rails/user)" ssh -oBatchMode=yes -oStrictHostKeyChecking=no -i "$($INSTALL_ROOT2/lib/redmine_git_hosting/ssh_key.sh)" -l "$gitolite_user" localhost info
 }
 
 function task_fix {
@@ -16,10 +16,10 @@ function task_fix {
   set -e
   programeiro /apt/assert_installed openssh-server
   sudo service ssh restart
-  local tempdir=$(sudo -u "$("$INSTALL_ROOT2/lib/rails/user.sh")" mktemp -d)
+  local tempdir=$(sudo -u "$(programeiro /rails/user)" mktemp -d)
   local publickey_temp="$tempdir/$(basename "$("$INSTALL_ROOT2/lib/redmine_git_hosting/ssh_key.sh")")".pub
-  sudo -u "$("$INSTALL_ROOT2/lib/rails/user.sh")" chmod 777 "$tempdir" -R
-  sudo -u "$("$INSTALL_ROOT2/lib/rails/user.sh")" cp "$("$INSTALL_ROOT2/lib/redmine_git_hosting/ssh_key.sh")".pub "$publickey_temp"
+  sudo -u "$(programeiro /rails/user)" chmod 777 "$tempdir" -R
+  sudo -u "$(programeiro /rails/user)" cp "$("$INSTALL_ROOT2/lib/redmine_git_hosting/ssh_key.sh")".pub "$publickey_temp"
   sudo -u "$gitolite_user" -H gitolite setup --pubkey "$publickey_temp"
-  sudo -u "$("$INSTALL_ROOT2/lib/rails/user.sh")" rm -rf "$tempdir"
+  sudo -u "$(programeiro /rails/user)" rm -rf "$tempdir"
 }

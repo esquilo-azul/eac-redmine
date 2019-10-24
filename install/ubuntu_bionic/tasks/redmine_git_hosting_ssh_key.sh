@@ -3,7 +3,7 @@
 set -u
 set -e
 
-redmine_user=$("$INSTALL_ROOT2/lib/rails/user.sh")
+redmine_user=$(programeiro /rails/user)
 ssh_key=$("$INSTALL_ROOT2/lib/redmine_git_hosting/ssh_key.sh")
 
 function task_condition {
