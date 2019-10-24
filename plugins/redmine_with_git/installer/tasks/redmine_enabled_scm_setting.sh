@@ -4,7 +4,7 @@ set -u
 set -e
 
 function enabled_scm_setting_template {
-  cat "$INSTALL_ROOT2/template/redmine_enabled_scm_setting_value"
+  cat "${REDMINE_WITH_GIT_TEMPLATE_ROOT}/redmine_enabled_scm_setting_value"
 }
 export -f enabled_scm_setting_template
 
