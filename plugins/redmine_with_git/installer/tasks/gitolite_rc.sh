@@ -10,7 +10,7 @@ function gitolite_rc_template {
 }
 
 function task_dependencies {
-  echo gitolite_setup
+  echo gitolite_user_home
 }
 
 function task_condition {

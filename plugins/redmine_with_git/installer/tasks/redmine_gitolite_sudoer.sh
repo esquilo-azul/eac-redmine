@@ -3,7 +3,11 @@
 set -u
 set -e
 
-SUDOER_FILE="/etc/sudoers.d/$(programeiro /rails/user)_redmine_with_git"
+SUFFIX=''
+if [ -n "$address_path" ]; then
+  SUFFIX="_$(printf "$address_path" | sed -e 's/^\///')"
+fi
+SUDOER_FILE="/etc/sudoers.d/$(programeiro /rails/user)_redmine_with_git${SUFFIX}"
 
 function sudoers_file_copy_file() {
   TMPFILE="$(mktemp)"
