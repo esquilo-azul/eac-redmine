@@ -1,3 +1,0 @@
-# Integração Rails/daemons.
-# https://github.com/mirasrael/daemons-rails
-gem 'daemons-rails'
