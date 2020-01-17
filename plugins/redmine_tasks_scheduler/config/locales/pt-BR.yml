@@ -1,0 +1,4 @@
+pt-BR:
+  redmine_tasks_scheduler:
+    daemon_autostart_description: Inicializar Daemon automaticamente junto com
+      o servidor?

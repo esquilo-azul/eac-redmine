@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/esquilo-azul/redmine_tasks_scheduler.git
+	branch = master
+	commit = b3ba99805c5f7b1dcbc6ff828c55cc1e606a0793
+	parent = 9b8270bf823c551ac2ea4bcd35a8ed1f32ed86ee
+	method = merge
+	cmdver = 0.4.0

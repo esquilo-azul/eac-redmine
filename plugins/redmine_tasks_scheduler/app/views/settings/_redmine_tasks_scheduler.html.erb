@@ -1,0 +1,9 @@
+<p>
+  <label><%= t('redmine_tasks_scheduler.daemon_autostart_description') %></label>
+  <select name="settings[daemon_autostart]">
+    <%= options_for_select(
+      [[t(:general_text_No), '0'], [t(:general_text_Yes), '1']],
+      settings[:daemon_autostart]
+      ) %>
+  </select>
+</p>
