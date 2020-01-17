@@ -423,7 +423,7 @@ DEPENDENCIES
   rmagick (~> 2.16.0)
   roadie (~> 3.2.1)
   roadie-rails (~> 1.1.1)
-  rubocop
+  rubocop (~> 0.74.0)
   ruby-openid (~> 2.3.0)
   selenium-webdriver
   simplecov (~> 0.9.1)
