@@ -3,9 +3,6 @@
 require 'redmine'
 require 'redmine_with_git/version'
 
-require 'eac_rails_utils'
-require 'eac_ruby_utils'
-
 Redmine::Plugin.register :redmine_with_git do
   name 'RedmineWithGit'
   author 'Esquilo Azul Company'
