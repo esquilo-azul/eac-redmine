@@ -16,5 +16,5 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'avm-tools', '~> 0.28'
   s.add_dependency 'eac_rails_utils', '~> 0.7', '>= 0.7.1'
-  s.add_dependency 'eac_ruby_utils', '~> 0.10', '>= 0.10.1'
+  s.add_dependency 'eac_ruby_utils', '~> 0.17'
 end

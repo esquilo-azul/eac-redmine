@@ -42,7 +42,7 @@ PATH
     redmine_with_git (0.6.3)
       avm-tools (~> 0.28)
       eac_rails_utils (~> 0.7, >= 0.7.1)
-      eac_ruby_utils (~> 0.10, >= 0.10.1)
+      eac_ruby_utils (~> 0.17)
 
 GEM
   remote: https://rubygems.org/
