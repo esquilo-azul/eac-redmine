@@ -2,7 +2,7 @@
 
 Redmine::Plugin.post_register :redmine_with_git do
   # Source: https://github.com/esquilo-azul/redmine_nonproject_modules
-  requires_redmine_plugin(:redmine_nonproject_modules, version_or_higher: '0.3.0')
+  requires_redmine_plugin(:redmine_nonproject_modules, version_or_higher: '0.3.1')
   # Source: https://github.com/jbox-web/redmine_bootstrap_kit.git
   # Note: redmine_bootstrap_kit is a redmine_git_hosting's dependency.
   requires_redmine_plugin(:redmine_bootstrap_kit, version_or_higher: '0.2.5')
