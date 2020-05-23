@@ -11,6 +11,6 @@ Redmine::Plugin.post_register :redmine_with_git do
 
   # Source: https://github.com/esquilo-azul/redmine_installer
   if ::Redmine::Plugin.registered_plugins.keys.include?(:redmine_installer)
-    requires_redmine_plugin(:redmine_installer, version_or_higher: '0.9.0')
+    requires_redmine_plugin(:redmine_installer, version_or_higher: '0.10.0')
   end
 end

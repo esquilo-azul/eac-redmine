@@ -24,6 +24,5 @@ function task_condition {
 function task_fix {
   set -u
   set -e
-  local setting_value=$(enabled_scm_setting_template | programeiro /text/escape_single_quotes)
-  programeiro /redmine/set_setting_value 'enabled_scm' "$setting_value"
+  programeiro /redmine/set_setting_value 'enabled_scm' "$(enabled_scm_setting_template)"
 }

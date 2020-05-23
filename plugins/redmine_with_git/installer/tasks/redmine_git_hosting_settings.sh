@@ -23,7 +23,7 @@ function task_condition {
 }
 
 function task_fix {
-  local setting_value=$(redmine_git_hosting_setting_template | programeiro /text/escape_single_quotes)
-  programeiro /redmine/set_setting_value 'plugin_redmine_git_hosting' "$setting_value"
+  programeiro /redmine/set_setting_value 'plugin_redmine_git_hosting' \
+    "$(redmine_git_hosting_setting_template)"
   programeiro /redmine/installer/triggers/set 'redmine_git_hosting_rescue'
 }
