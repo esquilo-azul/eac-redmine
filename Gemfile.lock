@@ -18,7 +18,7 @@ GIT
 PATH
   remote: plugins/eac_redmine_base0
   specs:
-    eac_redmine_base0 (0.3.1)
+    eac_redmine_base0 (0.3.2)
       avm-tools (~> 0.44, >= 0.44.1)
       eac_ruby_gems_utils (~> 0.4)
       rubocop (~> 0.74.0)
