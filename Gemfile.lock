@@ -16,6 +16,15 @@ GIT
       rack (~> 1.6.0)
 
 PATH
+  remote: plugins/eac_redmine_base0
+  specs:
+    eac_redmine_base0 (0.3.1)
+      avm-tools (~> 0.44, >= 0.44.1)
+      eac_ruby_gems_utils (~> 0.4)
+      rubocop (~> 0.74.0)
+      rubocop-rails (~> 2.2.1)
+
+PATH
   remote: plugins/redmine_avm
   specs:
     redmine_avm (0.3.4)
@@ -323,6 +332,9 @@ GEM
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.7)
+    rubocop-rails (2.2.1)
+      rack (>= 1.1)
+      rubocop (>= 0.72.0)
     ruby-openid (2.3.0)
     ruby-progressbar (1.10.1)
     ruby_parser (3.14.2)
@@ -404,6 +416,7 @@ DEPENDENCIES
   creole
   dalli
   delayed_job_active_record
+  eac_redmine_base0!
   faker
   github-markup
   gitlab-grack!

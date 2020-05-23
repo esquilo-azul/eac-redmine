@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/esquilo-azul/eac_redmine_base0.git
+	branch = master
+	commit = 4de407d7611046f24827e9277114501975998cf5
+	parent = 74a1fd05bb29600d27be42c7c30693b8b68f0e4f
+	method = merge
+	cmdver = 0.4.0
