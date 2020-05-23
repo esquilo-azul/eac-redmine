@@ -18,8 +18,8 @@ GIT
 PATH
   remote: plugins/redmine_avm
   specs:
-    redmine_avm (0.3.3)
-      aranha (~> 0.10, >= 0.10.1)
+    redmine_avm (0.3.4)
+      aranha-parsers (~> 0.4)
 
 PATH
   remote: plugins/redmine_nonproject_modules
@@ -93,21 +93,11 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    aranha (0.14.0)
-      active_scaffold (>= 3.4.41.1)
-      aranha-parsers (~> 0.4)
-      aranha-selenium (~> 0.1, >= 0.1.2)
-      eac_ruby_utils (~> 0.15)
-      httpclient (>= 2.6)
-      rails (~> 4.2.10)
     aranha-parsers (0.4.0)
       activesupport (>= 4.0.0)
       addressable (~> 2.7)
       curb (~> 0.9.10)
       httpclient (~> 2.8, >= 2.8.3)
-    aranha-selenium (0.1.2)
-      activesupport
-      selenium-webdriver (~> 3.142, >= 3.142.3)
     arel (6.0.4)
     asciidoctor (2.0.10)
     ast (2.4.0)
