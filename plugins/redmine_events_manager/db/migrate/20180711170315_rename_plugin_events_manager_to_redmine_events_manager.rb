@@ -1,4 +1,8 @@
-class RenamePluginEventsManagerToRedmineEventsManager < ActiveRecord::Migration
+# frozen_string_literal: true
+
+class RenamePluginEventsManagerToRedmineEventsManager < (
+    Rails.version < '5.2' ? ActiveRecord::Migration : ActiveRecord::Migration[4.2]
+  )
   class Settings < ActiveRecord::Base
   end
 
@@ -15,6 +19,7 @@ class RenamePluginEventsManagerToRedmineEventsManager < ActiveRecord::Migration
   def rename_plugin(from, to)
     old_record = Setting.find_by(name: from)
     return unless old_record.present?
+
     new_record = Setting.find_by(name: to)
     if new_record.present?
       new_value = plugin_setting_value(old_record).value.merge(plugin_setting_value(new_record))

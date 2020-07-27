@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class ListenerOption < ActiveRecord::Base
   DEFAULT_DELAY = 0
   DEFAULT_ENABLED = true
 
   class << self
     def listener_class_list
-      @listener_classes ||= ::EventsManager.all_listeners
+      @listener_class_list ||= ::EventsManager.all_listeners
     end
 
     def listener_class_options
@@ -12,17 +14,17 @@ class ListenerOption < ActiveRecord::Base
     end
 
     def listener_delay(listener_class)
-      o = ::ListenerOption.where(listener_class: listener_class).first
+      o = ::ListenerOption.find_by(listener_class: listener_class.name)
       o && o.delay.present? && o.delay >= 0 ? o.delay : DEFAULT_DELAY
     end
 
     def listener_enabled?(listener_class)
-      o = ::ListenerOption.where(listener_class: listener_class).first
+      o = ::ListenerOption.find_by(listener_class: listener_class.name)
       o.present? ? o.enabled? : DEFAULT_ENABLED
     end
 
     def listener_enable(listener_class, enabled)
-      o = ::ListenerOption.find_or_create_by(listener_class: listener_class)
+      o = ::ListenerOption.find_or_create_by(listener_class: listener_class.name)
       o.enabled = enabled
       o.save!
     end

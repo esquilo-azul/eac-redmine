@@ -1,4 +1,4 @@
-# coding: utf-8
+# frozen_string_literal: true
 
 require 'redmine'
 
@@ -15,7 +15,7 @@ Redmine::Plugin.register :redmine_events_manager do
   name 'Events Manager'
   author 'Eduardo Henrique Bogoni'
   description 'Management for events'
-  version '0.4.4'
+  version '0.4.5'
 
   settings default: { event_exception_unchecked: false }
 

@@ -1,4 +1,8 @@
-class CreateDelayedJobs < ActiveRecord::Migration
+# frozen_string_literal: true
+
+class CreateDelayedJobs < (
+    Rails.version < '5.2' ? ActiveRecord::Migration : ActiveRecord::Migration[4.2]
+  )
   def self.up
     create_table :delayed_jobs, force: true do |table|
       table.integer :priority, default: 0, null: false # Allows some jobs to jump to the front of
@@ -14,7 +18,7 @@ class CreateDelayedJobs < ActiveRecord::Migration
       table.timestamps null: true
     end
 
-    add_index :delayed_jobs, [:priority, :run_at], name: 'delayed_jobs_priority'
+    add_index :delayed_jobs, %i[priority run_at], name: 'delayed_jobs_priority'
   end
 
   def self.down
