@@ -87,8 +87,7 @@ module EacRedmineBase0
         return ::Avm::Result.neutral("task \"#{test_task_name}\" not found") unless test_task?
 
         ::Avm::Result.success_or_error(
-          run_test ? 'success' : "failed (Log: #{stdout_log})",
-          run_test
+          run_test, 'success', "failed (Log: #{stdout_log})"
         )
       end
 
