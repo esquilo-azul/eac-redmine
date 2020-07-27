@@ -8,5 +8,5 @@ function task_condition {
 }
 
 function task_dependencies {
-  echo gitolite_rc redmine_gitolite_sudoer redmine_git_hosting_settings apt_ruby python_two
+  echo gitolite_setup redmine_gitolite_sudoer redmine_git_hosting_settings apt_ruby python_two
 }

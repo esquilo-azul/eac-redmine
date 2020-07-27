@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,installer,lib}/**/*', 'init.rb']
 
-  s.add_dependency 'avm-tools', '~> 0.28'
-  s.add_dependency 'eac_rails_utils', '~> 0.7', '>= 0.7.1'
-  s.add_dependency 'eac_ruby_utils', '~> 0.17'
+  s.add_dependency 'avm-tools', '~> 0.48'
+  s.add_dependency 'eac_rails_utils', '~> 0.11'
+  s.add_dependency 'eac_ruby_utils', '~> 0.35'
 end
