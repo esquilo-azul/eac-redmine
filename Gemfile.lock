@@ -42,7 +42,7 @@ PATH
 PATH
   remote: plugins/redmine_plugins_helper
   specs:
-    redmine_plugins_helper (0.6.2)
+    redmine_plugins_helper (0.6.3)
       sass-rails (~> 5.0)
 
 PATH
