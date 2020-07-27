@@ -7,13 +7,14 @@ SUFFIX=''
 if [ -n "$address_path" ]; then
   SUFFIX="_$(printf "$address_path" | sed -e 's/^\///')"
 fi
-SUDOER_FILE="/etc/sudoers.d/$(programeiro /rails/user)_redmine_with_git${SUFFIX}"
+export SUDOER_FILE_BASENAME="$(programeiro /rails/user)_redmine_with_git${SUFFIX}"
+export SUDOER_FILE="/etc/sudoers.d/${SUDOER_FILE_BASENAME}"
+export SUDOER_TMP_FILE="/tmp/${SUDOER_FILE_BASENAME}"
 
 function sudoers_file_copy_file() {
-  TMPFILE="$(mktemp)"
-  sudo cp "$SUDOER_FILE" "$TMPFILE"
-  sudo chmod og+r "$TMPFILE"
-  printf "$TMPFILE\n"
+  sudo cp "$SUDOER_FILE" "$SUDOER_TMP_FILE"
+  sudo chmod og+r "$SUDOER_TMP_FILE"
+  printf "$SUDOER_TMP_FILE\n"
 }
 
 function task_dependencies {
@@ -43,7 +44,7 @@ function task_fix {
   set -u
   set -e
   export rails_user="$(programeiro /rails/user)"
-  programeiro /template/apply "$REDMINE_WITH_GIT_TEMPLATE_ROOT/redmine_user_sudoer" | sudo tee "$SUDOER_FILE" > /dev/null
-  sudo chmod 440 "$SUDOER_FILE"
+  programeiro /template/apply "$REDMINE_WITH_GIT_TEMPLATE_ROOT/redmine_user_sudoer" | \
+    programeiro /linux/sudo_write "$SUDOER_FILE"
 }
 export -f task_fix
