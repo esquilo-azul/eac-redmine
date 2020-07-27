@@ -33,10 +33,11 @@ PATH
 PATH
   remote: plugins/redmine_nonproject_modules
   specs:
-    redmine_nonproject_modules (0.3.1)
-      active_scaffold (~> 3.5, >= 3.5.4)
-      activemodel-associations
-      eac_ruby_utils (~> 0.10, >= 0.10.1)
+    redmine_nonproject_modules (0.3.2)
+      active_scaffold (~> 3.5)
+      eac_rails_utils (~> 0.11, >= 0.11.2)
+      eac_ruby_utils (~> 0.33)
+      jquery-rails (~> 4.4)
       virtus
 
 PATH
