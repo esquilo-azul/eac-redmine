@@ -1,3 +1,0 @@
-# Analisador de código Ruby
-# https://github.com/bbatsov/rubocop
-gem 'rubocop', '~> 0.74.0'
