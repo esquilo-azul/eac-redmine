@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-class RenamePluginAvmToRedmineAvm < ActiveRecord::Migration
+class RenamePluginAvmToRedmineAvm < (
+    Rails.version < '5.2' ? ActiveRecord::Migration : ActiveRecord::Migration[4.2]
+  )
   class Settings < ActiveRecord::Base
   end
 
