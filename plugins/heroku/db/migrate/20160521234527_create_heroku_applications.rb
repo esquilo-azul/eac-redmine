@@ -1,4 +1,6 @@
-class CreateHerokuApplications < ActiveRecord::Migration
+class CreateHerokuApplications < (
+    Rails.version < '5.2' ? ActiveRecord::Migration : ActiveRecord::Migration[4.2]
+  )
   def change
     create_table :heroku_applications do |t|
       t.string :name
