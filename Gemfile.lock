@@ -21,7 +21,6 @@ PATH
     eac_redmine_base0 (0.3.3)
       avm-tools (~> 0.58)
       eac_ruby_gems_utils (~> 0.4)
-      rubocop (~> 0.74.0)
 
 PATH
   remote: plugins/redmine_avm
