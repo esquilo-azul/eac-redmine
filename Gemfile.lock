@@ -22,7 +22,6 @@ PATH
       avm-tools (~> 0.58)
       eac_ruby_gems_utils (~> 0.4)
       rubocop (~> 0.74.0)
-      rubocop-rails (~> 2.2.1)
 
 PATH
   remote: plugins/redmine_avm
@@ -349,9 +348,6 @@ GEM
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.7)
-    rubocop-rails (2.2.1)
-      rack (>= 1.1)
-      rubocop (>= 0.72.0)
     ruby-openid (2.3.0)
     ruby-progressbar (1.10.1)
     ruby_parser (3.14.2)
