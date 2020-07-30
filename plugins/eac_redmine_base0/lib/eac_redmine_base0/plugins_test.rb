@@ -12,7 +12,7 @@ module EacRedmineBase0
 
     def run
       @plugins = []
-      ::Redmine::Plugin.registered_plugins.values.each do |plugin|
+      ::Redmine::Plugin.registered_plugins.each_value do |plugin|
         check_plugin(plugin)
       end
       check_results
