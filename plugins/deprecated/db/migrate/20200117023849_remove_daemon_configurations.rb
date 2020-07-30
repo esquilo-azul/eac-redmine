@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-class RemoveDaemonConfigurations < ActiveRecord::Migration
+class RemoveDaemonConfigurations  < (
+    Rails.version < '5.2' ? ActiveRecord::Migration : ActiveRecord::Migration[4.2]
+  )
   def change
     drop_table :daemon_configurations do |t|
       t.string :daemon

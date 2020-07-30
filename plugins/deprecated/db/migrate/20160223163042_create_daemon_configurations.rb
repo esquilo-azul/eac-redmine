@@ -1,4 +1,6 @@
-class CreateDaemonConfigurations < ActiveRecord::Migration
+class CreateDaemonConfigurations  < (
+    Rails.version < '5.2' ? ActiveRecord::Migration : ActiveRecord::Migration[4.2]
+  )
   def change
     create_table :daemon_configurations do |t|
       t.string :daemon
