@@ -70,5 +70,5 @@ module Avm
 end
 
 unless ::Issue.included_modules.include? ::Avm::Patches::IssuePatch
-  ::Issue.send(:include, ::Avm::Patches::IssuePatch)
+  ::Issue.include ::Avm::Patches::IssuePatch
 end
