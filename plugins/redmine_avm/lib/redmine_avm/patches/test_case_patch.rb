@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Patches
     module TestCasePatch
       def self.included(base)
@@ -11,7 +11,7 @@ module Avm
 end
 
 if Rails.env.test?
-  unless ::ActiveSupport::TestCase.included_modules.include? Avm::Patches::TestCasePatch
-    ::ActiveSupport::TestCase.include Avm::Patches::TestCasePatch
+  unless ::ActiveSupport::TestCase.included_modules.include? ::RedmineAvm::Patches::TestCasePatch
+    ::ActiveSupport::TestCase.include ::RedmineAvm::Patches::TestCasePatch
   end
 end
