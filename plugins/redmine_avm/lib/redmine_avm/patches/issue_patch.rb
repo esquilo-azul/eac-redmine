@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Patches
     module IssuePatch
       def self.included(base)
@@ -69,6 +69,6 @@ module Avm
   end
 end
 
-unless ::Issue.included_modules.include? ::Avm::Patches::IssuePatch
-  ::Issue.include ::Avm::Patches::IssuePatch
+unless ::Issue.included_modules.include? ::RedmineAvm::Patches::IssuePatch
+  ::Issue.include ::RedmineAvm::Patches::IssuePatch
 end
