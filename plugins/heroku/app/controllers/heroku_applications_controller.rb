@@ -1,6 +1,6 @@
 class HerokuApplicationsController < ApplicationController
   layout 'admin_active_scaffold'
-  before_filter :require_admin
+  before_action :require_admin
 
   active_scaffold :heroku_application do |conf|
     conf.columns[:account].form_ui = :select
