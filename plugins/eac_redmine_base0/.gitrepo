@@ -1,7 +1,7 @@
 [subrepo]
   cmdver = 0.4.0
-  commit = 1ef3420026098a64468cf43906fdb2e61ba4f8e4
+  commit = 0607b5a7b668d2924444a495e55cca56df37adcb
   method = merge
-  parent = 5aa573708c0149213d0cb4d19fd63e0e18dd1a9b
+  parent = c4049d3739a31a7034b0775dc4cb07d5cca32563
   branch = master
   remote = https://github.com/esquilo-azul/eac_redmine_base0.git
