@@ -23,6 +23,15 @@ PATH
       eac_ruby_gems_utils (~> 0.4)
 
 PATH
+  remote: plugins/notifyme
+  specs:
+    notifyme (0.4.3)
+      htmlentities
+      imgkit
+      telegram-bot-ruby
+      wkhtmltoimage-binary
+
+PATH
   remote: plugins/redmine_avm
   specs:
     redmine_avm (0.3.5)
@@ -475,9 +484,7 @@ DEPENDENCIES
   gitolite-rugged!
   haml-rails
   hiredis
-  htmlentities
   i18n (~> 0.7.0)
-  imgkit
   jquery-rails (>= 3.1.5)
   launchy
   mail (~> 2.6.4)
@@ -487,6 +494,7 @@ DEPENDENCIES
   mocha
   net-ldap (~> 0.12.0)
   nokogiri (~> 1.8.1)
+  notifyme!
   org-ruby
   pg (~> 0.18.1)
   protected_attributes
@@ -514,11 +522,9 @@ DEPENDENCIES
   simplecov (~> 0.9.1)
   sshkey
   tasks_scheduler (~> 0.4, >= 0.4.2)
-  telegram-bot-ruby
   test_after_commit (~> 0.4.2)
   tzinfo-data
   will_paginate
-  wkhtmltoimage-binary
   yard
 
 BUNDLED WITH
