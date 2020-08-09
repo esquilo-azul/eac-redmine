@@ -44,8 +44,9 @@ module EacRedmineBase0
 
     def check_results
       if tests_failed.any?
-        fatal_error "Some test did not pass:\n" +
-                    tests_failed.map { |test| "  * #{test} (Log: #{test.stdout_log})" }.join("\n")
+        fatal_error "Some test did not pass:\n" + tests_failed.map do |test|
+          "  * #{test} (Log: #{test.stdout_log}, #{test.stderr_log})"
+        end.join("\n")
       else
         success 'All tests passed'
       end
