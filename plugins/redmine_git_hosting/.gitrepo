@@ -1,45 +1,7 @@
-; DO NOT EDIT (unless you know what you are doing)
-
-
-
-;
-
-
-
-; This subdirectory is a git "subrepo", and this file is maintained by the
-
-
-
-; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
-
-
-
-;
-
-
-
 [subrepo]
-
-
-
-	remote = https://github.com/jbox-web/redmine_git_hosting
-
-
-
-	branch = 1.2.3
-
-
-
-	commit = c1e0cc5476a711a18c294ad34f21e62348d5994e
-
-
-
-	parent = 5397c31d6d52c60553e2da38cbba4c918f5cb5c3
-
-
-
-	method = merge
-
-
-
-	cmdver = 0.4.0
+  cmdver = 0.4.1
+  commit = 40396b773e7e9328d8f3313ce3aedf573dc2b996
+  method = rebase
+  parent = d5cfc560e3b878041df3d0ac1ac112c5754b2066
+  branch = master
+  remote = https://github.com/esquilo-azul/redmine_git_hosting
