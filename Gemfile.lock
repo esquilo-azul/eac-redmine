@@ -25,7 +25,7 @@ PATH
 PATH
   remote: plugins/notifyme
   specs:
-    notifyme (0.4.4)
+    notifyme (0.4.5)
       htmlentities
       imgkit
       telegram-bot-ruby
