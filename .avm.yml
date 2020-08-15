@@ -1,0 +1,3 @@
+---
+test:
+  bundle_command: exec rake eac_redmine_base0:plugins:test
