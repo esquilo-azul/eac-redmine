@@ -38,6 +38,12 @@ PATH
       aranha-parsers (~> 0.4)
 
 PATH
+  remote: plugins/redmine_events_manager
+  specs:
+    redmine_events_manager (0.4.8)
+      delayed_job_active_record
+
+PATH
   remote: plugins/redmine_nonproject_modules
   specs:
     redmine_nonproject_modules (0.3.3)
@@ -445,7 +451,6 @@ DEPENDENCIES
   coderay (~> 1.1.1)
   creole
   dalli
-  delayed_job_active_record
   eac_redmine_base0!
   faker
   github-markup
@@ -476,6 +481,7 @@ DEPENDENCIES
   redcarpet (~> 3.4.0)
   redis
   redmine_avm!
+  redmine_events_manager!
   redmine_nonproject_modules!
   redmine_plugins_helper!
   redmine_with_git!
