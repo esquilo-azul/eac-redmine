@@ -1,12 +1,7 @@
-; DO NOT EDIT (unless you know what you are doing)
-;
-; This subdirectory is a git "subrepo", and this file is maintained by the
-; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
-;
 [subrepo]
-	remote = https://github.com/esquilo-azul/redmine_avm
-	branch = master
-	commit = 50c5871967aa2154d517cdcbc4e0f487a9cff772
-	parent = 3e02bb2bf60ce1404e3dd3a0a195582700779106
-	method = merge
-	cmdver = 0.4.0
+  cmdver = 0.4.0
+  commit = e97f2273f108ad2abcc84062cf80b6c13c943a59
+  method = merge
+  parent = 3c49cad425f58fe6ee53fb9578785f7e9eb1e8ea
+  branch = master
+  remote = https://github.com/esquilo-azul/redmine_avm
