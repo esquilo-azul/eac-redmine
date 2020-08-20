@@ -63,6 +63,12 @@ PATH
       sass-rails (~> 5.0)
 
 PATH
+  remote: plugins/redmine_tasks_scheduler
+  specs:
+    redmine_tasks_scheduler (0.2.2)
+      tasks_scheduler (~> 0.4, >= 0.4.2)
+
+PATH
   remote: plugins/redmine_with_git
   specs:
     redmine_with_git (0.6.8)
@@ -409,10 +415,11 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     sshkey (2.0.0)
-    tasks_scheduler (0.4.2)
+    tasks_scheduler (0.5.0)
       active_scaffold
       daemons
       eac_ruby_gems_utils (~> 0.4, >= 0.4.1)
+      eac_ruby_utils (~> 0.43)
       js-routes
       parse-cron
       rails (>= 4.2.11.3)
@@ -484,6 +491,7 @@ DEPENDENCIES
   redmine_events_manager!
   redmine_nonproject_modules!
   redmine_plugins_helper!
+  redmine_tasks_scheduler!
   redmine_with_git!
   request_store (= 1.0.5)
   rmagick (~> 2.16.0)
@@ -493,7 +501,6 @@ DEPENDENCIES
   selenium-webdriver
   simplecov (~> 0.9.1)
   sshkey
-  tasks_scheduler (~> 0.4, >= 0.4.2)
   test_after_commit (~> 0.4.2)
   tzinfo-data
   will_paginate
