@@ -16,4 +16,6 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,lib}/**/*', 'init.rb']
 
   s.add_dependency 'tasks_scheduler', '~> 0.4', '>= 0.4.2'
+
+  s.add_development_dependency 'eac_ruby_gem_support', '~> 0.1', '>= 0.1.2'
 end

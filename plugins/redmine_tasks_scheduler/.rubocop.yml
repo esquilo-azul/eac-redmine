@@ -1,3 +1,11 @@
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 2.4
+  TargetRailsVersion: 4.2
+
 Metrics/AbcSize:
   Exclude:
     - 'db/migrate/**/*'
@@ -8,7 +16,7 @@ Metrics/BlockLength:
     - 'db/migrate/**/*'
     - 'lib/tasks/**/*'
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 100
   Exclude:
     - 'db/migrate/**/*'
