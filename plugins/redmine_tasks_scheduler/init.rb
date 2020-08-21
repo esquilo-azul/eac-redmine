@@ -20,9 +20,4 @@ Rails.configuration.to_prepare do
               caption: :'activerecord.models.scheduled_task.other',
               if: proc { GroupPermission.permission?('scheduled_tasks') }
   end
-  Redmine::MenuManager.map :top_menu do |menu|
-    menu.push :tasks_scheduler_alert,
-              { controller: 'tasks_scheduler_daemon', action: 'index', id: nil },
-              caption: '', last: true, if: proc { GroupPermission.permission?('scheduled_tasks') }
-  end
 end
