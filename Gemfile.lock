@@ -9,11 +9,11 @@ GIT
 
 GIT
   remote: https://github.com/jbox-web/grack.git
-  revision: 1bc51d833970d8544790198cc1d75310dd835175
-  branch: fix_rails4
+  revision: f2d856ee2d54940db2f509c47d546a891fae26b8
+  branch: fix_gemfile
   specs:
-    gitlab-grack (2.0.0.pre)
-      rack (~> 1.6.0)
+    gitlab-grack (2.0.2)
+      rack (>= 1.5.1)
 
 PATH
   remote: plugins/eac_redmine_base0
@@ -136,6 +136,7 @@ GEM
       ofx-parser (~> 1.1.0)
     arel (6.0.4)
     asciidoctor (2.0.17)
+    ast (2.4.2)
     autoprefixer-rails (10.4.7.0)
       execjs (~> 2)
     avm (0.19.0)
@@ -223,6 +224,9 @@ GEM
       sassc (>= 2.0.0)
     brakeman (5.2.3)
     builder (3.2.4)
+    bullet (7.0.2)
+      activesupport (>= 3.0.0)
+      uniform_notifier (~> 1.11)
     capybara (2.18.0)
       addressable
       mini_mime (>= 0.1.3)
@@ -233,6 +237,8 @@ GEM
     childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
     clipboard (1.3.6)
+    codeclimate-test-reporter (1.0.9)
+      simplecov (<= 0.13)
     coderay (1.1.3)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -245,6 +251,7 @@ GEM
     coffee-script-source (1.12.2)
     colorize (0.8.1)
     concurrent-ruby (1.1.10)
+    connection_pool (2.2.5)
     content-type (0.0.1)
       parslet (~> 1.5)
     crass (1.0.6)
@@ -254,6 +261,7 @@ GEM
     curb (0.9.11)
     daemons (1.4.1)
     dalli (3.2.2)
+    database_cleaner (1.99.0)
     deface (1.5.3)
       nokogiri (>= 1.6)
       polyglot
@@ -317,9 +325,13 @@ GEM
       eac_config (~> 0.5)
       eac_ruby_utils (~> 0.64)
     erubis (2.7.0)
+    escape_utils (1.3.0)
     execjs (2.8.1)
-    faker (2.1.0)
-      i18n (>= 0.7)
+    factory_bot (4.11.1)
+      activesupport (>= 3.0.0)
+    factory_bot_rails (4.11.1)
+      factory_bot (~> 4.11.1)
+      railties (>= 3.0.0)
     faraday (1.10.0)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -352,22 +364,11 @@ GEM
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     gratr19 (0.4.4.1)
-    haml (5.2.2)
-      temple (>= 0.8.0)
-      tilt
-    haml-rails (1.0.0)
-      actionpack (>= 4.0.1)
-      activesupport (>= 4.0.1)
-      haml (>= 4.0.6, < 6.0)
-      html2haml (>= 1.0.1)
-      railties (>= 4.0.1)
     hiredis (0.6.3)
     hpricot (0.8.6)
-    html2haml (2.2.0)
-      erubis (~> 2.7.0)
-      haml (>= 4.0, < 6)
-      nokogiri (>= 1.6.0)
-      ruby_parser (~> 3.5)
+    html-pipeline (2.14.2)
+      activesupport (>= 2)
+      nokogiri (>= 1.4)
     htmlbeautifier (1.4.2)
     htmlentities (4.3.4)
     httpclient (2.8.3)
@@ -415,8 +416,11 @@ GEM
     org-ruby (0.9.12)
       rubypants (~> 0.2)
     os (1.1.4)
+    parallel (1.22.1)
     parse-cron (0.1.4)
     parseconfig (1.1.2)
+    parser (3.1.2.0)
+      ast (~> 2.4.1)
     parslet (1.8.2)
     pg (0.18.4)
     polyglot (0.3.5)
@@ -428,6 +432,8 @@ GEM
       rack (>= 1.1.0)
       ruby-openid (>= 2.1.8)
     rack-parser (0.7.0)
+      rack
+    rack-protection (2.2.0)
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -442,6 +448,8 @@ GEM
       bundler (>= 1.3.0, < 2.0)
       railties (= 4.2.11.1)
       sprockets-rails
+    rails-controller-testing (0.0.3)
+      rails (>= 4.2)
     rails-deprecated_sanitizer (1.0.4)
       activesupport (>= 4.2.0.alpha)
     rails-dom-testing (1.0.9)
@@ -468,7 +476,10 @@ GEM
     rdoc (4.3.0)
     redcarpet (3.4.0)
     redis (4.6.0)
+    regexp_parser (2.5.0)
     request_store (1.0.5)
+    rexml (3.2.5)
+    rinku (2.0.6)
     rmagick (2.16.0)
     roadie (3.2.2)
       css_parser (~> 1.4)
@@ -477,29 +488,44 @@ GEM
       railties (>= 3.0, < 5.1)
       roadie (~> 3.1)
     rouge (3.29.0)
-    rspec-core (3.11.0)
-      rspec-support (~> 3.11.0)
-    rspec-expectations (3.11.0)
+    rspec (3.9.0)
+      rspec-core (~> 3.9.0)
+      rspec-expectations (~> 3.9.0)
+      rspec-mocks (~> 3.9.0)
+    rspec-core (3.9.3)
+      rspec-support (~> 3.9.3)
+    rspec-expectations (3.9.4)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.11.0)
-    rspec-mocks (3.11.1)
+      rspec-support (~> 3.9.0)
+    rspec-mocks (3.9.1)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.11.0)
-    rspec-rails (4.1.2)
-      actionpack (>= 4.2)
-      activesupport (>= 4.2)
-      railties (>= 4.2)
-      rspec-core (~> 3.10)
-      rspec-expectations (~> 3.10)
-      rspec-mocks (~> 3.10)
-      rspec-support (~> 3.10)
-    rspec-support (3.11.0)
+      rspec-support (~> 3.9.0)
+    rspec-rails (3.9.1)
+      actionpack (>= 3.0)
+      activesupport (>= 3.0)
+      railties (>= 3.0)
+      rspec-core (~> 3.9.0)
+      rspec-expectations (~> 3.9.0)
+      rspec-mocks (~> 3.9.0)
+      rspec-support (~> 3.9.0)
+    rspec-support (3.9.4)
+    rubocop (1.30.1)
+      parallel (~> 1.10)
+      parser (>= 3.1.0.0)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8, < 3.0)
+      rexml (>= 3.2.5, < 4.0)
+      rubocop-ast (>= 1.18.0, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 3.0)
+    rubocop-ast (1.18.0)
+      parser (>= 3.1.1.0)
+    rubocop-rspec (2.11.1)
+      rubocop (~> 1.19)
     ruby-filemagic (0.7.3)
     ruby-openid (2.9.2)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.5)
-    ruby_parser (3.19.1)
-      sexp_processor (~> 4.16)
     rubypants (0.7.1)
     rubyzip (1.3.0)
     rugged (0.99.0)
@@ -520,7 +546,17 @@ GEM
       childprocess (~> 0.5)
       rubyzip (~> 1.0)
       websocket (~> 1.0)
-    sexp_processor (4.16.1)
+    shoulda (3.5.0)
+      shoulda-context (~> 1.0, >= 1.0.1)
+      shoulda-matchers (>= 1.4.1, < 3.0)
+    shoulda-context (1.2.2)
+    shoulda-matchers (2.7.0)
+      activesupport (>= 3.0.0)
+    sidekiq (5.2.8)
+      connection_pool (~> 2.2, >= 2.2.2)
+      rack (< 2.1.0)
+      rack-protection (>= 1.5.0)
+      redis (>= 3.3.5, < 5)
     simplecov (0.9.2)
       docile (~> 1.1.0)
       multi_json (~> 1.0)
@@ -533,6 +569,9 @@ GEM
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (>= 3.0, < 5.0)
+    spring (4.0.0)
+    spring-commands-rspec (1.0.4)
+      spring (>= 0.9.1)
     sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -561,6 +600,8 @@ GEM
     tilt (2.0.10)
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
+    unicode-display_width (2.1.0)
+    uniform_notifier (1.16.0)
     virtus (2.0.0)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
@@ -582,20 +623,24 @@ DEPENDENCIES
   actionpack-xml_parser
   asciidoctor
   brakeman
+  bullet
   bundler (>= 1.5.0, < 2.0.0)
   capybara (~> 2.13)
+  codeclimate-test-reporter
   coderay (~> 1.1.1)
   creole
   dalli
+  database_cleaner
   deface (= 1.5.3)
   eac_redmine_base0!
-  faker
+  escape_utils
+  factory_bot_rails (< 5.0)
   gemoji (~> 3.0.0)
   github-markup
-  gitlab-grack!
+  gitlab-grack (~> 2.0.0)!
   gitolite-rugged!
-  haml-rails
   hiredis
+  html-pipeline
   i18n (~> 0.7.0)
   invisible_captcha
   jquery-rails (>= 3.1.5)
@@ -613,6 +658,7 @@ DEPENDENCIES
   rack-openid
   rack-parser
   rails (= 4.2.11.1)
+  rails-controller-testing
   rails-dom-testing
   rails-html-sanitizer (>= 1.0.3)
   rbpdf (~> 1.19.6)
@@ -626,13 +672,23 @@ DEPENDENCIES
   redmine_tasks_scheduler!
   redmine_with_git!
   request_store (= 1.0.5)
+  rinku
   rmagick (~> 2.16.0)
   roadie (~> 3.2.1)
   roadie-rails (~> 1.1.1)
+  rspec
+  rspec-rails (~> 3.5, >= 3.5.2)
+  rubocop-rspec
   ruby-openid (~> 2.9.2)
   selenium-webdriver (~> 2.53.4)
+  shoulda (~> 3.5.0)
+  shoulda-context
+  shoulda-matchers (~> 2.7.0)
+  sidekiq
   simplecov (~> 0.9.1)
   slim-rails
+  spring
+  spring-commands-rspec
   sprockets (~> 3.7.2)
   sshkey
   test_after_commit (~> 0.4.2)

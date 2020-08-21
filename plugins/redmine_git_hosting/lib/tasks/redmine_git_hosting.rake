@@ -7,16 +7,6 @@ namespace :redmine_git_hosting do
     end
   end
 
-  task :restore_defaults do
-    ActiveSupport::Deprecation.warn('redmine_git_hosting:restore_defaults is deprecated. Use redmine_git_hosting:update_settings instead.')
-    Rake::Task['redmine_git_hosting:update_settings'].invoke
-  end
-
-  task :restore_default_settings do
-    ActiveSupport::Deprecation.warn('redmine_git_hosting:restore_default_settings is deprecated. Use redmine_git_hosting:update_settings instead.')
-    Rake::Task['redmine_git_hosting:update_settings'].invoke
-  end
-
 
   desc 'Dump plugin settings in console'
   task dump_settings: [:environment] do

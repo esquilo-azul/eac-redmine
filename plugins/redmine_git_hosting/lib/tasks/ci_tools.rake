@@ -1,15 +1,9 @@
 namespace :redmine_git_hosting do
-
   namespace :ci do
-    begin
-      require 'ci/reporter/rake/rspec'
-
+    unless Rails.env.production?
       RSpec::Core::RakeTask.new do |task|
-        task.rspec_opts = 'plugins/redmine_git_hosting/spec --color'
+        task.rspec_opts = '--pattern plugins/redmine_git_hosting/spec/\*\*\{,/\*/\*\*\}/\*_spec.rb --color'
       end
-    rescue Exception => e
-    else
-      ENV['CI_REPORTS'] = Rails.root.join('junit').to_s
     end
 
     desc 'Check unit tests results'
@@ -46,20 +40,16 @@ namespace :redmine_git_hosting do
       end
     end
 
-    task all: ['ci:setup:rspec', 'spec', 'check_unit_tests_results']
+    task all: ['spec', 'check_unit_tests_results']
 
     def ls_dir(dir)
       puts "* ls -hal #{dir}"
       puts %x[ ls -hal "#{dir}" ]
       puts ''
     end
-
   end
 
-
   task default: 'redmine_git_hosting:ci:all'
-  task spec:    'redmine_git_hosting:ci:all'
   task rspec:   'redmine_git_hosting:ci:all'
   task test:    'redmine_git_hosting:ci:all'
-
 end

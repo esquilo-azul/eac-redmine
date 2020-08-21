@@ -1,0 +1,23 @@
+/*
+PLUGIN ICON
+*/
+
+#admin-menu a.redmine-git-hosting::before {
+  font-family: Font Awesome\ 5 Brands;
+  font-size: 1.4em;
+  content: "\f841"; /* fab fa-git-alt */
+  padding-right: 4px;
+}
+
+#admin-menu a.redmine-git-hosting {
+  padding-left: 0;
+}
+
+.authors-list {
+  columns: 2;
+  -webkit-columns: 2;
+  -moz-columns: 2;
+}
+
+.icon-git { padding-right: 10px; }
+.icon-git-disabled { opacity: 0.5; }

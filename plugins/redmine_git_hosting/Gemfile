@@ -1,24 +1,8 @@
 # Gitolite Admin repository management
 gem 'gitolite-rugged', git: 'https://github.com/jbox-web/gitolite-rugged.git', tag: '1.2.0'
 
-## Redmine 3.4.X
-## Ruby/Rack Git Smart-HTTP Server Handler (use our own repository because Redmine uses Rails 4.2 and Rack 1.6)
-gem 'gitlab-grack', git: 'https://github.com/jbox-web/grack.git', require: 'grack', branch: 'fix_rails4'
-gem 'faker'
-gem 'sshkey'
-
-## Redmine 3.x, < 3.4
-## Ruby/Rack Git Smart-HTTP Server Handler (use our own repository because Redmine uses Rails 4.2 and Rack 1.6)
-#gem 'gitlab-grack', git: 'https://github.com/jbox-web/grack.git', require: 'grack', branch: 'fix_rails4'
-#gem 'redcarpet', '~> 3.3.2'
-
-## Redmine 2.x
-## Ruby/Rack Git Smart-HTTP Server Handler (use our own repository because Redmine still uses Rails 3 and Rack 1.4)
-# gem 'gitlab-grack', git: 'https://github.com/jbox-web/grack.git', require: 'grack', branch: 'fix_rails3'
-# gem 'redcarpet', '~> 3.3.2'
-
-# HAML views
-gem 'haml-rails'
+# Ruby/Rack Git Smart-HTTP Server Handler
+gem 'gitlab-grack', '~> 2.0.0', git: 'https://github.com/jbox-web/grack.git', require: 'grack', branch: 'fix_gemfile'
 
 # Memcached client for GitCache
 gem 'dalli'
@@ -27,14 +11,47 @@ gem 'dalli'
 gem 'redis'
 gem 'hiredis'
 
+# Markdown rendering
+gem 'escape_utils'
+gem 'html-pipeline'
+gem 'rinku'
+
 # Syntaxic coloration
 gem 'github-markup'
 gem 'RedCloth'
 gem 'org-ruby'
 gem 'creole'
-# gem 'wikicloth'
 gem 'asciidoctor'
-gem 'rdoc', "~> 4.3"
 
 # Rack parser for Hrack
 gem 'rack-parser', require: 'rack/parser'
+
+# temp autoloading fix
+gem 'sidekiq'
+gem 'sshkey'
+
+group :development, :test do
+  gem 'rspec'
+  gem 'rspec-rails', '~> 3.5', '>= 3.5.2'
+  gem 'rails-controller-testing'
+
+  gem 'shoulda', '~> 3.5.0'
+  gem 'shoulda-context'
+  gem 'shoulda-matchers', '~> 2.7.0'
+
+  gem 'database_cleaner'
+  gem 'factory_bot_rails', '< 5.0'
+
+  # gem 'rubocop', require: false # Already in core Gemfile
+  gem 'rubocop-rspec'
+
+  # Publish to CodeClimate
+  gem 'codeclimate-test-reporter', require: false
+end
+
+group :development do
+  gem 'brakeman'
+  gem 'bullet'
+  gem 'spring'
+  gem 'spring-commands-rspec'
+end

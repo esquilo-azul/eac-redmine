@@ -1,16 +1,4 @@
 /*
-PLUGIN ICONS
-*/
-#admin-menu a.redmine-git-hosting { background-image: url('../images/git_icon.png'); }
-
-.icon-git-logo { background-image: url('../images/git_icon.png'); padding-right: 5px; }
-.icon-clone { background-image: url('../images/clone.png'); }
-.icon-move { background-image: url('../images/move.png'); }
-
-.icon-git { padding-right: 15px; }
-.icon-git-disabled { opacity: 0.5; }
-
-/*
 PLUGIN SETTINGS
 */
 .git_hosting_access_box {
@@ -40,23 +28,9 @@ PLUGIN SETTINGS
   color: #467AA7;
 }
 
-.bootstrap-switch {
-  margin-left: 10px;
-}
-
-#tab-content-gitolite_redmine_config .switch-extended {
-  min-width: 175px;
-}
-
 #settings p {
   margin-bottom: 15px;
   margin-top: 15px;
-}
-
-.authors-list {
-  columns: 2;
-  -webkit-columns: 2;
-  -moz-columns: 2;
 }
 
 
@@ -71,15 +45,16 @@ REPOSITORY EDIT
 /*
 REPOSITORY VIEW
 */
-#sidebar li.repository.git {
-  background: url('../images/git_icon.png') no-repeat scroll 0 50% transparent;
-  margin: 10px 10px 10px 0;
-  padding-left: 25px;
+
+#sidebar li.repository.git::before {
+  font-family: Font Awesome\ 5 Brands;
+  font-size: 1.2em;
+  content: "\f841"; /* fab fa-git-alt */
+  padding-right: 4px;
 }
 
 #sidebar ul.repository.git {
-  padding-left: 15px;
-  list-style-type: none;
+  padding-left: 0;
 }
 
 #git_hosting_download_buttons {
@@ -256,16 +231,6 @@ STATISTICS
   color: #999999;
   font-weight: normal;
   line-height: 1;
-}
-
-/*FONT AWESOME*/
-.fa-align {
-  padding-right: 5px;
-}
-
-/*PROJECT OVERVIEW*/
-.repository-urls {
-  margin-top: 15px;
 }
 
 li.url_type {

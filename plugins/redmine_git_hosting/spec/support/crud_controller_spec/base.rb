@@ -3,26 +3,20 @@ module CrudControllerSpec
     extend ActiveSupport::Concern
 
     included do
-
       include CrudControllerSpec::Helpers
 
       before(:all) do
         @project        = create_project('git_project')
-        @repository     = create_git_repository(@project, identifier: 'git_repository')
-        @repository2    = create_git_repository(@project, identifier: 'git_repository2')
+        @repository     = find_or_create_git_repository(project: @project, identifier: 'git_repository')
+        @repository2    = find_or_create_git_repository(project: @project, identifier: 'git_repository2')
         @member_user    = create_user_with_permissions(@project, member_user_options)
         @anonymous_user = create_anonymous_user
         @object         = create_object
       end
 
-
       describe 'GET #index' do
         context 'with sufficient permissions' do
           before(:each) { set_session_user(@member_user) }
-
-          it 'populates an array of objects' do
-            check_index_variable(variable_for_index, [@object])
-          end
 
           it 'renders the :index view' do
             check_index_template
@@ -36,7 +30,6 @@ module CrudControllerSpec
           end
         end
       end unless respond_to?(:skip_actions) && skip_actions.include?('index')
-
 
       describe 'GET #show' do
         before { Setting.rest_api_enabled = 1 }
@@ -54,12 +47,11 @@ module CrudControllerSpec
         end
       end unless respond_to?(:skip_actions) && skip_actions.include?('show')
 
-
       describe 'GET #new' do
         context 'with sufficient permissions' do
           before(:each) { set_session_user(@member_user) }
 
-          it 'assigns a new RepositoryMirror to @object' do
+          it 'assigns a new @object variable' do
             check_new_variable(main_variable, tested_klass)
           end
 
@@ -75,7 +67,6 @@ module CrudControllerSpec
           end
         end
       end unless respond_to?(:skip_actions) && skip_actions.include?('new')
-
 
       describe 'POST #create' do
         context 'with sufficient permissions' do
@@ -112,7 +103,6 @@ module CrudControllerSpec
           end
         end
       end unless respond_to?(:skip_actions) && skip_actions.include?('create')
-
 
       describe 'GET #edit' do
         context 'with sufficient permissions' do
@@ -154,7 +144,6 @@ module CrudControllerSpec
           end
         end
       end unless respond_to?(:skip_actions) && skip_actions.include?('edit')
-
 
       describe 'PUT #update' do
         context 'with sufficient permissions' do
@@ -200,7 +189,6 @@ module CrudControllerSpec
         end
       end unless respond_to?(:skip_actions) && skip_actions.include?('update')
 
-
       describe 'DELETE #destroy' do
         context 'with sufficient permissions' do
           before(:each) do
@@ -224,7 +212,6 @@ module CrudControllerSpec
           end
         end
       end unless respond_to?(:skip_actions) && skip_actions.include?('destroy')
-
     end
   end
 end
