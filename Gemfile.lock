@@ -40,7 +40,7 @@ PATH
 PATH
   remote: plugins/redmine_events_manager
   specs:
-    redmine_events_manager (0.4.10)
+    redmine_events_manager (0.4.11)
       delayed_job_active_record
 
 PATH
