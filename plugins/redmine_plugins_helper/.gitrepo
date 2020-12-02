@@ -1,7 +1,7 @@
 [subrepo]
   cmdver = 0.4.0
-  commit = b2d049484a56bfa3fabe5329b6ff9faf783210dc
+  commit = e7faf322f87f13f8428a0fa12d733f1c32c4b694
   method = merge
-  parent = 4843980df0877b6bf2d1c313af4dc5a7e7912410
+  parent = 6906b4877e4a7954941d0d715b85fd937f0094a0
   branch = master
   remote = https://github.com/esquilo-azul/redmine_plugins_helper
