@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem "bundler", ">= 1.5.0", "< 2.0.0"
 
-gem "rails", '~> 4.2', '>= 4.2.11.3'
+gem "rails", "4.2.11.1"
 gem "addressable", "2.4.0" if RUBY_VERSION < "2.0"
 if RUBY_VERSION < "2.1"
   gem "public_suffix", (RUBY_VERSION < "2.0" ? "~> 1.4" : "~> 2.0.5")
@@ -26,6 +26,9 @@ gem "xpath", "< 3.2.0" if RUBY_VERSION < "2.3"
 # Request at least rails-html-sanitizer 1.0.3 because of security advisories
 gem "rails-html-sanitizer", ">= 1.0.3"
 
+# TODO: Remove the following line when #32223 is fixed
+gem "sprockets", "~> 3.7.2"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :x64_mingw, :mswin]
 gem "rbpdf", "~> 1.19.6"
@@ -37,7 +40,7 @@ end
 
 # Optional gem for OpenID authentication
 group :openid do
-  gem "ruby-openid", "~> 2.3.0", :require => "openid"
+  gem "ruby-openid", "~> 2.9.2", :require => "openid"
   gem "rack-openid"
 end
 
@@ -93,13 +96,13 @@ end
 group :test do
   gem "minitest"
   gem "rails-dom-testing"
-  gem "mocha"
+  gem 'mocha', '>= 1.4.0'
   gem "simplecov", "~> 0.9.1", :require => false
   # TODO: remove this after upgrading to Rails 5
   gem "test_after_commit", "~> 0.4.2"
   # For running UI tests
   gem "capybara", '~> 2.13'
-  gem "selenium-webdriver"
+  gem "selenium-webdriver", "~> 2.53.4"
 end
 
 local_gemfile = File.join(File.dirname(__FILE__), "Gemfile.local")

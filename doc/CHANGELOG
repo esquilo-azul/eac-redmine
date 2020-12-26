@@ -4,6 +4,123 @@ Redmine - project management software
 Copyright (C) 2006-2017  Jean-Philippe Lang
 http://www.redmine.org/
 
+== 2019-12-20 v3.4.13
+
+=== [Attachments]
+
+* Defect #20277: "Couldn't find template for digesting" error in the log when sending a thumbnail or an attachment
+
+=== [Gems support]
+
+* Patch #32592: Require 'mocha/minitest' instead of deprecated 'mocha/setup'
+
+=== [Text formatting]
+
+* Patch #25742: Improper markup sanitization in user content for space separated attribute values and different quoting styles
+
+== 2019-10-19 v3.4.12
+
+=== [Code cleanup/refactoring]
+
+* Defect #32022: IssueSubtaskingTest fails with high probability
+
+=== [Documentation]
+
+* Defect #32170: Text enclosed in pre tag in Wiki formatting reference is not displayed in monospaced font in Chrome
+* Defect #32184: Incorrect headings example in Textile help
+
+=== [Gems support]
+
+* Defect #32300: Don't use sprockets 4.0.0 in order to avoid Sprockets::Railtie::ManifestNeededError
+* Patch #32294: Update ruby-openid to 2.9.2
+
+=== [Issues]
+
+* Defect #31778: Total estimated time issue query column and issue field might leak information
+
+=== [Issues list]
+
+* Defect #31779: Total estimated time column shown even when estimated time field is deactivated
+
+=== [Translations]
+
+* Defect #32290: Typo in Russian translation for label_in_the_next_days
+
+=== [UI]
+
+* Defect #32012: Broken JavaScript icon in the repository view
+* Defect #32024: Broken gzip icon in the repository view
+
+== 2019-06-10 v3.4.11
+
+=== [Administration]
+
+* Defect #31125: Don't output ImageMagick version information to stdout
+
+=== [Code cleanup/refactoring]
+
+* Defect #30811: "rake db:fixtures:load" does not work
+
+=== [Email receiving]
+
+* Defect #30457: MailHandler.safe_receive does not output any error log
+* Defect #31503: Undefined local variable sender_email in MailHandler#receive_message_reply
+
+=== [Issues filter]
+
+* Patch #31276: Serialize group_by and totalable_names in Query#as_params
+
+=== [SCM]
+
+* Defect #31120: Garbage lines in the output of 'git branch' break git adapter
+
+=== [Security]
+
+* Defect #31520: Persistent XSS in textile formatting
+
+=== [Translations]
+
+* Defect #31264: Conflicting translation between "track" and "watch" in Simplified Chinese
+
+=== [UI - Responsive]
+
+* Defect #31153: Display horizontal scroll bar of files table when overflow occurs on small screen
+* Defect #31311: admin/info page: text cut off in pre tag on mobile
+
+=== [Wiki]
+
+* Patch #31334: Do not lose content when updating a wiki page that has been renamed in the meantime
+
+== 2019-03-31 v3.4.10
+
+=== [Administration]
+
+* Defect #30939: Timeout for "Check for updates" on Plugins page is too short
+
+=== [Files]
+
+* Defect #31087: Deleting a version silently deletes its attachments
+
+=== [Issues filter]
+
+* Defect #30367: "Last updated by" filter causes an SQL error with MariaDB
+
+=== [REST API]
+
+* Defect #29055: Searching for issue number with REST API redirects to issue HTML page
+
+=== [Rails support]
+
+* Feature #31027: Upgrade to Rails 4.2.11.1
+
+=== [Search engine]
+
+* Defect #30923: Project search should select subprojects scope when the project has subprojects
+
+=== [UI]
+
+* Defect #30872: Copyright is outdated
+
 == 2019-02-21 v3.4.9
 
 === [Gems support]
