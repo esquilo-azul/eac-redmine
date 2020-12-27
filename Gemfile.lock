@@ -67,7 +67,7 @@ PATH
   remote: plugins/redmine_tasks_scheduler
   specs:
     redmine_tasks_scheduler (0.3.0)
-      tasks_scheduler (~> 0.5)
+      tasks_scheduler (~> 0.6)
 
 PATH
   remote: plugins/redmine_with_git
