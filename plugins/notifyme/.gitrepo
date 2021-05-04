@@ -1,7 +1,7 @@
 [subrepo]
-  cmdver = 0.4.0
-  commit = 3b67fbaed410ba231d77fc53892aafe778a7628c
+  cmdver = 0.4.1
+  commit = 2bb09c4cfad0846dc5b995d0b4a0056dc593abe5
   method = rebase
-  parent = 1b4723e77c19c25cb7bf9e0807400367a2441090
+  parent = 5db224dfdbc9841ed0bc4e8f307b3969b1b276ff
   branch = master
   remote = https://github.com/esquilo-azul/notifyme.git

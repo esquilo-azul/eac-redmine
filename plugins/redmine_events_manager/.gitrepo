@@ -1,7 +1,7 @@
 [subrepo]
-  cmdver = 0.4.0
-  commit = 91d5a0f41063b2d4ba4535adc3625e2fccd8b102
+  cmdver = 0.4.1
+  commit = 3dbefa342f617ee916a821d3bda0f4e9558624f2
   method = merge
-  parent = 1b4723e77c19c25cb7bf9e0807400367a2441090
+  parent = 5db224dfdbc9841ed0bc4e8f307b3969b1b276ff
   branch = master
   remote = https://github.com/esquilo-azul/redmine_events_manager
