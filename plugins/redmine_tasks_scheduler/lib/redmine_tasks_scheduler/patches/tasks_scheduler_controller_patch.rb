@@ -10,6 +10,8 @@ module RedmineTasksScheduler
 
           require_permission const_get('PERMISSIONS')
           layout 'admin'
+          helper :scheduled_tasks
+          helper :tasks_scheduler
         end
       end
     end
