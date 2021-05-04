@@ -39,8 +39,9 @@
 # Assets
 public/assets
 
-# redmine_with_git
+# redmine_installer
 /config/install.sh
+/config/secrets_key.txt
 
 # eac_redmine
 /log/*.pid
