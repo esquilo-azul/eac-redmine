@@ -1,7 +1,7 @@
 [subrepo]
-  cmdver = 0.4.0
-  commit = 27a1baa66fc56b66907db586e857dc52630b5413
+  cmdver = 0.4.1
+  commit = c581b16eddf1ed9bc913c80c6333835bdcf79104
   method = merge
-  parent = 3c49cad425f58fe6ee53fb9578785f7e9eb1e8ea
+  parent = 9410c798b64d4a31195c27e70c119d91d59936e6
   branch = master
   remote = https://github.com/esquilo-azul/redmine_with_git
