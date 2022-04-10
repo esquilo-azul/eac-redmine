@@ -33,6 +33,11 @@
     margin-bottom: $panel-body-padding-vertical;
   }
 
+  #login-submit {
+    padding-top: $padding-base-vertical;
+    padding-bottom: $padding-base-vertical;
+  }
+
   table {
     margin: auto;
     table-layout: fixed;
@@ -85,4 +90,22 @@
   background-image: url("../../../images/openid-bg.gif");
   background-repeat: no-repeat;
   background-position: right $input-padding-horizontal center;
+}
+
+
+//
+// Two-factor authentication
+// --------------------------------------------------
+
+.controller-twofa {
+  .splitcontentleft {
+    width: auto;
+    padding-right: 0;
+  }
+}
+
+ul.twofa_backup_codes {
+  margin-left: 0;
+  padding: 0;
+  list-style-type: none;
 }
