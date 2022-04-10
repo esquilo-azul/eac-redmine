@@ -12,6 +12,7 @@ function task_condition {
 export -f task_condition
 
 function task_fix {
-  sudo -u "$redmine_user" -H ssh-keygen -t rsa -f "$ssh_key" -N ''
+  # https://github.com/libgit2/pygit2/issues/1013#issuecomment-679200156
+  sudo -u "$redmine_user" -H ssh-keygen  -m PEM -t rsa -b 2048 -t rsa -f "$ssh_key" -N ''
 }
 export -f task_fix
