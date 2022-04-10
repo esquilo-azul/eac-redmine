@@ -4,6 +4,9 @@ set -u
 export INSTALL_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 export PLUGIN_ROOT=$(dirname "$INSTALL_ROOT")
 export REDMINE_ROOT=$(dirname "$(dirname "$PLUGIN_ROOT")")
+export SUB_ROOT="${PLUGIN_ROOT}/vendor"
+
+source "${SUB_ROOT}/eac-bash-lib/init.sh"
 
 function _build_plugins_path {
   SUBDIR="$1"
@@ -18,27 +21,36 @@ function _build_plugins_path {
 }
 export -f _build_plugins_path
 
+FILES_TO_SOURCE=()
+
 SETTINGS_PATH="$(_build_plugins_path 'default_settings.sh')"
 IFSBAK="$IFS"
 IFS=:
 for SETTINGS in $SETTINGS_PATH; do
-  source "$SETTINGS"
+  FILES_TO_SOURCE+=("$SETTINGS")
 done
 IFS="$IFSBAK"
-APP_SETTINGS="$REDMINE_ROOT/config/install.sh"
-if [ -f "$APP_SETTINGS" ]; then
-  source "$APP_SETTINGS"
-fi
+
+FILES_TO_SOURCE+=("$REDMINE_ROOT/config/install.sh")
+for FILE in "$REDMINE_ROOT/config/install.d/"*.sh; do
+  FILES_TO_SOURCE+=("$FILE")
+done
 
 SETUPS_PATH="$(_build_plugins_path 'setup.sh')"
 IFSBAK="$IFS"
 IFS=:
 if ls $SETUPS_PATH 1> /dev/null 2>&1; then
   for SETUP in $SETUPS_PATH; do
-    source "$SETUP"
+    FILES_TO_SOURCE+=("$SETUP")
   done
 fi
 IFS="$IFSBAK"
+
+for FILE_TO_SOURCE in "${FILES_TO_SOURCE[@]}"; do
+  if [ -f "$FILE_TO_SOURCE" ]; then
+    source "$FILE_TO_SOURCE"
+  fi
+done
 
 function programeiro_path {
   _build_plugins_path "programs"
@@ -46,7 +58,7 @@ function programeiro_path {
 export -f programeiro_path
 
 function programeiro {
-  PPATH="$(programeiro_path)" "$PLUGIN_ROOT/vendor/programeiro/run.sh" "$@"
+  PPATH="$(programeiro_path)" "${SUB_ROOT}/programeiro/run.sh" "$@"
 }
 export -f programeiro
 
@@ -56,7 +68,7 @@ function taskeiro_path {
 export -f taskeiro_path
 
 function taskeiro {
-  "$PLUGIN_ROOT/vendor/taskeiro/taskeiro" --path "$(taskeiro_path)" "$@"
+  "${SUB_ROOT}/taskeiro/taskeiro" --path "$(taskeiro_path)" "$@"
 }
 export -f taskeiro
 

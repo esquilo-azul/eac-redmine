@@ -4,11 +4,14 @@ set -u
 set -e
 
 function task_condition {
-  PGPASSWORD="$postgresql_password" psql -h 'localhost' -U "$postgresql_user" -c 'select 1' template1 > /dev/null 2> /dev/null
+  if bool_r "$SKIP_DATABASE"; then return 0; fi
+  if ! bool_r "$postgresql_internal"; then return 0; fi
+
+  programeiro /postgresql/test_connection template1
 }
 
 function task_dependencies {
-  echo postgresql_running
+  echo postgresql_client postgresql_running
 }
 
 function task_fix {

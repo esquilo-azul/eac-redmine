@@ -9,7 +9,7 @@ function host_name_setting_template {
 export -f host_name_setting_template
 
 function host_name_setting_current {
-  programeiro /redmine/get_setting_value 'host_name'
+  programeiro /redmine/setting/read 'host_name'
 }
 export -f host_name_setting_current
 
@@ -18,11 +18,13 @@ function task_dependencies {
 }
 
 function task_condition {
+  if bool_r "$SKIP_DATABASE"; then return 0; fi
+
   return $(programeiro /text/diff_commands 'host_name_setting_template' 'host_name_setting_current')
 }
 
 function task_fix {
   set -u
   set -e
-  programeiro /redmine/set_setting_value 'host_name' "$(host_name_setting_template)"
+  programeiro /redmine/setting/write 'host_name' "$(host_name_setting_template)"
 }
