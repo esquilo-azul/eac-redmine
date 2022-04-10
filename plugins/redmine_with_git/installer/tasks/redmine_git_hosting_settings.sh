@@ -10,7 +10,7 @@ function redmine_git_hosting_setting_template {
 export -f redmine_git_hosting_setting_template
 
 function redmine_git_hosting_setting_current {
-  programeiro /redmine/get_setting_value 'plugin_redmine_git_hosting'
+  programeiro /redmine/setting/read 'plugin_redmine_git_hosting'
 }
 export -f redmine_git_hosting_setting_current
 
@@ -19,11 +19,13 @@ function task_dependencies {
 }
 
 function task_condition {
+  if bool_r "$SKIP_DATABASE"; then return 0; fi
+
   return $(programeiro /text/diff_commands 'redmine_git_hosting_setting_template' 'redmine_git_hosting_setting_current')
 }
 
 function task_fix {
-  programeiro /redmine/set_setting_value 'plugin_redmine_git_hosting' \
+  programeiro /redmine/setting/write 'plugin_redmine_git_hosting' \
     "$(redmine_git_hosting_setting_template)"
   programeiro /redmine/installer/triggers/set 'redmine_git_hosting_rescue'
 }

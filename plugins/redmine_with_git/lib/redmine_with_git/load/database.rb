@@ -31,11 +31,7 @@ module RedmineWithGit
       end
 
       def psql_command
-        env.command(
-          [password_arg, 'psql',
-           '-h', database_schema['host'], '-U', database_schema['username'], '-d',
-           database_schema['database']]
-        )
+        build_postgres_command('psql')
       end
 
       def psql_sql_command(sql)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'avm/files/rotate'
+require 'avm/data/rotate'
 require 'eac_ruby_utils/patches/object/asserts'
 require 'eac_ruby_utils/listable'
 
@@ -61,7 +61,7 @@ module RedmineWithGit
 
       def run_if_rotate
         if ::File.exist?(path) && overwrite == OVERWRITE_ROTATE
-          rotate = ::Avm::Files::Rotate.new(path, space_limit: space_limit)
+          rotate = ::Avm::Data::Rotate.new(path, space_limit: space_limit)
           ::Rails.logger.info "Rotating \"#{rotate.source_path}\"..."
           rotate.run
           ::Rails.logger.info "Rotated to \"#{rotate.target_path}\""

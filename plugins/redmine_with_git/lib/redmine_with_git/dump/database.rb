@@ -8,11 +8,7 @@ module RedmineWithGit
       private
 
       def build_command
-        env.command(
-          [password_arg, 'pg_dump', '-x', '-c', '-O',
-           '-h', database_schema['host'], '-U', database_schema['username'], '-d',
-           database_schema['database'], '@ESC_|'] + compress_args
-        )
+        build_postgres_command('pg_dump', ['-x', '-c', '-O', '@ESC_|'] + compress_args)
       end
     end
   end
