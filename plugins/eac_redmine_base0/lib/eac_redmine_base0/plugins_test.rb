@@ -1,18 +1,22 @@
 # frozen_string_literal: true
 
-require 'eac_ruby_utils/console/speaker'
+require 'eac_cli/speaker'
+require 'eac_ruby_utils/core_ext'
 require 'eac_ruby_utils/envs'
+require 'eac_ruby_utils/speaker'
 
 module EacRedmineBase0
   class PluginsTest
-    include ::EacRubyUtils::Console::Speaker
+    enable_speaker
 
     def run
-      @tests = []
-      ::Redmine::Plugin.registered_plugins.each_value do |plugin|
-        check_plugin(plugin)
+      ::EacRubyUtils::Speaker.context.on(::EacCli::Speaker.new) do
+        @tests = []
+        ::Redmine::Plugin.registered_plugins.each_value do |plugin|
+          check_plugin(plugin)
+        end
+        check_results
       end
-      check_results
     end
 
     def check_plugin(plugin)
