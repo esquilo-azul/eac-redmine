@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,14 +21,15 @@ require File.expand_path('../../test_helper', __FILE__)
 
 class UserTest < ActiveSupport::TestCase
   fixtures :users, :email_addresses, :members, :projects, :roles, :member_roles, :auth_sources,
-            :trackers, :issue_statuses,
-            :projects_trackers,
-            :watchers,
-            :issue_categories, :enumerations, :issues,
-            :journals, :journal_details,
-            :groups_users,
-            :enabled_modules,
-            :tokens
+           :trackers, :issue_statuses,
+           :projects_trackers,
+           :watchers,
+           :issue_categories, :enumerations, :issues,
+           :journals, :journal_details,
+           :groups_users,
+           :enabled_modules,
+           :tokens,
+           :user_preferences
 
   include Redmine::I18n
 
@@ -34,6 +37,7 @@ class UserTest < ActiveSupport::TestCase
     @admin = User.find(1)
     @jsmith = User.find(2)
     @dlopper = User.find(3)
+    User.current = nil
   end
 
   def test_admin_scope_without_args_should_return_admin_users
@@ -259,6 +263,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_destroy_should_update_attachments
+    set_tmp_attachments_directory
     attachment = Attachment.create!(:container => Project.find(1),
       :file => uploaded_test_file("testfile.txt", "text/plain"),
       :author_id => 2)
@@ -441,16 +446,20 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_destroy_should_nullify_changesets
-    changeset = Changeset.create!(
-      :repository => Repository::Subversion.create!(
-        :project_id => 1,
-        :url => 'file:///tmp',
-        :identifier => 'tmp'
-      ),
-      :revision => '12',
-      :committed_on => Time.now,
-      :committer => 'jsmith'
-      )
+    changeset =
+      Changeset.
+        create!(
+          :repository =>
+            Repository::Subversion.
+              create!(
+                :project_id => 1,
+                :url => 'file:///tmp',
+                :identifier => 'tmp'
+              ),
+          :revision => '12',
+          :committed_on => Time.now,
+          :committer => 'jsmith'
+        )
     assert_equal 2, changeset.user_id
 
     User.find(2).destroy
@@ -536,6 +545,18 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  def test_validate_password_format
+    Setting::PASSWORD_CHAR_CLASSES.each do |key, regexp|
+      with_settings :password_required_char_classes => key do
+        user = User.new(:firstname => "new", :lastname => "user", :login => "random", :mail => "random@somnet.foo")
+        p = 'PASSWDpasswd01234!@#$%'.gsub(regexp, '')
+        user.password, user.password_confirmation = p, p
+        assert !user.save
+        assert_equal 1, user.errors.count
+      end
+    end
+  end
+
   def test_name_format
     assert_equal 'John S.', @jsmith.name(:firstname_lastinitial)
     assert_equal 'Smith, John', @jsmith.name(:lastname_comma_firstname)
@@ -583,7 +604,23 @@ class UserTest < ActiveSupport::TestCase
     assert_equal '2012-05-15', User.find(1).time_to_date(time).to_s
 
     preference.update_attribute :time_zone, ''
-    assert_equal '2012-05-15', User.find(1).time_to_date(time).to_s
+    assert_equal time.localtime.to_date.to_s, User.find(1).time_to_date(time).to_s
+  end
+
+  def test_convert_time_to_user_timezone_should_return_the_time_according_to_user_time_zone
+    preference = User.find(1).pref
+    time = Time.gm(2012, 05, 15, 23, 30).utc # 2012-05-15 23:30 UTC
+    time_not_utc = Time.new(2012, 05, 15, 23, 30)
+
+    preference.update_attribute :time_zone, 'Baku' # UTC+5
+    assert_equal '2012-05-16 04:30:00 +0500', User.find(1).convert_time_to_user_timezone(time).to_s
+
+    preference.update_attribute :time_zone, 'La Paz' # UTC-4
+    assert_equal '2012-05-15 19:30:00 -0400', User.find(1).convert_time_to_user_timezone(time).to_s
+
+    preference.update_attribute :time_zone, ''
+    assert_equal time.localtime.to_s, User.find(1).convert_time_to_user_timezone(time).to_s
+    assert_equal time_not_utc, User.find(1).convert_time_to_user_timezone(time_not_utc)
   end
 
   def test_fields_for_order_statement_should_return_fields_according_user_format_setting
@@ -658,13 +695,31 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "ADMIN", user.login
   end
 
-  if ldap_configured?
-    test "#try_to_login using LDAP with failed connection to the LDAP server" do
-      auth_source = AuthSourceLdap.find(1)
-      AuthSource.any_instance.stubs(:initialize_ldap_con).raises(Net::LDAP::LdapError, 'Cannot connect')
+  test "#try_to_login! using LDAP with existing user and failed connection to the LDAP server" do
+    auth_source = AuthSourceLdap.find(1)
+    user = users(:users_001)
+    user.update_column :auth_source_id, auth_source.id
+    AuthSource.any_instance.stubs(:initialize_ldap_con).raises(Net::LDAP::Error, 'Cannot connect')
+    assert_raise(AuthSourceException){User.try_to_login!('admin', 'admin')}
+  end
 
-      assert_nil User.try_to_login('edavis', 'wrong')
-    end
+  test "#try_to_login using LDAP with existing user and failed connection to the LDAP server" do
+    auth_source = AuthSourceLdap.find(1)
+    user = users(:users_001)
+    user.update_column :auth_source_id, auth_source.id
+    AuthSource.any_instance.stubs(:initialize_ldap_con).raises(Net::LDAP::Error, 'Cannot connect')
+    assert_nil User.try_to_login('admin', 'admin')
+  end
+
+  test "#try_to_login using LDAP with new user and failed connection to the LDAP server" do
+    auth_source = AuthSourceLdap.find(1)
+    auth_source.update onthefly_register: true
+    AuthSource.any_instance.stubs(:initialize_ldap_con).raises(Net::LDAP::Error, 'Cannot connect')
+
+    assert_nil User.try_to_login('edavis', 'wrong')
+  end
+
+  if ldap_configured?
 
     test "#try_to_login using LDAP" do
       assert_nil User.try_to_login('edavis', 'wrong')
@@ -733,9 +788,12 @@ class UserTest < ActiveSupport::TestCase
     anon1 = User.anonymous
     assert !anon1.new_record?
     assert_kind_of AnonymousUser, anon1
-    anon2 = AnonymousUser.create(
-                :lastname => 'Anonymous', :firstname => '',
-                :login => '', :status => 0)
+    anon2 =
+      AnonymousUser.
+        create(
+          :lastname => 'Anonymous', :firstname => '',
+          :login => '', :status => 0
+        )
     assert_equal 1, anon2.errors.count
   end
 
@@ -948,7 +1006,7 @@ class UserTest < ActiveSupport::TestCase
     user = User.find(2)
     assert_kind_of Hash, user.projects_by_role
     assert_equal 2, user.projects_by_role.size
-    assert_equal [1,5], user.projects_by_role[Role.find(1)].collect(&:id).sort
+    assert_equal [1, 5], user.projects_by_role[Role.find(1)].collect(&:id).sort
     assert_equal [2], user.projects_by_role[Role.find(2)].collect(&:id).sort
   end
 
@@ -1039,6 +1097,14 @@ class UserTest < ActiveSupport::TestCase
     assert !u.password_confirmation.blank?
   end
 
+  def test_random_password_include_required_characters
+    with_settings :password_required_char_classes => Setting::PASSWORD_CHAR_CLASSES do
+      u = User.new(:firstname => "new", :lastname => "user", :login => "random", :mail => "random@somnet.foo")
+      u.random_password
+      assert u.valid?
+    end
+  end
+
   test "#change_password_allowed? should be allowed if no auth source is set" do
     user = User.generate!
     assert user.change_password_allowed?
@@ -1124,8 +1190,10 @@ class UserTest < ActiveSupport::TestCase
 
   test "#allowed_to? for normal users" do
     project = Project.find(1)
-    assert_equal true, @jsmith.allowed_to?(:delete_messages, project)    #Manager
-    assert_equal false, @dlopper.allowed_to?(:delete_messages, project) #Developer
+    # Manager
+    assert_equal true, @jsmith.allowed_to?(:delete_messages, project)
+    # Developer
+    assert_equal false, @dlopper.allowed_to?(:delete_messages, project)
   end
 
   test "#allowed_to? with empty array should return false" do
@@ -1134,13 +1202,17 @@ class UserTest < ActiveSupport::TestCase
 
   test "#allowed_to? with multiple projects" do
     assert_equal true, @admin.allowed_to?(:view_project, Project.all.to_a)
-    assert_equal false, @dlopper.allowed_to?(:view_project, Project.all.to_a) #cannot see Project(2)
-    assert_equal true, @jsmith.allowed_to?(:edit_issues, @jsmith.projects.to_a) #Manager or Developer everywhere
-    assert_equal false, @jsmith.allowed_to?(:delete_issue_watchers, @jsmith.projects.to_a) #Dev cannot delete_issue_watchers
+    # cannot see Project(2)
+    assert_equal false, @dlopper.allowed_to?(:view_project, Project.all.to_a)
+    # Manager or Developer everywhere
+    assert_equal true, @jsmith.allowed_to?(:edit_issues, @jsmith.projects.to_a)
+    # Dev cannot delete_issue_watchers
+    assert_equal false, @jsmith.allowed_to?(:delete_issue_watchers, @jsmith.projects.to_a)
   end
 
   test "#allowed_to? with with options[:global] should return true if user has one role with the permission" do
-    @dlopper2 = User.find(5) #only Developer on a project, not Manager anywhere
+    # only Developer on a project, not Manager anywhere
+    @dlopper2 = User.find(5)
     @anonymous = User.find(6)
     assert_equal true, @jsmith.allowed_to?(:delete_issue_watchers, nil, :global => true)
     assert_equal false, @dlopper2.allowed_to?(:delete_issue_watchers, nil, :global => true)
@@ -1151,7 +1223,8 @@ class UserTest < ActiveSupport::TestCase
 
   # this is just a proxy method, the test only calls it to ensure it doesn't break trivially
   test "#allowed_to_globally?" do
-    @dlopper2 = User.find(5) #only Developer on a project, not Manager anywhere
+    # only Developer on a project, not Manager anywhere
+    @dlopper2 = User.find(5)
     @anonymous = User.find(6)
     assert_equal true, @jsmith.allowed_to_globally?(:delete_issue_watchers)
     assert_equal false, @dlopper2.allowed_to_globally?(:delete_issue_watchers)
@@ -1196,6 +1269,14 @@ class UserTest < ActiveSupport::TestCase
     issue.assigned_to = new_assignee
     assert assignee.notify_about?(issue)
     assert new_assignee.notify_about?(issue)
+
+    issue.save!
+    assert assignee.notify_about?(issue)
+    assert new_assignee.notify_about?(issue)
+
+    issue.save!
+    assert !assignee.notify_about?(issue)
+    assert new_assignee.notify_about?(issue)
   end
 
   def test_notify_about_news
@@ -1225,33 +1306,40 @@ class UserTest < ActiveSupport::TestCase
     assert_equal user, User.try_to_login(user.login, "unsalted")
   end
 
+  def test_bookmarked_project_ids
+    # User with bookmarked projects
+    assert_equal [1, 5], User.find(1).bookmarked_project_ids
+    # User without bookmarked projects
+    assert_equal [], User.find(2).bookmarked_project_ids
+  end
+
   if Object.const_defined?(:OpenID)
     def test_setting_identity_url
       normalized_open_id_url = 'http://example.com/'
-      u = User.new( :identity_url => 'http://example.com/' )
+      u = User.new(:identity_url => 'http://example.com/')
       assert_equal normalized_open_id_url, u.identity_url
     end
 
     def test_setting_identity_url_without_trailing_slash
       normalized_open_id_url = 'http://example.com/'
-      u = User.new( :identity_url => 'http://example.com' )
+      u = User.new(:identity_url => 'http://example.com')
       assert_equal normalized_open_id_url, u.identity_url
     end
 
     def test_setting_identity_url_without_protocol
       normalized_open_id_url = 'http://example.com/'
-      u = User.new( :identity_url => 'example.com' )
+      u = User.new(:identity_url => 'example.com')
       assert_equal normalized_open_id_url, u.identity_url
     end
 
     def test_setting_blank_identity_url
-      u = User.new( :identity_url => 'example.com' )
+      u = User.new(:identity_url => 'example.com')
       u.identity_url = ''
       assert u.identity_url.blank?
     end
 
     def test_setting_invalid_identity_url
-      u = User.new( :identity_url => 'this is not an openid url' )
+      u = User.new(:identity_url => 'this is not an openid url')
       assert u.identity_url.blank?
     end
   else

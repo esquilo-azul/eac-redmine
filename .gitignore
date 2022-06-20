@@ -18,11 +18,14 @@
 /files/*
 /lib/redmine/scm/adapters/mercurial/redminehelper.pyc
 /lib/redmine/scm/adapters/mercurial/redminehelper.pyo
-/log/**/*.log*
+/log/*.log*
 /log/mongrel_debug
 !/plugins/README
 /public/dispatch.*
 /public/plugin_assets/*
+!/public/themes/alternate
+!/public/themes/classic
+!/public/themes/README
 /tmp/*
 /tmp/cache/*
 /tmp/pdf/*
@@ -36,12 +39,10 @@
 /.bundle
 /Gemfile.local
 
-# Assets
-public/assets
+/node_modules
+yarn-error.log
 
-# redmine_installer
+#eac_redmine_base0
+/public/assets/**/*
 /config/install.sh
-/config/secrets_key.txt
-
-# eac_redmine
-/log/*.pid
+/log/**/*

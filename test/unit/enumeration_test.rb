@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -51,7 +53,7 @@ class EnumerationTest < ActiveSupport::TestCase
     assert e.is_a?(Enumeration)
     assert e.is_default?
     assert e.active?
-    e.update_attributes(:active => false)
+    e.update(:active => false)
     assert e.is_default?
     assert !e.active?
   end
@@ -72,25 +74,25 @@ class EnumerationTest < ActiveSupport::TestCase
 
   def test_update_default
     e = Enumeration.default
-    e.update_attributes(:name => 'Changed', :is_default => true)
+    e.update(:name => 'Changed', :is_default => true)
     assert_equal e, Enumeration.default
   end
 
   def test_update_default_to_non_default
     e = Enumeration.default
-    e.update_attributes(:name => 'Changed', :is_default => false)
+    e.update(:name => 'Changed', :is_default => false)
     assert_nil Enumeration.default
   end
 
   def test_change_default
     e = Enumeration.find_by_name('Default Enumeration')
-    e.update_attributes(:name => 'Changed Enumeration', :is_default => true)
+    e.update(:name => 'Changed Enumeration', :is_default => true)
     assert_equal e, Enumeration.default
   end
 
   def test_destroy_with_reassign
     Enumeration.find(4).destroy(Enumeration.find(6))
-    assert_nil Issue.where(:priority_id => 4).first
+    assert_not Issue.where(:priority_id => 4).exists?
     assert_equal 6, Enumeration.find(6).objects_count
   end
 
@@ -166,6 +168,7 @@ class EnumerationTest < ActiveSupport::TestCase
 
   def test_destroying_override_should_not_update_positions
     Enumeration.delete_all
+    Issue.delete_all
 
     a = IssuePriority.create!(:name => 'A')
     b = IssuePriority.create!(:name => 'B')

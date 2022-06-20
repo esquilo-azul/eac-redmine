@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -26,12 +28,12 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
   extend ActionView::Helpers::SanitizeHelper::ClassMethods
 
   fixtures :projects, :roles, :enabled_modules, :users,
-                      :repositories, :changesets,
-                      :trackers, :issue_statuses, :issues,
-                      :versions, :documents,
-                      :wikis, :wiki_pages, :wiki_contents,
-                      :boards, :messages,
-                      :attachments
+           :repositories, :changesets,
+           :trackers, :issue_statuses, :issues,
+           :versions, :documents,
+           :wikis, :wiki_pages, :wiki_contents,
+           :boards, :messages,
+           :attachments, :enumerations
 
   def setup
     super
@@ -87,7 +89,7 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
 
   def test_multiple_macros_on_the_same_line
     Redmine::WikiFormatting::Macros.macro :foo do |obj, args|
-      args.any? ? "args: #{args.join(',')}" : "no args" 
+      args.any? ? "args: #{args.join(',')}" : "no args"
     end
 
     assert_equal '<p>no args no args</p>', textilizable("{{foo}} {{foo}}")
@@ -99,12 +101,18 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
   def test_macro_should_receive_the_object_as_argument_when_with_object_and_attribute
     issue = Issue.find(1)
     issue.description = "{{hello_world}}"
-    assert_equal '<p>Hello world! Object: Issue, Called with no argument and no block of text.</p>', textilizable(issue, :description)
+    assert_equal(
+      '<p>Hello world! Object: Issue, Called with no argument and no block of text.</p>',
+      textilizable(issue, :description)
+    )
   end
 
   def test_macro_should_receive_the_object_as_argument_when_called_with_object_option
     text = "{{hello_world}}"
-    assert_equal '<p>Hello world! Object: Issue, Called with no argument and no block of text.</p>', textilizable(text, :object => Issue.find(1))
+    assert_equal(
+      '<p>Hello world! Object: Issue, Called with no argument and no block of text.</p>',
+      textilizable(text, :object => Issue.find(1))
+    )
   end
 
   def test_extract_macro_options_should_with_args
@@ -133,7 +141,10 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
     end
 
     text = "{{exception}}"
-    assert_include '<div class="flash error">Error executing the <strong>exception</strong> macro (My message)</div>', textilizable(text)
+    assert_include(
+      '<div class="flash error">Error executing the <strong>exception</strong> macro (My message)</div>',
+      textilizable(text)
+    )
   end
 
   def test_macro_arguments_should_not_be_parsed_by_formatters
@@ -210,11 +221,11 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
     text = "{{collapse\n*Collapsed* block of text\n}}"
     with_locale 'en' do
       result = textilizable(text)
-  
+
       assert_select_in result, 'div.collapsed-text'
       assert_select_in result, 'strong', :text => 'Collapsed'
-      assert_select_in result, 'a.collapsible.collapsed', :text => 'Show'
-      assert_select_in result, 'a.collapsible', :text => 'Hide'
+      assert_select_in result, 'a.collapsible.icon-collapsed', :text => 'Show'
+      assert_select_in result, 'a.collapsible.icon-expended', :text => 'Hide'
     end
   end
 
@@ -224,8 +235,8 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
 
     assert_select_in result, 'div.collapsed-text'
     assert_select_in result, 'strong', :text => 'Collapsed'
-    assert_select_in result, 'a.collapsible.collapsed', :text => 'Example'
-    assert_select_in result, 'a.collapsible', :text => 'Example'
+    assert_select_in result, 'a.collapsible.icon-collapsed', :text => 'Example'
+    assert_select_in result, 'a.collapsible.icon-expended', :text => 'Example'
   end
 
   def test_macro_collapse_with_two_args
@@ -234,35 +245,36 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
 
     assert_select_in result, 'div.collapsed-text'
     assert_select_in result, 'strong', :text => 'Collapsed'
-    assert_select_in result, 'a.collapsible.collapsed', :text => 'Show example'
-    assert_select_in result, 'a.collapsible', :text => 'Hide example'
+    assert_select_in result, 'a.collapsible.icon-collapsed', :text => 'Show example'
+    assert_select_in result, 'a.collapsible.icon-expended', :text => 'Hide example'
   end
 
   def test_macro_collapse_should_not_break_toc
     set_language_if_valid 'en'
 
-    text =  <<-RAW
-{{toc}}
+    text = <<~RAW
+      {{toc}}
 
-h1. Title
+      h1. Title
 
-{{collapse(Show example, Hide example)
-h2. Heading 
-}}"
-RAW
-
-    expected_toc = '<ul class="toc"><li><strong>Table of contents</strong></li><li><a href="#Title">Title</a><ul><li><a href="#Heading">Heading</a></li></ul></li></ul>'
-
+      {{collapse(Show example, Hide example)
+      h2. Heading
+      }}"
+    RAW
+    expected_toc =
+      '<ul class="toc"><li><strong>Table of contents</strong></li>' \
+      '<li><a href="#Title">Title</a><ul><li><a href="#Heading">Heading</a></li></ul></li></ul>'
     assert_include expected_toc, textilizable(text).gsub(/[\r\n]/, '')
   end
 
   def test_macro_child_pages
-    expected =  "<p><ul class=\"pages-hierarchy\">\n" +
-                 "<li><a href=\"/projects/ecookbook/wiki/Child_1\">Child 1</a>\n" +
-                 "<ul class=\"pages-hierarchy\">\n<li><a href=\"/projects/ecookbook/wiki/Child_1_1\">Child 1 1</a></li>\n</ul>\n</li>\n" +
-                 "<li><a href=\"/projects/ecookbook/wiki/Child_2\">Child 2</a></li>\n" +
-                 "</ul>\n</p>"
-
+    expected =
+      "<p><ul class=\"pages-hierarchy\">\n" \
+      "<li><a href=\"/projects/ecookbook/wiki/Child_1\">Child 1</a>\n" \
+      "<ul class=\"pages-hierarchy\">\n" \
+      "<li><a href=\"/projects/ecookbook/wiki/Child_1_1\">Child 1 1</a></li>\n</ul>\n</li>\n" \
+      "<li><a href=\"/projects/ecookbook/wiki/Child_2\">Child 2</a></li>\n" \
+      "</ul>\n</p>"
     @project = Project.find(1)
     # child pages of the current wiki page
     assert_equal expected, textilizable("{{child_pages}}", :object => WikiPage.find(2).content)
@@ -274,30 +286,37 @@ RAW
   end
 
   def test_macro_child_pages_with_parent_option
-    expected =  "<p><ul class=\"pages-hierarchy\">\n" +
-                 "<li><a href=\"/projects/ecookbook/wiki/Another_page\">Another page</a>\n" +
-                 "<ul class=\"pages-hierarchy\">\n" +
-                 "<li><a href=\"/projects/ecookbook/wiki/Child_1\">Child 1</a>\n" +
-                 "<ul class=\"pages-hierarchy\">\n<li><a href=\"/projects/ecookbook/wiki/Child_1_1\">Child 1 1</a></li>\n</ul>\n</li>\n" +
-                 "<li><a href=\"/projects/ecookbook/wiki/Child_2\">Child 2</a></li>\n" +
-                 "</ul>\n</li>\n</ul>\n</p>"
+    expected =
+      "<p><ul class=\"pages-hierarchy\">\n" \
+      "<li><a href=\"/projects/ecookbook/wiki/Another_page\">Another page</a>\n" \
+      "<ul class=\"pages-hierarchy\">\n" \
+      "<li><a href=\"/projects/ecookbook/wiki/Child_1\">Child 1</a>\n" \
+      "<ul class=\"pages-hierarchy\">\n" \
+      "<li><a href=\"/projects/ecookbook/wiki/Child_1_1\">Child 1 1</a></li>\n</ul>\n</li>\n" \
+      "<li><a href=\"/projects/ecookbook/wiki/Child_2\">Child 2</a></li>\n" \
+      "</ul>\n</li>\n</ul>\n</p>"
 
     @project = Project.find(1)
     # child pages of the current wiki page
     assert_equal expected, textilizable("{{child_pages(parent=1)}}", :object => WikiPage.find(2).content)
     # child pages of another page
-    assert_equal expected, textilizable("{{child_pages(Another_page, parent=1)}}", :object => WikiPage.find(1).content)
-
+    assert_equal(
+      expected,
+      textilizable("{{child_pages(Another_page, parent=1)}}", :object => WikiPage.find(1).content)
+    )
     @project = Project.find(2)
-    assert_equal expected, textilizable("{{child_pages(ecookbook:Another_page, parent=1)}}", :object => WikiPage.find(1).content)
+    assert_equal(
+      expected,
+      textilizable("{{child_pages(ecookbook:Another_page, parent=1)}}", :object => WikiPage.find(1).content)
+    )
   end
 
   def test_macro_child_pages_with_depth_option
-    expected =  "<p><ul class=\"pages-hierarchy\">\n" +
-                 "<li><a href=\"/projects/ecookbook/wiki/Child_1\">Child 1</a></li>\n" +
-                 "<li><a href=\"/projects/ecookbook/wiki/Child_2\">Child 2</a></li>\n" +
-                 "</ul>\n</p>"
-
+    expected =
+      "<p><ul class=\"pages-hierarchy\">\n" \
+        "<li><a href=\"/projects/ecookbook/wiki/Child_1\">Child 1</a></li>\n" \
+        "<li><a href=\"/projects/ecookbook/wiki/Child_2\">Child 2</a></li>\n" \
+        "</ul>\n</p>"
     @project = Project.find(1)
     assert_equal expected, textilizable("{{child_pages(depth=1)}}", :object => WikiPage.find(2).content)
   end
@@ -307,7 +326,7 @@ RAW
   end
 
   def test_macro_thumbnail
-    link = link_to('<img alt="testfile.PNG" src="/attachments/thumbnail/17" />'.html_safe,
+    link = link_to('<img alt="testfile.PNG" src="/attachments/thumbnail/17/200" />'.html_safe,
                    "/attachments/17",
                    :class => "thumbnail",
                    :title => "testfile.PNG")
@@ -316,7 +335,7 @@ RAW
   end
 
   def test_macro_thumbnail_with_full_path
-    link = link_to('<img alt="testfile.PNG" src="http://test.host/attachments/thumbnail/17" />'.html_safe,
+    link = link_to('<img alt="testfile.PNG" src="http://test.host/attachments/thumbnail/17/200" />'.html_safe,
                    "http://test.host/attachments/17",
                    :class => "thumbnail",
                    :title => "testfile.PNG")
@@ -325,16 +344,16 @@ RAW
   end
 
   def test_macro_thumbnail_with_size
-    link = link_to('<img alt="testfile.PNG" src="/attachments/thumbnail/17/200" />'.html_safe,
+    link = link_to('<img alt="testfile.PNG" src="/attachments/thumbnail/17/400" />'.html_safe,
                    "/attachments/17",
                    :class => "thumbnail",
                    :title => "testfile.PNG")
     assert_equal "<p>#{link}</p>",
-                 textilizable("{{thumbnail(testfile.png, size=200)}}", :object => Issue.find(14))
+                 textilizable("{{thumbnail(testfile.png, size=400)}}", :object => Issue.find(14))
   end
 
   def test_macro_thumbnail_with_title
-    link = link_to('<img alt="testfile.PNG" src="/attachments/thumbnail/17" />'.html_safe,
+    link = link_to('<img alt="testfile.PNG" src="/attachments/thumbnail/17/200" />'.html_safe,
                    "/attachments/17",
                    :class => "thumbnail",
                    :title => "Cool image")
@@ -344,32 +363,30 @@ RAW
 
   def test_macro_thumbnail_with_invalid_filename_should_fail
     assert_include 'test.png not found',
-      textilizable("{{thumbnail(test.png)}}", :object => Issue.find(14))
+                   textilizable("{{thumbnail(test.png)}}", :object => Issue.find(14))
   end
 
   def test_macros_should_not_be_executed_in_pre_tags
-    text = <<-RAW
-{{hello_world(foo)}}
+    text = <<~RAW
+      {{hello_world(foo)}}
 
-<pre>
-{{hello_world(pre)}}
-!{{hello_world(pre)}}
-</pre>
+      <pre>
+      {{hello_world(pre)}}
+      !{{hello_world(pre)}}
+      </pre>
 
-{{hello_world(bar)}}
-RAW
+      {{hello_world(bar)}}
+    RAW
+    expected = <<~EXPECTED
+      <p>Hello world! Object: NilClass, Arguments: foo and no block of text.</p>
 
-    expected = <<-EXPECTED
-<p>Hello world! Object: NilClass, Arguments: foo and no block of text.</p>
+      <pre>
+      {{hello_world(pre)}}
+      !{{hello_world(pre)}}
+      </pre>
 
-<pre>
-{{hello_world(pre)}}
-!{{hello_world(pre)}}
-</pre>
-
-<p>Hello world! Object: NilClass, Arguments: bar and no block of text.</p>
-EXPECTED
-
+      <p>Hello world! Object: NilClass, Arguments: bar and no block of text.</p>
+    EXPECTED
     assert_equal expected.gsub(%r{[\r\n\t]}, ''), textilizable(text).gsub(%r{[\r\n\t]}, '')
   end
 
@@ -380,30 +397,50 @@ EXPECTED
 
   def test_macros_should_not_mangle_next_macros_outputs
     text = '{{macro(2)}} !{{macro(2)}} {{hello_world(foo)}}'
-    assert_equal '<p>{{macro(2)}} {{macro(2)}} Hello world! Object: NilClass, Arguments: foo and no block of text.</p>', textilizable(text)
+    assert_equal(
+      '<p>{{macro(2)}} {{macro(2)}} Hello world! Object: NilClass, Arguments: foo and no block of text.</p>',
+      textilizable(text)
+    )
   end
 
   def test_macros_with_text_should_not_mangle_following_macros
-    text = <<-RAW
-{{hello_world
-Line of text
-}}
+    text = <<~RAW
+      {{hello_world
+      Line of text
+      }}
 
-{{hello_world
-Another line of text
-}}
-RAW
-
-    expected = <<-EXPECTED
-<p>Hello world! Object: NilClass, Called with no argument and a 12 bytes long block of text.</p>
-<p>Hello world! Object: NilClass, Called with no argument and a 20 bytes long block of text.</p>
-EXPECTED
-
+      {{hello_world
+      Another line of text
+      }}
+    RAW
+    expected = <<~EXPECTED
+      <p>Hello world! Object: NilClass, Called with no argument and a 12 bytes long block of text.</p>
+      <p>Hello world! Object: NilClass, Called with no argument and a 20 bytes long block of text.</p>
+    EXPECTED
     assert_equal expected.gsub(%r{[\r\n\t]}, ''), textilizable(text).gsub(%r{[\r\n\t]}, '')
   end
 
   def test_macro_should_support_phrase_modifiers
     text = "*{{hello_world}}*"
     assert_match %r|\A<p><strong>Hello world!.*</strong></p>\z|, textilizable(text)
+  end
+
+  def test_issue_macro_should_not_render_link_if_not_visible
+    assert_equal "<p>#123</p>", textilizable('{{issue(123)}}')
+  end
+
+  def test_issue_macro_should_render_link_to_issue
+    issue = Issue.find(1)
+    assert_equal(
+      %{<p><a class="issue tracker-1 status-1 priority-4 priority-lowest behind-schedule" } +
+      %{href="/issues/1">Bug #1</a>: #{issue.subject}</p>},
+      textilizable("{{issue(1)}}")
+    )
+    assert_equal(
+      %{<p>eCookbook - } +
+      %{<a class="issue tracker-1 status-1 priority-4 priority-lowest behind-schedule" } +
+      %{href="/issues/1">Bug #1</a>: #{issue.subject}</p>},
+      textilizable("{{issue(1, project=true)}}")
+    )
   end
 end

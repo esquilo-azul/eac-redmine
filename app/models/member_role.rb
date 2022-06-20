@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -26,7 +28,6 @@ class MemberRole < ActiveRecord::Base
 
   validates_presence_of :role
   validate :validate_role_member
-  attr_protected :id
 
   def validate_role_member
     errors.add :role_id, :invalid if role && !role.member?
@@ -34,6 +35,11 @@ class MemberRole < ActiveRecord::Base
 
   def inherited?
     !inherited_from.nil?
+  end
+
+  # Returns the MemberRole from which self was inherited, or nil
+  def inherited_from_member_role
+    MemberRole.find_by_id(inherited_from) if inherited_from
   end
 
   # Destroys the MemberRole without destroying its Member if it doesn't have

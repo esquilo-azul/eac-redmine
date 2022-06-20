@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record'
 
 module ActiveRecord
@@ -6,7 +8,7 @@ module ActiveRecord
     # Translate attribute names for validation errors display
     def self.human_attribute_name(attr, options = {})
       prepared_attr = attr.to_s.sub(/_id$/, '').sub(/^.+\./, '')
-      class_prefix = name.underscore.gsub('/', '_')
+      class_prefix = name.underscore.tr('/', '_')
 
       redmine_default = [
         :"field_#{class_prefix}_#{prepared_attr}",
@@ -95,7 +97,7 @@ module ActionView
       alias :options_for_select_without_non_empty_blank_option :options_for_select
       def options_for_select(container, selected = nil)
         if container.is_a?(Array)
-          container = container.map {|element| element.blank? ? ["&nbsp;".html_safe, ""] : element}
+          container = container.map {|element| element.presence || ["&nbsp;".html_safe, ""]}
         end
         options_for_select_without_non_empty_blank_option(container, selected)
       end
@@ -106,35 +108,18 @@ end
 require 'mail'
 
 module DeliveryMethods
-  class AsyncSMTP < ::Mail::SMTP
-    def deliver!(*args)
-      Thread.start do
-        super *args
-      end
-    end
-  end
-
-  class AsyncSendmail < ::Mail::Sendmail
-    def deliver!(*args)
-      Thread.start do
-        super *args
-      end
-    end
-  end
-
   class TmpFile
     def initialize(*args); end
 
     def deliver!(mail)
       dest_dir = File.join(Rails.root, 'tmp', 'emails')
       Dir.mkdir(dest_dir) unless File.directory?(dest_dir)
-      File.open(File.join(dest_dir, mail.message_id.gsub(/[<>]/, '') + '.eml'), 'wb') {|f| f.write(mail.encoded) }
+      filename = "#{Time.now.to_i}_#{mail.message_id.gsub(/[<>]/, '')}.eml"
+      File.open(File.join(dest_dir, filename), 'wb') {|f| f.write(mail.encoded) }
     end
   end
 end
 
-ActionMailer::Base.add_delivery_method :async_smtp, DeliveryMethods::AsyncSMTP
-ActionMailer::Base.add_delivery_method :async_sendmail, DeliveryMethods::AsyncSendmail
 ActionMailer::Base.add_delivery_method :tmp_file, DeliveryMethods::TmpFile
 
 # Changes how sent emails are logged
@@ -142,7 +127,7 @@ ActionMailer::Base.add_delivery_method :tmp_file, DeliveryMethods::TmpFile
 module ActionMailer
   class LogSubscriber < ActiveSupport::LogSubscriber
     def deliver(event)
-      recipients = [:to, :cc, :bcc].inject("") do |s, header|
+      recipients = [:to, :cc, :bcc].inject(+"") do |s, header|
         r = Array.wrap(event.payload[header])
         if r.any?
           s << "\n  #{header}: #{r.join(', ')}"
@@ -151,16 +136,6 @@ module ActionMailer
       end
       info("\nSent email \"#{event.payload[:subject]}\" (%1.fms)#{recipients}" % event.duration)
       debug(event.payload[:mail])
-    end
-  end
-end
-
-# #deliver is deprecated in Rails 4.2
-# Prevents massive deprecation warnings
-module ActionMailer
-  class MessageDelivery < Delegator
-    def deliver
-      deliver_now
     end
   end
 end
@@ -201,7 +176,7 @@ module ActionView
         unless asset_id.blank?
           source += "?#{asset_id}"
         end
-        asset_path(source, options)
+        asset_path(source, options.merge(skip_pipeline: true))
       end
       alias :path_to_asset :asset_path_with_asset_id
 
@@ -218,7 +193,7 @@ module ActionView
             if File.exist? path
               exist = true
             else
-              path = File.join(Rails.public_path, compute_asset_path("#{source}#{extname}", options))
+              path = File.join(Rails.public_path, public_compute_asset_path("#{source}#{extname}", options))
               if File.exist? path
                 exist = true
               end
@@ -234,6 +209,20 @@ module ActionView
             asset_id
           end
         end
+      end
+    end
+  end
+end
+
+# https://github.com/rack/rack/pull/1703
+# TODO: remove this when Rack is updated to 3.0.0
+require 'rack'
+module Rack
+  class RewindableInput
+    unless method_defined?(:size)
+      def size
+        make_rewindable unless @rewindable_io
+        @rewindable_io.size
       end
     end
   end

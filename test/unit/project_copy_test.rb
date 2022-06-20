@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -36,9 +38,10 @@ class ProjectCopyTest < ActiveSupport::TestCase
            :boards, :messages,
            :repositories,
            :news, :comments,
-           :documents
+           :documents, :attachments
 
   def setup
+    User.current = nil
     ProjectCustomField.destroy_all
     @source_project = Project.find(2)
     @project = Project.new(:name => 'Copy Test', :identifier => 'copy-test')
@@ -49,6 +52,15 @@ class ProjectCopyTest < ActiveSupport::TestCase
   def test_copy_should_return_false_if_save_fails
     project = Project.new(:name => 'Copy', :identifier => nil)
     assert_equal false, project.copy(@source_project)
+  end
+
+  test "#copy should copy project attachments" do
+    set_tmp_attachments_directory
+    Attachment.create!(:container => @source_project, :file => uploaded_test_file("testfile.txt", "text/plain"), :author_id => 1)
+    assert @project.copy(@source_project)
+
+    assert_equal 1, @project.attachments.count, "Attachment not copied"
+    assert_equal "testfile.txt", @project.attachments.first.filename
   end
 
   test "#copy should copy issues" do
@@ -141,7 +153,7 @@ class ProjectCopyTest < ActiveSupport::TestCase
 
   def test_copy_issues_should_reassign_version_custom_fields_to_copied_versions
     User.current = User.find(1)
-    CustomField.delete_all
+    CustomField.destroy_all
     field = IssueCustomField.generate!(:field_format => 'version', :is_for_all => true, :trackers => Tracker.all)
     source_project = Project.generate!(:trackers => Tracker.all)
     source_version = Version.generate!(:project => source_project)
@@ -189,13 +201,14 @@ class ProjectCopyTest < ActiveSupport::TestCase
 
     # Second issue with a cross project relation
     assert_equal 2, copied_second_issue.relations.size, "Relation not copied"
-    copied_relation = copied_second_issue.relations.select {|r| r.relation_type == 'duplicates'}.first
+    copied_relation = copied_second_issue.relations.find {|r| r.relation_type == 'duplicates'}
     assert_equal "duplicates", copied_relation.relation_type
     assert_equal 1, copied_relation.issue_from_id, "Cross project relation not kept"
     assert_not_equal source_relation_cross_project.id, copied_relation.id
   end
 
   test "#copy should copy issue attachments" do
+    set_tmp_attachments_directory
     issue = Issue.generate!(:subject => "copy with attachment", :tracker_id => 1, :project_id => @source_project.id)
     Attachment.create!(:container => issue, :file => uploaded_test_file("testfile.txt", "text/plain"), :author_id => 1)
     @source_project.issues << issue
@@ -284,6 +297,19 @@ class ProjectCopyTest < ActiveSupport::TestCase
     end
   end
 
+  test "#copy should copy version attachments" do
+    set_tmp_attachments_directory
+    version = Version.generate!(:name => "copy with attachment")
+    Attachment.create!(:container => version, :file => uploaded_test_file("testfile.txt", "text/plain"), :author_id => 1)
+    @source_project.versions << version
+    assert @project.copy(@source_project)
+
+    copied_version = @project.versions.where(:name => "copy with attachment").first
+    assert_not_nil copied_version
+    assert_equal 1, copied_version.attachments.count, "Attachment not copied"
+    assert_equal "testfile.txt", copied_version.attachments.first.filename
+  end
+
   test "#copy should copy wiki" do
     assert_difference 'Wiki.count' do
       assert @project.copy(@source_project)
@@ -303,13 +329,16 @@ class ProjectCopyTest < ActiveSupport::TestCase
     assert project.wiki
   end
 
-  test "#copy should copy wiki pages and content with hierarchy" do
+  test "#copy should copy wiki pages, attachment and content with hierarchy" do
+    @source_project.wiki.pages.first.attachments << Attachment.first.copy
     assert_difference 'WikiPage.count', @source_project.wiki.pages.size do
       assert @project.copy(@source_project)
     end
 
     assert @project.wiki
     assert_equal @source_project.wiki.pages.size, @project.wiki.pages.size
+
+    assert_equal @source_project.wiki.pages.first.attachments.first.filename, @project.wiki.pages.first.attachments.first.filename
 
     @project.wiki.pages.each do |wiki_page|
       assert wiki_page.content
@@ -339,6 +368,29 @@ class ProjectCopyTest < ActiveSupport::TestCase
     @project.boards.each do |board|
       assert !@source_project.boards.include?(board)
     end
+  end
+
+  test "#copy should copy documents" do
+    source_project = Project.find(1)
+    assert @project.copy(source_project)
+
+    assert_equal 3, @project.documents.size
+    @project.documents.each do |document|
+      assert !source_project.documents.include?(document)
+    end
+  end
+
+  test "#copy should copy document attachments" do
+    set_tmp_attachments_directory
+    document = Document.generate!(:title => "copy with attachment", :category_id => 1, :project_id => @source_project.id)
+    Attachment.create!(:container => document, :file => uploaded_test_file("testfile.txt", "text/plain"), :author_id => 1)
+    @source_project.documents << document
+    assert @project.copy(@source_project)
+
+    copied_document = @project.documents.where(:title => "copy with attachment").first
+    assert_not_nil copied_document
+    assert_equal 1, copied_document.attachments.count, "Attachment not copied"
+    assert_equal "testfile.txt", copied_document.attachments.first.filename
   end
 
   test "#copy should change the new issues to use the copied issue categories" do

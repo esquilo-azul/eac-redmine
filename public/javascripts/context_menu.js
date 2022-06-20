@@ -1,11 +1,11 @@
 /* Redmine - project management software
-   Copyright (C) 2006-2017  Jean-Philippe Lang */
+   Copyright (C) 2006-2021  Jean-Philippe Lang */
 
 var contextMenuObserving;
 
 function contextMenuRightClick(event) {
   var target = $(event.target);
-  if (target.is('a')) {return;}
+  if (target.is('a:not(.js-contextmenu)')) {return;}
   var tr = target.closest('.hascontextmenu').first();
   if (tr.length < 1) {return;}
   event.preventDefault();
@@ -30,7 +30,12 @@ function contextMenuClick(event) {
   if (event.which == 1 || (navigator.appVersion.match(/\bMSIE\b/))) {
     var tr = target.closest('.hascontextmenu').first();
     if (tr.length > 0) {
-      // a row was clicked, check if the click was on checkbox
+      // a row was clicked
+      if (target.is('td.checkbox')) {
+    	// the td containing the checkbox was clicked, toggle the checkbox
+    	target = target.find('input').first();
+    	target.prop("checked", !target.prop("checked"));
+      }
       if (target.is('input')) {
         // a checkbox may be clicked
         if (target.prop('checked')) {
@@ -41,6 +46,7 @@ function contextMenuClick(event) {
       } else {
         if (event.ctrlKey || event.metaKey) {
           contextMenuToggleSelection(tr);
+          contextMenuClearDocumentSelection();
         } else if (event.shiftKey) {
           lastSelected = contextMenuLastSelected();
           if (lastSelected.length) {
@@ -48,6 +54,7 @@ function contextMenuClick(event) {
             $('.hascontextmenu').each(function(){
               if (toggling || $(this).is(tr)) {
                 contextMenuAddSelection($(this));
+                contextMenuClearDocumentSelection();
               }
               if ($(this).is(tr) || $(this).is(lastSelected)) {
                 toggling = !toggling;
@@ -186,7 +193,6 @@ function contextMenuToggleSelection(tr) {
 function contextMenuAddSelection(tr) {
   tr.addClass('context-menu-selection');
   contextMenuCheckSelectionBox(tr, true);
-  contextMenuClearDocumentSelection();
 }
 
 function contextMenuRemoveSelection(tr) {
@@ -218,6 +224,7 @@ function contextMenuInit() {
   if (!contextMenuObserving) {
     $(document).click(contextMenuClick);
     $(document).contextmenu(contextMenuRightClick);
+    $(document).on('click', '.js-contextmenu', contextMenuRightClick);
     contextMenuObserving = true;
   }
 }

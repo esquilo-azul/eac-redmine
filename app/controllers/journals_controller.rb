@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -64,13 +66,14 @@ class JournalsController < ApplicationController
     if @journal
       user = @journal.user
       text = @journal.notes
+      @content = +"#{ll(Setting.default_language, :text_user_wrote_in, {:value => user, :link => "#note-#{params[:journal_indice]}"})}\n> "
     else
       user = @issue.author
       text = @issue.description
+      @content = +"#{ll(Setting.default_language, :text_user_wrote, user)}\n> "
     end
     # Replaces pre blocks with [...]
     text = text.to_s.strip.gsub(%r{<pre>(.*?)</pre>}m, '[...]')
-    @content = "#{ll(Setting.default_language, :text_user_wrote, user)}\n> "
     @content << text.gsub(/(\r?\n|\r\n?)/, "\n> ") + "\n\n"
   rescue ActiveRecord::RecordNotFound
     render_404
@@ -89,9 +92,9 @@ class JournalsController < ApplicationController
     @journal.safe_attributes = params[:journal]
     @journal.save
     @journal.destroy if @journal.details.empty? && @journal.notes.blank?
-    call_hook(:controller_journals_edit_post, { :journal => @journal, :params => params})
+    call_hook(:controller_journals_edit_post, {:journal => @journal, :params => params})
     respond_to do |format|
-      format.html { redirect_to issue_path(@journal.journalized) }
+      format.html {redirect_to issue_path(@journal.journalized)}
       format.js
     end
   end

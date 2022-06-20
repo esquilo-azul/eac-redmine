@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -63,9 +65,9 @@ class ApplicationTest < Redmine::IntegrationTest
     assert_nil session[:user_id]
   end
 
-  def test_missing_template_should_respond_with_404
+  def test_missing_template_should_respond_with_4xx
     get '/login.png'
-    assert_response 404
+    assert_response 406
   end
 
   def test_invalid_token_should_call_custom_handler

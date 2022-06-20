@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb
 
@@ -22,6 +24,9 @@ Rails.application.configure do
   # The :test delivery method accumulates sent emails in the
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
+
+  # Disable Async delivery
+  config.active_job.queue_adapter = :inline
 
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false

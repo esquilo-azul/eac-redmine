@@ -1,6 +1,19 @@
+# frozen_string_literal: true
+
 require File.expand_path('../boot', __FILE__)
 
-require 'rails/all'
+require 'rails'
+# Pick the frameworks you want:
+require 'active_model/railtie'
+require 'active_job/railtie'
+require 'active_record/railtie'
+require 'active_storage/engine'
+require 'action_controller/railtie'
+require 'action_mailer/railtie'
+require 'action_view/railtie'
+require 'action_cable/engine'
+# require 'sprockets/railtie'
+require 'rails/test_unit/railtie'
 
 Bundler.require(*Rails.groups)
 
@@ -28,7 +41,9 @@ module RedmineApp
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
-    I18n.enforce_available_locales = true
+    config.i18n.enforce_available_locales = true
+    config.i18n.fallbacks = true
+    config.i18n.default_locale = 'en'
 
     # Configure the default encoding used in templates for Ruby 1.9.
     config.encoding = "utf-8"
@@ -36,26 +51,16 @@ module RedmineApp
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
 
-    # Enable the asset pipeline
-    config.assets.enabled = false
-
-    # Version of your assets, change this if you want to expire all your assets
-    config.assets.version = '1.0'
-
     config.action_mailer.perform_deliveries = false
 
     # Do not include all helpers
     config.action_controller.include_all_helpers = false
 
-    # Do not suppress errors in after_rollback and after_commit callbacks
-    config.active_record.raise_in_transactional_callbacks = true
-
-    # XML parameter parser removed from core in Rails 4.0
-    # and extracted to actionpack-xml_parser gem
-    config.middleware.insert_after ActionDispatch::ParamsParser, ActionDispatch::XmlParamsParser
+    # Since Redmine 4.0, boolean values are stored in sqlite3 databases as 1 and 0
+    config.active_record.sqlite3.represent_boolean_as_integer = true
 
     # Sets the Content-Length header on responses with fixed-length bodies
-    config.middleware.insert_after Rack::Sendfile, Rack::ContentLength
+    config.middleware.insert_before Rack::Sendfile, Rack::ContentLength
 
     # Verify validity of user sessions
     config.redmine_verify_sessions = true
@@ -72,9 +77,12 @@ module RedmineApp
     # can change it (environments/ENV.rb would take precedence over it)
     config.log_level = Rails.env.production? ? :info : :debug
 
-    config.session_store :cookie_store,
+    config.session_store(
+      :cookie_store,
       :key => '_redmine_session',
-      :path => config.relative_url_root || '/'
+      :path => config.relative_url_root || '/',
+      :same_site => :lax
+    )
 
     if File.exists?(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
       instance_eval File.read(File.join(File.dirname(__FILE__), 'additional_environment.rb'))

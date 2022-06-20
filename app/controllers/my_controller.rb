@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,15 +21,19 @@ class MyController < ApplicationController
   self.main_menu = false
   before_action :require_login
   # let user change user's password when user has to
-  skip_before_action :check_password_change, :only => :password
+  skip_before_action :check_password_change, :check_twofa_activation, :only => :password
 
-  require_sudo_mode :account, only: :post
+  accept_api_auth :account
+
+  require_sudo_mode :account, only: :put
   require_sudo_mode :reset_rss_key, :reset_api_key, :show_api_key, :destroy
 
   helper :issues
   helper :users
   helper :custom_fields
   helper :queries
+  helper :activities
+  helper :calendars
 
   def index
     page
@@ -45,15 +51,25 @@ class MyController < ApplicationController
   def account
     @user = User.current
     @pref = @user.pref
-    if request.post?
+    if request.put?
       @user.safe_attributes = params[:user]
       @user.pref.safe_attributes = params[:pref]
       if @user.save
         @user.pref.save
         set_language_if_valid @user.language
-        flash[:notice] = l(:notice_account_updated)
-        redirect_to my_account_path
+        respond_to do |format|
+          format.html do
+            flash[:notice] = l(:notice_account_updated)
+            redirect_to my_account_path
+          end
+          format.api  {render_api_ok}
+        end
         return
+      else
+        respond_to do |format|
+          format.html {render :action => :account}
+          format.api  {render_validation_errors(@user)}
+        end
       end
     end
   end
@@ -95,7 +111,7 @@ class MyController < ApplicationController
         if @user.save
           # The session token was destroyed by the password change, generate a new one
           session[:tk] = @user.generate_session_token
-          Mailer.password_updated(@user)
+          Mailer.deliver_password_updated(@user, User.current)
           flash[:notice] = l(:notice_account_password_updated)
           redirect_to my_account_path
         end
@@ -138,7 +154,7 @@ class MyController < ApplicationController
     block_settings = params[:settings] || {}
 
     block_settings.each do |block, settings|
-      @user.pref.update_block_settings(block, settings)
+      @user.pref.update_block_settings(block, settings.to_unsafe_hash)
     end
     @user.pref.save
     @updated_blocks = block_settings.keys
@@ -153,7 +169,7 @@ class MyController < ApplicationController
     if @user.pref.add_block @block
       @user.pref.save
       respond_to do |format|
-        format.html { redirect_to my_page_path }
+        format.html {redirect_to my_page_path}
         format.js
       end
     else
@@ -169,7 +185,7 @@ class MyController < ApplicationController
     @user.pref.remove_block @block
     @user.pref.save
     respond_to do |format|
-      format.html { redirect_to my_page_path }
+      format.html {redirect_to my_page_path}
       format.js
     end
   end

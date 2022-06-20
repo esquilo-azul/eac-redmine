@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,7 +21,7 @@ require 'digest/md5'
 
 module Redmine
   module WikiFormatting
-    class StaleSectionError < Exception; end
+    class StaleSectionError < StandardError; end
 
     @@formatters = {}
 
@@ -33,10 +35,12 @@ module Redmine
         name = name.to_s
         raise ArgumentError, "format name '#{name}' is already taken" if @@formatters[name]
 
-        formatter, helper, parser = args.any? ?
-          args :
-          %w(Formatter Helper HtmlParser).map {|m| "Redmine::WikiFormatting::#{name.classify}::#{m}".constantize rescue nil}
-
+        formatter, helper, parser =
+          if args.any?
+            args
+          else
+            %w(Formatter Helper HtmlParser).map {|m| "Redmine::WikiFormatting::#{name.classify}::#{m}".constantize rescue nil}
+          end
         raise "A formatter class is required" if formatter.nil?
 
         @@formatters[name] = {
@@ -79,15 +83,17 @@ module Redmine
       end
 
       def to_html(format, text, options = {})
-        text = if Setting.cache_formatted_text? && text.size > 2.kilobyte && cache_store && cache_key = cache_key_for(format, text, options[:object], options[:attribute])
-          # Text retrieved from the cache store may be frozen
-          # We need to dup it so we can do in-place substitutions with gsub!
-          cache_store.fetch cache_key do
+        text =
+          if Setting.cache_formatted_text? && text.size > 2.kilobyte && cache_store &&
+              cache_key = cache_key_for(format, text, options[:object], options[:attribute])
+            # Text retrieved from the cache store may be frozen
+            # We need to dup it so we can do in-place substitutions with gsub!
+            cache_store.fetch cache_key do
+              formatter_for(format).new(text).to_html
+            end.dup
+          else
             formatter_for(format).new(text).to_html
-          end.dup
-        else
-          formatter_for(format).new(text).to_html
-        end
+          end
         text
       end
 
@@ -125,7 +131,7 @@ module Redmine
                         ([^<]\S*?)               # url
                         (\/)?                    # slash
                       )
-                      ((?:&gt;)?|[^[:alnum:]_\=\/;\(\)]*?)               # post
+                      ((?:&gt;)?|[^[:alnum:]_\=\/;\(\)\-]*?)             # post
                       (?=<|\s|$)
                      }x unless const_defined?(:AUTO_LINK_RE)
 
@@ -133,16 +139,16 @@ module Redmine
       def auto_link!(text)
         text.gsub!(AUTO_LINK_RE) do
           all, leading, proto, url, post = $&, $1, $2, $3, $6
-          if leading =~ /<a\s/i || leading =~ /![<>=]?/
+          if /<a\s/i.match?(leading) || /![<>=]?/.match?(leading)
             # don't replace URLs that are already linked
             # and URLs prefixed with ! !> !< != (textile images)
             all
           else
             # Idea below : an URL with unbalanced parenthesis and
             # ending by ')' is put into external parenthesis
-            if ( url[-1]==?) and ((url.count("(") - url.count(")")) < 0 ) )
-              url=url[0..-2] # discard closing parenthesis from url
-              post = ")"+post # add closing parenthesis to post
+            if url[-1] == ")" and ((url.count("(") - url.count(")")) < 0)
+              url = url[0..-2] # discard closing parenthesis from url
+              post = ")" + post # add closing parenthesis to post
             end
             content = proto + url
             href = "#{proto=="www."?"http://www.":proto}#{url}"
@@ -153,14 +159,42 @@ module Redmine
 
       # Destructively replaces email addresses into clickable links
       def auto_mailto!(text)
-        text.gsub!(/((?<!@)\b[\w\.!#\$%\-+.\/]+@[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)+)/) do
+        text.gsub!(/([\w\.!#\$%\-+.\/]+@[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)+)/) do
           mail = $1
-          if text.match(/<a\b[^>]*>(.*)(#{Regexp.escape(mail)})(.*)<\/a>/)
+          if /<a\b[^>]*>(.*)(#{Regexp.escape(mail)})(.*)<\/a>/.match?(text)
             mail
           else
             %(<a class="email" href="mailto:#{ERB::Util.html_escape mail}">#{ERB::Util.html_escape mail}</a>).html_safe
           end
         end
+      end
+
+      def restore_redmine_links(html)
+        # restore wiki links eg. [[Foo]]
+        html.gsub!(%r{\[<a href="(.*?)">(.*?)</a>\]}) do
+          "[[#{$2}]]"
+        end
+        # restore Redmine links with double-quotes, eg. version:"1.0"
+        html.gsub!(/(\w):&quot;(.+?)&quot;/) do
+          "#{$1}:\"#{$2}\""
+        end
+        # restore user links with @ in login name eg. [@jsmith@somenet.foo]
+        html.gsub!(%r{[@\A]<a(\sclass="email")? href="mailto:(.*?)">(.*?)</a>}) do
+          "@#{$2}"
+        end
+        # restore user links with @ in login name eg. [user:jsmith@somenet.foo]
+        html.gsub!(%r{\buser:<a(\sclass="email")? href="mailto:(.*?)">(.*?)<\/a>}) do
+          "user:#{$2}"
+        end
+        # restore attachments links with @ in file name eg. [attachment:image@2x.png]
+        html.gsub!(%r{\battachment:<a(\sclass="email")? href="mailto:(.*?)">(.*?)</a>}) do
+          "attachment:#{$2}"
+        end
+        # restore hires images which are misrecognized as email address eg. [printscreen@2x.png]
+        html.gsub!(%r{<a(\sclass="email")? href="mailto:[^"]+@\dx\.(bmp|gif|jpg|jpe|jpeg|png)">(.*?)</a>}) do
+          "#{$3}"
+        end
+        html
       end
     end
 
@@ -180,12 +214,13 @@ module Redmine
           t = CGI::escapeHTML(@text)
           auto_link!(t)
           auto_mailto!(t)
+          restore_redmine_links(t)
           simple_format(t, {}, :sanitize => false)
         end
       end
 
       module Helper
-        def wikitoolbar_for(field_id)
+        def wikitoolbar_for(field_id, preview_url = preview_text_path)
         end
 
         def heads_for_wiki_formatter

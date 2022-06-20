@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -25,6 +27,12 @@ module Redmine
       diff = diff.split("\n") if diff.is_a?(String)
       @diff_type = options[:type] || 'inline'
       @diff_style = options[:style]
+      # remove git footer
+      if diff.length > 1 &&
+           diff[-2] =~ /^--/ &&
+           diff[-1] =~ /^[0-9]/
+        diff.pop(2)
+      end
       lines = 0
       @truncated = false
       diff_table = DiffTable.new(diff_type, diff_style)
@@ -49,7 +57,7 @@ module Redmine
 
   # Class that represents a file diff
   class DiffTable < Array
-    attr_reader :file_name
+    attr_reader :file_name, :previous_file_name
 
     # Initialize with a Diff file and the type of Diff View
     # The type view must be inline or sbs (side_by_side)
@@ -60,6 +68,7 @@ module Redmine
       @type = type
       @style = style
       @file_name = nil
+      @previous_file_name = nil
       @git_diff = false
     end
 
@@ -75,7 +84,7 @@ module Redmine
           @parsing = true
         end
       else
-        if line =~ %r{^[^\+\-\s@\\]}
+        if %r{^[^\+\-\s@\\]}.match?(line)
           @parsing = false
           return false
         elsif line =~ /^@@ (\+|\-)(\d+)(,\d+)? (\+|\-)(\d+)(,\d+)? @@/
@@ -111,17 +120,21 @@ module Redmine
     def file_name=(arg)
       both_git_diff = false
       if file_name.nil?
-        @git_diff = true if arg =~ %r{^(a/|/dev/null)}
+        @git_diff = true if %r{^(a/|/dev/null)}.match?(arg)
       else
-        both_git_diff = (@git_diff && arg =~ %r{^(b/|/dev/null)})
+        both_git_diff = (@git_diff && %r{^(b/|/dev/null)}.match?(arg))
       end
       if both_git_diff
         if file_name && arg == "/dev/null"
           # keep the original file name
           @file_name = file_name.sub(%r{^a/}, '')
         else
+          # remove leading a/
+          @previous_file_name = file_name.sub(%r{^a/}, '') unless file_name == "/dev/null"
           # remove leading b/
           @file_name = arg.sub(%r{^b/}, '')
+
+          @previous_file_name = nil if @previous_file_name == @file_name
         end
       elsif @style == "Subversion"
         # removing trailing "(revision nn)"
@@ -161,7 +174,7 @@ module Redmine
         true
       else
         write_offsets
-        if line[0, 1] =~ /\s/
+        if /\s/.match?(line[0, 1])
           diff = Diff.new
           diff.line_right = line[1..-1]
           diff.nb_line_right = @line_num_r
@@ -196,11 +209,13 @@ module Redmine
       if line_left.present? && line_right.present? && line_left != line_right
         max = [line_left.size, line_right.size].min
         starting = 0
-        while starting < max && line_left[starting] == line_right[starting]
+        while starting < max &&
+                line_left[starting] == line_right[starting]
           starting += 1
         end
         ending = -1
-        while ending >= -(max - starting) && (line_left[ending] == line_right[ending])
+        while ending >= -(max - starting) &&
+               (line_left[ending] == line_right[ending])
           ending -= 1
         end
         unless starting == 0 && ending == -1
@@ -220,7 +235,7 @@ module Redmine
     attr_accessor :type_diff_left
     attr_accessor :offsets
 
-    def initialize()
+    def initialize
       self.nb_line_left = ''
       self.nb_line_right = ''
       self.line_left = ''
@@ -267,7 +282,7 @@ module Redmine
 
     def line_to_html_raw(line, offsets)
       if offsets
-        s = ''
+        s = +''
         unless offsets.first == 0
           s << CGI.escapeHTML(line[0..offsets.first-1])
         end

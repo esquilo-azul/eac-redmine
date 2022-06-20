@@ -1,7 +1,7 @@
-# encoding: utf-8
-#
+# frozen_string_literal: true
+
 # Redmine - project management software
-# Copyright (C) 2006-2017  Jean-Philippe Lang
+# Copyright (C) 2006-2021  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -52,6 +52,16 @@ class WikiTest < ActiveSupport::TestCase
     assert_equal page, wiki.find_page('ANOTHER page')
   end
 
+  def test_ordering_pages_should_not_be_case_sensitive
+    wiki = Wiki.find(1)
+    wiki.pages.destroy_all
+    %w(ABc ACd Aac Acc).each do |title|
+      wiki.pages.create(:title => title)
+    end
+    wiki.reload
+    assert_equal %w(Aac ABc Acc ACd), wiki.pages.pluck(:title)
+  end
+
   def test_find_page_with_cyrillic_characters
     wiki = Wiki.find(1)
     page = WikiPage.find(10)
@@ -82,7 +92,7 @@ class WikiTest < ActiveSupport::TestCase
   end
 
   def test_titleize
-    ja_test = "\xe3\x83\x86\xe3\x82\xb9\xe3\x83\x88".force_encoding('UTF-8')
+    ja_test = 'テスト'
     assert_equal 'Page_title_with_CAPITALES', Wiki.titleize('page title with CAPITALES')
     assert_equal ja_test, Wiki.titleize(ja_test)
   end
@@ -103,6 +113,7 @@ class WikiTest < ActiveSupport::TestCase
   end
 
   def test_destroy_should_remove_redirects_from_the_wiki
+    set_tmp_attachments_directory
     WikiRedirect.create!(:wiki_id => 1, :title => 'Foo', :redirects_to_wiki_id => 2, :redirects_to => 'Bar')
 
     Wiki.find(1).destroy
@@ -110,6 +121,7 @@ class WikiTest < ActiveSupport::TestCase
   end
 
   def test_destroy_should_remove_redirects_to_the_wiki
+    set_tmp_attachments_directory
     WikiRedirect.create!(:wiki_id => 2, :title => 'Foo', :redirects_to_wiki_id => 1, :redirects_to => 'Bar')
 
     Wiki.find(1).destroy
