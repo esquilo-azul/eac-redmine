@@ -6,7 +6,7 @@ Redmine::Plugin.register :heroku do
   name 'Heroku'
   author 'Eduardo Henrique Bogoni'
   description ''
-  version '0.2.1'
+  version '0.2.2'
 
   Redmine::MenuManager.map :admin_menu do |menu|
     menu.push :heroku_accounts, { controller: 'heroku_accounts', action: 'index' },
