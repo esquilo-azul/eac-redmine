@@ -6,13 +6,12 @@ module RedmineWithGit
       module Commands
         module GitPatch
           def self.included(base)
-            base.send(:include, InstanceMethods)
-            base.alias_method_chain :git_version, :redmine_with_git
+            base.prepend(InstanceMethods)
           end
         end
 
         module InstanceMethods
-          def git_version_with_redmine_with_git
+          def git_version
             sudo_git('--version')
           rescue RedmineGitHosting::Error::GitoliteCommandException => e
             logger.error("Can't retrieve Git version: #{e.output}")

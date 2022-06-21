@@ -4,14 +4,11 @@ module RedmineGitHosting
   module Cache
     module DatabasePatch
       def self.included(base)
-        base.include(InstanceMethods)
-        base.class_eval do
-          alias_method_chain :apply_cache_limit, :redmine_with_git
-        end
+        base.prepend(InstanceMethods)
       end
 
       module InstanceMethods
-        def apply_cache_limit_with_redmine_with_git
+        def apply_cache_limit
           return unless max_cache_elements >= 0 && GitCache.count > max_cache_elements
 
           GitCache.order(created_at: :desc).last.destroy
