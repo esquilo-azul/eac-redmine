@@ -2,6 +2,6 @@
   cmdver = 0.4.1
   commit = 058e1f74a357ee4f16dfc69787bcc5fc6c122ca1
   method = rebase
-  parent = 22f3086f753d9657c2f4f86c79297975f84a66f2
-  branch = stable
+  parent = 4b8b44a2661f0b2bc6d9c48594b1e8f296c5144b
+  branch = 2.0.24
   remote = https://github.com/AlphaNodes/additionals.git
