@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RedmineAvm
   class TestConfig
     def before_each

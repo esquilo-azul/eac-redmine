@@ -10,8 +10,7 @@ module RedmineAvm
   end
 end
 
-if Rails.env.test?
-  unless ::ActiveSupport::TestCase.included_modules.include? ::RedmineAvm::Patches::TestCasePatch
-    ::ActiveSupport::TestCase.include ::RedmineAvm::Patches::TestCasePatch
-  end
+if Rails.env.test? &&
+   !(::ActiveSupport::TestCase.included_modules.include? ::RedmineAvm::Patches::TestCasePatch)
+  ::ActiveSupport::TestCase.include ::RedmineAvm::Patches::TestCasePatch
 end
