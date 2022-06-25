@@ -6,7 +6,8 @@ require 'aranha/parsers/source_target_fixtures'
 module Avm
   module Issues
     class DependenciesSectionTest < ActiveSupport::TestCase
-      fixtures :issues, :issue_relations, :issue_statuses, :projects, :trackers, :users
+      fixtures :enumerations, :issues, :issue_relations, :issue_statuses, :projects, :trackers,
+               :users
 
       test 'dependencies section' do
         ::Aranha::Parsers::SourceTargetFixtures.new(fixtures_dir).source_target_files do |s, t|

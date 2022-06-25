@@ -6,7 +6,8 @@ require 'aranha/parsers/source_target_fixtures'
 module Avm
   module Issues
     class MotivationTest < ActiveSupport::TestCase
-      fixtures :issues, :issue_relations, :issue_statuses, :projects, :trackers, :users
+      fixtures :enumerations, :issues, :issue_relations, :issue_statuses, :projects, :trackers,
+               :users
 
       setup do
         ::IssueRelation.destroy_all
