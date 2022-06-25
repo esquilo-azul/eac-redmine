@@ -59,7 +59,7 @@ PATH
   specs:
     redmine_plugins_helper (0.9.2)
       bigdecimal (< 2)
-      eac_ruby_utils (~> 0.43)
+      eac_ruby_utils (~> 0.95, >= 0.95.1)
       launchy
       rspec-rails
       sass-rails (~> 5.0)
