@@ -52,7 +52,6 @@ PATH
       eac_rails_utils (~> 0.15)
       eac_ruby_utils (~> 0.95, >= 0.95.1)
       jquery-rails (~> 4.4)
-      virtus
 
 PATH
   remote: plugins/redmine_plugins_helper
