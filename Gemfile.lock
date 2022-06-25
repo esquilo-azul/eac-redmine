@@ -36,7 +36,7 @@ PATH
   remote: plugins/redmine_avm
   specs:
     redmine_avm (0.3.7)
-      aranha-parsers (~> 0.4)
+      aranha-parsers (~> 0.14, >= 0.14.1)
 
 PATH
   remote: plugins/redmine_events_manager
@@ -150,7 +150,7 @@ GEM
     ast (2.4.2)
     autoprefixer-rails (10.4.7.0)
       execjs (~> 2)
-    avm (0.19.0)
+    avm (0.20.0)
       eac_cli (~> 0.23, >= 0.23.1)
       eac_docker (~> 0.3)
       eac_git (~> 0.6)
@@ -171,15 +171,16 @@ GEM
     avm-eac_postgresql_base0 (0.2.0)
       avm (~> 0.12, >= 0.12.1)
       eac_ruby_utils (~> 0.82)
-    avm-eac_rails_base0 (0.3.0)
-      avm-eac_rails_base1 (~> 0.2)
+    avm-eac_rails_base0 (0.4.0)
+      avm-eac_rails_base1 (~> 0.3)
       eac_ruby_utils (~> 0.80, >= 0.80.2)
-    avm-eac_rails_base1 (0.2.1)
+    avm-eac_rails_base1 (0.3.0)
+      avm-eac_ruby_base1 (~> 0.6)
       avm-eac_webapp_base0 (~> 0.3)
       eac_ruby_gems_utils (~> 0.9, >= 0.9.9)
       eac_ruby_utils (~> 0.68)
-    avm-eac_redmine_base0 (0.5.2)
-      avm-eac_rails_base1 (~> 0.2)
+    avm-eac_redmine_base0 (0.6.0)
+      avm-eac_rails_base1 (~> 0.3)
       avm-eac_ubuntu_base0 (~> 0.2)
       curb (~> 0.9.10)
       eac_fs (~> 0.4)
@@ -209,7 +210,7 @@ GEM
       avm-files (~> 0.1)
       eac_git (~> 0.11)
       eac_ruby_utils (~> 0.76)
-    avm-tools (0.117.3)
+    avm-tools (0.118.0)
       aranha-parsers (~> 0.4)
       avm (~> 0.18)
       avm-eac_asciidoctor_base0 (~> 0.3, >= 0.3.4)
