@@ -49,7 +49,7 @@ PATH
   specs:
     redmine_nonproject_modules (0.3.7)
       active_scaffold (~> 3.5)
-      eac_rails_utils (~> 0.12, >= 0.12.2)
+      eac_rails_utils (~> 0.15)
       eac_ruby_utils (~> 0.33)
       jquery-rails (~> 4.4)
       virtus
