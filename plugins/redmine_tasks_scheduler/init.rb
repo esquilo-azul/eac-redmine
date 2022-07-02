@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require 'redmine'
-require 'active_scaffold'
-ActiveScaffold.delayed_setup = true
 
 Redmine::Plugin.register :redmine_tasks_scheduler do
   name 'Redmine Tasks Scheduler'
