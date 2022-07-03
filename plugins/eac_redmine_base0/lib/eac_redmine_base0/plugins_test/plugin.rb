@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'avm/patches/eac_ruby_gems_utils/gem'
+require 'avm/eac_redmine_base0/sources/base'
+require 'avm/eac_redmine_plugin_base0/sources/base'
 require 'avm/result'
 require 'eac_ruby_utils/simple_cache'
 
@@ -30,11 +31,11 @@ module EacRedmineBase0
       end
 
       def plugin_gem_uncached
-        ::EacRubyGemsUtils::Gem.new(directory)
+        ::Avm::EacRedminePluginBase0::Sources::Base.new(directory)
       end
 
       def rails_gem_uncached
-        ::EacRubyGemsUtils::Gem.new(::Rails.root)
+        ::Avm::EacRedmineBase0::Sources::Base.new(::Rails.root)
       end
     end
   end
