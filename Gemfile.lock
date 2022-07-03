@@ -19,6 +19,7 @@ PATH
   remote: plugins/eac_redmine_base0
   specs:
     eac_redmine_base0 (0.4.2)
+      avm-eac_redmine_plugin_base0 (~> 0.1)
 
 PATH
   remote: plugins/notifyme
@@ -160,6 +161,9 @@ GEM
     avm-eac_generic_base0 (0.2.0)
       avm (~> 0.19)
       eac_ruby_utils (~> 0.80)
+    avm-eac_redmine_plugin_base0 (0.1.1)
+      avm-eac_ruby_base1 (~> 0.8, >= 0.8.1)
+      eac_ruby_utils (~> 0.95, >= 0.95.1)
     avm-eac_ruby_base1 (0.8.1)
       avm (~> 0.22)
       avm-eac_generic_base0 (~> 0.2)
@@ -255,8 +259,6 @@ GEM
       nested_form_fields
       rails (>= 4.2.11)
       virtus (>= 1.0.5)
-    eac_ruby_gems_utils (0.10.0)
-      eac_ruby_utils (~> 0.81)
     eac_ruby_utils (0.95.1)
       activesupport (>= 4, < 7)
       addressable (~> 2.6)
