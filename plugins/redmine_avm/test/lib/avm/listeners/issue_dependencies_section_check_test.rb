@@ -5,7 +5,8 @@ require 'test_helper'
 module Avm
   module Listeners
     class IssueDependenciesSectionCheckTest < ActiveSupport::TestCase
-      fixtures :issues, :issue_relations, :issue_statuses, :projects, :trackers, :users
+      fixtures :enumerations, :issues, :issue_relations, :issue_statuses, :projects, :trackers,
+               :users
       attr_reader :blocked, :blocking
 
       setup do
