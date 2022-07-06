@@ -35,7 +35,7 @@ PATH
 PATH
   remote: plugins/redmine_avm
   specs:
-    redmine_avm (0.3.9)
+    redmine_avm (0.3.10)
       aranha-parsers (~> 0.14, >= 0.14.1)
 
 PATH
