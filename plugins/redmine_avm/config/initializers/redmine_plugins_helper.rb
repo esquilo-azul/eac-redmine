@@ -11,7 +11,7 @@ default_value = {
   unmotivated_message: 'This issue is not motivated.'
 }
 
-if ActiveRecord::Base.connection.table_exists? ::User.table_name
+if ::RedminePluginsHelper::Available.model?(::User)
   default_admin = ::User.where(id: 1, admin: true).first
   default_value[:admin_user_id] = default_admin.id if default_admin
 end
