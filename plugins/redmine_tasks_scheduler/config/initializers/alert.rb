@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+return unless ::RedminePluginsHelper::Available.settings?
+
 GroupPermission.add_permission(::TasksSchedulerDaemonController::PERMISSIONS)
 Redmine::MenuManager.map :top_menu do |menu|
   menu.push :tasks_scheduler_alert,

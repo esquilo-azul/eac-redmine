@@ -18,6 +18,8 @@ module RedmineTasksScheduler
   end
 end
 
+return unless ::RedminePluginsHelper::Available.settings?
+
 [::ScheduledTasksController, ::TasksSchedulerDaemonController].each do |controller_class|
   patch_class = ::RedmineTasksScheduler::Patches::TasksSchedulerControllerPatch
   unless controller_class.included_modules.include?(patch_class)
