@@ -10,7 +10,7 @@ module RedmineWithGit
       private
 
       def before_clear
-        raise(<<~MESSAGE) unless ::RedminePluginsHelper.settings_table_exist?
+        raise(<<~MESSAGE) unless ::RedminePluginsHelper::Available.settings?
           Settings table does not exist.
         MESSAGE
 
