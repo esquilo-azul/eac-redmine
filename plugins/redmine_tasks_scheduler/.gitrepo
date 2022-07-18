@@ -1,7 +1,7 @@
 [subrepo]
   cmdver = 0.4.1
-  commit = 1fa3a0e7b093e32eb11b653e355d5b8c7dff177f
+  commit = 3708ad7a2a8f867a1281ee5d679a7ca0bf347bfc
   method = merge
-  parent = 0f7245a1c92700139dc7fbbbaf6367869c17f627
+  parent = 7342d65e0d34210f0a2d8d9c18b0fd8f9b3897f3
   branch = master
   remote = https://github.com/esquilo-azul/redmine_tasks_scheduler.git

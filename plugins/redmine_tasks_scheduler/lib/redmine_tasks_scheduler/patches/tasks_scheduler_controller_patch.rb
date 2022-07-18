@@ -18,7 +18,7 @@ module RedmineTasksScheduler
   end
 end
 
-return unless ::RedminePluginsHelper::Available.settings?
+return unless ::RedminePluginsHelper::Available.database_schema?
 
 [::ScheduledTasksController, ::TasksSchedulerDaemonController].each do |controller_class|
   patch_class = ::RedmineTasksScheduler::Patches::TasksSchedulerControllerPatch

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-return unless ::RedminePluginsHelper::Available.settings?
+return unless ::RedminePluginsHelper::Available.database_schema?
 
 GroupPermission.add_permission(::ScheduledTasksController::PERMISSIONS)
 Redmine::MenuManager.map :admin_menu do |menu|
