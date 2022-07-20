@@ -10,7 +10,3 @@ Redmine::Plugin.register :eac_redmine_base0 do
   description ::EacRedmineBase0::SUMMARY
   version ::EacRedmineBase0::VERSION
 end
-
-Rails.configuration.to_prepare do
-  require 'eac_redmine_base0/maintained_plugins'
-end
