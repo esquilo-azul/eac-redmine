@@ -18,7 +18,7 @@ GIT
 PATH
   remote: plugins/eac_redmine_base0
   specs:
-    eac_redmine_base0 (0.4.3)
+    eac_redmine_base0 (0.5.0)
       avm-eac_redmine_base0 (~> 0.6, >= 0.6.1)
       avm-eac_redmine_plugin_base0 (~> 0.1)
 
