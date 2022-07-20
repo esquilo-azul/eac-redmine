@@ -1,2 +1,13 @@
 ---
 locale: pt-BR
+subs:
+  at:
+    plugins/additionals:
+      test:
+        commands: []
+    plugins/deprecated:
+      test:
+        commands: []
+    plugins/redmine_git_hosting:
+      test:
+        commands: []
