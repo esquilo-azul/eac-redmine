@@ -1,7 +1,7 @@
 [subrepo]
   cmdver = 0.4.1
-  commit = d928d45c91f397c65f1bc4fe9b61a3506a6a97dc
+  commit = cdfc8ce55c0a030cb247cd5b131e39a0f41c3694
   method = rebase
-  parent = b63c9788f0159dfbc13d7cd71b9488b8d014b2ab
+  parent = 90ff18d90d94e0584b0e1a3b1c25f777c9504459
   branch = master
   remote = https://github.com/esquilo-azul/redmine_installer
