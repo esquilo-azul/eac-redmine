@@ -2,19 +2,15 @@
 
 module RedminePluginsHelper
   class FixMigrations
-    def initialize
-      run
-    end
-
-    private
-
-    def run
+    def perform
       database_plugins_versions.each do |dbv|
         check_database_version(dbv)
       end
       Rails.logger.info("Database versions checked: #{database_plugins_versions.count}")
       Rails.logger.info("Local versions found: #{local_versions.count}")
     end
+
+    private
 
     def check_database_version(dbv)
       lv = local_version(dbv[:timestamp])
@@ -43,8 +39,8 @@ module RedminePluginsHelper
 
     def move_plugin_version(source_version, target_version)
       Rails.logger.info("Moving #{source_version} to plugin \"#{target_version}\"")
-      ::ActiveRecord::SchemaMigration.find_by(version: source_version)
-                                     .update!(version: target_version)
+      ::ActiveRecord::SchemaMigration.where(version: source_version)
+                                     .update_all(version: target_version) # rubocop:disable Rails/SkipsModelValidations
     end
 
     def local_version(timestamp)
@@ -68,7 +64,9 @@ module RedminePluginsHelper
 
     def database_plugins_versions
       @database_plugins_versions ||= ::RedminePluginsHelper::Migration
-                                     .from_database.select(&:plugin?).map(&:version)
+                                     .from_database.select(&:plugin?).map do |m|
+        { plugin: m.plugin_id, timestamp: m.version, version: m.database_version }
+      end
     end
 
     def plugin_version(plugin_id, timestamp)
