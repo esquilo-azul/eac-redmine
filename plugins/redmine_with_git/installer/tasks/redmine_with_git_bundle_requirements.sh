@@ -7,9 +7,9 @@ REDMINE_WITH_GIT_PACKAGES=(build-essential libcurl4-openssl-dev libssh2-1 libssh
   libgpg-error-dev)
 
 function task_condition {
-  return $(programeiro /apt/installed "${REDMINE_WITH_GIT_PACKAGES[@]}")
+  package_installed apt "${REDMINE_WITH_GIT_PACKAGES[@]}"
 }
 
 function task_fix {
-  programeiro /apt/assert_installed "${REDMINE_WITH_GIT_PACKAGES[@]}"
+  package_assert apt "${REDMINE_WITH_GIT_PACKAGES[@]}"
 }
