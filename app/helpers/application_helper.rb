@@ -281,6 +281,7 @@ module ApplicationHelper
         object.filename
       end
     when 'CustomValue', 'CustomFieldValue'
+      return "" unless object.customized&.visible?
       if object.custom_field
         f = object.custom_field.format.formatted_custom_value(self, object, html)
         if f.nil? || f.is_a?(String)
@@ -318,7 +319,7 @@ module ApplicationHelper
 
   def toggle_link(name, id, options={})
     onclick = +"$('##{id}').toggle(); "
-    onclick << (options[:focus] ? "$('##{options[:focus]}').focus(); " : "this.blur(); ")
+    onclick << (options[:focus] ? "$('##{options[:focus]}:visible').focus(); " : "this.blur(); ")
     onclick << "$(window).scrollTop($('##{options[:focus]}').position().top); " if options[:scroll]
     onclick << "return false;"
     link_to(name, "#", :onclick => onclick)
@@ -1702,7 +1703,7 @@ module ApplicationHelper
   # Returns the javascript tags that are included in the html layout head
   def javascript_heads
     tags = javascript_include_tag(
-      'jquery-3.5.1-ui-1.12.1-ujs-5.2.4.5',
+      'jquery-3.6.1-ui-1.13.2-ujs-5.2.8.1',
       'jquery-migrate-3.3.2.min.js',
       'tribute-5.1.3.min',
       'tablesort-5.2.1.min.js',

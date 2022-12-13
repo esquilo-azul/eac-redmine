@@ -115,7 +115,8 @@ class QueryAssociationColumn < QueryColumn
   end
 
   def value_object(object)
-    if assoc = object.send(@association)
+    assoc = object.send(@association)
+    if assoc && assoc.visible?
       assoc.send @attribute
     end
   end
@@ -186,7 +187,8 @@ class QueryAssociationCustomFieldColumn < QueryCustomFieldColumn
   end
 
   def value_object(object)
-    if assoc = object.send(@association)
+    assoc = object.send(@association)
+    if assoc && assoc.visible?
       super(assoc)
     end
   end
@@ -1054,7 +1056,7 @@ class Query < ActiveRecord::Base
   end
 
   def display_type=(type)
-    unless type || self.available_display_types.include?(type)
+    unless type && self.available_display_types.include?(type)
       type = self.available_display_types.first
     end
     options[:display_type] = type
@@ -1149,12 +1151,13 @@ class Query < ActiveRecord::Base
     if /[<>]/.match?(operator)
       where = "(#{where}) AND #{db_table}.#{db_field} <> ''"
     end
-    "#{queried_table_name}.#{customized_key} #{not_in} IN (" \
-      "SELECT #{customized_class.table_name}.id FROM #{customized_class.table_name}" \
+    "#{not_in} EXISTS (" \
+      "SELECT ct.id FROM #{customized_class.table_name} ct" \
       " LEFT OUTER JOIN #{db_table} ON #{db_table}.customized_type='#{customized_class}'" \
-      " AND #{db_table}.customized_id=#{customized_class.table_name}.id" \
+      " AND #{db_table}.customized_id=ct.id" \
       " AND #{db_table}.custom_field_id=#{custom_field_id}" \
-      " WHERE (#{where}) AND (#{filter[:field].visibility_by_project_condition}))"
+      " WHERE #{queried_table_name}.#{customized_key} = ct.id AND " \
+      "  (#{where}) AND (#{filter[:field].visibility_by_project_condition}))"
   end
 
   def sql_for_chained_custom_field(field, operator, value, custom_field_id, chained_custom_field_id)
@@ -1166,7 +1169,7 @@ class Query < ActiveRecord::Base
     end
 
     filter = available_filters[field]
-    target_class = filter[:through].format.target_class
+    target_class = filter[:through].format.target_class.base_class
 
     "#{queried_table_name}.id #{not_in} IN (" +
       "SELECT customized_id FROM #{CustomValue.table_name}" +
@@ -1174,7 +1177,7 @@ class Query < ActiveRecord::Base
       "  AND CAST(CASE value WHEN '' THEN '0' ELSE value END AS decimal(30,0)) IN (" +
       "  SELECT customized_id FROM #{CustomValue.table_name}" +
       "  WHERE customized_type='#{target_class}' AND custom_field_id=#{chained_custom_field_id}" +
-      "  AND #{sql_for_field(field, operator, value, CustomValue.table_name, 'value')}))"
+      "  AND #{sql_for_field(field, operator, value, CustomValue.table_name, 'value', true)}))"
 
   end
 

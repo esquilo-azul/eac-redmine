@@ -45,4 +45,5 @@ yarn-error.log
 #eac_redmine_base0
 /public/assets/**/*
 /config/install.sh
+/config/secrets_key.txt
 /log/**/*

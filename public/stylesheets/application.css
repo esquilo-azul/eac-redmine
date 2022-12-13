@@ -41,6 +41,10 @@ div#wrapper, div#wrapper2, div#wrapper3 { min-height: inherit; }
 
 #quick-search {float:right;}
 #quick-search #q {width:130px; height:24px; box-sizing:border-box; vertical-align:middle; border:1px solid #ccc; border-radius:3px;}
+#quick-search form {float:left; margin-right:3px;}
+#quick-search form input {margin-top:0; margin-bottom:0;}
+#quick-search form label {vertical-align:middle;}
+#quick-search #project-jump {float:left;}
 
 #main-menu {position: absolute;  bottom: 0px;  left: 10px; margin-right: -500px; width: 100%;}
 #main-menu ul {margin: 0;  padding: 0; width: 100%; white-space: nowrap;}
@@ -528,7 +532,7 @@ p.footnote { font-size: 0.9em; margin-top: 0px; margin-bottom: 0px; }
 .wiki-class-ltr {direction:ltr !important;}
 .wiki-class-rtl {direction:rtl !important;}
 
-div.issue div.subject div div { padding-left: 16px; }
+div.issue div.subject div div { padding-left: 16px; word-break: break-word; }
 div.issue div.subject p {margin: 0; margin-bottom: 0.1em; font-size: 90%; color: #999;}
 div.issue div.subject>div>p { margin-top: 0.5em; }
 div.issue div.subject h3 {margin: 0; margin-bottom: 0.1em;}
@@ -546,11 +550,21 @@ body.controller-issues h2.inline-flex {padding-right: 0}
 
 #issue_tree table.issues, #relations table.issues { border: 0; }
 #issue_tree td.checkbox, #relations td.checkbox {display:none;}
-#issue_tree td.subject, #relations td.subject {width: 50%;}
 #issue_tree td.buttons, #relations td.buttons {padding:0;}
 #issue_tree .issues-stat {font-size: 80%}
 #issue_tree .issues-stat .badge {bottom: initial;}
-
+#issue_tree .issue > td, #relations .issue > td, #issue_tree .issue .user {
+  text-overflow: ellipsis; /* if text exceeds its space, add ... */
+  overflow: hidden;
+}
+#issue_tree .issue > td.subject, #relations .issue > td.subject {
+  width: 50%;
+  word-break: break-word; /* break word if subject is too long */
+  padding-right: 25px; /* this is the spaces that .buttons uses next to subject */
+}
+#issue_tree .issue > td.assigned_to, #relations .issue > td.assigned_to {
+  white-space: nowrap;
+}
 #trackers_description {display:none;}
 #trackers_description dt {font-weight: bold; text-decoration: underline;}
 #trackers_description dd {margin: 0; padding: 0 0 1em 0;}
@@ -669,11 +683,11 @@ input#issue_subject, input#document_title { width: 99%; }
 select#issue_done_ratio { width: 95px; }
 
 ul.projects {margin:0; padding-left:1em;}
-ul.projects ul {padding-left:1.6em;}
+ul.projects ul.projects {padding-left:1.6em;}
 ul.projects.root {margin:0; padding:0;}
 ul.projects li.root, ul.projects li.child {list-style-type:none;}
 ul.projects li.root div.archived, ul.projects li.child div.archived {color: #aaa;}
-ul.projects div.description li {list-style-type:initial;}
+ul.projects div.description ul li {list-style-type:initial;}
 
 #projects-index {
   column-count: auto;
