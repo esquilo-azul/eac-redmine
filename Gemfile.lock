@@ -25,8 +25,8 @@ PATH
 PATH
   remote: plugins/notifyme
   specs:
-    notifyme (0.4.12)
-      eac_ruby_utils (~> 0.95, >= 0.95.1)
+    notifyme (0.4.13)
+      eac_ruby_utils (~> 0.110, >= 0.110.1)
       htmlentities
       imgkit
       telegram-bot-ruby
@@ -305,7 +305,7 @@ GEM
       virtus (>= 1.0.5)
     eac_rest (0.6.1)
       eac_ruby_utils (~> 0.70)
-    eac_ruby_utils (0.110.0)
+    eac_ruby_utils (0.110.1)
       activesupport (>= 4, < 7)
       addressable (~> 2.8, >= 2.8.1)
       bundler
