@@ -4,7 +4,7 @@ set -u
 set -e
 
 function task_dependencies {
-  printf 'asdf'
+  printf 'asdf_profile'
 }
 
 function task_condition {
@@ -12,5 +12,6 @@ function task_condition {
 }
 
 function task_fix {
+  package_assert apt curl gcc make zlib1g-dev
   asdf_version_assert_global ruby "$ruby_version"
 }
