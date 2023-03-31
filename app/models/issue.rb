@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Redmine - project management software
-# Copyright (C) 2006-2021  Jean-Philippe Lang
+# Copyright (C) 2006-2023  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -192,6 +192,10 @@ class Issue < ActiveRecord::Base
     user_tracker_permission?(user, :edit_issues) || (
       user_tracker_permission?(user, :edit_own_issues) && author == user
     )
+  end
+
+  def attachments_addable?(user=User.current)
+    attributes_editable?(user) || notes_addable?(user)
   end
 
   # Overrides Redmine::Acts::Attachable::InstanceMethods#attachments_editable?

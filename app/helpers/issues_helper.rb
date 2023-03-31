@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Redmine - project management software
-# Copyright (C) 2006-2021  Jean-Philippe Lang
+# Copyright (C) 2006-2023  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -679,8 +679,8 @@ module IssuesHelper
   def issue_history_tabs
     tabs = []
     if @journals.present?
-      journals_without_notes = @journals.select{|value| value.notes.blank?}
-      journals_with_notes = @journals.reject{|value| value.notes.blank?}
+      has_details = @journals.any? {|value| value.details.present?}
+      has_notes = @journals.any? {|value| value.notes.present?}
       tabs <<
         {
           :name => 'history',
@@ -689,7 +689,7 @@ module IssuesHelper
           :partial => 'issues/tabs/history',
           :locals => {:issue => @issue, :journals => @journals}
         }
-      if journals_with_notes.any?
+      if has_notes
         tabs <<
           {
             :name => 'notes',
@@ -697,7 +697,7 @@ module IssuesHelper
             :onclick => 'showIssueHistory("notes", this.href)'
           }
       end
-      if journals_without_notes.any?
+      if has_details
         tabs <<
           {
             :name => 'properties',
