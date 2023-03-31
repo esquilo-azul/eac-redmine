@@ -29,7 +29,7 @@ function task_condition {
   fi
   export rails_user="$(programeiro /rails/user)"
   SUDOERS_FILE_COPY="$(sudoers_file_copy_file)"
-  result=$(programeiro /template/apply "${REDMINE_WITH_GIT_TEMPLATE_ROOT}/redmine_user_sudoer" | programeiro /text/diff_stdin_file "$SUDOERS_FILE_COPY")
+  result=$(template_apply "${REDMINE_WITH_GIT_TEMPLATE_ROOT}/redmine_user_sudoer" | programeiro /text/diff_stdin_file "$SUDOERS_FILE_COPY")
   sudo rm -f "$SUDOERS_FILE_COPY"
   if [ "$result" != '0' ]; then
     return 1
@@ -44,7 +44,7 @@ function task_fix {
   set -u
   set -e
   export rails_user="$(programeiro /rails/user)"
-  programeiro /template/apply "$REDMINE_WITH_GIT_TEMPLATE_ROOT/redmine_user_sudoer" | \
+  template_apply "$REDMINE_WITH_GIT_TEMPLATE_ROOT/redmine_user_sudoer" | \
     programeiro /linux/sudo_write "$SUDOER_FILE"
 }
 export -f task_fix

@@ -1,6 +1,6 @@
 Defaults:redmine !requiretty
-${rails_user} ALL=(${gitolite_user}) NOPASSWD:ALL
-${rails_user} ALL=(root) NOPASSWD:/usr/bin/stat
-${rails_user} ALL=(root) NOPASSWD:/bin/cp ${SUDOER_FILE} ${SUDOER_TMP_FILE}
-${rails_user} ALL=(root) NOPASSWD:/bin/chmod og+r ${SUDOER_TMP_FILE}
-${rails_user} ALL=(root) NOPASSWD:/bin/rm -f ${SUDOER_TMP_FILE}
+%%rails_user%% ALL=(%%gitolite_user%%) NOPASSWD:ALL
+%%rails_user%% ALL=(root) NOPASSWD:/usr/bin/stat
+%%rails_user%% ALL=(root) NOPASSWD:/bin/cp %%SUDOER_FILE%% %%SUDOER_TMP_FILE%%
+%%rails_user%% ALL=(root) NOPASSWD:/bin/chmod og+r %%SUDOER_TMP_FILE%%
+%%rails_user%% ALL=(root) NOPASSWD:/bin/rm -f %%SUDOER_TMP_FILE%%
