@@ -1,0 +1,23 @@
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
+Layout/LineLength:
+  Max: 100
+
+Metrics/BlockLength:
+  Exclude:
+    - lib/tasks/**/*.rake
+    - spec/**/*_spec.rb
+
+Style/Documentation:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
