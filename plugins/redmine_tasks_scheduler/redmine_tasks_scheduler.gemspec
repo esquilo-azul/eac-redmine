@@ -8,14 +8,15 @@ require 'redmine_tasks_scheduler/version'
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = 'redmine_tasks_scheduler'
-  s.version     = ::RedmineTasksScheduler::VERSION
-  s.authors     = [::RedmineTasksScheduler::VERSION]
-  s.summary     = ::RedmineTasksScheduler::SUMMARY
-  s.homepage    = ::RedmineTasksScheduler::HOMEPAGE
+  s.version     = RedmineTasksScheduler::VERSION
+  s.authors     = [RedmineTasksScheduler::VERSION]
+  s.summary     = RedmineTasksScheduler::SUMMARY
+  s.homepage    = RedmineTasksScheduler::HOMEPAGE
 
   s.files = Dir['{app,config,lib}/**/*', 'init.rb']
+  s.required_ruby_version = '>= 2.7.0'
 
-  s.add_dependency 'tasks_scheduler', '~> 0.6', '>= 0.6.13'
+  s.add_dependency 'tasks_scheduler', '~> 0.8'
 
-  s.add_development_dependency 'eac_ruby_gem_support', '~> 0.5.1'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.9', '>= 0.9.2'
 end

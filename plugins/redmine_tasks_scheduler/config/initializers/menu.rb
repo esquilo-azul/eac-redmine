@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
-return unless ::RedminePluginsHelper::Available.database_schema?
-
-GroupPermission.add_permission(::ScheduledTasksController::PERMISSIONS)
-Redmine::MenuManager.map :admin_menu do |menu|
-  menu.push :scheduled_tasks, { controller: 'scheduled_tasks', action: 'status', id: nil },
-            caption: :'activerecord.models.scheduled_task.other',
-            if: proc { GroupPermission.permission?(::ScheduledTasksController::PERMISSIONS) }
+GroupPermission.add_permission(RedmineTasksScheduler::Permissions::WRITE)
+Redmine::Plugin.by_path(__FILE__).nonprojects_menu do |menu|
+  {
+    tasks_scheduler_daemon: { controller: 'tasks_scheduler_daemon', action: 'index', id: nil },
+    status_scheduled_tasks: { controller: 'scheduled_tasks', action: 'status', id: nil },
+    scheduled_tasks: { controller: 'scheduled_tasks', action: 'index', id: nil }
+  }.each do |k, v|
+    menu.push k, v,
+              caption: :"eac_rails_utils.menus.root.admin.tasks_scheduler.main_app_#{k}",
+              if: proc { GroupPermission.permission?(RedmineTasksScheduler::Permissions::WRITE) }
+  end
 end

@@ -1,4 +1,5 @@
 pt-BR:
+  menu_redmine_tasks_scheduler: ${eac_rails_utils.menus.root.admin.tasks_scheduler.__self}
   redmine_tasks_scheduler:
     daemon_autostart_description: Inicializar Daemon automaticamente junto com
       o servidor?
