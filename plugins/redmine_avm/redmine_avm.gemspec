@@ -15,7 +15,5 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,db,lib}/**/*', 'init.rb']
 
-  s.add_dependency 'aranha-parsers', '~> 0.14', '>= 0.14.1'
-
-  s.add_development_dependency 'eac_ruby_gem_support', '~> 0.5.1'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.9', '>= 0.9.2'
 end

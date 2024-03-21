@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'test_helper'
-require 'aranha/parsers/source_target_fixtures'
+require 'eac_ruby_gem_support/source_target_fixtures'
 
 module Avm
   module Issues
@@ -10,7 +10,7 @@ module Avm
                :users
 
       test 'dependencies section' do
-        ::Aranha::Parsers::SourceTargetFixtures.new(fixtures_dir).source_target_files do |s, t|
+        ::EacRubyGemSupport::SourceTargetFixtures.new(fixtures_dir).source_target_files do |s, t|
           td = YAML.load_file(t)
           issue = issue_with_description(File.read(s))
 

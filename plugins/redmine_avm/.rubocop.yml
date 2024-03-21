@@ -1,30 +1,81 @@
-require:
-  - rubocop-rails
-  - rubocop-rspec
-
-AllCops:
-  TargetRailsVersion: 4.0
-
-Layout/LineLength:
-  Max: 100
-
+---
+inherit_gem:
+  eac_rails_gem_support: ".rubocop.yml"
+Gemspec/RequiredRubyVersion:
+  Exclude:
+  - redmine_avm.gemspec
+Layout/LineEndStringConcatenationIndentation:
+  Exclude:
+  - config/initializers/redmine_plugins_helper.rb
+Layout/MultilineMethodCallIndentation:
+  Exclude:
+  - app/controllers/issue_status_assigns_controller.rb
+  - lib/redmine_avm/patches/issue_patch.rb
+  - lib/tasks/issue.rake
 Metrics/AbcSize:
   Exclude:
-    - test/**/*
-
+  - test/lib/avm/issues/motivation_test.rb
 Metrics/BlockLength:
   Exclude:
-    - test/**/*
-    - lib/tasks/**/*.rake
-
-Style/Documentation:
-  Enabled: false
-
-Style/HashEachMethods:
-  Enabled: true
-
-Style/HashTransformKeys:
-  Enabled: true
-
-Style/HashTransformValues:
-  Enabled: true
+  - lib/tasks/issue.rake
+Naming/VariableNumber:
+  Exclude:
+  - test/lib/avm/issues/dependencies_section_test.rb
+  - test/lib/avm/issues/motivation_test.rb
+  - test/lib/avm/listeners/issue_auto_unblock_test.rb
+  - test/lib/avm/listeners/issue_dependencies_section_check_test.rb
+Rails/ActiveSupportOnLoad:
+  Exclude:
+  - lib/redmine_avm/patches/test_case_patch.rb
+Rails/EagerEvaluationLogMessage:
+  Exclude:
+  - lib/avm/issue/assign.rb
+  - lib/avm/issue/unblock.rb
+  - lib/avm/issue/undefine.rb
+  - lib/avm/listeners/issue_auto_unblock.rb
+  - lib/avm/listeners/issue_auto_undefine.rb
+Rails/FindEach:
+  Exclude:
+  - lib/tasks/issue.rake
+Rails/RedundantPresenceValidationOnBelongsTo:
+  Exclude:
+  - app/models/issue_status_assign.rb
+Rails/ShortI18n:
+  Exclude:
+  - lib/avm/issue/assign.rb
+  - lib/avm/issue/unblock.rb
+  - lib/avm/issue/undefine.rb
+Rails/UniqueValidationWithoutIndex:
+  Exclude:
+  - app/models/issue_status_assign.rb
+Style/OptionalBooleanParameter:
+  Exclude:
+  - lib/avm/settings.rb
+Style/RedundantConstantBase:
+  Exclude:
+  - config/initializers/redmine_plugins_helper.rb
+  - init.rb
+  - lib/redmine_avm/patches/issue_patch.rb
+  - lib/redmine_avm/patches/test_case_patch.rb
+  - lib/tasks/redmine_avm.rake
+  - redmine_avm.gemspec
+Style/RedundantReturn:
+  Exclude:
+  - lib/avm/issue/unblock.rb
+  - lib/avm/issue/undefine.rb
+  - lib/avm/listeners/issue_auto_assign.rb
+  - lib/avm/listeners/issue_auto_unblock/issue_update.rb
+  - lib/avm/listeners/issue_auto_undefine/issue_update.rb
+  - lib/avm/listeners/issue_dependencies_section_check.rb
+  - lib/avm/listeners/issue_motivation_check.rb
+Style/RedundantStringEscape:
+  Exclude:
+  - lib/avm/issue/dependencies_section_check.rb
+  - lib/avm/issue/motivation_check.rb
+  - test/lib/avm/listeners/issue_auto_unblock_test.rb
+  - test/lib/avm/listeners/issue_dependencies_section_check_test.rb
+Style/StringConcatenation:
+  Exclude:
+  - config/initializers/redmine_plugins_helper.rb
+  - lib/redmine_avm/patches/issue_patch.rb
+  - test/lib/avm/listeners/issue_auto_unblock_test.rb

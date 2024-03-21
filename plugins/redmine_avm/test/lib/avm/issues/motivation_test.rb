@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'test_helper'
-require 'aranha/parsers/source_target_fixtures'
+require 'eac_ruby_gem_support/source_target_fixtures'
 
 module Avm
   module Issues
@@ -15,7 +15,7 @@ module Avm
 
       class << self
         def target_source_fixtures
-          ::Aranha::Parsers::SourceTargetFixtures.new(fixtures_dir)
+          ::EacRubyGemSupport::SourceTargetFixtures.new(fixtures_dir)
         end
 
         def fixtures_dir
