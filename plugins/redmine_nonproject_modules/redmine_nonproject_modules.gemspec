@@ -8,18 +8,20 @@ require 'redmine_nonproject_modules/version'
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = 'redmine_nonproject_modules'
-  s.version     = ::RedmineNonprojectModules::VERSION
-  s.authors     = [::RedmineNonprojectModules::VERSION]
-  s.summary     = ::RedmineNonprojectModules::SUMMARY
-  s.homepage    = ::RedmineNonprojectModules::HOMEPAGE
+  s.version     = RedmineNonprojectModules::VERSION
+  s.authors     = [RedmineNonprojectModules::VERSION]
+  s.summary     = RedmineNonprojectModules::SUMMARY
+  s.homepage    = RedmineNonprojectModules::HOMEPAGE
 
   s.files = Dir['{app,config,lib}/**/*', 'init.rb']
+  s.required_ruby_version = '>= 2.7.0'
 
-  s.add_dependency 'eac_active_scaffold', '~> 0.2', '>= 0.2.2'
-  s.add_dependency 'eac_rails_utils', '~> 0.15'
-  s.add_dependency 'eac_ruby_utils', '~> 0.95', '>= 0.95.1'
-  s.add_dependency 'jquery-rails', '~> 4.5'
+  s.add_dependency 'eac_active_scaffold', '~> 0.5', '>= 0.5.3'
+  s.add_dependency 'eac_rails_utils', '~> 0.22', '>= 0.22.2'
+  s.add_dependency 'eac_ruby_utils', '~> 0.121'
+  s.add_dependency 'i18n-recursive-lookup', '~> 0.0', '>= 0.0.5'
+  s.add_dependency 'jquery-rails', '~> 4.6'
 
   # Test/development gems
-  s.add_development_dependency 'eac_ruby_gem_support', '~> 0.5.1'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.9', '>= 0.9.2'
 end

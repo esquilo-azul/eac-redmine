@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-RSpec.describe ::RedmineNonprojectModules::Patches::Redmine::MenuManagerMapperPatch do
-  let(:controller_entry_class) { ::RedmineNonprojectModules::Patches::Redmine::ControllerEntry }
+RSpec.describe RedmineNonprojectModules::Patches::Redmine::MenuManagerMapperPatch do
+  let(:controller_entry_class) { RedmineNonprojectModules::MenuControllerEntry }
 
   describe 'build' do
     let(:expected) do
       [:colaboradores, { controller: 'colaboradores', action: 'index', id: nil },
-       caption: :label_colaboradores,
-       if: nil]
+       { caption: :label_colaboradores,
+         if: nil }]
     end
     let(:actual) do
       r = controller_entry_class.new('colaboradores').build
@@ -21,8 +21,8 @@ RSpec.describe ::RedmineNonprojectModules::Patches::Redmine::MenuManagerMapperPa
   describe 'build with action' do
     let(:expected) do
       [:lotacoes_arvore, { controller: 'lotacoes', action: 'arvore', id: nil },
-       caption: :label_lotacoes_arvore,
-       if: nil]
+       { caption: :label_lotacoes_arvore,
+         if: nil }]
     end
     let(:actual) do
       r = controller_entry_class.new('lotacoes', action: 'arvore').build

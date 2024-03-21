@@ -5,8 +5,7 @@ require 'eac_ruby_utils/simple_cache'
 class GroupPermission < ActiveRecord::Base
   belongs_to :group
 
-  validates :group, presence: true
-  validates :permission, presence: true, uniqueness: { scope: [:group],
+  validates :permission, presence: true, uniqueness: { scope: [:group], # rubocop:disable Rails/UniqueValidationWithoutIndex
                                                        case_sensitive: false }
 
   def permission=(value)
@@ -27,7 +26,7 @@ class GroupPermission < ActiveRecord::Base
       permission(key).description
     end
 
-    def permission?(permission, user = false)
+    def permission?(permission, user = false) # rubocop:disable Style/OptionalBooleanParameter
       return permission_by_hash?(permission, user) if permission.is_a?(Hash)
 
       permission(permission).user_has?(user || User.current)

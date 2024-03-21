@@ -26,7 +26,7 @@ RSpec.describe GroupPermission, type: :feature do
   context 'when no admin access protected page' do
     include_context 'with logged user', 'jsmith'
 
-    let(:no_admin) { users(:users_002) }
+    let(:no_admin) { users(:users_002) } # rubocop:disable Naming/VariableNumber
 
     before do
       visit '/group_permissions'
@@ -53,7 +53,7 @@ RSpec.describe GroupPermission, type: :feature do
   end
 
   describe 'permission dependency' do
-    let(:no_admin) { users(:users_002) }
+    let(:no_admin) { users(:users_002) } # rubocop:disable Naming/VariableNumber
     let(:g) do
       r = Group.create!(name: 'My group')
       r.users << no_admin
@@ -63,7 +63,7 @@ RSpec.describe GroupPermission, type: :feature do
 
     def assert_dummy_includes(user, dummy, include)
       e = { dummy_permission: dummy, include: include }
-      a = Hash[e.keys.map { |p| [p, user.permission?(p)] }]
+      a = e.keys.to_h { |p| [p, user.permission?(p)] } # rubocop:disable Rails/IndexWith
       expect(a).to eq(e)
     end
 
@@ -88,7 +88,7 @@ RSpec.describe GroupPermission, type: :feature do
 
   it 'blocks no existing dependencies' do
     expect { described_class.add_permission('recursive1', dependencies: %w[not_exist]) }
-      .to raise_error(::StandardError)
+      .to raise_error(StandardError)
   end
 
   describe 'no redefine dependencies' do

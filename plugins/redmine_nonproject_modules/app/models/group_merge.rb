@@ -2,7 +2,7 @@
 
 require 'eac_rails_utils/models/tableless'
 
-class GroupMerge < ::EacRailsUtils::Models::Tableless
+class GroupMerge < EacRailsUtils::Models::Tableless
   ONLY_ON_TARGET = :only_on_target
   ONLY_ON_SOURCE = :only_on_source
   ON_BOTH = :on_both
@@ -11,9 +11,6 @@ class GroupMerge < ::EacRailsUtils::Models::Tableless
   attribute :target_id, Integer
   belongs_to :source, class_name: 'Group'
   belongs_to :target, class_name: 'Group'
-
-  validates :source, presence: true
-  validates :target, presence: true
 
   def to_merge_elements
     (target_elements + source_elements).uniq.map do |x|
