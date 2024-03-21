@@ -18,8 +18,8 @@ GIT
 PATH
   remote: plugins/eac_redmine_base0
   specs:
-    eac_redmine_base0 (0.6.0)
-      eac_ruby_utils (~> 0.119)
+    eac_redmine_base0 (0.6.1)
+      eac_ruby_utils (~> 0.121)
 
 PATH
   remote: plugins/notifyme
