@@ -8,17 +8,16 @@ require 'redmine_plugins_helper/version'
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = 'redmine_plugins_helper'
-  s.version     = ::RedminePluginsHelper::VERSION
-  s.authors     = [::RedminePluginsHelper::VERSION]
-  s.summary     = ::RedminePluginsHelper::SUMMARY
+  s.version     = RedminePluginsHelper::VERSION
+  s.authors     = [RedminePluginsHelper::VERSION]
+  s.summary     = RedminePluginsHelper::SUMMARY
 
   s.files = Dir['{app,config,lib}/**/*', 'init.rb']
+  s.required_ruby_version = '>= 2.7'
 
-  s.add_dependency 'bigdecimal', '< 2'
-  s.add_dependency 'eac_ruby_utils', '~> 0.95', '>= 0.95.1'
-  s.add_dependency 'launchy'
-  s.add_dependency 'rspec-rails'
-  s.add_dependency 'sass-rails', '~> 5.0'
-
-  s.add_development_dependency 'eac_ruby_gem_support', '~> 0.5.1'
+  s.add_dependency 'bigdecimal', '~> 1.4', '>= 1.4.4'
+  s.add_dependency 'eac_rails_gem_support', '~> 0.9', '>= 0.9.2'
+  s.add_dependency 'eac_ruby_utils', '~> 0.121'
+  s.add_dependency 'launchy', '~> 2.5', '>= 2.5.2'
+  s.add_dependency 'sass-rails', '~> 5.1'
 end

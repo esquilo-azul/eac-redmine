@@ -10,10 +10,10 @@ module RedminePluginsHelper
 
         included do
           extend ClassMethods
-          include InstanceMethods
+          include ::RedminePluginsHelper::Patches::Redmine::PluginPatch::Assets
+          prepend ::RedminePluginsHelper::Patches::Redmine::PluginPatch::Dependencies
+          include ::RedminePluginsHelper::Patches::Redmine::PluginPatch::Initializers
         end
-
-        ASSETS_SUBDIRS = %w[stylesheets javascripts images].freeze
 
         module ClassMethods
           def by_path(path)
@@ -40,57 +40,12 @@ module RedminePluginsHelper
           end
         end
 
-        module InstanceMethods
-          def load_initializers
-            Dir["#{initializers_directory}/*.rb"].sort.each { |f| require f }
-          end
-
-          ASSETS_SUBDIRS.each do |assert_subdir|
-            class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
-            def #{assert_subdir}_directory
-              ::File.join(directory, 'app', 'assets', '#{assert_subdir}')
-            end
-            RUBY_EVAL
-          end
-
-          def add_assets_paths
-            ASSETS_SUBDIRS.each do |assert_subdir|
-              assets_directory = send("#{assert_subdir}_directory")
-              next unless ::File.directory?(assets_directory)
-
-              Rails.application.config.assets.paths << assets_directory
-            end
-          end
-
-          def main_javascript_asset_path
-            find_asset(javascripts_directory, %w[js coffee js.coffee])
-          end
-
-          def main_stylesheet_asset_path
-            find_asset(stylesheets_directory, %w[css scss])
-          end
-
-          private
-
-          def initializers_directory
-            File.join(directory, 'config', 'initializers')
-          end
-
-          def find_asset(assets_directory, extensions)
-            extensions.each do |extension|
-              ['', '.erb'].each do |erb_extension|
-                path = ::File.join(assets_directory, "#{id}.#{extension}#{erb_extension}")
-                return id if ::File.exist?(path)
-              end
-            end
-            nil
-          end
-        end
+        require_sub __FILE__
       end
     end
   end
 end
 
-patch = ::RedminePluginsHelper::Patches::Redmine::PluginPatch
-target = ::Redmine::Plugin
+patch = RedminePluginsHelper::Patches::Redmine::PluginPatch
+target = Redmine::Plugin
 target.send(:include, patch) unless target.include?(patch)

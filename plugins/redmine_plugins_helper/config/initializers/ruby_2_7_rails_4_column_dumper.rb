@@ -2,12 +2,12 @@
 
 # Reference: https://stackoverflow.com/questions/62570662/rails-4-ruby-2-7-1-schema-rb-shows-could-not-dump-table-because-of-following-f
 
-return unless RUBY_VERSION >= '2.7' && ::Rails.version < '5'
+return unless RUBY_VERSION >= '2.7' && Rails.version < '5'
 
 module ActiveRecord
   module ConnectionAdapters
     module ColumnDumper
-      def prepare_column_options(column, types) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
+      def prepare_column_options(column, types) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
         spec = {}
         spec[:name]      = column.name.inspect
         spec[:type]      = column.type.to_s

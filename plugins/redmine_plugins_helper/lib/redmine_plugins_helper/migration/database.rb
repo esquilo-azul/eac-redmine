@@ -6,15 +6,15 @@ module RedminePluginsHelper
       common_concern
 
       DATABASE_CORE_VERSION_PARSER = /^(\d+)$/.to_parser { |m| [PLUGIN_ID_CORE_VALUE, m[1]] }
-      DATABASE_PLUGIN_VERSION_PARSER = /^(\d+)\-(\S+)$/.to_parser { |m| [m[2], m[1]] }
+      DATABASE_PLUGIN_VERSION_PARSER = /^(\d+)-(\S+)$/.to_parser { |m| [m[2], m[1]] }
       DATABASE_VERSION_PARSERS = [DATABASE_PLUGIN_VERSION_PARSER, DATABASE_CORE_VERSION_PARSER]
-                                 .freeze
+                                   .freeze
 
       module ClassMethods
         # @return [Enumerable<RedminePluginsHelper::Migration>]
         def from_database
           ::ActiveRecord::SchemaMigration.create_table
-          ::ActiveRecord::SchemaMigration.all.pluck(:version).map do |version|
+          ::ActiveRecord::SchemaMigration.pluck(:version).map do |version|
             from_database_version(version)
           end
         end

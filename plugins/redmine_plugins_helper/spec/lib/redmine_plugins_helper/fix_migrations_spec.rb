@@ -2,12 +2,12 @@
 
 require 'redmine_plugins_helper/fix_migrations'
 
-::RSpec.describe ::RedminePluginsHelper::FixMigrations do
+RSpec.describe RedminePluginsHelper::FixMigrations do
   before do
-    ::ActiveRecord::SchemaMigration.delete_all
+    ActiveRecord::SchemaMigration.delete_all
   end
 
-  it { expect(::ActiveRecord::SchemaMigration.count).to eq(0) }
+  it { expect(ActiveRecord::SchemaMigration.count).to eq(0) }
 
   context 'with database versions' do
     let(:database_versions) do
@@ -17,7 +17,7 @@ require 'redmine_plugins_helper/fix_migrations'
 
     before do
       database_versions.each do |version|
-        ::ActiveRecord::SchemaMigration.create!(version: version)
+        ActiveRecord::SchemaMigration.create!(version: version)
       end
     end
 
@@ -32,8 +32,7 @@ require 'redmine_plugins_helper/fix_migrations'
           [:redmine_plugins_helper, 20_220_102_030_402],
           [:redmine_plugins_helper, 20_220_102_030_403]
 
-        ].map { |lv| [lv[1], [{ plugin: lv[0], timestamp: lv[1], version: "#{lv[1]}-#{lv[0]}" }]] }
-          .to_h
+        ].to_h { |lv| [lv[1], [{ plugin: lv[0], timestamp: lv[1], version: "#{lv[1]}-#{lv[0]}" }]] }
       end
 
       let(:instance) do
@@ -60,6 +59,6 @@ require 'redmine_plugins_helper/fix_migrations'
   end
 
   def sorted_database_versions
-    ::ActiveRecord::SchemaMigration.all.order(version: :asc).pluck(:version)
+    ActiveRecord::SchemaMigration.order(version: :asc).pluck(:version)
   end
 end

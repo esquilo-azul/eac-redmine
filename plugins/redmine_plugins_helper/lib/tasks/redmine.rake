@@ -2,26 +2,25 @@
 
 Rake::Task['redmine:plugins:migrate'].clear
 
-namespace :redmine do
+namespace :redmine do # rubocop:disable Metrics/BlockLength
   desc 'Run migrations of core Redmine and installed plugins.'
-  task migrate: ['db:migrate', 'redmine:plugins:migrate:fix', 'redmine:plugins:migrate'] do
-  end
+  task migrate: ['db:migrate', 'redmine:plugins:migrate:fix', 'redmine:plugins:migrate']
 
   namespace :version do
     desc 'Shows Redmine\'s version.'
     task show: :environment do
-      puts ::Redmine::VERSION::STRING
+      puts Redmine::VERSION::STRING
     end
   end
 
   task version: 'version:show'
 
-  namespace :plugins do
+  namespace :plugins do # rubocop:disable Metrics/BlockLength
     desc 'Migrates installed plugins.'
     task migrate: :environment do
-      name = ENV['NAME']
+      name = ENV.fetch('NAME', nil)
       version = nil
-      version_string = ENV['VERSION']
+      version_string = ENV.fetch('VERSION', nil)
       if version_string
         if version_string =~ /^\d+$/
           version = version_string.to_i
@@ -42,7 +41,7 @@ namespace :redmine do
     namespace :migrate do
       desc 'Fix migrations moved from a plugin to another'
       task fix: :environment do
-        ::RedminePluginsHelper::FixMigrations.new.perform
+        RedminePluginsHelper::FixMigrations.new.perform
       end
 
       desc 'Show migrations status of all plugins'

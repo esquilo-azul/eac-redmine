@@ -13,7 +13,7 @@ module ActiveRecord
     module PostgreSQL
       module SchemaStatements
         # Resets the sequence of a table's primary key to the maximum value.
-        def reset_pk_sequence!(table, pkey = nil, sequence = nil) #:nodoc:
+        def reset_pk_sequence!(table, pkey = nil, sequence = nil) # :nodoc:
           unless pkey && sequence
             default_pk, default_sequence = pk_and_sequence_for(table)
             pkey ||= default_pk
@@ -36,7 +36,7 @@ module ActiveRecord
 
           if postgresql_version >= 100_000
             select_value('SELECT seqmin FROM pg_sequence WHERE seqrelid = ' \
-                "#{quote(quoted_sequence)}::regclass")
+                         "#{quote(quoted_sequence)}::regclass")
           else
             select_value("SELECT min_value FROM #{quoted_sequence}")
           end
