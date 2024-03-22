@@ -29,7 +29,7 @@ PATH
       htmlentities (~> 4.3, >= 4.3.4)
       imgkit (~> 1.6, >= 1.6.3)
       telegram-bot-ruby (~> 2.0)
-      wkhtmltoimage-binary
+      wkhtmltoimage-binary (~> 0.12, >= 0.12.5)
 
 PATH
   remote: plugins/redmine_avm
