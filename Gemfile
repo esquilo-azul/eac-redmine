@@ -18,14 +18,17 @@ gem 'nokogiri', (if Gem.ruby_version < Gem::Version.new('2.5.0')
                    '~> 1.10.10'
                  elsif Gem.ruby_version < Gem::Version.new('2.6.0')
                    '~> 1.12.5'
+                 elsif Gem.ruby_version < Gem::Version.new('2.7.0')
+                   '~> 1.13.10'
                  else
-                   '~> 1.13'
+                   '~> 1.15.2'
                  end)
 gem 'i18n', '~> 1.8.2'
 gem 'rbpdf', '~> 1.21.0'
 gem 'addressable'
 gem 'rubyzip', '~> 2.3.0'
 gem 'psych', '~> 3.1' if Gem.ruby_version < Gem::Version.new('2.6.0')
+gem 'loofah', '<= 2.20.0' if Gem.ruby_version < Gem::Version.new('2.5.0')
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :x64_mingw, :mswin]
@@ -93,19 +96,19 @@ end
 
 group :test do
   gem "rails-dom-testing"
-  gem 'mocha', (Gem.ruby_version < Gem::Version.new('2.7.0') ? ['>= 1.4.0', '< 2.0.0'] : '>= 1.4.0')
+  gem 'mocha', '>= 2.0.1'
   gem 'simplecov', '~> 0.18.5', :require => false
   gem "ffi", platforms: [:mingw, :x64_mingw, :mswin]
   # For running system tests
   # TODO: Remove version specification once Capybara supports Puma 6
   gem 'puma', '< 6.0.0'
-  # gem 'capybara', '~> 3.31.0'
+  gem 'capybara', '~> 3.31.0'
   gem "selenium-webdriver", "~> 3.142.7"
   gem 'webdrivers', '~> 4.4', require: false
   # RuboCop
-  # gem 'rubocop', '~> 1.12.0'
-  # gem 'rubocop-performance', '~> 1.10.1'
-  # gem 'rubocop-rails', '~> 2.9.0'
+  gem 'rubocop', '~> 1.12.0'
+  gem 'rubocop-performance', '~> 1.10.1'
+  gem 'rubocop-rails', '~> 2.9.0'
 end
 
 local_gemfile = File.join(File.dirname(__FILE__), "Gemfile.local")
