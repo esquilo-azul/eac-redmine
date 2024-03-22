@@ -28,7 +28,7 @@ PATH
       eac_ruby_utils (~> 0.121)
       htmlentities (~> 4.3, >= 4.3.4)
       imgkit (~> 1.6, >= 1.6.3)
-      telegram-bot-ruby
+      telegram-bot-ruby (~> 2.0)
       wkhtmltoimage-binary
 
 PATH
