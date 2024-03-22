@@ -27,7 +27,7 @@ PATH
     notifyme (0.4.13)
       eac_ruby_utils (~> 0.121)
       htmlentities (~> 4.3, >= 4.3.4)
-      imgkit
+      imgkit (~> 1.6, >= 1.6.3)
       telegram-bot-ruby
       wkhtmltoimage-binary
 
