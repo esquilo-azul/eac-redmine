@@ -658,9 +658,9 @@ DEPENDENCIES
   marcel
   mini_magick (~> 4.11.0)
   mini_mime (~> 1.0.1)
-  mocha (>= 1.4.0)
+  mocha (>= 2.0.1)
   net-ldap (~> 0.17.0)
-  nokogiri (~> 1.13)
+  nokogiri (~> 1.15)
   notifyme!
   org-ruby
   pg (~> 1.2.2)

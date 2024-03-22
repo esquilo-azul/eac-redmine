@@ -21,7 +21,7 @@ gem 'nokogiri', (if Gem.ruby_version < Gem::Version.new('2.5.0')
                  elsif Gem.ruby_version < Gem::Version.new('2.7.0')
                    '~> 1.13.10'
                  else
-                   '~> 1.15.2'
+                   '~> 1.15'
                  end)
 gem 'i18n', '~> 1.8.2'
 gem 'rbpdf', '~> 1.21.0'
@@ -102,13 +102,13 @@ group :test do
   # For running system tests
   # TODO: Remove version specification once Capybara supports Puma 6
   gem 'puma', '< 6.0.0'
-  gem 'capybara', '~> 3.31.0'
+  # gem 'capybara', '~> 3.31.0'
   gem "selenium-webdriver", "~> 3.142.7"
   gem 'webdrivers', '~> 4.4', require: false
   # RuboCop
-  gem 'rubocop', '~> 1.12.0'
-  gem 'rubocop-performance', '~> 1.10.1'
-  gem 'rubocop-rails', '~> 2.9.0'
+  # gem 'rubocop', '~> 1.12.0'
+  # gem 'rubocop-performance', '~> 1.10.1'
+  # gem 'rubocop-rails', '~> 2.9.0'
 end
 
 local_gemfile = File.join(File.dirname(__FILE__), "Gemfile.local")
