@@ -19,7 +19,8 @@ end
 
 return unless RedminePluginsHelper::Available.database_schema?
 
-[ScheduledTasksController, TasksSchedulerDaemonController].each do |controller_class|
+[ScheduledTasksController, ScheduledTaskStatusesController, TasksSchedulerDaemonController]
+  .each do |controller_class|
   patch_class = RedmineTasksScheduler::Patches::TasksSchedulerControllerPatch
   unless controller_class.included_modules.include?(patch_class)
     controller_class.send(:include, patch_class)
