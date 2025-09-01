@@ -1,7 +1,7 @@
 @import 'tasks_scheduler';
 
 #top-menu .tasks-scheduler-alert {
-  background-image: url('../../../images/warning.png');
+  background-image: url('/images/warning.png');
   background-position: 0% 40%;
   background-repeat: no-repeat;
   padding-left: 20px;
