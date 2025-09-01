@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'eac_ruby_utils/core_ext'
-require 'eac_ruby_utils/patch'
 require 'redmine_git_hosting/gitolite_hook'
 require 'rbconfig'
 
@@ -88,7 +87,7 @@ module RedmineWithGit
   end
 end
 
-::EacRubyUtils.patch(
+::EacRubyUtils.patch_module(
   ::RedmineGitHosting::GitoliteHook,
   ::RedmineWithGit::Patches::RedmineGitHosting::GitoliteHookPatch
 )
