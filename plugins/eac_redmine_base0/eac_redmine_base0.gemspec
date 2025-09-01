@@ -16,7 +16,9 @@ Gem::Specification.new do |s|
   s.files = Dir['{lib}/**/*', 'init.rb']
   s.required_ruby_version = '>= 2.7'
 
-  s.add_dependency 'eac_ruby_utils', '~> 0.121'
+  # blankslate: required for the core 4.2.11 and not supplied in its Gemfile.
+  s.add_dependency 'blankslate', '~> 3.1', '>= 3.1.3'
+  s.add_dependency 'eac_ruby_utils', '~> 0.123'
 
-  s.add_development_dependency 'eac_rails_gem_support', '~> 0.9', '>= 0.9.2'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.10', '>= 0.10.1'
 end
