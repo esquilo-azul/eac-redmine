@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'test_helper'
-require 'eac_ruby_gem_support/source_target_fixtures'
+require 'eac_ruby_gem_support'
 
 module Avm
   module Issues
@@ -39,7 +39,7 @@ module Avm
       end
 
       test 'there are fixtures' do
-        assert self.class.target_source_fixtures.source_target_files.count.positive?
+        assert self.class.target_source_fixtures.source_target_files.any?
       end
 
       private

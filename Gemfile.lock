@@ -35,7 +35,7 @@ PATH
 PATH
   remote: plugins/redmine_avm
   specs:
-    redmine_avm (0.3.11)
+    redmine_avm (0.3.12)
 
 PATH
   remote: plugins/redmine_events_manager

@@ -19,7 +19,7 @@ module Avm
 
       private
 
-      def undefine?
+      def undefine? # rubocop:disable Naming/PredicateMethod
         return "##{@issue.id} already undefined" if @issue.undefined?
         return "##{@issue.id} already closed" if @issue.closed?
         return "##{@issue.id} has no undefined dependencies" unless @issue.dependencies.any?(

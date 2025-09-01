@@ -19,7 +19,7 @@ module Avm
 
       private
 
-      def unblock?
+      def unblock? # rubocop:disable Naming/PredicateMethod
         return "##{@issue.id} is not blocked" unless status_blocked?
         return "##{@issue.id} has open dependencies" if open_dependencies?
       end
