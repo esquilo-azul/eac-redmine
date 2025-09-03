@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module ExtendRepositoriesHelper
-  def encoding_field(form, repository)
-    content_tag(:p) do
+  def encoding_field(form, _repository)
+    tag.p do
       form.select(
         :path_encoding, [nil] + Setting::ENCODINGS,
         label: l(:field_scm_path_encoding)
@@ -12,35 +14,37 @@ module ExtendRepositoriesHelper
     %w[zip tar tar.gz].map { |f| [f, download_git_revision_repository_path(repository, rev: rev, download_format: f)] }
   end
 
-  def create_readme_field(form, repository)
+  def create_readme_field(_form, repository)
     return unless repository.new_record?
 
-    content_tag(:p) do
+    tag.p do
       hidden_field_tag('repository[create_readme]', 'false', id: '') +
-        content_tag(:label, l(:label_init_repo_with_readme), for: 'repository_create_readme') +
+        tag.label(l(:label_init_repo_with_readme), for: 'repository_create_readme') +
         check_box_tag('repository[create_readme]', 'true', RedmineGitHosting::Config.init_repositories_on_create?)
     end
   end
 
-  def enable_git_annex_field(form, repository)
+  def enable_git_annex_field(_form, repository)
     return unless repository.new_record?
 
-    content_tag(:p) do
+    tag.p do
       hidden_field_tag('repository[enable_git_annex]', 'false', id: '') +
-        content_tag(:label, l(:label_init_repo_with_git_annex), for: 'repository_enable_git_annex') +
+        tag.label(l(:label_init_repo_with_git_annex), for: 'repository_enable_git_annex') +
         check_box_tag('repository[enable_git_annex]', 'true')
     end
   end
 
-  def repository_branches_list(branches)
-    options_for_select branches.collect { |b| [b.to_s, b.to_s] }, selected: branches.find(&:is_default).to_s
+  def repository_branches_list(branches, selected: nil)
+    options_for_select branches.collect { |b| [b.to_s, b.to_s] },
+                       selected: selected.presence || branches.find(&:is_default).to_s
   end
 
   def render_repository_quick_jump(repository)
-    options = repository.project.repositories.map { |r| [r.redmine_name, edit_repository_path(r)] }
-    select_tag('repository_quick_jump_box',
+    options = repository.project.repositories.sort
+    options.map! { |r| [r.redmine_name, edit_repository_path(r)] }
+    select_tag 'repository_quick_jump_box',
                options_for_select(options, selected: edit_repository_path(repository)),
-               onchange: 'if (this.value != \'\') { window.location = this.value; }')
+               onchange: 'if (this.value != \'\') { window.location = this.value; }'
   end
 
   def link_to_repository(repo, current_repo)
@@ -51,7 +55,7 @@ module ExtendRepositoriesHelper
   end
 
   def icon_for_url_type(url_type)
-    font_awesome_icon(RepositoryGitExtra::URLS_ICONS[url_type][:icon])
+    font_awesome_icon RepositoryGitExtra::URLS_ICONS[url_type][:icon]
   end
 
   def label_for_url_type(url_type)
@@ -62,6 +66,6 @@ module ExtendRepositoriesHelper
     projects = Project.active
                       .where(Project.allowed_to_condition(User.current, :manage_repository))
                       .where.not(id: project.id)
-    project_tree_options_for_select(projects, selected: project) if projects.any?
+    project_tree_options_for_select projects, selected: project if projects.any?
   end
 end

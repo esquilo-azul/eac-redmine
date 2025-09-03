@@ -1,41 +1,36 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+# frozen_string_literal: true
+
+require File.expand_path "#{File.dirname __FILE__}/../spec_helper"
 
 describe RepositoryMirror do
+  VALID_URLS = ['ssh://user@host.xz:2222/path/to/repo.git',
+                'ssh://user@host.xz/path/to/repo.git',
+                'ssh://user-name@long.host-domain.xz/path.git',
+                'ssh://host.xz:2222/path/to/repo.git',
+                'ssh://host.xz/path/to/repo.git',
+                'ssh://user@host.xz/path/to/repo.git',
+                'ssh://host.xz/path/to/repo.git',
+                'ssh://user@host.xz/~user/path/to/repo.git',
+                'ssh://host.xz/~user/path/to/repo.git',
+                'ssh://user@host.xz/~/path/to/repo.git',
+                'ssh://host.xz/~/path/to/repo.git',
+                'ssh://host.xz/~/path.to/repo.git'].freeze
 
-  VALID_URLS = [
-    'ssh://user@host.xz:2222/path/to/repo.git',
-    'ssh://user@host.xz/path/to/repo.git',
-    'ssh://user-name@long.host-domain.xz/path.git',
-    'ssh://host.xz:2222/path/to/repo.git',
-    'ssh://host.xz/path/to/repo.git',
-    'ssh://user@host.xz/path/to/repo.git',
-    'ssh://host.xz/path/to/repo.git',
-    'ssh://user@host.xz/~user/path/to/repo.git',
-    'ssh://host.xz/~user/path/to/repo.git',
-    'ssh://user@host.xz/~/path/to/repo.git',
-    'ssh://host.xz/~/path/to/repo.git',
-    'ssh://host.xz/~/path.to/repo.git'
-  ]
-
-
-  def build_mirror(opts = {})
-    build(:repository_mirror, opts)
+  def build_mirror(**opts)
+    build(:repository_mirror, **opts)
   end
-
 
   def expect_invalid_refspec(refspec)
     expect(build_mirror(push_mode: 1, explicit_refspec: refspec)).not_to be_valid
   end
 
-
   def expect_valid_refspec(refspec)
     expect(build_mirror(push_mode: 1, explicit_refspec: refspec)).to be_valid
   end
 
-
   describe 'Valid RepositoryMirror creation' do
-    before(:each) do
-      @mirror = build(:repository_mirror)
+    before :each do
+      @mirror = build :repository_mirror
     end
 
     subject { @mirror }
@@ -50,13 +45,13 @@ describe RepositoryMirror do
     it { should validate_presence_of(:url) }
     it { should validate_presence_of(:push_mode) }
 
-    it { should validate_uniqueness_of(:url).scoped_to(:repository_id) }
+    it { should validate_uniqueness_of(:url).case_insensitive.scoped_to(:repository_id) }
 
     it { should allow_value(*VALID_URLS).for(:url) }
 
     it { should validate_numericality_of(:push_mode) }
 
-    it { should validate_inclusion_of(:push_mode).in_array(%w(0 1 2)) }
+    it { should validate_inclusion_of(:push_mode).in_array(%w[0 1 2]) }
 
     ## Attributes content
     it { expect(@mirror.active).to be true }
@@ -105,9 +100,7 @@ describe RepositoryMirror do
         expect_valid_refspec '+devel:devel/*'
       end
     end
-
   end
-
 
   describe 'Invalid Mirror creation' do
     ## Test presence conflicts
@@ -149,17 +142,15 @@ describe RepositoryMirror do
     end
   end
 
-
   context 'when many mirror are saved' do
     before do
-      create(:repository_mirror, active: true)
-      create(:repository_mirror, active: true)
-      create(:repository_mirror, active: false)
-      create(:repository_mirror, active: false)
+      create :repository_mirror, active: true
+      create :repository_mirror, active: true
+      create :repository_mirror, active: false
+      create :repository_mirror, active: false
     end
 
     it { expect(RepositoryMirror.active.length).to be == 3 }
     it { expect(RepositoryMirror.inactive.length).to be == 2 }
   end
-
 end

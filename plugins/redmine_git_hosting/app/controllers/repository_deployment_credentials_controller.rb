@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RepositoryDeploymentCredentialsController < RedmineGitHostingController
   include RedmineGitHosting::GitoliteAccessor::Methods
 
@@ -9,7 +11,7 @@ class RepositoryDeploymentCredentialsController < RedmineGitHostingController
   helper :gitolite_public_keys
 
   def index
-    @repository_deployment_credentials = @repository.deployment_credentials.all
+    @repository_deployment_credentials = @repository.deployment_credentials.sorted
     render layout: false
   end
 
@@ -25,17 +27,17 @@ class RepositoryDeploymentCredentialsController < RedmineGitHostingController
 
   def create
     @credential = build_new_credential
-    return unless @credential.save
+    return render action: 'new' unless @credential.save
 
-    flash[:notice] = l(:notice_deployment_credential_created)
+    flash[:notice] = l :notice_deployment_credential_created
     call_use_case_and_redirect
   end
 
   def update
     @credential.safe_attributes = params[:repository_deployment_credential]
-    return unless @credential.save
+    return render action: 'edit' unless @credential.save
 
-    flash[:notice] = l(:notice_deployment_credential_updated)
+    flash[:notice] = l :notice_deployment_credential_updated
     call_use_case_and_redirect
   end
 
@@ -45,9 +47,9 @@ class RepositoryDeploymentCredentialsController < RedmineGitHostingController
     if will_delete_key && @key.repository_deployment_credentials.empty?
       # Key no longer used -- delete it!
       @key.destroy
-      flash[:notice] = l(:notice_deployment_credential_deleted_with_key)
+      flash[:notice] = l :notice_deployment_credential_deleted_with_key
     else
-      flash[:notice] = l(:notice_deployment_credential_deleted)
+      flash[:notice] = l :notice_deployment_credential_deleted
     end
 
     call_use_case_and_redirect
@@ -60,7 +62,7 @@ class RepositoryDeploymentCredentialsController < RedmineGitHostingController
   end
 
   def find_deployment_credential
-    credential = @repository.deployment_credentials.find(params[:id])
+    credential = @repository.deployment_credentials.find params[:id]
   rescue ActiveRecord::RecordNotFound
     render_404
   else
@@ -84,30 +86,31 @@ class RepositoryDeploymentCredentialsController < RedmineGitHostingController
 
   def find_all_keys
     # display create_with_key view.  Find preexisting keys to offer to user
-    @user_keys     = User.current.gitolite_public_keys.deploy_key.order('title ASC')
+    @user_keys = User.current.gitolite_public_keys.deploy_key.order :title
     @disabled_keys = @repository.deployment_credentials.map(&:gitolite_public_key)
-    @other_keys    = []
+    @other_keys = []
     # Admin can use other's deploy keys as well
-    @other_keys    = other_deployment_keys if User.current.admin?
+    @other_keys = other_deployment_keys if User.current.admin?
   end
 
   def other_deployment_keys
-    users_allowed_to_create_deployment_keys.map { |user| user.gitolite_public_keys.deploy_key.order('title ASC') }.flatten
+    keys = users_allowed_to_create_deployment_keys.map { |user| user.gitolite_public_keys.deploy_key.sorted }
+    keys.flatten
   end
 
   def users_allowed_to_create_deployment_keys
     @project.users.select { |user| user != User.current && user.git_allowed_to?(:create_repository_deployment_credentials, @repository) }
   end
 
-  def call_use_case(opts = {})
-    options = opts.merge(message: "Update deploy keys for repository : '#{@repository.gitolite_repository_name}'")
-    gitolite_accessor.update_repository(@repository, options)
+  def call_use_case(**opts)
+    options = opts.merge message: "Update deploy keys for repository : '#{@repository.gitolite_repository_name}'"
+    gitolite_accessor.update_repository @repository, **options
   end
 
   def build_new_credential
     credential = @repository.deployment_credentials.new
     credential.safe_attributes = params[:repository_deployment_credential]
-    key = GitolitePublicKey.find_by(id: params[:repository_deployment_credential][:gitolite_public_key_id])
+    key = GitolitePublicKey.find_by id: params[:repository_deployment_credential][:gitolite_public_key_id]
 
     credential.gitolite_public_key = key unless key.nil?
 

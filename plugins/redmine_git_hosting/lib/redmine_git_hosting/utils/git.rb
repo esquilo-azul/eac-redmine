@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module RedmineGitHosting
   module Utils
     module Git
       extend self
 
       REF_COMPONENT_PART  = '[\\.\\-\\w_\\*]+'
-      REF_COMPONENT_REGEX = /\A(refs\/)?((#{REF_COMPONENT_PART})\/)?(#{REF_COMPONENT_PART}(\/#{REF_COMPONENT_PART})*)\z/
+      REF_COMPONENT_REGEX = %r{\A(refs/)?((#{REF_COMPONENT_PART})/)?(#{REF_COMPONENT_PART}(/#{REF_COMPONENT_PART})*)\z}.freeze
 
       # Parse a reference component. Two possibilities:
       #
@@ -12,15 +14,12 @@ module RedmineGitHosting
       # 2) name
       #
       def parse_refspec(spec)
-        parsed_refspec = spec.match(REF_COMPONENT_REGEX)
-        return nil if parsed_refspec.nil?
+        parsed_refspec = spec.match REF_COMPONENT_REGEX
+        return if parsed_refspec.nil?
+
         if parsed_refspec[1]
           # Should be first class.  If no type component, return fail
-          if parsed_refspec[3]
-            { type: parsed_refspec[3], name: parsed_refspec[4] }
-          else
-            nil
-          end
+          { type: parsed_refspec[3], name: parsed_refspec[4] } if parsed_refspec[3]
         elsif parsed_refspec[3]
           { type: nil, name: "#{parsed_refspec[3]}/#{parsed_refspec[4]}" }
         else
@@ -28,16 +27,13 @@ module RedmineGitHosting
         end
       end
 
-
       def author_name(committer)
         committer.gsub(/\A([^<]+)\s+.*\z/, '\1')
       end
 
-
       def author_email(committer)
         committer.gsub(/\A.*<([^>]+)>.*\z/, '\1')
       end
-
     end
   end
 end

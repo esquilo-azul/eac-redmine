@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PluginSettingsValidation
   module HooksConfig
     extend ActiveSupport::Concern
@@ -10,13 +12,13 @@ module PluginSettingsValidation
                    :gitolite_hooks_url
 
       before_validation do
-        self.gitolite_hooks_url = strip_value(gitolite_hooks_url)
+        self.gitolite_hooks_url = strip_value gitolite_hooks_url
       end
 
       validates :gitolite_overwrite_existing_hooks, presence: true, inclusion: { in: RedmineGitHosting::Validators::BOOLEAN_FIELDS }
       validates :gitolite_hooks_are_asynchronous,   presence: true, inclusion: { in: RedmineGitHosting::Validators::BOOLEAN_FIELDS }
       validates :gitolite_hooks_debug,              presence: true, inclusion: { in: RedmineGitHosting::Validators::BOOLEAN_FIELDS }
-      validates :gitolite_hooks_url,                presence: true, format:    { with: URI::regexp(%w[http https]) }
+      validates :gitolite_hooks_url,                presence: true, format:    { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
     end
   end
 end

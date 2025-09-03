@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddSettingsToPlugin4 < ActiveRecord::Migration[4.2]
   def up
     # Add some new settings to settings page, if they don't exist
@@ -8,20 +10,20 @@ class AddSettingsToPlugin4 < ActiveRecord::Migration[4.2]
       say 'Added redmine_git_hosting settings: gitForceHooksUpdate'
       Setting.plugin_redmine_git_hosting = valuehash
     end
-  rescue => e
+  rescue StandardError => e
     say e.message
   end
 
   def down
     # Remove above settings from plugin page
     valuehash = Setting.plugin_redmine_git_hosting.clone
-    valuehash.delete('gitForceHooksUpdate')
+    valuehash.delete 'gitForceHooksUpdate'
 
     if Setting.plugin_redmine_git_hosting != valuehash
       say 'Removed redmine_git_hosting settings: gitForceHooksUpdate'
       Setting.plugin_redmine_git_hosting = valuehash
     end
-  rescue => e
+  rescue StandardError => e
     say e.message
   end
 end

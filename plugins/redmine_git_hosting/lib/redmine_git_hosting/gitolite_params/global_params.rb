@@ -1,16 +1,11 @@
+# frozen_string_literal: true
+
 module RedmineGitHosting
   module GitoliteParams
     class GlobalParams
-
       include BaseParam
 
-      attr_reader :gitolite_hooks_url
-      attr_reader :debug_mode
-      attr_reader :async_mode
-
-      attr_reader :namespace
-      attr_reader :current_params
-
+      attr_reader :gitolite_hooks_url, :debug_mode, :async_mode, :namespace, :current_params
 
       def initialize
         # Params to set
@@ -22,12 +17,11 @@ module RedmineGitHosting
         @namespace = RedmineGitHosting::Config.gitolite_hooks_namespace
 
         # Get current params
-        @current_params = get_git_config_params(@namespace)
+        @current_params = get_git_config_params @namespace
 
         # Build hash of installed params
         @installed = {}
       end
-
 
       def installed?
         @installed['redmineurl'] = (current_params['redmineurl'] == gitolite_hooks_url)
@@ -36,14 +30,12 @@ module RedmineGitHosting
         @installed
       end
 
-
       def install!
-        @installed['redmineurl'] = set_git_config_param(namespace, 'redmineurl', gitolite_hooks_url)
-        @installed['debugmode']  = set_git_config_param(namespace, 'debugmode', debug_mode)
-        @installed['asyncmode']  = set_git_config_param(namespace, 'asyncmode', async_mode)
+        @installed['redmineurl'] = set_git_config_param namespace, 'redmineurl', gitolite_hooks_url
+        @installed['debugmode']  = set_git_config_param namespace, 'debugmode', debug_mode
+        @installed['asyncmode']  = set_git_config_param namespace, 'asyncmode', async_mode
         @installed
       end
-
     end
   end
 end

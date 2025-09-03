@@ -1,4 +1,6 @@
-unless ENV['DISABLE_COVERAGE'] == 'true'
+# frozen_string_literal: true
+
+if ENV['COVERAGE']
   require 'simplecov'
 
   ## Start Simplecov
@@ -7,15 +9,19 @@ unless ENV['DISABLE_COVERAGE'] == 'true'
   end
 end
 
+unless defined? 'HOME_BASE_DIR'
+  HOME_BASE_DIR = RUBY_PLATFORM.include?('darwin') ? '/Users' : '/home'
+end
+
 ## Load Redmine App
 ENV['RAILS_ENV'] = 'test'
-require File.expand_path(File.dirname(__FILE__) + '/../config/environment')
+require File.expand_path "#{File.dirname __FILE__}/../config/environment"
 require 'rspec/rails'
 
 ## Load FactoryBots factories
-Dir[Rails.root.join('plugins/*/spec/factories/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('plugins/*/spec/factories/**/*.rb')].sort.each { |f| require f }
 
-Dir[Rails.root.join('plugins/*/spec/support/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('plugins/*/spec/support/**/*.rb')].sort.each { |f| require f }
 
 ## Configure RSpec
 RSpec.configure do |config|
@@ -30,19 +36,19 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.before(:suite) do
-    DatabaseCleaner.clean_with(:truncation)
+  config.before :suite do
+    DatabaseCleaner.clean_with :truncation
   end
 
-  config.before(:each) do
+  config.before :each do
     DatabaseCleaner.strategy = :transaction
   end
 
-  config.before(:each) do
+  config.before :each do
     DatabaseCleaner.start
   end
 
-  config.after(:each) do
+  config.after :each do
     DatabaseCleaner.clean
   end
 end

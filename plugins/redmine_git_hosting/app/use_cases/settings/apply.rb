@@ -1,26 +1,24 @@
+# frozen_string_literal: true
+
 module Settings
   class Apply
     include RedmineGitHosting::GitoliteAccessor::Methods
 
-    attr_reader :previous_settings
-    attr_reader :resync_projects
-    attr_reader :resync_ssh_keys
-    attr_reader :regenerate_ssh_keys
-    attr_reader :flush_cache
-    attr_reader :delete_trash_repo
+    attr_reader :previous_settings, :resync_projects, :resync_ssh_keys, :regenerate_ssh_keys, :flush_cache, :delete_trash_repo
 
-    def initialize(previous_settings, opts = {})
+    def initialize(previous_settings, resync_all_projects: false, resync_all_ssh_keys: false, regenerate_all_ssh_keys: false,
+                   flush_gitolite_cache: false, delete_trash_repo: [])
       @previous_settings   = previous_settings
-      @resync_projects     = opts.delete(:resync_all_projects) { false }
-      @resync_ssh_keys     = opts.delete(:resync_all_ssh_keys) { false }
-      @regenerate_ssh_keys = opts.delete(:regenerate_all_ssh_keys) { false }
-      @flush_cache         = opts.delete(:flush_gitolite_cache) { false }
-      @delete_trash_repo   = opts.delete(:delete_trash_repo) { [] }
+      @resync_projects     = resync_all_projects
+      @resync_ssh_keys     = resync_all_ssh_keys
+      @regenerate_ssh_keys = regenerate_all_ssh_keys
+      @flush_cache         = flush_gitolite_cache
+      @delete_trash_repo   = delete_trash_repo
     end
 
     class << self
-      def call(previous_settings, opts = {})
-        new(previous_settings, opts).call
+      def call(previous_settings, options)
+        new(previous_settings, **options).call
       end
     end
 
@@ -62,7 +60,7 @@ module Settings
          value_has_changed?(:gitolite_user)        ||
          value_has_changed?(:gitolite_temp_dir)
 
-        RedmineGitHosting.logger.info("Temp dir has changed, remove the previous one : '#{previous_settings[:gitolite_temp_dir]}'")
+        RedmineGitHosting.logger.info "Temp dir has changed, remove the previous one : '#{previous_settings[:gitolite_temp_dir]}'"
         FileUtils.rm_rf previous_settings[:gitolite_temp_dir]
       end
     end
@@ -75,8 +73,8 @@ module Settings
 
         # Need to update everyone!
         # We take all root projects (even those who are closed) and move each hierarchy individually
-        count = Project.includes(:repositories).all.select { |x| x if x.parent_id.nil? }.length
-        gitolite_accessor.move_repositories_tree(count) if count.positive?
+        count = Project.includes(:repositories).all.count { |x| x if x.parent_id.nil? }
+        gitolite_accessor.move_repositories_tree count if count.positive?
       end
     end
 
@@ -85,8 +83,11 @@ module Settings
       if value_has_changed?(:gitolite_config_file)       ||
          value_has_changed?(:gitolite_identifier_prefix) ||
          value_has_changed?(:gitolite_identifier_strip_user_id)
-        options = { message: 'Gitolite configuration has been modified, resync all projects (active, closed, archived)...' }
-        gitolite_accessor.update_projects('all', options)
+
+        gitolite_accessor.update_projects(
+          'all',
+          message: 'Gitolite configuration has been modified, resync all projects (active, closed, archived)...'
+        )
       end
     end
 
@@ -98,8 +99,8 @@ module Settings
          value_has_changed?(:gitolite_notify_global_exclude)
 
         # Need to update everyone!
-        options = { message: 'Gitolite configuration has been modified, resync all active projects...' }
-        gitolite_accessor.update_projects('active', options)
+        gitolite_accessor.update_projects 'active',
+                                          message: 'Gitolite configuration has been modified, resync all active projects...'
       end
     end
 
@@ -116,13 +117,16 @@ module Settings
 
     def check_cache_config
       ## Gitolite cache has changed, clear cache entries!
-      RedmineGitHosting::Cache.clear_obsolete_cache_entries if value_has_changed?(:gitolite_cache_max_time)
+      RedmineGitHosting::Cache.clear_obsolete_cache_entries if value_has_changed? :gitolite_cache_max_time
     end
 
     def do_resync_projects
+      return unless resync_projects
+
       ## A resync has been asked within the interface, update all projects in force mode
-      options = { message: 'Forced resync of all projects (active, closed, archived)...', force: true }
-      gitolite_accessor.update_projects('all', options) if resync_projects
+      gitolite_accessor.update_projects 'all',
+                                        message: 'Forced resync of all projects (active, closed, archived)...',
+                                        force: true
     end
 
     def do_resync_ssh_keys
@@ -140,11 +144,11 @@ module Settings
     end
 
     def do_delete_trash_repo
-      gitolite_accessor.delete_from_recycle_bin(delete_trash_repo) unless delete_trash_repo.empty?
+      gitolite_accessor.delete_from_recycle_bin delete_trash_repo unless delete_trash_repo.empty?
     end
 
     def do_add_redmine_rw_access
-      if Additionals.true? current_setting(:redmine_has_rw_access_on_all_repos)
+      if RedminePluginKit.true? current_setting(:redmine_has_rw_access_on_all_repos)
         gitolite_accessor.enable_rw_access
       else
         gitolite_accessor.disable_rw_access

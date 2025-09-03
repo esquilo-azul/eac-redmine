@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ArchivedRepositoriesController < RepositoriesController
   skip_before_action :authorize
   skip_before_action :find_project_repository, only: :index
@@ -5,7 +7,8 @@ class ArchivedRepositoriesController < RepositoriesController
   before_action :can_view_archived_projects
 
   def index
-    @archived_projects = Project.where("status = #{Project::STATUS_ARCHIVED}").includes(:repositories)
+    @archived_projects = Project.where(status: Project::STATUS_ARCHIVED)
+                                .includes(:repositories)
   end
 
   private

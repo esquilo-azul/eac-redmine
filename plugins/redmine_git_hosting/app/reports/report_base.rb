@@ -1,5 +1,6 @@
-class ReportBase
+# frozen_string_literal: true
 
+class ReportBase
   include Redmine::I18n
   include ReportHelper
   include ReportQuery
@@ -9,5 +10,4 @@ class ReportBase
   def initialize(repository)
     @repository = repository
   end
-
 end

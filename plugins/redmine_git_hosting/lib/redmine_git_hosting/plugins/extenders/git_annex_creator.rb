@@ -1,19 +1,21 @@
+# frozen_string_literal: true
+
 module RedmineGitHosting::Plugins::Extenders
   class GitAnnexCreator < BaseExtender
     attr_reader :enable_git_annex
 
-    def initialize(*args)
-      super
+    def initialize(repository, **options)
+      super(repository, **options)
       @enable_git_annex = options.delete(:enable_git_annex) { false }
     end
 
     def post_create
       return unless installable?
 
-      if !git_annex_installed?
-        install_git_annex
+      if git_annex_installed?
+        logger.warn "GitAnnex already exists in path '#{gitolite_repo_path}'"
       else
-        logger.warn("GitAnnex already exists in path '#{gitolite_repo_path}'")
+        install_git_annex
       end
     end
 
@@ -24,19 +26,19 @@ module RedmineGitHosting::Plugins::Extenders
     end
 
     def enable_git_annex?
-      Additionals.true? enable_git_annex
+      RedminePluginKit.true? enable_git_annex
     end
 
     def git_annex_installed?
-      directory_exists?(File.join(gitolite_repo_path, 'annex'))
+      directory_exists? File.join(gitolite_repo_path, 'annex')
     end
 
     def install_git_annex
-      sudo_git('annex', 'init')
+      sudo_git 'annex', 'init'
     rescue RedmineGitHosting::Error::GitoliteCommandException
-      logger.error("Error while enabling GitAnnex for repository '#{gitolite_repo_name}'")
+      logger.error "Error while enabling GitAnnex for repository '#{gitolite_repo_name}'"
     else
-      logger.info("GitAnnex successfully enabled for repository '#{gitolite_repo_name}'")
+      logger.info "GitAnnex successfully enabled for repository '#{gitolite_repo_name}'"
     end
   end
 end

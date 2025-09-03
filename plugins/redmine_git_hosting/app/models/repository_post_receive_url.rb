@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uri'
 
 class RepositoryPostReceiveUrl < ActiveRecord::Base
@@ -15,16 +17,17 @@ class RepositoryPostReceiveUrl < ActiveRecord::Base
   # Only allow HTTP(s) format
   validates :url, presence: true,
                   uniqueness: { case_sensitive: false, scope: :repository_id },
-                  format: { with: URI::regexp(%w[http https]) }
+                  format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
 
-  validates :mode, presence: true, inclusion: { in: %i[github get] }
+  validates :mode, presence: true, inclusion: { in: %i[github get post] }
 
   ## Serializations
   serialize :triggers, Array
 
   ## Scopes
-  scope :active,   -> { where(active: true) }
-  scope :inactive, -> { where(active: false) }
+  scope :active, -> { where active: true }
+  scope :inactive, -> { where active: false }
+  scope :sorted, -> { order :url }
 
   ## Callbacks
   before_validation :strip_whitespace
@@ -46,7 +49,11 @@ class RepositoryPostReceiveUrl < ActiveRecord::Base
 
   # Strip leading and trailing whitespace
   def strip_whitespace
-    self.url = url.strip rescue ''
+    self.url = begin
+      url.strip
+    rescue StandardError
+      ''
+    end
   end
 
   # Remove blank entries in triggers

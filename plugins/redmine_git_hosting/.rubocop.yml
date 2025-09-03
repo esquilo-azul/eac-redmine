@@ -1,6 +1,8 @@
+inherit_from: .rubocop_todo.yml
+
 require:
-  - rubocop-rspec
   - rubocop-performance
+  - rubocop-rails
 
 Rails:
   Enabled: true
@@ -8,6 +10,7 @@ Rails:
 AllCops:
   TargetRubyVersion: 2.5
   TargetRailsVersion: 5.2
+  NewCops: enable
   Include:
     - '**/*.ruby'
     - '**/*.rake'
@@ -17,44 +20,115 @@ AllCops:
     - '**/Gemfile'
 
 Metrics/AbcSize:
-  Max: 65
+  Enabled: false
 
 Metrics/BlockLength:
-  Max: 60
+  Enabled: false
 
 Metrics/ClassLength:
   Enabled: false
 
 Metrics/CyclomaticComplexity:
-  Max: 20
+  Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 140
 
 Metrics/MethodLength:
-  Max: 60
+  Enabled: false
 
 Metrics/ModuleLength:
   Enabled: false
 
 Metrics/PerceivedComplexity:
-  Max: 25
+  Max: 45
 
-Rails/SkipsModelValidations:
+Rails/ApplicationJob:
+  Enabled: false
+
+Rails/ApplicationRecord:
+  Enabled: false
+
+Lint/AmbiguousOperatorPrecedence:
   Enabled: false
 
 Rails/CreateTableWithTimestamps:
   Enabled: false
 
-# app/model/application_record.rb is missing in redmine, we can't use ApplicationRecord
-Rails/ApplicationRecord:
+Rails/HelperInstanceVariable:
   Enabled: false
 
-Style/FrozenStringLiteralComment:
+Rails/SkipsModelValidations:
   Enabled: false
+
+Performance/ChainArrayAllocation:
+  Enabled: true
 
 Style/AutoResourceCleanup:
   Enabled: true
 
+Style/ExpandPathArguments:
+  Enabled: true
+  Exclude:
+    - spec/**/*
+
+Lint/ConstantDefinitionInBlock:
+  Enabled: true
+  Exclude:
+    - spec/**/*
+
+Metrics/ParameterLists:
+  Enabled: true
+  CountKeywordArgs: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  Exclude:
+    - '/**/*.rsb'
+
+Style/OptionHash:
+  Enabled: true
+  SuspiciousParamNames:
+    - options
+    - api_options
+    - opts
+    - args
+    - params
+    - parameters
+    - settings
+
+Style/ReturnNil:
+  Enabled: true
+
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
+  AllowParenthesesInMultilineCall: true
+  AllowParenthesesInChaining: true
+  EnforcedStyle: omit_parentheses
+
 Style/Documentation:
+  Enabled: false
+
+Style/HashTransformKeys:
+  Enabled: false
+
+Style/HashTransformValues:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Layout/SpaceBeforeBrackets:
+  Enabled: false
+
+Rails/EnvironmentVariableAccess:
+  Enabled: true
+  AllowReads: true
+
+# Hrack::Server requires the `initialize` method
+Style/RedundantInitialize:
+  Enabled: false
+
+# Because our unit tests assert that
+Rails/RedundantPresenceValidationOnBelongsTo:
   Enabled: false

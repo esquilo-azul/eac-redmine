@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module RedmineGitHosting::Plugins::Extenders
   class BranchUpdater < BaseExtender
     attr_reader :update_default_branch
 
-    def initialize(*args)
-      super
+    def initialize(repository, **options)
+      super(repository, **options)
       @update_default_branch = options.delete(:update_default_branch) { false }
     end
 
@@ -15,15 +17,15 @@ module RedmineGitHosting::Plugins::Extenders
     private
 
     def update_default_branch?
-      Additionals.true? update_default_branch
+      RedminePluginKit.true? update_default_branch
     end
 
     def do_update_default_branch
-      sudo_git('symbolic-ref', 'HEAD', new_default_branch)
+      sudo_git 'symbolic-ref', 'HEAD', new_default_branch
     rescue RedmineGitHosting::GitHosting::GitHostingException
-      logger.error("Error while updating default branch for repository '#{gitolite_repo_name}'")
+      logger.error "Error while updating default branch for repository '#{gitolite_repo_name}'"
     else
-      logger.info("Default branch successfully updated for repository '#{gitolite_repo_name}'")
+      logger.info "Default branch successfully updated for repository '#{gitolite_repo_name}'"
       repository.empty_cache!
     end
 

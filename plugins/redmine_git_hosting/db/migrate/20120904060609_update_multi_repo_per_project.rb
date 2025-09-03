@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateMultiRepoPerProject < ActiveRecord::Migration[4.2]
   def up
     unless columns('repository_mirrors').index { |x| x.name == 'repository_id' }
@@ -9,7 +11,7 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration[4.2]
           mirror.save!
         end
         say "Success.  Changed #{RepositoryMirror.all.count} records."
-      rescue => e
+      rescue StandardError => e
         say 'Failed to attach repository mirrors to repositories.'
         say "Error: #{e.message}"
       end
@@ -26,7 +28,7 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration[4.2]
           prurl.save!
         end
         say "Success.  Changed #{RepositoryPostReceiveUrl.all.count} records."
-      rescue => e
+      rescue StandardError => e
         say 'Failed to attach repositories post-receive-urls to repositories.'
         say "Error: #{e.message}"
       end
@@ -36,7 +38,7 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration[4.2]
       end
     end
 
-    add_index :projects, [:identifier]
+    add_index :projects, [:identifier] unless index_exists? :projects, :identifier
     if columns('repositories').index { |x| x.name == 'identifier' }
       add_index :repositories, [:identifier]
       add_index :repositories, %i[identifier project_id]
@@ -46,10 +48,12 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration[4.2]
     begin
       # Add some new settings to settings page, if they don't exist
       valuehash = Setting.plugin_redmine_git_hosting.clone
-      if (Repository.all.map(&:identifier).inject(Hash.new(0) do |h, x|
-                                                    h[x] += 1 if x.present?
-                                                    h
-                                                  end.values.max) || 0) > 1
+      if (Repository.all
+                    .map(&:identifier)
+                    .inject(Hash.new(0) do |h, x|
+                      h[x] += 1 if x.present?
+                      h
+                    end.values.max) || 0) > 1
         # Oops -- have duplication.      Force to false.
         valuehash['gitRepositoryIdentUnique'] = 'false'
       else
@@ -61,7 +65,7 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration[4.2]
         say "Added redmine_git_hosting settings: 'gitRepositoryIdentUnique' => #{valuehash['gitRepositoryIdentUnique']}"
         Setting.plugin_redmine_git_hosting = valuehash
       end
-    rescue => e
+    rescue StandardError => e
       say "Error: #{e.message}"
     end
   end
@@ -76,7 +80,7 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration[4.2]
           mirror.save!
         end
         say "Success.  Changed #{RepositoryMirror.all.count} records."
-      rescue => e
+      rescue StandardError => e
         say 'Failed to re-attach repository mirrors to projects.'
         say "Error: #{e.message}"
       end
@@ -93,7 +97,7 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration[4.2]
           prurl.save!
         end
         say "Success.  Changed #{RepositoryPostReceiveUrl.all.count} records."
-      rescue => e
+      rescue StandardError => e
         say 'Failed to re-attach repository post-receive urls to projects.'
         say "Error: #{e.message}"
       end
@@ -113,13 +117,13 @@ class UpdateMultiRepoPerProject < ActiveRecord::Migration[4.2]
     begin
       # Remove above settings from plugin page
       valuehash = Setting.plugin_redmine_git_hosting.clone
-      valuehash.delete('gitRepositoryIdentUnique')
+      valuehash.delete 'gitRepositoryIdentUnique'
 
       if Setting.plugin_redmine_git_hosting != valuehash
         say 'Removed redmine_git_hosting settings: gitRepositoryIdentUnique'
         Setting.plugin_redmine_git_hosting = valuehash
       end
-    rescue => e
+    rescue StandardError => e
       say "Error: #{e.message}"
     end
   end

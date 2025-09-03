@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RedmineGitHosting
   module Commands
     module Base
@@ -5,27 +7,25 @@ module RedmineGitHosting
 
       # Wrapper to Open3.capture.
       #
-      def capture(args = [], opts = {})
+      def capture(args = [], **opts)
         cmd = args.shift
-        RedmineGitHosting::Utils::Exec.capture(cmd, args, opts)
+        RedmineGitHosting::Utils::Exec.capture cmd, args, **opts
       end
-
 
       # Wrapper to Open3.capture.
       #
-      def execute(args = [], opts = {})
+      def execute(args = [], **opts)
         cmd = args.shift
-        RedmineGitHosting::Utils::Exec.execute(cmd, args, opts)
+        RedmineGitHosting::Utils::Exec.execute cmd, args, **opts
       end
-
 
       private
 
-
-        def logger
-          RedmineGitHosting.logger
-        end
-
+      def logger
+        RedmineGitHosting.logger
+      end
     end
+
+    extend Commands::Base
   end
 end

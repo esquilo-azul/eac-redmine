@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RedmineGitHosting
   module Config
     module Base
@@ -11,16 +13,16 @@ module RedmineGitHosting
 
       def get_setting(setting, bool = false)
         if bool
-          Additionals.true? do_get_setting(setting)
+          RedminePluginKit.true? do_get_setting(setting)
         else
-          do_get_setting(setting)
+          do_get_setting setting
         end
       end
 
       def reload_from_file!
         ## Get default config from init.rb
         default_hash = Redmine::Plugin.find('redmine_git_hosting').settings[:default]
-        do_reload_config(default_hash)
+        do_reload_config default_hash
       end
 
       def dump_settings
@@ -36,7 +38,7 @@ module RedmineGitHosting
         ## may not exist on first migration
         begin
           value = Setting.plugin_redmine_git_hosting[setting]
-        rescue
+        rescue StandardError
           value = Redmine::Plugin.find('redmine_git_hosting').settings[:default][setting]
         else
           ## The Setting table exist but does not contain the value yet, fallback to default
@@ -51,37 +53,41 @@ module RedmineGitHosting
         Setting.check_cache
 
         ## Get actual values
-        valuehash = (Setting.plugin_redmine_git_hosting).clone rescue {}
+        valuehash = begin
+          Setting.plugin_redmine_git_hosting.clone
+        rescue StandardError
+          {}
+        end
 
         ## Update!
         changes = 0
 
         default_hash.each do |key, value|
-          if valuehash[key] != value
-            console_logger.info("Changing '#{key}' : #{valuehash[key]} => #{value}")
-            valuehash[key] = value
-            changes += 1
-          end
+          next if valuehash[key] == value
+
+          console_logger.info "Changing '#{key}' : #{valuehash[key]} => #{value}"
+          valuehash[key] = value
+          changes += 1
         end
 
         if changes.zero?
-          console_logger.info('No changes necessary.')
+          console_logger.info 'No changes necessary.'
         else
-          commit_changes(valuehash)
+          commit_changes valuehash
         end
       end
 
       def commit_changes(valuehash)
-        console_logger.info('Committing changes ... ')
+        console_logger.info 'Committing changes ... '
         begin
           ## Update Settings
           Setting.plugin_redmine_git_hosting = valuehash
           ## Refresh Settings cache
           Setting.check_cache
-          console_logger.info('Success!')
-        rescue => e
-          console_logger.error('Failure.')
-          console_logger.error(e.message)
+          console_logger.info 'Success!'
+        rescue StandardError => e
+          console_logger.error 'Failure.'
+          console_logger.error e.message
         end
       end
 
@@ -93,5 +99,7 @@ module RedmineGitHosting
         RedmineGitHosting.logger
       end
     end
+
+    extend Config::Base
   end
 end

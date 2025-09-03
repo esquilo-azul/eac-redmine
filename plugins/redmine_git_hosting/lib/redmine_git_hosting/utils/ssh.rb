@@ -1,24 +1,25 @@
+# frozen_string_literal: true
+
 module RedmineGitHosting
   module Utils
     module Ssh
       extend self
 
       def ssh_fingerprint(key)
-        file = Tempfile.new('keytest')
-        file.write(key)
+        file = Tempfile.new 'keytest'
+        file.write key
         file.close
 
         begin
-          output = Utils::Exec.capture('ssh-keygen', ['-l', '-f', file.path])
-        rescue RedmineGitHosting::Error::GitoliteCommandException => e
-          raise RedmineGitHosting::Error::InvalidSshKey.new("Invalid Ssh Key : #{key}")
+          output = Utils::Exec.capture 'ssh-keygen', ['-l', '-f', file.path]
+        rescue RedmineGitHosting::Error::GitoliteCommandException
+          raise RedmineGitHosting::Error::InvalidSshKey, "Invalid Ssh Key : #{key}"
         else
           output.split[1]
         ensure
           file.unlink
         end
       end
-
 
       def sanitize_ssh_key(key)
         # First -- let the first control char or space stand (to divide key type from key)
@@ -31,12 +32,8 @@ module RedmineGitHosting
         key = key.sub(/=[ \r\n\t]/, '= ')
 
         # Delete any remaining control characters....
-        key = key.gsub(/[\a\r\n\t]/, '').strip
-
-        # Return the sanitized key
-        key
+        key.gsub(/[\a\r\n\t]/, '').strip
       end
-
     end
   end
 end

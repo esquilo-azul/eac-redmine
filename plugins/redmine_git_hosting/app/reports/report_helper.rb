@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ReportHelper
   def date_to
     User.current.today
@@ -22,11 +24,15 @@ module ReportHelper
   end
 
   def get_hour_from_date(date)
-    return nil unless date
+    return unless date
 
     time = date.to_time
     zone = User.current.time_zone
-    local = zone ? time.in_time_zone(zone) : (time.utc? ? time.localtime : time)
+    local = if zone
+              time.in_time_zone zone
+            else
+              (time.utc? ? time.localtime : time)
+            end
     local.hour
   end
 

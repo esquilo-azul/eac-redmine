@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RepositoryGitExtra < ActiveRecord::Base
   include Redmine::SafeAttributes
 
@@ -49,20 +51,16 @@ class RepositoryGitExtra < ActiveRecord::Base
 
   def validate_urls_order
     urls_order.each do |url|
-      errors.add(:urls_order, :invalid) unless ALLOWED_URLS.include?(url)
+      errors.add :urls_order, :invalid unless ALLOWED_URLS.include? url
     end
   end
 
-  # This is Rails method : <attribute>_changed?
+  # This is Rails method :saved_changes
   # However, the value is cleared before passing the object to the controller.
   # We need to save it in virtual attribute to trigger Gitolite resync if changed.
   #
   def check_if_default_branch_changed
-    self.default_branch_has_changed = if default_branch_changed?
-                                        true
-                                      else
-                                        false
-                                      end
+    self.default_branch_has_changed = saved_changes&.key? :default_branch
   end
 
   def check_urls_order_consistency
@@ -79,17 +77,17 @@ class RepositoryGitExtra < ActiveRecord::Base
 
   def check_git_http_urls
     if git_http? && git_https?
-      add_url('http')
-      add_url('https')
+      add_url 'http'
+      add_url 'https'
     elsif git_http?
-      add_url('http')
-      remove_url('https')
+      add_url 'http'
+      remove_url 'https'
     elsif git_https?
-      add_url('https')
-      remove_url('http')
+      add_url 'https'
+      remove_url 'http'
     else
-      remove_url('http')
-      remove_url('https')
+      remove_url 'http'
+      remove_url 'https'
     end
   end
 
@@ -106,7 +104,7 @@ class RepositoryGitExtra < ActiveRecord::Base
   end
 
   def remove_url(url)
-    urls_order.delete(url)
+    urls_order.delete url
   end
 
   def add_url(url)

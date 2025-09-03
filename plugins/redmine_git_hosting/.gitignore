@@ -6,3 +6,10 @@ settings.yml
 /coverage
 /junit
 custom_hooks.rb
+/ssh_keys/redmine_gitolite_admin_id_rsa*
+.DS_Store
+.vscode/
+node_modules/
+yarn.lock
+coverage/
+.enable_dev

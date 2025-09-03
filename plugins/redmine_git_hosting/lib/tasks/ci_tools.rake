@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 namespace :redmine_git_hosting do
   namespace :ci do
-    unless Rails.env.production?
+    if Rails.env.development? || Rails.env.test?
       RSpec::Core::RakeTask.new do |task|
         task.rspec_opts = '--pattern plugins/redmine_git_hosting/spec/\*\*\{,/\*/\*\*\}/\*_spec.rb --color'
       end
@@ -18,33 +20,33 @@ namespace :redmine_git_hosting do
       puts "gitolite_admin_dir : #{gitolite_admin_dir}"
       puts ''
 
-      ls_dir(gitolite_temp_dir)
-      ls_dir("#{gitolite_temp_dir}/git")
-      ls_dir("#{gitolite_temp_dir}/git/gitolite-admin.git")
+      ls_dir gitolite_temp_dir
+      ls_dir "#{gitolite_temp_dir}/git"
+      ls_dir "#{gitolite_temp_dir}/git/gitolite-admin.git"
 
       begin
-        repo = Rugged::Repository.new(gitolite_admin_dir)
+        repo = Rugged::Repository.new gitolite_admin_dir
         puts "git repo work dir  : #{repo.workdir}"
         puts "git repo path      : #{repo.path}"
         puts ''
         puts 'GIT STATUS :'
         puts '------------'
-        puts %x[ git --work-tree "#{repo.workdir}" --git-dir "#{repo.path}" status ]
+        puts `git --work-tree "#{repo.workdir}" --git-dir "#{repo.path}" status`
         puts ''
         puts 'GIT LOG :'
         puts '---------'
-        puts %x[ git --work-tree "#{repo.workdir}" --git-dir "#{repo.path}" log ]
-      rescue => e
+        puts `git --work-tree "#{repo.workdir}" --git-dir "#{repo.path}" log`
+      rescue StandardError => e
         puts 'Error while getting tests results'
         puts e.message
       end
     end
 
-    task all: ['spec', 'check_unit_tests_results']
+    task all: %w[spec check_unit_tests_results]
 
     def ls_dir(dir)
       puts "* ls -hal #{dir}"
-      puts %x[ ls -hal "#{dir}" ]
+      puts `ls -hal "#{dir}`
       puts ''
     end
   end
