@@ -1,7 +1,7 @@
 [subrepo]
   cmdver = 0.4.1
-  commit = c2969cf4d9868bb5050d10d48eef9b71d7445756
+  commit = b2bcbe022715b8a1033e5754d7bf29c3747aa3a6
   method = merge
-  parent = c9ce5c0875e19ff5895075387b14e80e703d0d42
+  parent = 10c7dd8d47c4d2f2c1b8f8dc88c43f842e73daa2
   branch = master
   remote = https://github.com/esquilo-azul/redmine_nonproject_modules
