@@ -108,19 +108,19 @@ group :test do
   gem "ffi", platforms: [:mingw, :x64_mingw, :mswin]
   # For running system tests
   gem 'puma', (Gem.ruby_version < Gem::Version.new('2.7') ? '< 6.0.0' : '>= 0')
-  gem 'capybara', (if Gem.ruby_version < Gem::Version.new('2.6')
-                     '~> 3.35.3'
-                   elsif Gem.ruby_version < Gem::Version.new('2.7')
-                     '~> 3.36.0'
-                   else
-                     '~> 3.38.0'
-                   end)
+  # gem 'capybara', (if Gem.ruby_version < Gem::Version.new('2.6')
+  #                    '~> 3.35.3'
+  #                  elsif Gem.ruby_version < Gem::Version.new('2.7')
+  #                    '~> 3.36.0'
+  #                  else
+  #                    '~> 3.38.0'
+  #                  end)
   gem "selenium-webdriver", "~> 3.142.7"
   gem 'webdrivers', '4.6.1', require: false
   # RuboCop
-  gem 'rubocop', '~> 1.26.0'
+  # gem 'rubocop', '~> 1.26.0'
   gem 'rubocop-performance', '~> 1.13.0'
-  gem 'rubocop-rails', '~> 2.14.0'
+  # gem 'rubocop-rails', '~> 2.14.0'
 end
 
 local_gemfile = File.join(File.dirname(__FILE__), "Gemfile.local")
