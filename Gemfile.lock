@@ -48,7 +48,7 @@ PATH
   specs:
     redmine_nonproject_modules (0.5.2)
       eac_active_scaffold (~> 0.7)
-      eac_rails_utils (~> 0.23, >= 0.23.3)
+      eac_rails_utils (~> 0.26, >= 0.26.1)
       eac_ruby_utils (~> 0.121)
       i18n-recursive-lookup (~> 0.0, >= 0.0.5)
       jquery-rails (~> 4.6)
