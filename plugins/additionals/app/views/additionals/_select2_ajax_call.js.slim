@@ -1,4 +1,4 @@
-- options = {} if options.nil?
+- options ||= {}
 javascript:
   $(function() {
     $("#{defined?(field_id) ? ('#' + field_id) : ('.' + field_class)}").select2({
@@ -21,7 +21,7 @@ javascript:
       placeholder: "#{options[:placeholder].presence}",
       allowClear: #{options[:allow_clear].present? && options[:allow_clear] ? 'true' : 'false'},
       minimumInputLength: 0,
-      width: "#{options[:width].presence || '60%'}",
+      width: "#{options[:width].presence || '90%'}",
       templateResult: #{options[:template_result].presence || 'formatNameWithIcon'},
       #{options[:template_selection].present? ? ('templateSelection: ' + options[:template_selection]) : nil}
     })
