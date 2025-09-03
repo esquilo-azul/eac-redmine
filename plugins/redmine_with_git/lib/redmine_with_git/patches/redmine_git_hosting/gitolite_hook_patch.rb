@@ -45,7 +45,7 @@ module RedmineWithGit
           # @return [String]
           def ruby_shebang
             bin = ::RbConfig::CONFIG['RUBY_INSTALL_NAME'] || ::RbConfig::CONFIG['ruby_install_name']
-            bin += (::RbConfig::CONFIG['EXEEXT'] || ::RbConfig::CONFIG['exeext'] || '')
+            bin += ::RbConfig::CONFIG['EXEEXT'] || ::RbConfig::CONFIG['exeext'] || ''
             ::File.join(::RbConfig::CONFIG['bindir'], bin)
           end
 

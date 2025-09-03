@@ -41,7 +41,7 @@ module RedmineWithGit
         ['gzip', '-d', '-c', '-']
       end
 
-      def tar_extract_command(target_dir, compression = true)
+      def tar_extract_command(target_dir, compression = true) # rubocop:disable Style/OptionalBooleanParameter
         env.command('tar', (compression ? '-xz' : '-x'), '-C', target_dir)
       end
 

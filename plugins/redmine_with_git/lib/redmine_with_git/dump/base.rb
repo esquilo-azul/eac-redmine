@@ -73,7 +73,7 @@ module RedmineWithGit
         build_command.execute!(output_file: path)
       end
 
-      def create_tar_command(dir, compression = true)
+      def create_tar_command(dir, compression = true) # rubocop:disable Style/OptionalBooleanParameter
         tar = "cd #{Shellwords.escape(dir)}; tar -c *"
         tar += " | #{compress_args.join(' ')}" if compression
         env.command(['bash', '-c', tar])

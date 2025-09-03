@@ -17,7 +17,7 @@ module RedmineWithGit
       end
 
       def password_arg
-        '@ESC_PGPASSWORD=' + Shellwords.escape(database_schema['password'])
+        "@ESC_PGPASSWORD=#{Shellwords.escape(database_schema['password'])}"
       end
     end
   end
