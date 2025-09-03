@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Redmine - project management software
-# Copyright (C) 2006-2023  Jean-Philippe Lang
+# Copyright (C) 2006-  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -152,7 +152,6 @@ module Redmine
       # Returns issues that will be rendered
       def issues
         @issues ||= @query.issues(
-          :include => [:assigned_to, :tracker, :priority, :category, :fixed_version],
           :order => ["#{Project.table_name}.lft ASC", "#{Issue.table_name}.id ASC"],
           :limit => @max_rows
         )
@@ -724,7 +723,7 @@ module Redmine
             progress_date = calc_progress_date(issue.start_date,
                                                issue.due_before, issue.done_ratio)
             css_classes << ' behind-start-date' if progress_date < self.date_from
-            css_classes << ' over-end-date' if progress_date > self.date_to
+            css_classes << ' over-end-date' if progress_date > self.date_to && issue.done_ratio > 0
           end
           s = (+"").html_safe
           s << view.assignee_avatar(issue.assigned_to, :size => 13, :class => 'icon-gravatar')
@@ -744,7 +743,7 @@ module Redmine
             progress_date = calc_progress_date(version.start_date,
                                                version.due_date, version.visible_fixed_issues.completed_percent)
             html_class << ' behind-start-date' if progress_date < self.date_from
-            html_class << ' over-end-date' if progress_date > self.date_to
+            html_class << ' over-end-date' if progress_date > self.date_to && version.visible_fixed_issues.completed_percent > 0
           end
           s = view.link_to_version(version).html_safe
           view.content_tag(:span, s, :class => html_class).html_safe
@@ -788,7 +787,7 @@ module Redmine
           }
         end
         if has_children
-          content = view.content_tag(:span, nil, :class => 'icon icon-expended expander') + content
+          content = view.content_tag(:span, nil, :class => 'icon icon-expanded expander') + content
           tag_options[:class] += ' open'
         else
           if params[:indent]

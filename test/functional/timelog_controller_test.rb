@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Redmine - project management software
-# Copyright (C) 2006-2023  Jean-Philippe Lang
+# Copyright (C) 2006-  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -714,12 +714,14 @@ class TimelogControllerTest < Redmine::ControllerTest
   def test_get_bulk_edit
     @request.session[:user_id] = 2
 
-    get :bulk_edit, :params => {:ids => [1, 2]}
+    with_settings :timespan_format => 'minutes' do
+      get :bulk_edit, :params => {:ids => [1, 2]}
+    end
     assert_response :success
 
     assert_select 'ul#bulk-selection' do
       assert_select 'li', 2
-      assert_select 'li a', :text => '03/23/2007 - eCookbook: 4.25 hours (John Smith)'
+      assert_select 'li a', :text => '03/23/2007 - eCookbook: 4:15 hours (John Smith)'
     end
 
     assert_select 'form#bulk_edit_form[action=?]', '/time_entries/bulk_update' do
@@ -929,7 +931,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     get :index
     assert_response :success
 
-    assert_select '.total-for-hours', :text => 'Hours: 162.90'
+    assert_select '.total-for-hours', :text => 'Hours: 162:54'
     assert_select 'form#query_form[action=?]', '/time_entries'
 
     assert_equal ['Project', 'Date', 'User', 'Activity', 'Issue', 'Comment', 'Hours'], columns_in_list
@@ -1008,7 +1010,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     projects = css_select('table.time-entries tbody td.project').map(&:text).uniq.sort
     assert_equal ["eCookbook", "eCookbook Subproject 1"], projects
 
-    assert_select '.total-for-hours', :text => 'Hours: 162.90'
+    assert_select '.total-for-hours', :text => 'Hours: 162:54'
     assert_select 'form#query_form[action=?]', '/projects/ecookbook/time_entries'
 
     # 'Log time' shoudl link to log time on the filtered issue
@@ -1046,7 +1048,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     @request.session[:user_id] = 2
 
     get :index, :params => {:project_id => 'ecookbook', :issue_id => issue.id.to_s, :set_filter => 1}
-    assert_select '.total-for-hours', :text => 'Hours: 7.00'
+    assert_select '.total-for-hours', :text => 'Hours: 7:00'
 
     # 'Log time' shoudl link to log time on the filtered issue
     assert_select 'a[href=?]', "/issues/#{issue.id}/time_entries/new"
@@ -1060,7 +1062,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     @request.session[:user_id] = 2
 
     get :index, :params => {:project_id => 'ecookbook', :"issue.fixed_version_id" => version.id.to_s, :set_filter => 1}
-    assert_select '.total-for-hours', :text => 'Hours: 5.00'
+    assert_select '.total-for-hours', :text => 'Hours: 5:00'
   end
 
   def test_index_at_project_level_with_multiple_issue_fixed_version_ids
@@ -1084,7 +1086,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     assert_response :success
 
     assert_select 'tr.time-entry', 2
-    assert_select '.total-for-hours', :text => 'Hours: 5.00'
+    assert_select '.total-for-hours', :text => 'Hours: 5:00'
   end
 
   def test_index_at_project_level_with_date_range
@@ -1100,7 +1102,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     assert_response :success
 
     assert_select 'tr.time-entry', 3
-    assert_select '.total-for-hours', :text => 'Hours: 12.90'
+    assert_select '.total-for-hours', :text => 'Hours: 12:54'
     assert_select 'form#query_form[action=?]', '/projects/ecookbook/time_entries'
   end
 
@@ -1116,7 +1118,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     assert_response :success
 
     assert_select 'tr.time-entry', 3
-    assert_select '.total-for-hours', :text => 'Hours: 12.90'
+    assert_select '.total-for-hours', :text => 'Hours: 12:54'
     assert_select 'form#query_form[action=?]', '/projects/ecookbook/time_entries'
   end
 
@@ -1165,7 +1167,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     assert_response :success
     assert_equal(
       [t2, t1, t3].map(&:id).map(&:to_s),
-      css_select('input[name="ids[]"]').map {|e| e.attr('value')}
+      css_select('input[name="ids[]"]').map {|e| e.attr(:value)}
     )
     get(
       :index,
@@ -1180,7 +1182,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     assert_response :success
     assert_equal(
       [t3, t1, t2].map(&:id).map(&:to_s),
-      css_select('input[name="ids[]"]').map {|e| e.attr('value')}
+      css_select('input[name="ids[]"]').map {|e| e.attr(:value)}
     )
   end
 
@@ -1206,7 +1208,7 @@ class TimelogControllerTest < Redmine::ControllerTest
       get :index, :params => params.dup.merge(sort_criteria)
       assert_response :success
       expected_ids = expected.map(&:id).map(&:to_s)
-      actual_ids = css_select('input[name="ids[]"]').map {|e| e.attr('value')}
+      actual_ids = css_select('input[name="ids[]"]').map {|e| e.attr(:value)}
       assert_equal expected_ids, actual_ids
     end
   end
@@ -1242,7 +1244,7 @@ class TimelogControllerTest < Redmine::ControllerTest
       }
     )
     assert_response :success
-    assert_equal [entry].map(&:id).map(&:to_s), css_select('input[name="ids[]"]').map {|e| e.attr('value')}
+    assert_equal [entry].map(&:id).map(&:to_s), css_select('input[name="ids[]"]').map {|e| e.attr(:value)}
   end
 
   def test_index_with_project_status_filter
@@ -1261,7 +1263,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     )
     assert_response :success
 
-    time_entries = css_select('input[name="ids[]"]').map {|e| e.attr('value')}
+    time_entries = css_select('input[name="ids[]"]').map {|e| e.attr(:value)}
     assert_include '1', time_entries
     assert_not_include '4', time_entries
   end
@@ -1308,7 +1310,7 @@ class TimelogControllerTest < Redmine::ControllerTest
       :v => {'issue.tracker_id' => ['2']}
     }
     assert_response :success
-    assert_equal [entry].map(&:id).map(&:to_s), css_select('input[name="ids[]"]').map {|e| e.attr('value')}
+    assert_equal [entry].map(&:id).map(&:to_s), css_select('input[name="ids[]"]').map {|e| e.attr(:value)}
   end
 
   def test_index_with_issue_tracker_column
@@ -1348,7 +1350,7 @@ class TimelogControllerTest < Redmine::ControllerTest
       :v => {'issue.category_id' => ['1']}
     }
     assert_response :success
-    assert_equal ['1', '2'], css_select('input[name="ids[]"]').map {|e| e.attr('value')}
+    assert_equal ['1', '2'], css_select('input[name="ids[]"]').map {|e| e.attr(:value)}
   end
 
   def test_index_with_issue_category_column
@@ -1383,7 +1385,7 @@ class TimelogControllerTest < Redmine::ControllerTest
       :v => {'author_id' => ['2']}
     }
     assert_response :success
-    assert_equal ['1'], css_select('input[name="ids[]"]').map {|e| e.attr('value')}
+    assert_equal ['1'], css_select('input[name="ids[]"]').map {|e| e.attr(:value)}
   end
 
   def test_index_with_author_column
@@ -1447,7 +1449,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     assert_response :success
     assert_equal(
       [entry].map(&:id).map(&:to_s),
-      css_select('input[name="ids[]"]').map {|e| e.attr('value')}
+      css_select('input[name="ids[]"]').map {|e| e.attr(:value)}
     )
   end
 
@@ -1624,7 +1626,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     get :index, :params => {:project_id => 1, :format => 'atom'}
     assert_response :success
     assert_equal 'application/atom+xml', @response.media_type
-    assert_select 'entry > title', :text => /7\.65 hours/
+    assert_select 'entry > title', :text => /7:39 hours/
   end
 
   def test_index_at_project_level_should_include_csv_export_dialog
@@ -1665,7 +1667,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     with_settings :date_format => '%m/%d/%Y' do
       get :index, :params => {:format => 'csv'}
       assert_response :success
-      assert_equal 'text/csv', response.media_type
+      assert_equal 'text/csv; header=present', response.media_type
     end
   end
 
@@ -1673,7 +1675,7 @@ class TimelogControllerTest < Redmine::ControllerTest
     with_settings :date_format => '%m/%d/%Y' do
       get :index, :params => {:project_id => 1, :format => 'csv'}
       assert_response :success
-      assert_equal 'text/csv', response.media_type
+      assert_equal 'text/csv; header=present', response.media_type
     end
   end
 

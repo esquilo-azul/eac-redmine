@@ -298,6 +298,7 @@ class RedCloth3 < String
         @pre_list = []
         rip_offtags text
         no_textile text
+        remove_html_comments text
         escape_html_tags text
         # need to do this before #hard_break and #blocks
         block_textile_quotes text unless @lite_mode
@@ -1041,7 +1042,7 @@ class RedCloth3 < String
     end
 
     def footnote_ref( text )
-        text.gsub!(/\b\[([0-9]+?)\](\s)?/,
+        text.gsub!(/(?<=[\p{Word}\]])\[([0-9]+?)\](\s)?/,
                    '<sup><a href="#fn\1">\1</a></sup>\2')
     end
 
@@ -1218,5 +1219,9 @@ class RedCloth3 < String
                 "&lt;#{htmlesc all}#{'&gt;' unless close.blank?}"
             end
         end
+    end
+
+    def remove_html_comments(text)
+        text.gsub!(/<!--[\s\S]*?-->/, '')
     end
 end

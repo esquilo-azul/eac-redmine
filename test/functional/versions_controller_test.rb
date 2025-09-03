@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Redmine - project management software
-# Copyright (C) 2006-2023  Jean-Philippe Lang
+# Copyright (C) 2006-  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -45,6 +45,9 @@ class VersionsControllerTest < Redmine::ControllerTest
     # Context menu on issues
     assert_select "form[data-cm-url=?]", '/issues/context_menu'
     assert_select "div#sidebar" do
+      # Tracker checkboxes
+      assert_select 'input[type=hidden][name=?]', 'tracker_ids[]'
+      assert_select 'input[type=checkbox][name=?]', 'tracker_ids[]', 3
       # Links to versions anchors
       assert_select 'a[href=?]', '#2.0'
       # Links to completed versions in the sidebar
@@ -83,6 +86,8 @@ class VersionsControllerTest < Redmine::ControllerTest
     assert_select 'h3', :text => Version.find(4).name
     # Subproject version
     assert_select 'h3', :text => /#{version_name}/
+    # Subproject checkbox
+    assert_select '#sidebar input[id=?][value=?]', "with_subprojects", 1
   end
 
   def test_index_should_prepend_shared_versions
@@ -113,6 +118,20 @@ class VersionsControllerTest < Redmine::ControllerTest
         end
       end
     end
+  end
+
+  def test_index_subproject_checkbox_should_check_descendants_visibility
+    project = Project.find(6)
+    project.is_public = false
+    project.save
+
+    @request.session[:user_id] = 2
+
+    get :index, :params => {:project_id => 5, :with_subprojects => 1}
+    assert_response :success
+
+    # Subproject checkbox should not be shown
+    assert_select '#sidebar input[id=?]', "with_subprojects", :count => 0
   end
 
   def test_show
@@ -162,7 +181,7 @@ class VersionsControllerTest < Redmine::ControllerTest
       assert_select 'a', :text => '1 open'
     end
 
-    assert_select '.time-tracking td.total-hours a:first-child', :text => '2.00 hours'
+    assert_select '.time-tracking td.total-hours a:first-child', :text => '2:00 hours'
   end
 
   def test_show_should_link_to_spent_time_on_version
@@ -173,7 +192,7 @@ class VersionsControllerTest < Redmine::ControllerTest
     get :show, :params => {:id => version.id}
     assert_response :success
 
-    assert_select '.total-hours', :text => '7.20 hours'
+    assert_select '.total-hours', :text => '7:12 hours'
     assert_select '.total-hours a[href=?]', "/projects/ecookbook/time_entries?issue.fixed_version_id=#{version.id}&set_filter=1"
   end
 

@@ -85,7 +85,7 @@
 <p class="wiki-update-info">
   <% if User.current.allowed_to?(:view_wiki_edits, @project) %>
     <%= wiki_content_update_info(@content) %>
-    · <%= link_to l(:label_x_revisions, :count => @content.version), {:action => 'history', :id => @page.title} %>
+    · <%= link_to l(:label_x_revisions, :count => @page.content.versions.size), {:action => 'history', :id => @page.title} %>
   <% end %>
   <% if @page.protected? %>
     <span class="badge badge-status-locked"><%= l('status_locked') %></span>
@@ -100,6 +100,12 @@
 
 <% content_for :sidebar do %>
   <%= render :partial => 'sidebar' %>
+  <% if User.current.allowed_to?(:add_wiki_page_watchers, @project) ||
+    (@page.watchers.present? && User.current.allowed_to?(:view_wiki_page_watchers, @project)) %>
+    <div id="watchers">
+      <%= render :partial => 'watchers/watchers', :locals => {:watched => @page} %>
+    </div>
+  <% end %>
 <% end %>
 
 <% content_for :header_tags do %>

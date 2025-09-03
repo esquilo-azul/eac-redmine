@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Redmine - project management software
-# Copyright (C) 2006-2023  Jean-Philippe Lang
+# Copyright (C) 2006-  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -214,7 +214,7 @@ class QueryTest < ActiveSupport::TestCase
     assert issues.all? {|i| i.custom_field_value(2).blank?}
   end
 
-  def test_operator_none_for_text
+  def test_operator_none_for_blank_text
     query = IssueQuery.new(:name => '_')
     query.add_filter('status_id', '*', [''])
     query.add_filter('description', '!*', [''])
@@ -224,6 +224,19 @@ class QueryTest < ActiveSupport::TestCase
     assert issues.any?
     assert issues.all? {|i| i.description.blank?}
     assert_equal [11, 12], issues.map(&:id).sort
+  end
+
+  def test_operator_any_for_blank_text
+    Issue.where(id: [1, 2]).update_all(description: '')
+    query = IssueQuery.new(:name => '_')
+    query.add_filter('status_id', '*', [''])
+    query.add_filter('description', '*', [''])
+    assert query.has_filter?('description')
+    issues = find_issues_with_query(query)
+
+    assert issues.any?
+    assert issues.all? {|i| i.description.present?}
+    assert_empty issues.map(&:id) & [1, 2]
   end
 
   def test_operator_all
@@ -803,6 +816,47 @@ class QueryTest < ActiveSupport::TestCase
     end
   end
 
+  def test_filter_notes
+    user = User.generate!
+    Journal.create!(:user_id => user.id, :journalized => Issue.find(2), :notes => 'Notes.')
+    Journal.create!(:user_id => user.id, :journalized => Issue.find(3), :notes => 'Notes.')
+
+    issue_journals = Issue.find(1).journals.sort
+    assert_equal ['Journal notes', 'Some notes with Redmine links: #2, r2.'], issue_journals.map(&:notes)
+    assert_equal [false, false], issue_journals.map(&:private_notes)
+
+    query = IssueQuery.new(:name => '_')
+    filter_name = 'notes'
+    assert_include filter_name, query.available_filters.keys
+
+    {
+      '~' => [1, 2, 3],
+      '!~' => Issue.ids.sort - [1, 2, 3],
+      '^' => [2, 3],
+      '$' => [1],
+    }.each do |operator, expected|
+      query.filters = {filter_name => {:operator => operator, :values => ['Notes']}}
+      assert_equal expected, find_issues_with_query(query).map(&:id).sort
+    end
+  end
+
+  def test_filter_notes_should_ignore_private_notes_that_are_not_visible
+    user = User.generate!
+    Journal.create!(:user_id => user.id, :journalized => Issue.find(2), :notes => 'Notes.', :private_notes => true)
+    Journal.create!(:user_id => user.id, :journalized => Issue.find(3), :notes => 'Notes.')
+
+    issue_journals = Issue.find(1).journals.sort
+    assert_equal ['Journal notes', 'Some notes with Redmine links: #2, r2.'], issue_journals.map(&:notes)
+    assert_equal [false, false], issue_journals.map(&:private_notes)
+
+    query = IssueQuery.new(:name => '_')
+    filter_name = 'notes'
+    assert_include filter_name, query.available_filters.keys
+
+    query.filters = {filter_name => {:operator => '~', :values => ['Notes']}}
+    assert_equal [1, 3], find_issues_with_query(query).map(&:id).sort
+  end
+
   def test_filter_updated_by
     user = User.generate!
     Journal.create!(:user_id => user.id, :journalized => Issue.find(2), :notes => 'Notes')
@@ -1013,7 +1067,7 @@ class QueryTest < ActiveSupport::TestCase
     assert_equal Project.where(parent_id: bookmarks).ids, result.map(&:id).sort
   end
 
-  def test_filter_watched_issues
+  def test_filter_watched_issues_by_user
     User.current = User.find(1)
     query =
       IssueQuery.new(
@@ -1021,7 +1075,7 @@ class QueryTest < ActiveSupport::TestCase
         :filters => {
           'watcher_id' => {
             :operator => '=',
-            :values => ['me']
+            :values => [User.current.id]
           }
         }
       )
@@ -1031,13 +1085,17 @@ class QueryTest < ActiveSupport::TestCase
     assert_equal Issue.visible.watched_by(User.current).sort_by(&:id), result.sort_by(&:id)
   end
 
-  def test_filter_watched_issues_with_groups_also
+  def test_filter_watched_issues_by_me_should_include_user_groups
     user = User.find(2)
     group = Group.find(10)
     group.users << user
     Issue.find(3).add_watcher(user)
     Issue.find(7).add_watcher(group)
+    manager = Role.find(1)
+    # view_issue_watchers permission is not required to see watched issues by current user or user groups
+    manager.remove_permission! :view_issue_watchers
     User.current = user
+
     query =
       IssueQuery.new(
         :name => '_',
@@ -1049,9 +1107,40 @@ class QueryTest < ActiveSupport::TestCase
         }
       )
     result = find_issues_with_query(query)
+
     assert_not_nil result
     assert !result.empty?
     assert_equal [3, 7], result.sort_by(&:id).pluck(:id)
+  end
+
+  def test_filter_watched_issues_by_group_should_include_only_projects_with_permission
+    user = User.find(2)
+    group = Group.find(10)
+
+    Issue.find(4).add_watcher(group)
+    Issue.find(2).add_watcher(group)
+
+    developer = Role.find(2)
+    developer.remove_permission! :view_issue_watchers
+
+    User.current = user
+
+    query =
+      IssueQuery.new(
+        :name => '_',
+        :filters => {
+          'watcher_id' => {
+            :operator => '=',
+            :values => [group.id]
+          }
+        }
+      )
+    result = find_issues_with_query(query)
+
+    assert_not_nil result
+
+    # "Developer" role doesn't have the view_issue_watchers permission of issue's #4 project (OnlineStore).
+    assert_equal [2], result.pluck(:id)
   end
 
   def test_filter_unwatched_issues
@@ -1532,6 +1621,48 @@ class QueryTest < ActiveSupport::TestCase
     assert_equal [3, 4], issues.collect(&:id).sort
   end
 
+  def test_filter_on_attachment_description_when_any
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"attachment_description" => {:operator => '*', :values =>  ['']}}
+    issues = find_issues_with_query(query)
+    assert_equal [2, 3, 14], issues.collect(&:id).sort
+  end
+
+  def test_filter_on_attachment_description_when_none
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"attachment_description" => {:operator => '!*', :values =>  ['']}}
+    issues = find_issues_with_query(query)
+    assert_equal [2, 3, 4, 14], issues.collect(&:id).sort
+  end
+
+  def test_filter_on_attachment_description_when_contains
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"attachment_description" => {:operator => '~', :values =>  ['attachment']}}
+    issues = find_issues_with_query(query)
+    assert_equal [3, 14], issues.collect(&:id).sort
+  end
+
+  def test_filter_on_attachment_description_when_does_not_contain
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"attachment_description" => {:operator => '!~', :values =>  ['attachment']}}
+    issues = find_issues_with_query(query)
+    assert_equal [2], issues.collect(&:id).sort
+  end
+
+  def test_filter_on_attachment_description_when_starts_with
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"attachment_description" => {:operator => '^', :values =>  ['attachment']}}
+    issues = find_issues_with_query(query)
+    assert_equal [14], issues.collect(&:id).sort
+  end
+
+  def test_filter_on_attachment_description_when_ends_with
+    query = IssueQuery.new(:name => '_')
+    query.filters = {"attachment_description" => {:operator => '$', :values =>  ['attachment']}}
+    issues = find_issues_with_query(query)
+    assert_equal [3], issues.collect(&:id).sort
+  end
+
   def test_filter_on_subject_when_starts_with
     query = IssueQuery.new(:name => '_')
     query.filters = {'subject' => {:operator => '^', :values => ['issue']}}
@@ -1649,7 +1780,7 @@ class QueryTest < ActiveSupport::TestCase
     q = IssueQuery.new(:name => '_', :column_names => [:subject, :spent_hours])
     assert q.has_column?(:spent_hours)
     issues = q.issues
-    assert_not_nil issues.first.instance_variable_get("@spent_hours")
+    assert_not_nil issues.first.instance_variable_get(:@spent_hours)
   end
 
   def test_query_should_preload_last_updated_by
@@ -1659,7 +1790,7 @@ class QueryTest < ActiveSupport::TestCase
       assert q.has_column?(:last_updated_by)
 
       issues = q.issues.sort_by(&:id)
-      assert issues.all? {|issue| !issue.instance_variable_get("@last_updated_by").nil?}
+      assert issues.all? {|issue| !issue.instance_variable_get(:@last_updated_by).nil?}
       assert_equal ["User", "User", "NilClass"], issues.map {|i| i.last_updated_by.class.name}
       assert_equal ["John Smith", "John Smith", ""], issues.map {|i| i.last_updated_by.to_s}
     end
@@ -1669,7 +1800,7 @@ class QueryTest < ActiveSupport::TestCase
     q = IssueQuery.new(:name => '_', :column_names => [:subject, :last_notes])
     assert q.has_column?(:last_notes)
     issues = q.issues
-    assert_not_nil issues.first.instance_variable_get("@last_notes")
+    assert_not_nil issues.first.instance_variable_get(:@last_notes)
   end
 
   def test_groupable_columns_should_include_custom_fields
@@ -2712,6 +2843,90 @@ class QueryTest < ActiveSupport::TestCase
 
     # Non-paginated issue ids and paginated issue ids should be in the same order.
     assert_equal issue_ids, paginated_issue_ids
+  end
+
+  def test_destruction_of_default_query_should_remove_reference_from_project
+    project = Project.find('ecookbook')
+    project_query = IssueQuery.find(1)
+    project.update_column :default_issue_query_id, project_query.id
+
+    project_query.destroy
+    project.reload
+    assert_nil project.default_issue_query_id
+  end
+
+  def test_should_determine_default_issue_query
+    project = Project.find('ecookbook')
+    user = project.users.first
+
+    project_query = IssueQuery.find(1)
+    query = IssueQuery.find(4)
+    user_query = IssueQuery.find(3)
+    user_query.update(visibility: Query::VISIBILITY_PUBLIC)
+    user_query.update_column :user_id, user.id
+
+    [nil, user, User.anonymous].each do |u|
+      [nil, project].each do |p|
+        assert_nil IssueQuery.default(project: p, user: u)
+      end
+    end
+
+    # only global default is set
+    with_settings :default_issue_query => query.id do
+      [nil, user, User.anonymous].each do |u|
+        [nil, project].each do |p|
+          assert_equal query, IssueQuery.default(project: p, user: u)
+        end
+      end
+    end
+
+    # with project default
+    assert_equal project.id, project_query.project_id
+    project.update_column :default_issue_query_id, project_query.id
+    [nil, user, User.anonymous].each do |u|
+      assert_nil IssueQuery.default(project: nil, user: u)
+      assert_equal project_query, IssueQuery.default(project: project, user: u)
+    end
+
+    # project default should override global default
+    with_settings :default_issue_query => query.id do
+      [nil, user, User.anonymous].each do |u|
+        assert_equal query, IssueQuery.default(project: nil, user: u)
+        assert_equal project_query, IssueQuery.default(project: project, user: u)
+      end
+    end
+
+    # user default, overrides project and global default
+    user.pref.default_issue_query = user_query.id
+    user.pref.save
+    with_settings :default_issue_query => query.id do
+      [nil, project].each do |p|
+        assert_equal user_query, IssueQuery.default(project: p, user: user)
+        assert_equal user_query, IssueQuery.default(project: p, user: user)
+      end
+    end
+  end
+
+  def test_sql_contains_should_escape_value
+    i = Issue.generate! subject: 'Sanitize test'
+    query = IssueQuery.new(:project => nil, :name => '_')
+    query.add_filter('subject', '~', ['te%t'])
+    assert_equal 0, query.issue_count
+
+    i.update_column :subject, 'Sanitize te%t'
+    assert_equal 1, query.issue_count
+
+    i.update_column :subject, 'Sanitize te_t'
+    query = IssueQuery.new(:project => nil, :name => '_')
+    query.add_filter('subject', '~', ['te_t'])
+    assert_equal 1, query.issue_count
+  end
+
+  def test_sql_contains_should_tokenize
+    query = IssueQuery.new(:project => nil, :name => '_')
+    query.add_filter('subject', '~', ['issue today'])
+
+    assert_equal 1, query.issue_count
   end
 
   def test_display_type_should_accept_known_types

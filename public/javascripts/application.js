@@ -31,7 +31,7 @@ function toggleRowGroup(el) {
   var tr = $(el).parents('tr').first();
   var n = tr.next();
   tr.toggleClass('open');
-  $(el).toggleClass('icon-expended icon-collapsed');
+  $(el).toggleClass('icon-expanded icon-collapsed');
   while (n.length && !n.hasClass('group')) {
     n.toggle();
     n = n.next('tr');
@@ -43,7 +43,7 @@ function collapseAllRowGroups(el) {
   tbody.children('tr').each(function(index) {
     if ($(this).hasClass('group')) {
       $(this).removeClass('open');
-      $(this).find('.expander').switchClass('icon-expended', 'icon-collapsed');
+      $(this).find('.expander').switchClass('icon-expanded', 'icon-collapsed');
     } else {
       $(this).hide();
     }
@@ -55,7 +55,7 @@ function expandAllRowGroups(el) {
   tbody.children('tr').each(function(index) {
     if ($(this).hasClass('group')) {
       $(this).addClass('open');
-      $(this).find('.expander').switchClass('icon-collapsed', 'icon-expended');
+      $(this).find('.expander').switchClass('icon-collapsed', 'icon-expanded');
     } else {
       $(this).show();
     }
@@ -74,7 +74,7 @@ function toggleAllRowGroups(el) {
 function toggleFieldset(el) {
   var fieldset = $(el).parents('fieldset').first();
   fieldset.toggleClass('collapsed');
-  fieldset.children('legend').toggleClass('icon-expended icon-collapsed');
+  fieldset.children('legend').toggleClass('icon-expanded icon-collapsed');
   fieldset.children('div').toggle();
 }
 
@@ -550,12 +550,12 @@ function scmEntryClick(id, url) {
     var el = $('#'+id);
     if (el.hasClass('open')) {
         collapseScmEntry(id);
-        el.find('.expander').switchClass('icon-expended', 'icon-collapsed');
+        el.find('.expander').switchClass('icon-expanded', 'icon-collapsed');
         el.addClass('collapsed');
         return false;
     } else if (el.hasClass('loaded')) {
         expandScmEntry(id);
-        el.find('.expander').switchClass('icon-collapsed', 'icon-expended');
+        el.find('.expander').switchClass('icon-collapsed', 'icon-expanded');
         el.removeClass('collapsed');
         return false;
     }
@@ -568,7 +568,7 @@ function scmEntryClick(id, url) {
       success: function(data) {
         el.after(data);
         el.addClass('open').addClass('loaded').removeClass('loading');
-        el.find('.expander').switchClass('icon-collapsed', 'icon-expended');
+        el.find('.expander').switchClass('icon-collapsed', 'icon-expanded');
       }
     });
     return true;
@@ -1127,9 +1127,13 @@ function inlineAutoComplete(element) {
     if (element.dataset.tribute === 'true') {return};
 
     const getDataSource = function(entity) {
-      const dataSources = JSON.parse(rm.AutoComplete.dataSources);
+      const dataSources = rm.AutoComplete.dataSources;
 
-      return dataSources[entity];
+      if (dataSources[entity]) {
+        return dataSources[entity];
+      } else {
+        return false;
+      }
     }
 
     const remoteSearch = function(url, cb) {
@@ -1157,7 +1161,13 @@ function inlineAutoComplete(element) {
             if (event.target.type === 'text' && $(element).attr('autocomplete') != 'off') {
               $(element).attr('autocomplete', 'off');
             }
-            remoteSearch(getDataSource('issues') + text, function (issues) {
+            // When triggered with text starting with "##", like "##a", the search term will become "#a",
+            // causing the SQL query to fail in finding issues with "a" in the subject.
+            // To avoid this, remove the first "#" from the search term.
+            if (text) {
+              text = text.replace(/^#/, '');
+            }
+            remoteSearch(getDataSource('issues') + encodeURIComponent(text), function (issues) {
               return cb(issues);
             });
           },
@@ -1165,7 +1175,12 @@ function inlineAutoComplete(element) {
           fillAttr: 'label',
           requireLeadingSpace: true,
           selectTemplate: function (issue) {
-            return '#' + issue.original.id;
+            let leadingHash = "#"
+            // keep ## syntax which is a valid issue syntax to show issue with title.
+            if (this.currentMentionTextSnapshot.charAt(0) === "#") {
+              leadingHash = "##"
+            }
+            return leadingHash + issue.original.id;
           },
           menuItemTemplate: function (issue) {
             return sanitizeHTML(issue.original.label);
@@ -1174,7 +1189,7 @@ function inlineAutoComplete(element) {
         {
           trigger: '[[',
           values: function (text, cb) {
-            remoteSearch(getDataSource('wiki_pages') + text, function (wikiPages) {
+            remoteSearch(getDataSource('wiki_pages') + encodeURIComponent(text), function (wikiPages) {
               return cb(wikiPages);
             });
           },
@@ -1186,6 +1201,26 @@ function inlineAutoComplete(element) {
           },
           menuItemTemplate: function (wikiPage) {
             return sanitizeHTML(wikiPage.original.label);
+          }
+        },
+        {
+          trigger: '@',
+          lookup: function (user, mentionText) {
+            return user.name + user.firstname + user.lastname + user.login;
+          },
+          values: function (text, cb) {
+            const url = getDataSource('users');
+            if (url) {
+              remoteSearch(url + encodeURIComponent(text), function (users) {
+                return cb(users);
+              });
+            }
+          },
+          menuItemTemplate: function (user) {
+            return user.original.name;
+          },
+          selectTemplate: function (user) {
+            return '@' + user.original.login;
           }
         }
       ],

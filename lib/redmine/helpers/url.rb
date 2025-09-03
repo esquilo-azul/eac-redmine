@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Redmine - project management software
-# Copyright (C) 2006-2023  Jean-Philippe Lang
+# Copyright (C) 2006-  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -43,9 +43,7 @@ module Redmine
         scheme = $1.downcase
         return false unless /\A[a-z][a-z0-9\+\.\-]*\z/.match?(scheme) # RFC 3986
 
-        # To support Ruby 2.4, we use `none? {|obj| ... }` instead of
-        # `none?(pattern)` in 4.2-stable branch.
-        %w(data javascript vbscript).none? {|v| v == scheme}
+        %w(data javascript vbscript).none?(scheme)
       end
     end
   end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Redmine - project management software
-# Copyright (C) 2006-2023  Jean-Philippe Lang
+# Copyright (C) 2006-  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -28,14 +28,21 @@ class WatchersController < ApplicationController
     set_watcher(@watchables, User.current, false)
   end
 
-  before_action :find_project, :authorize, :only => [:new, :create, :append, :destroy, :autocomplete_for_user]
+  before_action :find_project, :authorize, :only => [:new, :create, :append, :destroy, :autocomplete_for_user, :autocomplete_for_mention]
   accept_api_auth :create, :destroy
 
   def new
-    @users = users_for_new_watcher
+    respond_to do |format|
+      format.html { render_404 }
+      format.js do
+        @users = users_for_new_watcher
+      end
+    end
   end
 
   def create
+    return unless authorize_for_watchable_type(:add)
+
     user_ids = []
     if params[:watcher]
       user_ids << (params[:watcher][:user_ids] || params[:watcher][:user_id])
@@ -46,7 +53,9 @@ class WatchersController < ApplicationController
     users = Principal.assignable_watchers.where(:id => user_ids).to_a
     users.each do |user|
       @watchables.each do |watchable|
-        Watcher.create(:watchable => watchable, :user => user)
+        if watchable.valid_watcher?(user)
+          Watcher.create(:watchable => watchable, :user => user)
+        end
       end
     end
     respond_to do |format|
@@ -71,6 +80,8 @@ class WatchersController < ApplicationController
   end
 
   def destroy
+    return unless authorize_for_watchable_type(:delete)
+
     user = Principal.find(params[:user_id])
     @watchables.each do |watchable|
       watchable.set_watcher(user, false)
@@ -91,6 +102,11 @@ class WatchersController < ApplicationController
   def autocomplete_for_user
     @users = users_for_new_watcher
     render :layout => false
+  end
+
+  def autocomplete_for_mention
+    users = users_for_mention
+    render :json => format_users_json(users)
   end
 
   private
@@ -146,13 +162,48 @@ class WatchersController < ApplicationController
     users = scope.sorted.like(params[:q]).to_a
     if @watchables && @watchables.size == 1
       watchable_object = @watchables.first
-      users -= watchable_object.watcher_users
-
-      if watchable_object.respond_to?(:visible?)
-        users.reject! {|user| user.is_a?(User) && !watchable_object.visible?(user)}
-      end
+      users -= watchable_object.visible_watcher_users
+    end
+    @watchables&.each do |watchable|
+      users.reject!{|user| !watchable.valid_watcher?(user)}
     end
     users
+  end
+
+  def users_for_mention
+    users = []
+    q = params[:q].to_s.strip
+
+    scope = nil
+    if params[:q].blank? && @project.present?
+      scope = @project.principals.assignable_watchers
+    else
+      scope = Principal.assignable_watchers.limit(10)
+    end
+    # Exclude Group principal for now
+    scope = scope.where(:type => ['User'])
+
+    users = scope.sorted.like(params[:q]).to_a
+
+    if @watchables && @watchables.size == 1
+      object = @watchables.first
+      if object.respond_to?(:visible?)
+        users.reject! {|user| user.is_a?(User) && !object.visible?(user)}
+      end
+    end
+
+    users
+  end
+
+  def format_users_json(users)
+    users.map do |user|
+      {
+        'firstname' => user.firstname,
+        'lastname' => user.lastname,
+        'name' => user.name,
+        'login' => user.login
+      }
+    end
   end
 
   def find_objects_from_params
@@ -181,5 +232,15 @@ class WatchersController < ApplicationController
     end
 
     objects
+  end
+
+  # Check permission for the watchable type for each watchable involved
+  def authorize_for_watchable_type(action)
+    if @watchables.any?{|watchable| !User.current.allowed_to?(:"#{action}_#{watchable.class.name.underscore}_watchers", watchable.project)}
+      render_403
+      return false
+    else
+      return true
+    end
   end
 end

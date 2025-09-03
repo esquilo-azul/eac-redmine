@@ -2,7 +2,7 @@
 
 #
 # Redmine - project management software
-# Copyright (C) 2006-2023  Jean-Philippe Lang
+# Copyright (C) 2006-  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -596,12 +596,16 @@ class Redmine::WikiFormatting::TextileFormatterTest < ActionView::TestCase
   end
 
   def test_should_not_allow_arbitrary_class_attribute_on_offtags
-    %w(code pre kbd).each do |tag|
-      assert_html_output({"<#{tag} class=\"foo\">test</#{tag}>" => "<#{tag}>test</#{tag}>"}, false)
-      assert_html_output({"<#{tag} class='foo'>test</#{tag}>" => "<#{tag}>test</#{tag}>"}, false)
-      assert_html_output({"<#{tag} class=\"ruby foo\">test</#{tag}>" => "<#{tag}>test</#{tag}>"}, false)
-      assert_html_output({"<#{tag} class='ruby foo'>test</#{tag}>" => "<#{tag}>test</#{tag}>"}, false)
-      assert_html_output({"<#{tag} class=\"ruby \"foo\" bar\">test</#{tag}>" => "<#{tag}>test</#{tag}>"}, false)
+    {
+      "class=\"foo\"" => "data-language=\"foo\"",
+      "class='foo'" => "data-language=\"foo\"",
+      "class=\"ruby foo\"" => "data-language=\"ruby foo\"",
+      "class='ruby foo'" => "data-language=\"ruby foo\"",
+      "class=\"ruby \"foo\" bar\"" => "data-language=\"ruby \"",
+    }.each do |classattr, codeattr|
+      assert_html_output({"<code #{classattr}>test</code>" => "<code #{codeattr}>test</code>"}, false)
+      assert_html_output({"<pre #{classattr}>test</pre>" => "<pre>test</pre>"}, false)
+      assert_html_output({"<kbd #{classattr}>test</kbd>" => "<kbd>test</kbd>"}, false)
     end
 
     assert_html_output({"<notextile class=\"foo\">test</notextile>" => "test"}, false)
@@ -615,13 +619,25 @@ class Redmine::WikiFormatting::TextileFormatterTest < ActionView::TestCase
     # language name is double-quoted
     assert_html_output(
       {"<code class=\"ruby\">test</code>" =>
-         "<code class=\"ruby syntaxhl\"><span class=\"nb\">test</span></code>"},
+         "<code class=\"ruby syntaxhl\" data-language=\"ruby\"><span class=\"nb\">test</span></code>"},
       false
     )
     # language name is single-quoted
     assert_html_output(
       {"<code class='ruby'>test</code>" =>
-         "<code class=\"ruby syntaxhl\"><span class=\"nb\">test</span></code>"},
+         "<code class=\"ruby syntaxhl\" data-language=\"ruby\"><span class=\"nb\">test</span></code>"},
+      false
+    )
+  end
+
+  def test_should_preserve_code_language_class_attribute_in_data_language
+    assert_html_output(
+      {
+        "<code class=\"foolang\">unsupported language</code>" =>
+          "<code data-language=\"foolang\">unsupported language</code>",
+        "<code class=\"c-k&r\">special-char language</code>" =>
+          "<code data-language=\"c-k&#38;r\">special-char language</code>",
+      },
       false
     )
   end
@@ -714,12 +730,61 @@ class Redmine::WikiFormatting::TextileFormatterTest < ActionView::TestCase
     assert_equal expected.gsub(%r{[\r\n\t]}, ''), to_html(text).gsub(%r{[\r\n\t]}, '')
   end
 
+  def test_should_remove_html_comments
+    text = <<~STR
+      <!-- begin -->
+      Hello <!-- comment between words -->world.
+
+      <!--
+        multi-line
+      comment -->Foo
+
+      <pre>
+      This is a code block.
+      <p>
+      <!-- comments in a code block should be preserved -->
+      </p>
+      </pre>
+    STR
+    expected = <<~EXPECTED
+      <p>Hello world.</p>
+
+      <p>Foo</p>
+
+      <pre>
+      This is a code block.
+      &lt;p&gt;
+      &lt;!-- comments in a code block should be preserved --&gt;
+      &lt;/p&gt;
+      </pre>
+
+    EXPECTED
+    assert_equal expected.gsub(%r{[\r\n\t]}, ''), to_html(text).gsub(%r{[\r\n\t]}, '')
+  end
+
   def test_should_escape_bq_citations
     assert_html_output(
       {
         %{bq.:http://x/"onmouseover="alert(document.domain) Hover me} =>
           %{<blockquote cite="http://x/&quot;onmouseover=&quot;alert(document.domain)">\n\t\t<p>Hover me</p>\n\t</blockquote>}
       }, false)
+  end
+
+  def test_should_allow_multiple_footnotes
+    text = <<~STR
+      Some demo[1][2] And a sentence.[1]
+
+      fn1. One
+
+      fn2. Two
+    STR
+
+    expected = <<~EXPECTED
+      <p>Some demo<sup><a href="#fn1">1</a></sup><sup><a href="#fn2">2</a></sup> And a sentence.[1]</p>
+      <p id="fn1" class="footnote"><sup>1</sup> One</p>
+      <p id="fn2" class="footnote"><sup>2</sup> Two</p>
+    EXPECTED
+    assert_equal expected.gsub(%r{[\r\n\t]}, ''), to_html(text).gsub(%r{[\r\n\t]}, '')
   end
 
   private

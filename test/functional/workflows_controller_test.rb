@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Redmine - project management software
-# Copyright (C) 2006-2023  Jean-Philippe Lang
+# Copyright (C) 2006-  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -134,7 +134,7 @@ class WorkflowsControllerTest < Redmine::ControllerTest
   def test_post_edit
     WorkflowTransition.delete_all
 
-    post :edit, :params => {
+    patch :update, :params => {
       :role_id => 2,
       :tracker_id => 1,
       :transitions => {
@@ -152,7 +152,7 @@ class WorkflowsControllerTest < Redmine::ControllerTest
   def test_post_edit_with_allowed_statuses_for_new_issues
     WorkflowTransition.delete_all
 
-    post :edit, :params => {
+    patch :update, :params => {
       :role_id => 2,
       :tracker_id => 1,
       :transitions => {
@@ -169,7 +169,7 @@ class WorkflowsControllerTest < Redmine::ControllerTest
   def test_post_edit_with_additional_transitions
     WorkflowTransition.delete_all
 
-    post :edit, :params => {
+    patch :update, :params => {
       :role_id => 2,
       :tracker_id => 1,
       :transitions => {
@@ -195,6 +195,45 @@ class WorkflowsControllerTest < Redmine::ControllerTest
     w = WorkflowTransition.where(:role_id => 2, :tracker_id => 1, :old_status_id => 3, :new_status_id => 4).first
     assert w.author
     assert w.assignee
+  end
+
+  def test_post_edit_with_large_number_of_statuses
+    # This test ensures that workflows with many statuses can be saved.
+    # Without setting `ENV['RACK_QUERY_PARSER_PARAMS_LIMIT']`, this raises
+    # ActionController::BadRequest exception due to exceeding the default
+    # query parameter limit of 4096.
+    WorkflowTransition.delete_all
+
+    num_statuses = 40
+    transitions_data = {}
+
+    # Allowed statuses for a new issue (status_id = 0)
+    transitions_data['0'] = {}
+    (1..num_statuses).each do |status_id|
+      transitions_data['0'][status_id.to_s] = {'always' => '1'}
+    end
+
+    # Status transitions between statuses
+    (1..num_statuses).each do |status_id_from| # rubocop:disable RuboCopStyle/CombinableLoops
+      transitions_data[status_id_from.to_s] = {}
+      (1..num_statuses).each do |status_id_to|
+        # skip self-transitions
+        next if status_id_from == status_id_to
+
+        transitions_data[status_id_from.to_s][status_id_to.to_s] = {
+          'always' => '1', 'author' => '1', 'assignee' => '1'
+        }
+      end
+    end
+
+    assert_nothing_raised do
+      patch :update, :params => {
+        :role_id => 2,
+        :tracker_id => 1,
+        :transitions => transitions_data
+      }
+    end
+    assert_response :found
   end
 
   def test_get_permissions
@@ -346,7 +385,7 @@ class WorkflowsControllerTest < Redmine::ControllerTest
   def test_post_permissions
     WorkflowPermission.delete_all
 
-    post :permissions, :params => {
+    patch :update_permissions, :params => {
       :role_id => 1,
       :tracker_id => 2,
       :permissions => {
@@ -389,7 +428,7 @@ class WorkflowsControllerTest < Redmine::ControllerTest
   def test_post_copy_one_to_one
     source_transitions = status_transitions(:tracker_id => 1, :role_id => 2)
 
-    post :copy, :params => {
+    post :duplicate, :params => {
       :source_tracker_id => '1', :source_role_id => '2',
       :target_tracker_ids => ['3'], :target_role_ids => ['1']
     }
@@ -400,7 +439,7 @@ class WorkflowsControllerTest < Redmine::ControllerTest
   def test_post_copy_one_to_many
     source_transitions = status_transitions(:tracker_id => 1, :role_id => 2)
 
-    post :copy, :params => {
+    post :duplicate, :params => {
       :source_tracker_id => '1', :source_role_id => '2',
       :target_tracker_ids => ['2', '3'], :target_role_ids => ['1', '3']
     }
@@ -415,7 +454,7 @@ class WorkflowsControllerTest < Redmine::ControllerTest
     source_t2 = status_transitions(:tracker_id => 2, :role_id => 2)
     source_t3 = status_transitions(:tracker_id => 3, :role_id => 2)
 
-    post :copy, :params => {
+    post :duplicate, :params => {
       :source_tracker_id => 'any', :source_role_id => '2',
       :target_tracker_ids => ['2', '3'], :target_role_ids => ['1', '3']
     }
@@ -428,7 +467,7 @@ class WorkflowsControllerTest < Redmine::ControllerTest
 
   def test_post_copy_with_incomplete_source_specification_should_fail
     assert_no_difference 'WorkflowRule.count' do
-      post :copy, :params => {
+      post :duplicate, :params => {
         :source_tracker_id => '', :source_role_id => '2',
         :target_tracker_ids => ['2', '3'], :target_role_ids => ['1', '3']
       }
@@ -439,7 +478,7 @@ class WorkflowsControllerTest < Redmine::ControllerTest
 
   def test_post_copy_with_incomplete_target_specification_should_fail
     assert_no_difference 'WorkflowRule.count' do
-      post :copy, :params => {
+      post :duplicate, :params => {
         :source_tracker_id => '1', :source_role_id => '2',
         :target_tracker_ids => ['2', '3']
       }

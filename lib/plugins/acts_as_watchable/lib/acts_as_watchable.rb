@@ -15,9 +15,13 @@ module Redmine
             has_many :watchers, :as => :watchable, :dependent => :delete_all
             has_many :watcher_users, :through => :watchers, :source => :user, :validate => false
 
-            scope :watched_by, lambda { |user_id|
+            scope :watched_by, lambda { |principal|
+              user_ids = Array(principal.id)
+              user_ids |= principal.group_ids if principal.is_a?(User)
+              user_ids.compact!
+
               joins(:watchers).
-              where("#{Watcher.table_name}.user_id = ?", user_id)
+              where("#{Watcher.table_name}.user_id IN (?)", user_ids)
             }
           end
           send :include, Redmine::Acts::Watchable::InstanceMethods
@@ -36,6 +40,24 @@ module Redmine
             users.reject! {|user| user.is_a?(User) && !visible?(user)}
           end
           users
+        end
+
+        # array of watchers that the given user is allowed to see
+        def visible_watcher_users(user = User.current)
+          if user.allowed_to?(:"view_#{self.class.name.underscore}_watchers", project)
+            watcher_users
+          else
+            # without permission, the user can only see themselves (if they're a watcher)
+            watcher_users & [user]
+          end
+        end
+
+        # true if user can be added as a watcher
+        def valid_watcher?(user)
+          return true unless respond_to?(:visible?)
+          return true unless user.is_a?(User)
+
+          visible?(user)
         end
 
         # Adds user as a watcher
@@ -66,9 +88,17 @@ module Redmine
           super user_ids
         end
 
-        # Returns true if object is watched by +user+
-        def watched_by?(user)
-          !!(user && self.watcher_user_ids.detect {|uid| uid == user.id })
+        # Returns true if object is watched by +principal+, that is
+        # either by a given group,
+        # or by a given user or any of their groups
+        def watched_by?(principal)
+          return false unless principal
+
+          user_ids = Array(principal.id)
+          user_ids |= principal.group_ids if principal.is_a?(User)
+          user_ids.compact!
+
+          (self.watcher_user_ids & user_ids).any?
         end
 
         def notified_watchers

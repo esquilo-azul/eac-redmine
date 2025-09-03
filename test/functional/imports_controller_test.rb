@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Redmine - project management software
-# Copyright (C) 2006-2023  Jean-Philippe Lang
+# Copyright (C) 2006-  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -34,6 +34,8 @@ class ImportsControllerTest < Redmine::ControllerTest
            :custom_fields_projects,
            :custom_fields_trackers
 
+  include Redmine::I18n
+
   def setup
     User.current = nil
     @request.session[:user_id] = 2
@@ -48,6 +50,18 @@ class ImportsControllerTest < Redmine::ControllerTest
     assert_response :success
     assert_select 'input[name=?]', 'file'
     assert_select 'input[name=?][type=?][value=?]', 'project_id', 'hidden', 'subproject1'
+  end
+
+  def test_new_issue_import_without_add_issues_permission
+    Role.all.map { |role| role.remove_permission! :add_issues }
+    get(:new, :params => {:type => 'IssueImport', :project_id => 'subproject1'})
+    assert_response :forbidden
+  end
+
+  def test_new_time_entry_import_without_log_time_permission
+    Role.all.map { |role| role.remove_permission! :log_time }
+    get(:new, :params => {:type => 'TimeEntryImport', :project_id => 'subproject1'})
+    assert_response :forbidden
   end
 
   def test_create_should_save_the_file
@@ -72,7 +86,14 @@ class ImportsControllerTest < Redmine::ControllerTest
     assert_response :success
     assert_select 'select[name=?]', 'import_settings[separator]'
     assert_select 'select[name=?]', 'import_settings[wrapper]'
-    assert_select 'select[name=?]', 'import_settings[encoding]'
+    assert_select 'select[name=?]', 'import_settings[encoding]' do
+      encodings = valid_languages.map do |lang|
+        ll(lang.to_s, :general_csv_encoding)
+      end.uniq
+      encodings.each do |encoding|
+        assert_select 'option[value=?]', encoding
+      end
+    end
     assert_select 'select[name=?]', 'import_settings[date_format]'
   end
 
@@ -178,6 +199,27 @@ class ImportsControllerTest < Redmine::ControllerTest
     assert_nil import.total_items
 
     assert_select 'div#flash_error', /The file is not a CSV file or does not match the settings below \([[:print:]]+\)/
+  end
+
+  def test_post_settings_with_no_data_row_should_display_error
+    import = generate_import('import_issues_no_data_row.csv')
+
+    post(
+      :settings,
+      :params => {
+        :id => import.to_param,
+        :import_settings => {
+          :separator => ';',
+          :wrapper => '"',
+          :encoding => 'ISO-8859-1'
+        }
+      }
+    )
+    assert_response 200
+    import.reload
+    assert_equal 0, import.total_items
+
+    assert_select 'div#flash_error', /The file does not contain any data/
   end
 
   def test_get_mapping_should_display_mapping_form

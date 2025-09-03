@@ -20,7 +20,7 @@ module Redmine
 
       def check_password
         unless password.present? && User.current.check_password?(password)
-          errors[:password] << :invalid
+          errors.add(:password, :invalid)
         end
       end
     end
@@ -136,7 +136,7 @@ module Redmine
       # Before Filter which is used by the require_sudo_mode class method.
       class SudoRequestFilter < Struct.new(:parameters, :request_methods)
         def before(controller)
-          method_matches = request_methods.blank? || request_methods.include?(controller.request.method_symbol)
+          method_matches = request_methods.blank? || request_methods.include?(controller.request.request_method_symbol)
           if controller.api_request?
             true
           elsif SudoMode.possible? && method_matches
