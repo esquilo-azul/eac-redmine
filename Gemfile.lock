@@ -74,7 +74,7 @@ PATH
   specs:
     redmine_with_git (0.7.10)
       avm (~> 0.97, >= 0.97.1)
-      eac_rails_utils (~> 0.11)
+      eac_rails_utils (~> 0.26, >= 0.26.1)
       eac_ruby_utils (~> 0.119)
 
 GEM
