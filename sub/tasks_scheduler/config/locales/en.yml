@@ -1,0 +1,33 @@
+en:
+  activerecord:
+    models:
+      scheduled_task:
+        one: Scheduled task
+        other: Scheduled tasks
+  eac_rails_utils:
+    menus:
+      root:
+        admin:
+          tasks_scheduler:
+            __self: Tasks scheduler
+            main_app_tasks_scheduler_daemon: Daemon
+            main_app_scheduled_tasks: Tasks
+            main_app_scheduled_task_statuses: Status
+  helpers:
+      label:
+        scheduled_task:
+          args: Arguments
+          scheduling: Scheduling
+          task: Task
+          next_run: Next run
+          status: Status
+  current_run: Current run
+  end: End
+  last_successful_run: Last successful run
+  last_unsuccessful_run: Last unsuccessful run
+  log: Log
+  run_now: Run now
+  start: Start
+  scheduled_tasks: Scheduled tasks - Edit
+  tasks_scheduler_daemon: Scheduled tasks - Daemon
+  tasks_scheduler_status: Scheduled tasks - Status

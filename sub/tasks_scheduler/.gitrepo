@@ -1,0 +1,7 @@
+[subrepo]
+  cmdver = 0.4.1
+  commit = fb95b308553ca9953d146f93bcb892939681b8b9
+  method = merge
+  parent = bfa534f9d7c38d6df6958ea3aef5b3c0945ff6eb
+  branch = master
+  remote = https://github.com/esquilo-azul/tasks_scheduler.git
