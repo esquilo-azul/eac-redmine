@@ -1,6 +1,7 @@
 ---
 locale: pt-BR
 subs:
+  include_path: sub/*:plugins/*
   at:
     plugins/additionals:
       test:
