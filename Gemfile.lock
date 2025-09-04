@@ -120,6 +120,16 @@ PATH
       eac_ruby_utils (~> 0.128, >= 0.128.3)
       recordselect (~> 3.10, >= 3.10.9)
 
+PATH
+  remote: sub/eac_rails_utils
+  specs:
+    eac_rails_utils (0.26.1)
+      bootstrap-sass (~> 3.4, >= 3.4.1)
+      eac_ruby_utils (~> 0.128, >= 0.128.3)
+      nested_form_fields (~> 0.8, >= 0.8.4)
+      rails (>= 5.2.8.1)
+      virtus (~> 2.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -338,12 +348,6 @@ GEM
       rails (>= 5.2.8.1, < 7)
       rspec-rails (~> 5.1, >= 5.1.2)
       sqlite3 (~> 1.7, >= 1.7.3)
-    eac_rails_utils (0.26.1)
-      bootstrap-sass (~> 3.4, >= 3.4.1)
-      eac_ruby_utils (~> 0.128, >= 0.128.3)
-      nested_form_fields (~> 0.8, >= 0.8.4)
-      rails (>= 5.2.8.1)
-      virtus (~> 2.0)
     eac_ruby_gem_support (0.12.0)
       eac_ruby_utils (~> 0.127)
       rspec (~> 3.13, >= 3.13.1)
@@ -733,6 +737,7 @@ DEPENDENCIES
   database_cleaner-active_record
   deckar01-task_list (= 2.3.2)
   eac_active_scaffold!
+  eac_rails_utils!
   eac_redmine_base0!
   escape_utils
   ffi
