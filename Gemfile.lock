@@ -145,7 +145,7 @@ PATH
   remote: sub/tasks_scheduler
   specs:
     tasks_scheduler (0.10.0)
-      avm-eac_ruby_base1 (~> 0.37, >= 0.37.1)
+      avm-eac_ruby_base1 (~> 0.38)
       daemons (~> 1.4, >= 1.4.1)
       eac_active_scaffold (~> 0.6, >= 0.6.1)
       eac_rails_utils (~> 0.26)
