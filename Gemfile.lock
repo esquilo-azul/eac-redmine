@@ -148,7 +148,7 @@ PATH
       avm-eac_ruby_base1 (~> 0.38)
       daemons (~> 1.4, >= 1.4.1)
       eac_active_scaffold (~> 0.7)
-      eac_rails_utils (~> 0.26)
+      eac_rails_utils (~> 0.26, >= 0.26.2)
       eac_ruby_utils (~> 0.128, >= 0.128.3)
       parse-cron (~> 0.1, >= 0.1.4)
 
