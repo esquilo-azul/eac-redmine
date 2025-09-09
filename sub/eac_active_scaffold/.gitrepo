@@ -1,0 +1,7 @@
+[subrepo]
+  cmdver = 0.4.1
+  commit = d6b8ee3530b36b26f96a0be8463d0a1026f28f94
+  method = merge
+  parent = a72812c08ed9c361c91416e1e9105e9bb89307d2
+  branch = master
+  remote = https://github.com/esquilo-azul/eac_active_scaffold.git
