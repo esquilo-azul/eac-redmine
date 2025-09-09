@@ -67,7 +67,7 @@ PATH
 PATH
   remote: plugins/redmine_plugins_helper
   specs:
-    redmine_plugins_helper (0.15.5)
+    redmine_plugins_helper (0.16.0)
       bigdecimal (~> 1.4, >= 1.4.4)
       eac_rails_gem_support (~> 0.11)
       eac_ruby_utils (~> 0.128, >= 0.128.3)
