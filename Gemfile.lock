@@ -116,7 +116,7 @@ PATH
   specs:
     eac_active_scaffold (0.7.0)
       active_scaffold (~> 3.7, >= 3.7.13)
-      eac_rails_utils (~> 0.26)
+      eac_rails_utils (~> 0.26, >= 0.26.2)
       eac_ruby_utils (~> 0.128, >= 0.128.3)
       recordselect (~> 3.10, >= 3.10.9)
 
