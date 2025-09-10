@@ -13,8 +13,7 @@ module RedmineWithGit
         end
 
         module InstanceMethods
-          SHEBANG_PATTERNS = [:ruby].map { |k| [k, /^\#!.+\s+#{::Regexp.quote(k)}\s*$/] }
-                                    .to_h
+          SHEBANG_PATTERNS = [:ruby].index_with { |k| /^\#!.+\s+#{::Regexp.quote(k)}\s*$/ }
 
           def hook_file_has_changed?
             on_content_replaced { super }
