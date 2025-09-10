@@ -36,7 +36,7 @@ PATH
 PATH
   remote: plugins/notifyme
   specs:
-    notifyme (0.4.16)
+    notifyme (0.4.17)
       eac_ruby_utils (~> 0.128, >= 0.128.3)
       htmlentities (~> 4.3, >= 4.3.4)
       imgkit (~> 1.6, >= 1.6.3)
