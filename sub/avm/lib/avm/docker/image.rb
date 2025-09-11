@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'eac_docker/images/templatized'
-require 'eac_docker/registry'
-
 module Avm
   module Docker
     class Image < ::EacDocker::Images::Templatized
