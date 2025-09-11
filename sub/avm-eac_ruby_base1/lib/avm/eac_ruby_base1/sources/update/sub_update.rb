@@ -3,7 +3,7 @@
 module Avm
   module EacRubyBase1
     module Sources
-      class Update
+      module Update
         class SubUpdate
           enable_simple_cache
           enable_speaker
