@@ -5,4 +5,7 @@ module EacRedmineBase0
   HOMEPAGE = 'https://github.com/esquilo-azul/eac_redmine_base0'
   SUMMARY = 'E.A.C. base for Redmine.'
   VERSION = '0.6.2'
+
+  module Version
+  end
 end
