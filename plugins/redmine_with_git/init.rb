@@ -11,3 +11,7 @@ Redmine::Plugin.register :redmine_with_git do
   url 'https://github.com/esquilo-azul/redmine_with_git'
   author_url 'https://github.com/esquilo-azul'
 end
+
+Rails.autoloaders.each do |loader|
+  loader.ignore File.join(__dir__, 'lib/redmine_with_git/patches')
+end
