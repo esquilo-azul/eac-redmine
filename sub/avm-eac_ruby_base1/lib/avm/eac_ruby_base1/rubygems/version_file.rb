@@ -6,7 +6,7 @@ module Avm
       class VersionFile
         common_constructor :path
 
-        VERSION_LINE_PATTERN = /\A(\s*)VERSION\s*=\s*[\'\"]([^\'\"]+)[\'\"](\s*)\z/.freeze
+        VERSION_LINE_PATTERN = /\A(\s*)VERSION\s*=\s*['"]([^'"]+)['"](\s*)\z/.freeze
 
         def value
           return nil unless path.file?

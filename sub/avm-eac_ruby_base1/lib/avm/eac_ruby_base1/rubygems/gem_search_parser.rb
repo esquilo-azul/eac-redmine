@@ -5,7 +5,7 @@ module Avm
     module Rubygems
       class GemSearchParser < ::Aranha::Parsers::Base
         GEM_STRUCT = ::Struct.new(:name, :versions)
-        LINE_PARSER = /\A\s*(\S+)\s*\(([^\)]+)\)\s*\z/.to_parser do |m|
+        LINE_PARSER = /\A\s*(\S+)\s*\(([^)]+)\)\s*\z/.to_parser do |m|
           GEM_STRUCT.new(m[1], m[2].split(',').map(&:strip).reject(&:blank?))
         end
 

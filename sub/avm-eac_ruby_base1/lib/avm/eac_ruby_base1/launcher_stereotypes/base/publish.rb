@@ -6,6 +6,7 @@ module Avm
       class Base
         class Publish < ::Avm::Launcher::Publish::Base
           include ::EacRubyUtils::SimpleCache
+
           enable_speaker
 
           private

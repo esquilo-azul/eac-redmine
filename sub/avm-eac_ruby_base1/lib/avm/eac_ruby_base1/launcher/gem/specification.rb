@@ -8,7 +8,7 @@ module Avm
           class << self
             def parse_version_file(file)
               s = ::File.read(file)
-              m = /VERSION\s*=\s*[\'\"]([^\'\"]+)[\'\"]/.match(s)
+              m = /VERSION\s*=\s*['"]([^'"]+)['"]/.match(s)
               m ? m[1] : nil
             end
           end
