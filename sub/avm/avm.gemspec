@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.7'
 
   s.add_dependency 'clipboard', '~> 1.4', '>= 1.4.1'
-  s.add_dependency 'eac_cli', '~> 0.44'
+  s.add_dependency 'eac_cli', '~> 0.44', '>= 0.44.1'
   s.add_dependency 'eac_config', '~> 0.15'
   s.add_dependency 'eac_docker', '~> 0.8'
   s.add_dependency 'eac_fs', '~> 0.19', '>= 0.19.1'
