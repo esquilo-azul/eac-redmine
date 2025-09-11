@@ -93,7 +93,7 @@ PATH
   specs:
     avm-eac_ruby_base1 (0.38.0)
       aranha-parsers (~> 0.26, >= 0.26.1)
-      avm (~> 0.97)
+      avm (~> 0.98, >= 0.98.1)
       avm-eac_generic_base0 (~> 0.15, >= 0.15.1)
       eac_envs-http (~> 0.7)
       eac_ruby_utils (~> 0.128, >= 0.128.3)
