@@ -4,7 +4,7 @@ module RedmineTasksScheduler
   AUTHOR = 'Eduardo Henrique Bogoni'
   HOMEPAGE = 'https://github.com/esquilo-azul/redmine_tasks_scheduler'
   SUMMARY = 'Scheduler for rake tasks on Redmine.'
-  VERSION = '0.4.4'
+  VERSION = '0.4.5'
 
   module Version
   end
