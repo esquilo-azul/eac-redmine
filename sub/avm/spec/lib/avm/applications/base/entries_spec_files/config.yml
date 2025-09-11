@@ -1,0 +1,12 @@
+---
+app0:
+  name: Application 0
+  scm:
+    id: app1
+app1:
+  organization: org1
+  scm:
+    url: http://nowhere.net/anypath
+    type: ScmX
+    repos_path: mygroup
+    ssh_username: myuser

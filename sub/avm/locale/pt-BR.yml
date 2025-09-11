@@ -1,0 +1,6 @@
+pt-BR:
+  avm:
+    sources:
+      base:
+        sub:
+          remove_commit_message: 'Sub[%{sub_path}]: remove.'

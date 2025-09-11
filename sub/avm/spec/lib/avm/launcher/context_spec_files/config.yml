@@ -1,0 +1,9 @@
+---
+app:
+  avm_type: Application
+avm-tools_stub:
+  avm_type: Application
+ruby_gem_stub:
+  avm_type: Application
+subtree_main_app:
+  avm_type: Application

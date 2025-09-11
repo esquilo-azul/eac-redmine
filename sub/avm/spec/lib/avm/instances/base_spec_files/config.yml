@@ -1,0 +1,50 @@
+---
+app_0:
+  install:
+    id: app_1
+  web:
+    url: https://app0.net
+app_1:
+  install:
+    id: app_2
+    data_path: /data_fs_root
+    path: /fs_root
+  database:
+    name: app_1_db
+    username: user1
+    password: pass1
+    hostname: database.net
+app_2:
+  install:
+    hostname: myhost.com
+    username: myuser
+    url: ssh://otheruser@otherhost.com
+app_3:
+  database:
+    id: app_1
+  mailer:
+    id: mailer_0
+app_4:
+  install:
+    scheme: ssh
+    username: user4
+    hostname: host4.net
+    groupname: group4
+app_5:
+  install:
+    url: ssh://user5:passwd5@host5.net:2222/path/to/app5
+app_6:
+  install:
+    id: app_5
+mailer_0:
+  mailer:
+    from: 'noreply@example.net'
+    reply_to: ''
+    smtp:
+      address: 'smtp.example.net'
+      port: '587'
+      domain: 'example.net'
+      username: 'a_user'
+      password: 'a_secret'
+      authentication: plain
+      starttls_auto: 'true'

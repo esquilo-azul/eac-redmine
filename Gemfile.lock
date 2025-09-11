@@ -88,6 +88,19 @@ PATH
       eac_rails_utils (~> 0.26, >= 0.26.1)
       eac_ruby_utils (~> 0.128, >= 0.128.3)
 
+PATH
+  remote: sub/avm
+  specs:
+    avm (0.98.0)
+      clipboard (~> 1.4, >= 1.4.1)
+      eac_cli (~> 0.44)
+      eac_config (~> 0.15)
+      eac_docker (~> 0.8)
+      eac_fs (~> 0.19, >= 0.19.1)
+      eac_ruby_utils (~> 0.128, >= 0.128.3)
+      eac_templates (~> 0.8, >= 0.8.1)
+      minitar (~> 0.12, >= 0.12.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -176,15 +189,6 @@ GEM
     attr_extras (7.1.0)
     autoprefixer-rails (10.4.21.0)
       execjs (~> 2)
-    avm (0.98.0)
-      clipboard (~> 1.4, >= 1.4.1)
-      eac_cli (~> 0.44)
-      eac_config (~> 0.15)
-      eac_docker (~> 0.8)
-      eac_fs (~> 0.19, >= 0.19.1)
-      eac_ruby_utils (~> 0.128, >= 0.128.3)
-      eac_templates (~> 0.8, >= 0.8.1)
-      minitar (~> 0.12, >= 0.12.1)
     avm-eac_generic_base0 (0.15.1)
       avm (~> 0.96, >= 0.96.1)
       eac_ruby_utils (~> 0.128)
@@ -710,6 +714,7 @@ DEPENDENCIES
   additionals!
   addressable
   asciidoctor
+  avm!
   bullet
   bundler (>= 1.12.0)
   commonmarker (~> 0.23.8)

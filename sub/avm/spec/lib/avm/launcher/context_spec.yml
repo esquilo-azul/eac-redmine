@@ -1,0 +1,5 @@
+Instances:
+  /subtree_main_app:
+    git_current_revision: master
+  /app:
+    git_current_revision: master
