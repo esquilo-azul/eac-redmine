@@ -5,4 +5,7 @@ module RedmineAvm
   HOMEPAGE = 'https://github.com/esquilo-azul/redmine_avm'
   SUMMARY = 'AVM support for Redmine.'
   VERSION = '0.3.12'
+
+  module Version
+  end
 end
