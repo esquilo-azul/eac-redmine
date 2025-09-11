@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'eac_config', '~> 0.15'
   s.add_dependency 'eac_docker', '~> 0.8'
   s.add_dependency 'eac_fs', '~> 0.19', '>= 0.19.1'
-  s.add_dependency 'eac_ruby_utils', '~> 0.128', '>= 0.128.3'
+  s.add_dependency 'eac_ruby_utils', '~> 0.128', '>= 0.128.4'
   s.add_dependency 'eac_templates', '~> 0.8', '>= 0.8.1'
   s.add_dependency 'minitar', '~> 0.12', '>= 0.12.1'
 
