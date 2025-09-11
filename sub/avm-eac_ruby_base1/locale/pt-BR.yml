@@ -1,0 +1,16 @@
+pt-BR:
+  avm:
+    eac_ruby_base1:
+      launcher_stereotypes:
+        base:
+          publish:
+            new_gem_disallowed_check_result: "%{gem} não existe em %{provider}"
+            outdated_version_check_result: "%{gem} está desatualizada (Máx.: %{max_version})"
+            version_published_check_result: "%{gem} já enviada"
+            version_unpublished_check_result: "%{gem} não encontrada em %{provider}."
+      sources:
+        base:
+          update_self_commit_message: 'Todas as gems: atualiza.'
+          update_version_no_scm_message: "Gem \"%{application_id}\" (Local): atualiza para '%{version}'."
+        update_dependency_requirements:
+          commit_message: "Gem \"%{name}\": atualiza para '%{requirements_list}'."

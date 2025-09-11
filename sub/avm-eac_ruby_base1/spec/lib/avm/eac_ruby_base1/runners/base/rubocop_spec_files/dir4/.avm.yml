@@ -1,0 +1,4 @@
+---
+ruby:
+  rubocop:
+    command: ./false_command.rb

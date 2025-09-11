@@ -1,0 +1,305 @@
+---
+- :gem_name: actionpack
+  :versions_requirements:
+  - :requirements_source: ">= 5.0"
+    :stack:
+    - :gem_name: actionpack-xml_parser
+      :version: &9 !ruby/object:Gem::Version
+        version: 2.0.1
+  - :requirements_source: "= 5.2.8.1"
+    :stack:
+    - :gem_name: rails (= 5.2.8.1)
+      :version: &1 !ruby/object:Gem::Version
+        version: 5.2.8.1
+  - :requirements_source: ">= 5.0.1.rc1"
+    :stack:
+    - :gem_name: rails-controller-testing
+      :version: &2 !ruby/object:Gem::Version
+        version: 1.0.5
+  - :requirements_source: ">= 3.0"
+    :stack:
+    - :gem_name: rspec-rails (~> 3.5, >= 3.5.2)
+      :version: &4 !ruby/object:Gem::Version
+        version: 3.9.1
+  - :requirements_source: ">= 3.1"
+    :stack:
+    - :gem_name: slim-rails
+      :version: &14 !ruby/object:Gem::Version
+        version: 3.6.2
+- :gem_name: actionview
+  :versions_requirements:
+  - :requirements_source: "= 5.2.8.1"
+    :stack:
+    - :gem_name: rails (= 5.2.8.1)
+      :version: *1
+  - :requirements_source: ">= 5.0.1.rc1"
+    :stack:
+    - :gem_name: rails-controller-testing
+      :version: *2
+- :gem_name: activerecord
+  :versions_requirements:
+  - :requirements_source: "< 6, >= 4.1"
+    :stack:
+    - :gem_name: activemodel-associations
+      :version: &3 !ruby/object:Gem::Version
+        version: 0.2.0
+  - :requirements_source: ">= 4.0.0, < 7.1"
+    :stack:
+    - :gem_name: awesome_nested_set
+      :version: &15 !ruby/object:Gem::Version
+        version: 3.5.0
+  - :requirements_source: "= 5.2.8.1"
+    :stack:
+    - :gem_name: rails (= 5.2.8.1)
+      :version: *1
+- :gem_name: activesupport
+  :versions_requirements:
+  - :requirements_source: "< 6, >= 4.1"
+    :stack:
+    - :gem_name: activemodel-associations
+      :version: *3
+  - :requirements_source: ">= 4, < 7"
+    :stack:
+    - :gem_name: redmine_with_git
+      :version: &5 !ruby/object:Gem::Version
+        version: 0.7.9
+    - :gem_name: eac_ruby_utils (~> 0.119)
+      :version: !ruby/object:Gem::Version
+        version: 0.119.1
+  - :requirements_source: ">= 2"
+    :stack:
+    - :gem_name: html-pipeline
+      :version: !ruby/object:Gem::Version
+        version: 2.14.3
+  - :requirements_source: "= 5.2.8.1"
+    :stack:
+    - :gem_name: rails (= 5.2.8.1)
+      :version: *1
+  - :requirements_source: ">= 5.0.1.rc1"
+    :stack:
+    - :gem_name: rails-controller-testing
+      :version: *2
+  - :requirements_source: ">= 5.0.0"
+    :stack:
+    - :gem_name: rails-dom-testing
+      :version: &11 !ruby/object:Gem::Version
+        version: 2.2.0
+  - :requirements_source: ">= 3.0"
+    :stack:
+    - :gem_name: rspec-rails (~> 3.5, >= 3.5.2)
+      :version: *4
+  - :requirements_source: ">= 4.2.0"
+    :stack:
+    - :gem_name: rubocop-rails (~> 2.9.0)
+      :version: &7 !ruby/object:Gem::Version
+        version: 2.9.1
+- :gem_name: i18n
+  :versions_requirements:
+  - :requirements_source: "~> 1.8.2"
+    :stack: []
+  - :requirements_source: ">= 0.7, < 2"
+    :stack:
+    - :gem_name: rails (= 5.2.8.1)
+      :version: *1
+    - :gem_name: activesupport (= 5.2.8.1)
+      :version: *1
+- :gem_name: mail
+  :versions_requirements:
+  - :requirements_source: "~> 2.7.1"
+    :stack: []
+  - :requirements_source: "~> 2.5, >= 2.5.4"
+    :stack:
+    - :gem_name: rails (= 5.2.8.1)
+      :version: *1
+    - :gem_name: actionmailer (= 5.2.8.1)
+      :version: *1
+- :gem_name: mini_mime
+  :versions_requirements:
+  - :requirements_source: "~> 1.0.1"
+    :stack: []
+  - :requirements_source: ">= 0.1.3"
+    :stack:
+    - :gem_name: capybara (~> 3.31.0)
+      :version: &6 !ruby/object:Gem::Version
+        version: 3.31.0
+  - :requirements_source: ">= 0.1.1"
+    :stack:
+    - :gem_name: mail (~> 2.7.1)
+      :version: !ruby/object:Gem::Version
+        version: 2.7.1
+- :gem_name: nokogiri
+  :versions_requirements:
+  - :requirements_source: "~> 1.13.10"
+    :stack: []
+  - :requirements_source: "~> 1.15, >= 1.15.2"
+    :stack:
+    - :gem_name: redmine_with_git
+      :version: *5
+    - :gem_name: avm (~> 0.78)
+      :version: !ruby/object:Gem::Version
+        version: 0.78.0
+    - :gem_name: aranha-parsers (~> 0.20)
+      :version: &8 !ruby/object:Gem::Version
+        version: 0.21.0
+- :gem_name: rack
+  :versions_requirements:
+  - :requirements_source: "~> 2.0, >= 2.0.8"
+    :stack:
+    - :gem_name: rails (= 5.2.8.1)
+      :version: *1
+    - :gem_name: actionpack (= 5.2.8.1)
+      :version: *1
+  - :requirements_source: ">= 1.6.0"
+    :stack:
+    - :gem_name: capybara (~> 3.31.0)
+      :version: *6
+  - :requirements_source: ">= 1.5.1"
+    :stack:
+    - :gem_name: gitlab-grack (~> 2.0.0)
+      :version: !ruby/object:Gem::Version
+        version: 2.0.2
+  - :requirements_source:
+    :stack:
+    - :gem_name: rack-parser
+      :version: !ruby/object:Gem::Version
+        version: 0.7.0
+  - :requirements_source: ">= 1.4"
+    :stack:
+    - :gem_name: request_store (~> 1.5.0)
+      :version: !ruby/object:Gem::Version
+        version: 1.5.1
+  - :requirements_source: ">= 1.1"
+    :stack:
+    - :gem_name: rubocop-rails (~> 2.9.0)
+      :version: *7
+  - :requirements_source: ">= 2.2.4"
+    :stack:
+    - :gem_name: sidekiq
+      :version: !ruby/object:Gem::Version
+        version: 7.1.2
+  - :requirements_source: "> 1, < 3"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: &12 !ruby/object:Gem::Version
+        version: 0.12.2
+    - :gem_name: sass-rails (~> 5.0)
+      :version: &13 !ruby/object:Gem::Version
+        version: 5.1.0
+    - :gem_name: sprockets (>= 2.8, < 4.0)
+      :version: !ruby/object:Gem::Version
+        version: 3.7.2
+- :gem_name: rails
+  :versions_requirements:
+  - :requirements_source: "= 5.2.8.1"
+    :stack: []
+  - :requirements_source: "< 6.2, >= 4.2.0"
+    :stack:
+    - :gem_name: active_scaffold
+      :version: !ruby/object:Gem::Version
+        version: 3.6.20
+  - :requirements_source: ">= 4.1"
+    :stack:
+    - :gem_name: deface (= 1.5.3)
+      :version: !ruby/object:Gem::Version
+        version: 1.5.3
+  - :requirements_source: ">= 4.2.11"
+    :stack:
+    - :gem_name: redmine_nonproject_modules
+      :version: &10 !ruby/object:Gem::Version
+        version: 0.3.12
+    - :gem_name: eac_rails_utils (~> 0.15)
+      :version: *8
+  - :requirements_source: ">= 5.2"
+    :stack:
+    - :gem_name: invisible_captcha
+      :version: !ruby/object:Gem::Version
+        version: 2.1.0
+- :gem_name: railties
+  :versions_requirements:
+  - :requirements_source: ">= 5.0"
+    :stack:
+    - :gem_name: actionpack-xml_parser
+      :version: *9
+  - :requirements_source: ">= 4.2.0"
+    :stack:
+    - :gem_name: redmine_nonproject_modules
+      :version: *10
+    - :gem_name: jquery-rails (~> 4.5)
+      :version: !ruby/object:Gem::Version
+        version: 4.6.0
+  - :requirements_source: ">= 3.2.16"
+    :stack:
+    - :gem_name: jquery-ui-rails (~> 5.0.5)
+      :version: !ruby/object:Gem::Version
+        version: 5.0.5
+  - :requirements_source: "= 5.2.8.1"
+    :stack:
+    - :gem_name: rails (= 5.2.8.1)
+      :version: *1
+  - :requirements_source: ">= 5.1, < 6.2"
+    :stack:
+    - :gem_name: roadie-rails (~> 2.2.0)
+      :version: *11
+  - :requirements_source: ">= 3.0"
+    :stack:
+    - :gem_name: rspec-rails (~> 3.5, >= 3.5.2)
+      :version: *4
+  - :requirements_source: ">= 5.2.0"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: *12
+    - :gem_name: sass-rails (~> 5.0)
+      :version: *13
+  - :requirements_source: ">= 3.1"
+    :stack:
+    - :gem_name: slim-rails
+      :version: *14
+- :gem_name: rspec-rails
+  :versions_requirements:
+  - :requirements_source: "~> 3.5, >= 3.5.2"
+    :stack: []
+  - :requirements_source:
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: *12
+- :gem_name: rubocop
+  :versions_requirements:
+  - :requirements_source: "~> 1.12.0"
+    :stack: []
+  - :requirements_source: ">= 0.90.0, < 2.0"
+    :stack:
+    - :gem_name: rubocop-rails (~> 2.9.0)
+      :version: *7
+  - :requirements_source: "~> 1.0"
+    :stack:
+    - :gem_name: rubocop-rspec
+      :version: !ruby/object:Gem::Version
+        version: 2.4.0
+- :gem_name: "ruby\0"
+  :versions_requirements: []
+- :gem_name: selenium-webdriver
+  :versions_requirements:
+  - :requirements_source: "~> 3.142.7"
+    :stack: []
+  - :requirements_source: "> 3.141, < 5.0"
+    :stack:
+    - :gem_name: webdrivers (~> 4.4)
+      :version: !ruby/object:Gem::Version
+        version: 4.7.0
+- :gem_name: shoulda-matchers
+  :versions_requirements:
+  - :requirements_source: "~> 2.7.0"
+    :stack: []
+  - :requirements_source: ">= 1.4.1, < 3.0"
+    :stack:
+    - :gem_name: shoulda (~> 3.5.0)
+      :version: *15
+- :gem_name: simplecov
+  :versions_requirements:
+  - :requirements_source: "~> 0.18.5"
+    :stack: []
+  - :requirements_source:
+    :stack:
+    - :gem_name: codeclimate-test-reporter
+      :version: !ruby/object:Gem::Version
+        version: 1.0.7

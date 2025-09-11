@@ -1,0 +1,300 @@
+---
+- :gem_name: actionmailer
+  :versions_requirements:
+  - :requirements_source: ">= 4.1.0"
+    :stack:
+    - :gem_name: eac_users_support
+      :version: &8 !ruby/object:Gem::Version
+        version: 0.8.6
+    - :gem_name: devise_invitable (~> 1.7, >= 1.7.5)
+      :version: !ruby/object:Gem::Version
+        version: 1.7.5
+  - :requirements_source: "= 5.2.5"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: &1 !ruby/object:Gem::Version
+        version: 0.52.2
+    - :gem_name: rails (~> 5.2.4, >= 5.2.4.4)
+      :version: &2 !ruby/object:Gem::Version
+        version: 5.2.5
+- :gem_name: actionpack
+  :versions_requirements:
+  - :requirements_source: "= 5.2.5"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rails (~> 5.2.4, >= 5.2.4.4)
+      :version: *2
+  - :requirements_source: "~> 5.x, >= 5.0.1"
+    :stack:
+    - :gem_name: rails-controller-testing
+      :version: &4 !ruby/object:Gem::Version
+        version: 1.0.2
+  - :requirements_source: ">= 3.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rspec-rails (~> 3.7)
+      :version: &6 !ruby/object:Gem::Version
+        version: 3.9.1
+  - :requirements_source: ">= 4.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rails (~> 5.2.4, >= 5.2.4.4)
+      :version: *2
+    - :gem_name: sprockets-rails (>= 2.0.0)
+      :version: &11 !ruby/object:Gem::Version
+        version: 3.2.2
+- :gem_name: activemodel
+  :versions_requirements:
+  - :requirements_source: ">= 3.0"
+    :stack:
+    - :gem_name: activevalidators (~> 5.0, >= 5.0.1)
+      :version: &3 !ruby/object:Gem::Version
+        version: 5.1.0
+  - :requirements_source: ">= 4.0.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: carrierwave (~> 1.3, >= 1.3.1)
+      :version: !ruby/object:Gem::Version
+        version: 1.3.2
+  - :requirements_source: ">= 3, <= 6.1"
+    :stack:
+    - :gem_name: activevalidators (~> 5.0, >= 5.0.1)
+      :version: *3
+    - :gem_name: credit_card_validations (~> 3.2)
+      :version: &5 !ruby/object:Gem::Version
+        version: 3.5.1
+  - :requirements_source: "= 5.2.5"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rails (~> 5.2.4, >= 5.2.4.4)
+      :version: *2
+- :gem_name: activerecord
+  :versions_requirements:
+  - :requirements_source: ">= 5.2.4.5"
+    :stack:
+    - :gem_name: ancestry
+      :version: !ruby/object:Gem::Version
+        version: 4.0.0
+  - :requirements_source: ">= 4.0.0, < 7.0"
+    :stack:
+    - :gem_name: awesome_nested_set
+      :version: !ruby/object:Gem::Version
+        version: 3.4.0
+  - :requirements_source: "= 5.2.5"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rails (~> 5.2.4, >= 5.2.4.4)
+      :version: *2
+  - :requirements_source: "> 3.2"
+    :stack:
+    - :gem_name: wice_grid (= 3.6.0.pre4)
+      :version: !ruby/object:Gem::Version
+        version: 3.6.0.pre4
+- :gem_name: activesupport
+  :versions_requirements:
+  - :requirements_source: "= 5.2.5"
+    :stack:
+    - :gem_name: rails-controller-testing
+      :version: *4
+    - :gem_name: actionpack (~> 5.x, >= 5.0.1)
+      :version: *2
+  - :requirements_source: ">= 3, <= 6.1"
+    :stack:
+    - :gem_name: activevalidators (~> 5.0, >= 5.0.1)
+      :version: *3
+    - :gem_name: credit_card_validations (~> 3.2)
+      :version: *5
+  - :requirements_source: ">= 4.0"
+    :stack:
+    - :gem_name: eac_ruby_utils
+      :version: !ruby/object:Gem::Version
+        version: 0.62.1
+  - :requirements_source: ">= 4.2.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rails (~> 5.2.4, >= 5.2.4.4)
+      :version: *2
+    - :gem_name: activejob (= 5.2.5)
+      :version: *2
+    - :gem_name: globalid (>= 0.3.6)
+      :version: !ruby/object:Gem::Version
+        version: 0.4.2
+  - :requirements_source:
+    :stack:
+    - :gem_name: i18n-recursive-lookup
+      :version: &7 !ruby/object:Gem::Version
+        version: 0.0.5
+  - :requirements_source: ">= 5.0.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: jbuilder (~> 2.0)
+      :version: !ruby/object:Gem::Version
+        version: 2.11.2
+  - :requirements_source: "~> 5.x"
+    :stack:
+    - :gem_name: rails-controller-testing
+      :version: *4
+  - :requirements_source: ">= 3.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rspec-rails (~> 3.7)
+      :version: *6
+- :gem_name: i18n
+  :versions_requirements:
+  - :requirements_source: ">= 0.7, < 2"
+    :stack:
+    - :gem_name: rails-controller-testing
+      :version: *4
+    - :gem_name: actionpack (~> 5.x, >= 5.0.1)
+      :version: *2
+    - :gem_name: activesupport (= 5.2.5)
+      :version: *2
+  - :requirements_source:
+    :stack:
+    - :gem_name: i18n-recursive-lookup
+      :version: *7
+  - :requirements_source: "~> 0.6"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rails-i18n (~> 4.0)
+      :version: !ruby/object:Gem::Version
+        version: 4.0.2
+- :gem_name: rails
+  :versions_requirements:
+  - :requirements_source: ">= 4.0.5, < 5.2.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: active_scaffold (~> 3.5.5)
+      :version: !ruby/object:Gem::Version
+        version: 3.5.5
+  - :requirements_source: ">= 5.1.7, < 6"
+    :stack:
+    - :gem_name: aranha-rails
+      :version: !ruby/object:Gem::Version
+        version: 0.2.1
+  - :requirements_source: ">= 4.2.1"
+    :stack:
+    - :gem_name: can_can_dry
+      :version: !ruby/object:Gem::Version
+        version: 0.5.1
+  - :requirements_source: "~> 5.2.4, >= 5.2.4.4"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+  - :requirements_source: ">= 4.2.11"
+    :stack:
+    - :gem_name: eac_rails_utils
+      :version: !ruby/object:Gem::Version
+        version: 0.12.2
+  - :requirements_source: ">= 4.2.11.3"
+    :stack:
+    - :gem_name: eac_users_support
+      :version: *8
+  - :requirements_source:
+    :stack:
+    - :gem_name: products
+      :version: !ruby/object:Gem::Version
+        version: 0.0.0
+  - :requirements_source: ">= 4.2.0"
+    :stack:
+    - :gem_name: rails-settings-cached (~> 0.7.2)
+      :version: !ruby/object:Gem::Version
+        version: 0.7.2
+  - :requirements_source: ">= 4.0.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: recordselect (>= 3.10.1)
+      :version: !ruby/object:Gem::Version
+        version: 3.10.1
+  - :requirements_source: ">= 3.0"
+    :stack:
+    - :gem_name: simple_calendar (~> 2.0)
+      :version: &10 !ruby/object:Gem::Version
+        version: 2.4.2
+- :gem_name: railties
+  :versions_requirements:
+  - :requirements_source: ">= 4.2.11.3"
+    :stack:
+    - :gem_name: br_railties
+      :version: !ruby/object:Gem::Version
+        version: 0.4.4
+  - :requirements_source: ">= 4.1.0"
+    :stack:
+    - :gem_name: eac_users_support
+      :version: *8
+    - :gem_name: devise (~> 4.6, >= 4.6.1)
+      :version: !ruby/object:Gem::Version
+        version: 4.8.0
+  - :requirements_source: "= 5.2.5"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rails (~> 5.2.4, >= 5.2.4.4)
+      :version: *2
+  - :requirements_source: ">= 3.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rspec-rails (~> 3.7)
+      :version: *6
+  - :requirements_source: ">= 5.2.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: sass-rails (~> 5.0)
+      :version: *3
+  - :requirements_source: ">= 4.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: web-console (~> 2.0)
+      :version: !ruby/object:Gem::Version
+        version: 2.3.0
+- :gem_name: rubocop
+  :versions_requirements:
+  - :requirements_source: "~> 0.80.1"
+    :stack:
+    - :gem_name: eac_ruby_gem_support
+      :version: &9 !ruby/object:Gem::Version
+        version: 0.1.2
+  - :requirements_source: ">= 0.72.0"
+    :stack:
+    - :gem_name: eac_ruby_gem_support
+      :version: *9
+    - :gem_name: rubocop-rails (~> 2.4.2)
+      :version: *10
+  - :requirements_source: ">= 0.68.1"
+    :stack:
+    - :gem_name: eac_ruby_gem_support
+      :version: *9
+    - :gem_name: rubocop-rspec (~> 1.38.1)
+      :version: !ruby/object:Gem::Version
+        version: 1.38.1
+- :gem_name: sprockets
+  :versions_requirements:
+  - :requirements_source: ">= 2.8, < 4.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: sass-rails (~> 5.0)
+      :version: *3
+  - :requirements_source: ">= 3.0.0"
+    :stack:
+    - :gem_name: eac_rails_base0
+      :version: *1
+    - :gem_name: rails (~> 5.2.4, >= 5.2.4.4)
+      :version: *2
+    - :gem_name: sprockets-rails (>= 2.0.0)
+      :version: *11

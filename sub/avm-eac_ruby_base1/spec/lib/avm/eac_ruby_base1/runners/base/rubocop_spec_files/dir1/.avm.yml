@@ -1,0 +1,4 @@
+---
+ruby:
+  rubocop:
+    gemfile: ./dir3/Gemfile

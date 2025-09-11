@@ -1,0 +1,5 @@
+def abc(_arg)
+  123
+end
+
+abc 456

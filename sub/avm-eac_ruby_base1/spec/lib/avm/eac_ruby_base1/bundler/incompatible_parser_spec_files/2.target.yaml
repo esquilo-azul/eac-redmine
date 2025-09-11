@@ -1,0 +1,355 @@
+---
+- :gem_name: actionpack
+  :versions_requirements:
+  - :requirements_source: ">= 4.0.0, < 5"
+    :stack:
+    - :gem_name: actionpack-xml_parser
+      :version: !ruby/object:Gem::Version
+        version: 1.0.2
+  - :requirements_source: ">= 4.0.1"
+    :stack:
+    - :gem_name: haml-rails
+      :version: &8 !ruby/object:Gem::Version
+        version: 1.0.0
+  - :requirements_source: "= 4.2.11.1"
+    :stack:
+    - :gem_name: rails (= 4.2.11.1)
+      :version: &2 !ruby/object:Gem::Version
+        version: 4.2.11.1
+  - :requirements_source: ">= 4.2"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: &1 !ruby/object:Gem::Version
+        version: 0.9.2
+    - :gem_name: rspec-rails
+      :version: &9 !ruby/object:Gem::Version
+        version: 4.1.2
+  - :requirements_source: ">= 4.0"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: *1
+    - :gem_name: sass-rails (~> 5.0)
+      :version: &10 !ruby/object:Gem::Version
+        version: 5.0.7
+    - :gem_name: sprockets-rails (>= 2.0, < 4.0)
+      :version: &11 !ruby/object:Gem::Version
+        version: 3.2.2
+- :gem_name: activemodel
+  :versions_requirements:
+  - :requirements_source: "< 6, >= 4.1"
+    :stack:
+    - :gem_name: redmine_nonproject_modules
+      :version: &3 !ruby/object:Gem::Version
+        version: 0.3.7
+    - :gem_name: eac_rails_utils (~> 0.12, >= 0.12.2)
+      :version: &4 !ruby/object:Gem::Version
+        version: 0.15.0
+    - :gem_name: activemodel-associations (~> 0.2)
+      :version: &5 !ruby/object:Gem::Version
+        version: 0.2.0
+  - :requirements_source: ">= 4.0.1, < 5.0"
+    :stack:
+    - :gem_name: protected_attributes
+      :version: !ruby/object:Gem::Version
+        version: 1.1.4
+  - :requirements_source: "= 4.2.11.1"
+    :stack:
+    - :gem_name: rails (= 4.2.11.1)
+      :version: *2
+  - :requirements_source: ">= 3.0.0"
+    :stack:
+    - :gem_name: redmine_remotes
+      :version: &12 !ruby/object:Gem::Version
+        version: 0.15.1
+    - :gem_name: validate_url (~> 1.0, >= 1.0.8)
+      :version: !ruby/object:Gem::Version
+        version: 1.0.15
+- :gem_name: activerecord
+  :versions_requirements:
+  - :requirements_source: "< 6, >= 4.1"
+    :stack:
+    - :gem_name: redmine_nonproject_modules
+      :version: *3
+    - :gem_name: eac_rails_utils (~> 0.12, >= 0.12.2)
+      :version: *4
+    - :gem_name: activemodel-associations (~> 0.2)
+      :version: *5
+  - :requirements_source: ">= 3.0, < 8.0"
+    :stack:
+    - :gem_name: redmine_events_manager
+      :version: &6 !ruby/object:Gem::Version
+        version: 0.4.11
+    - :gem_name: delayed_job_active_record
+      :version: &7 !ruby/object:Gem::Version
+        version: 4.1.7
+  - :requirements_source: "= 4.2.11.1"
+    :stack:
+    - :gem_name: rails (= 4.2.11.1)
+      :version: *2
+  - :requirements_source: ">= 3.2"
+    :stack:
+    - :gem_name: test_after_commit (~> 0.4.2)
+      :version: !ruby/object:Gem::Version
+        version: 0.4.2
+- :gem_name: activesupport
+  :versions_requirements:
+  - :requirements_source: "< 6, >= 4.1"
+    :stack:
+    - :gem_name: redmine_nonproject_modules
+      :version: *3
+    - :gem_name: eac_rails_utils (~> 0.12, >= 0.12.2)
+      :version: *4
+    - :gem_name: activemodel-associations (~> 0.2)
+      :version: *5
+  - :requirements_source: ">= 3.0, < 8.0"
+    :stack:
+    - :gem_name: redmine_events_manager
+      :version: *6
+    - :gem_name: delayed_job_active_record
+      :version: *7
+    - :gem_name: delayed_job (>= 3.0, < 5)
+      :version: !ruby/object:Gem::Version
+        version: 4.1.10
+  - :requirements_source: ">= 4, < 7"
+    :stack:
+    - :gem_name: notifyme
+      :version: !ruby/object:Gem::Version
+        version: 0.4.10
+    - :gem_name: eac_ruby_utils (~> 0.46)
+      :version: !ruby/object:Gem::Version
+        version: 0.95.1
+  - :requirements_source: ">= 4.0.1"
+    :stack:
+    - :gem_name: haml-rails
+      :version: *8
+  - :requirements_source: "= 4.2.11.1"
+    :stack:
+    - :gem_name: rails (= 4.2.11.1)
+      :version: *2
+  - :requirements_source: ">= 4.2.0, < 5.0"
+    :stack:
+    - :gem_name: rails-dom-testing
+      :version: !ruby/object:Gem::Version
+        version: 1.0.9
+  - :requirements_source: ">= 4.2"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: *1
+    - :gem_name: rspec-rails
+      :version: *9
+  - :requirements_source: ">= 4.0"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: *1
+    - :gem_name: sass-rails (~> 5.0)
+      :version: *10
+    - :gem_name: sprockets-rails (>= 2.0, < 4.0)
+      :version: *11
+- :gem_name: i18n
+  :versions_requirements:
+  - :requirements_source: "~> 0.7.0"
+    :stack: []
+  - :requirements_source: "~> 0.7"
+    :stack:
+    - :gem_name: rails (= 4.2.11.1)
+      :version: *2
+    - :gem_name: activesupport (= 4.2.11.1)
+      :version: *2
+  - :requirements_source: ">= 0.7"
+    :stack:
+    - :gem_name: faker
+      :version: !ruby/object:Gem::Version
+        version: 2.1.0
+- :gem_name: mail
+  :versions_requirements:
+  - :requirements_source: "~> 2.6.4"
+    :stack: []
+  - :requirements_source: "~> 2.5, >= 2.5.4"
+    :stack:
+    - :gem_name: rails (= 4.2.11.1)
+      :version: *2
+    - :gem_name: actionmailer (= 4.2.11.1)
+      :version: *2
+- :gem_name: nokogiri
+  :versions_requirements:
+  - :requirements_source: "~> 1.8.1"
+    :stack: []
+  - :requirements_source: "~> 1.12, >= 1.12.4"
+    :stack:
+    - :gem_name: redmine_remotes
+      :version: *12
+    - :gem_name: aranha-parsers (~> 0.14, >= 0.14.1)
+      :version: !ruby/object:Gem::Version
+        version: 0.14.1
+- :gem_name: rack
+  :versions_requirements:
+  - :requirements_source: "~> 1.6"
+    :stack:
+    - :gem_name: rails (= 4.2.11.1)
+      :version: *2
+    - :gem_name: actionpack (= 4.2.11.1)
+      :version: *2
+  - :requirements_source: ">= 1.0.0"
+    :stack:
+    - :gem_name: capybara (~> 2.13)
+      :version: &13 !ruby/object:Gem::Version
+        version: 2.18.0
+  - :requirements_source: "~> 1.6.0"
+    :stack:
+    - :gem_name: gitlab-grack
+      :version: !ruby/object:Gem::Version
+        version: 2.0.0.pre
+  - :requirements_source: ">= 1.1.0"
+    :stack:
+    - :gem_name: rack-openid
+      :version: !ruby/object:Gem::Version
+        version: 1.4.2
+  - :requirements_source:
+    :stack:
+    - :gem_name: rack-parser
+      :version: !ruby/object:Gem::Version
+        version: 0.7.0
+  - :requirements_source: "> 1, < 3"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: *1
+    - :gem_name: sass-rails (~> 5.0)
+      :version: *10
+    - :gem_name: sprockets (>= 2.8, < 4.0)
+      :version: !ruby/object:Gem::Version
+        version: 3.7.2
+- :gem_name: rack-test
+  :versions_requirements:
+  - :requirements_source: "~> 0.6.2"
+    :stack:
+    - :gem_name: rails (= 4.2.11.1)
+      :version: *2
+    - :gem_name: actionpack (= 4.2.11.1)
+      :version: *2
+  - :requirements_source: ">= 0.5.4"
+    :stack:
+    - :gem_name: capybara (~> 2.13)
+      :version: *13
+- :gem_name: rails
+  :versions_requirements:
+  - :requirements_source: "= 4.2.11.1"
+    :stack: []
+  - :requirements_source: ">= 4.0.5, < 5.2.0"
+    :stack:
+    - :gem_name: redmine_nonproject_modules
+      :version: *3
+    - :gem_name: active_scaffold (~> 3.5)
+      :version: !ruby/object:Gem::Version
+        version: 3.5.5
+  - :requirements_source: ">= 4.2.11"
+    :stack:
+    - :gem_name: redmine_nonproject_modules
+      :version: *3
+    - :gem_name: eac_rails_utils (~> 0.12, >= 0.12.2)
+      :version: *4
+  - :requirements_source:
+    :stack:
+    - :gem_name: redmine_crm
+      :version: !ruby/object:Gem::Version
+        version: 0.0.57
+  - :requirements_source: ">= 4.2, < 6.2"
+    :stack:
+    - :gem_name: redmine_extensions
+      :version: !ruby/object:Gem::Version
+        version: 0.4.4
+- :gem_name: rails-dom-testing
+  :versions_requirements:
+  - :requirements_source:
+    :stack: []
+  - :requirements_source: ">= 1, < 3"
+    :stack:
+    - :gem_name: redmine_nonproject_modules
+      :version: *3
+    - :gem_name: jquery-rails (~> 4.4)
+      :version: &14 !ruby/object:Gem::Version
+        version: 4.5.0
+- :gem_name: railties
+  :versions_requirements:
+  - :requirements_source: ">= 4.0.1"
+    :stack:
+    - :gem_name: haml-rails
+      :version: *8
+  - :requirements_source: ">= 4.2.0"
+    :stack:
+    - :gem_name: redmine_nonproject_modules
+      :version: *3
+    - :gem_name: jquery-rails (~> 4.4)
+      :version: *14
+  - :requirements_source: ">= 4"
+    :stack:
+    - :gem_name: redmine_tasks_scheduler
+      :version: !ruby/object:Gem::Version
+        version: 0.3.1
+    - :gem_name: tasks_scheduler (~> 0.6)
+      :version: !ruby/object:Gem::Version
+        version: 0.6.10
+    - :gem_name: js-routes (~> 1.4, >= 1.4.14)
+      :version: !ruby/object:Gem::Version
+        version: 1.4.14
+  - :requirements_source: "= 4.2.11.1"
+    :stack:
+    - :gem_name: rails (= 4.2.11.1)
+      :version: *2
+  - :requirements_source: ">= 3.0, < 5.1"
+    :stack:
+    - :gem_name: roadie-rails (~> 1.1.1)
+      :version: &15 !ruby/object:Gem::Version
+        version: 1.1.1
+  - :requirements_source: ">= 4.0.0, < 6"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: *1
+    - :gem_name: sass-rails (~> 5.0)
+      :version: *10
+- :gem_name: request_store
+  :versions_requirements:
+  - :requirements_source: "= 1.0.5"
+    :stack: []
+  - :requirements_source: "~> 1.3"
+    :stack:
+    - :gem_name: redmine_nonproject_modules
+      :version: *3
+    - :gem_name: active_scaffold (~> 3.5)
+      :version: !ruby/object:Gem::Version
+        version: 3.6.10
+- :gem_name: roadie
+  :versions_requirements:
+  - :requirements_source: "~> 3.2.1"
+    :stack: []
+  - :requirements_source: "~> 3.1"
+    :stack:
+    - :gem_name: roadie-rails (~> 1.1.1)
+      :version: *15
+- :gem_name: sprockets
+  :versions_requirements:
+  - :requirements_source: ">= 2.8, < 4.0"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: *1
+    - :gem_name: sass-rails (~> 5.0)
+      :version: *10
+  - :requirements_source: ">= 3.0.0"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: *1
+    - :gem_name: sass-rails (~> 5.0)
+      :version: *10
+    - :gem_name: sprockets-rails (>= 2.0, < 4.0)
+      :version: *11
+- :gem_name: sprockets-rails
+  :versions_requirements:
+  - :requirements_source:
+    :stack:
+    - :gem_name: rails (= 4.2.11.1)
+      :version: *2
+  - :requirements_source: ">= 2.0, < 4.0"
+    :stack:
+    - :gem_name: redmine_plugins_helper
+      :version: *1
+    - :gem_name: sass-rails (~> 5.0)
+      :version: *10
