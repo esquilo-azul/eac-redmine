@@ -133,7 +133,7 @@ PATH
 PATH
   remote: sub/eac_ruby_utils
   specs:
-    eac_ruby_utils (0.128.3)
+    eac_ruby_utils (0.128.4)
       activesupport (>= 4, < 7)
       addressable (~> 2.8, >= 2.8.7)
       bundler
