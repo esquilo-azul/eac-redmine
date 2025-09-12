@@ -88,17 +88,6 @@ PATH
       eac_rails_utils (~> 0.26, >= 0.26.1)
       eac_ruby_utils (~> 0.128, >= 0.128.3)
 
-PATH
-  remote: sub/tasks_scheduler
-  specs:
-    tasks_scheduler (0.10.1)
-      avm-eac_ruby_base1 (~> 0.38)
-      daemons (~> 1.4, >= 1.4.1)
-      eac_active_scaffold (~> 0.7)
-      eac_rails_utils (~> 0.26, >= 0.26.2)
-      eac_ruby_utils (~> 0.128, >= 0.128.3)
-      parse-cron (~> 0.1, >= 0.1.4)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -665,6 +654,13 @@ GEM
       diff-lcs
       patience_diff
     tanuki_emoji (0.7.0)
+    tasks_scheduler (0.10.1)
+      avm-eac_ruby_base1 (~> 0.38)
+      daemons (~> 1.4, >= 1.4.1)
+      eac_active_scaffold (~> 0.7)
+      eac_rails_utils (~> 0.26, >= 0.26.2)
+      eac_ruby_utils (~> 0.128, >= 0.128.3)
+      parse-cron (~> 0.1, >= 0.1.4)
     telegram-bot-ruby (2.4.0)
       dry-struct (~> 1.6)
       faraday (~> 2.0)
@@ -779,7 +775,6 @@ DEPENDENCIES
   spring
   spring-commands-rspec
   sshkey
-  tasks_scheduler!
   tzinfo-data
   webdrivers (= 4.6.1)
   yard
