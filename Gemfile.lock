@@ -89,15 +89,6 @@ PATH
       eac_ruby_utils (~> 0.128, >= 0.128.3)
 
 PATH
-  remote: sub/eac_active_scaffold
-  specs:
-    eac_active_scaffold (0.7.1)
-      active_scaffold (~> 3.7, >= 3.7.13)
-      eac_rails_utils (~> 0.26, >= 0.26.2)
-      eac_ruby_utils (~> 0.128, >= 0.128.3)
-      recordselect (~> 3.10, >= 3.10.9)
-
-PATH
   remote: sub/eac_rails_utils
   specs:
     eac_rails_utils (0.26.2)
@@ -325,6 +316,11 @@ GEM
       dry-inflector (~> 1.0)
       dry-logic (~> 1.4)
       zeitwerk (~> 2.6)
+    eac_active_scaffold (0.7.1)
+      active_scaffold (~> 3.7, >= 3.7.13)
+      eac_rails_utils (~> 0.26, >= 0.26.2)
+      eac_ruby_utils (~> 0.128, >= 0.128.3)
+      recordselect (~> 3.10, >= 3.10.9)
     eac_cli (0.44.2)
       colorize (~> 0.8, >= 0.8.1)
       eac_config (~> 0.15)
@@ -734,7 +730,6 @@ DEPENDENCIES
   dalli
   database_cleaner-active_record
   deckar01-task_list (= 2.3.2)
-  eac_active_scaffold!
   eac_rails_utils!
   eac_redmine_base0!
   eac_ruby_utils!
