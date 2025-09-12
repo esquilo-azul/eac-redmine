@@ -4,7 +4,7 @@ module RedmineAvm
   AUTHOR = 'Eduardo Henrique Bogoni'
   HOMEPAGE = 'https://github.com/esquilo-azul/redmine_avm'
   SUMMARY = 'AVM support for Redmine.'
-  VERSION = '0.3.14'
+  VERSION = '0.3.15'
 
   module Version
   end
