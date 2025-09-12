@@ -89,16 +89,6 @@ PATH
       eac_ruby_utils (~> 0.128, >= 0.128.3)
 
 PATH
-  remote: sub/avm-eac_ruby_base1
-  specs:
-    avm-eac_ruby_base1 (0.38.1)
-      aranha-parsers (~> 0.26, >= 0.26.1)
-      avm (~> 0.98, >= 0.98.1)
-      avm-eac_generic_base0 (~> 0.15, >= 0.15.1)
-      eac_envs-http (~> 0.7)
-      eac_ruby_utils (~> 0.128, >= 0.128.4)
-
-PATH
   remote: sub/eac_active_scaffold
   specs:
     eac_active_scaffold (0.7.1)
@@ -239,6 +229,12 @@ GEM
     avm-eac_generic_base0 (0.15.1)
       avm (~> 0.96, >= 0.96.1)
       eac_ruby_utils (~> 0.128)
+    avm-eac_ruby_base1 (0.38.1)
+      aranha-parsers (~> 0.26, >= 0.26.1)
+      avm (~> 0.98, >= 0.98.1)
+      avm-eac_generic_base0 (~> 0.15, >= 0.15.1)
+      eac_envs-http (~> 0.7)
+      eac_ruby_utils (~> 0.128, >= 0.128.4)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -730,7 +726,6 @@ DEPENDENCIES
   additionals!
   addressable
   asciidoctor
-  avm-eac_ruby_base1!
   bullet
   bundler (>= 1.12.0)
   commonmarker (~> 0.23.8)

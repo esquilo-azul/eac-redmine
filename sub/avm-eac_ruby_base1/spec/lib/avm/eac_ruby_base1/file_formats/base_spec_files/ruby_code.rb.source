@@ -1,6 +1,0 @@
-def  abc (   arg )
-  123
-end
-
-
-abc              456
