@@ -1,3 +1,0 @@
----
-locale: en
-bundle_test_command: exec rspec
