@@ -1,12 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Style/RedundantStringEscape:
-  Exclude:
-  - lib/avm/issue/dependencies_section_check.rb
-  - lib/avm/issue/motivation_check.rb
-  - test/lib/avm/listeners/issue_auto_unblock_test.rb
-  - test/lib/avm/listeners/issue_dependencies_section_check_test.rb
 Style/StringConcatenation:
   Exclude:
   - config/initializers/redmine_plugins_helper.rb

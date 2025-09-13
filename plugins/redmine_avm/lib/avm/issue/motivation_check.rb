@@ -10,7 +10,7 @@ module Avm
       def run
         return if motivated?
 
-        Rails.logger.info("\##{@issue.id}: unmotivated")
+        Rails.logger.info("##{@issue.id}: unmotivated")
         undefine
       end
 

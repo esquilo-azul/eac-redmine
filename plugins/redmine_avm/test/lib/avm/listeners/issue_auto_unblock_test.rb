@@ -14,7 +14,7 @@ module Avm
         @blocking = issues(:issues_010) # rubocop:disable Naming/VariableNumber
         @blocked.status = Avm::Settings.issue_status_blocked
         @blocked.description += "\nh3. Dependencies\n\n" +
-                                @blocked.dependencies.map { |d| "\##{d.id}" }.join(', ')
+                                @blocked.dependencies.map { |d| "##{d.id}" }.join(', ')
         @blocked.save!
         @blocked.reload
         assert @blocked.relations_to.where(issue_from: @blocking).any?

@@ -44,9 +44,9 @@ module Avm
 
           h3. Dependencies
 
-          \#123 - dependency one
-          dependency two: \#456
-          other dependencies: \#234 \#34
+          #123 - dependency one
+          dependency two: #456
+          other dependencies: #234 #34
         MESSAGE
                       Avm::Settings.issue_status_undefined)
       end
@@ -57,9 +57,9 @@ module Avm
 
           h3. Dependencies
 
-          \#123 - dependency one
-          dependency two: \#456
-          other dependencies: \#10 \#34
+          #123 - dependency one
+          dependency two: #456
+          other dependencies: #10 #34
         MESSAGE
                       @status)
       end

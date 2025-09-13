@@ -12,13 +12,13 @@ module Avm
         return if @issue.dependencies.empty?
 
         unless @issue.dependencies_section
-          Rails.logger.info("\##{@issue.id}: no section found")
+          Rails.logger.info("##{@issue.id}: no section found")
           undefine_no_dependencies_secion
           return
         end
         return if all_dependencies_in_dependencies_section?
 
-        Rails.logger.info("\##{@issue.id}: missing dependencies in dependency section")
+        Rails.logger.info("##{@issue.id}: missing dependencies in dependency section")
         undefine_no_all_dependencies
       end
 
