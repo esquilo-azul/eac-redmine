@@ -1,9 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Style/OptionalBooleanParameter:
-  Exclude:
-  - lib/avm/settings.rb
 Style/RedundantConstantBase:
   Exclude:
   - config/initializers/redmine_plugins_helper.rb

@@ -3,19 +3,19 @@
 module Avm
   class Settings
     class << self
-      def issue_status_undefined(raise_if_empty = true)
+      def issue_status_undefined(raise_if_empty = true) # rubocop:disable Style/OptionalBooleanParameter
         issue_status('issue_status_undefined_id', 'indefida', raise_if_empty)
       end
 
-      def issue_status_blocked(raise_if_empty = true)
+      def issue_status_blocked(raise_if_empty = true) # rubocop:disable Style/OptionalBooleanParameter
         issue_status('issue_status_blocked_id', 'bloqueada', raise_if_empty)
       end
 
-      def issue_status_unblocked(raise_if_empty = true)
+      def issue_status_unblocked(raise_if_empty = true) # rubocop:disable Style/OptionalBooleanParameter
         issue_status('issue_status_unblocked_id', 'desbloqueada', raise_if_empty)
       end
 
-      def admin_user(raise_if_empty = true)
+      def admin_user(raise_if_empty = true) # rubocop:disable Style/OptionalBooleanParameter
         if Setting.plugin_redmine_avm['admin_user_id'].present?
           User.find(Setting.plugin_redmine_avm['admin_user_id'])
         elsif raise_if_empty
