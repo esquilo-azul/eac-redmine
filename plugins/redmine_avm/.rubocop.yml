@@ -1,9 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Layout/LineEndStringConcatenationIndentation:
-  Exclude:
-  - config/initializers/redmine_plugins_helper.rb
 Layout/MultilineMethodCallIndentation:
   Exclude:
   - app/controllers/issue_status_assigns_controller.rb
