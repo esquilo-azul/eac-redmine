@@ -18,6 +18,6 @@ module RedmineGitHosting
   end
 end
 
-patch = ::RedmineGitHosting::Cache::DatabasePatch
-target = ::RedmineGitHosting::Cache::Database
+patch = RedmineGitHosting::Cache::DatabasePatch
+target = RedmineGitHosting::Cache::Database
 target.send(:include, patch) unless target.included_modules.include? patch

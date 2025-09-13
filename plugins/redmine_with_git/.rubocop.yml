@@ -1,16 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Style/RedundantConstantBase:
-  Exclude:
-  - config/initializers/000_dependencies.rb
-  - config/initializers/001_patches.rb
-  - init.rb
-  - lib/redmine_with_git/patches/redmine_git_hosting/cache/database_patch.rb
-  - lib/redmine_with_git/patches/redmine_git_hosting/commands/git/git_patch.rb
-  - lib/redmine_with_git/patches/redmine_git_hosting/gitolite_hook_patch.rb
-  - lib/tasks/redmine_with_git.rake
-  - redmine_with_git.gemspec
 Style/RedundantStringEscape:
   Exclude:
   - lib/redmine_with_git/patches/redmine_git_hosting/gitolite_hook_patch.rb

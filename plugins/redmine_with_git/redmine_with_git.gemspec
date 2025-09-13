@@ -8,7 +8,7 @@ require 'redmine_with_git/version'
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = 'redmine_with_git'
-  s.version     = ::RedmineWithGit::VERSION
+  s.version     = RedmineWithGit::VERSION
   s.authors     = ['Esquilo Azul Company']
   s.summary     = 'Additional features for RedmineGitHosting.'
 

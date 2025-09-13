@@ -12,14 +12,14 @@ namespace :redmine_with_git do # rubocop:disable Metrics/BlockLength
         * [space_limit]: limits the used space by all rotated files.
       DESCRIPTION
       task a, %i[path overwrite space_limit] => :environment do |_t, args|
-        ::RedmineWithGit::Dump.const_get(a.camelize).new(args.path, overwrite: args.overwrite,
-                                                                    space_limit: args.space_limit)
+        RedmineWithGit::Dump.const_get(a.camelize).new(args.path, overwrite: args.overwrite,
+                                                                  space_limit: args.space_limit)
       end
     end
     namespace :load do
       desc "Load backup file for \"#{a}\" resource(s)"
       task a, [:path] => :environment do |_t, args|
-        ::RedmineWithGit::Load.const_get(a.camelize).new(args.path)
+        RedmineWithGit::Load.const_get(a.camelize).new(args.path)
       end
     end
   end
