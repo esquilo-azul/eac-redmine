@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Issue
     class Undefine
       def initialize(issue)
@@ -30,13 +30,13 @@ module Avm
 
       def undefine
         @issue.init_journal(
-          Avm::Settings.admin_user,
+          RedmineAvm::Settings.admin_user,
           I18n.t(
             :issue_undefine_message,
             undefined_dependencies_ids: undefined_dependency_ids_string
           )
         )
-        @issue.status = Avm::Settings.issue_status_undefined
+        @issue.status = RedmineAvm::Settings.issue_status_undefined
         @issue.save!
       end
 

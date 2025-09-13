@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Listeners
-    class IssueDependenciesSectionCheck
+    class IssueMotivationCheck
       attr_reader :event
 
       def initialize(event)
@@ -12,9 +12,9 @@ module Avm
       def run
         issue = issue_to_check
         return unless issue
-        return if issue.status == Avm::Settings.issue_status_undefined
+        return if issue.status == RedmineAvm::Settings.issue_status_undefined
 
-        Avm::Issue::DependenciesSectionCheck.new(issue).run if issue
+        RedmineAvm::Issue::MotivationCheck.new(issue).run if issue
       end
 
       private

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Listeners
     class IssueAutoUnblock
       module IssueUpdate
@@ -26,7 +26,7 @@ module Avm
         end
 
         def status_changed_to_blocked?
-          new_integer_value('status_id') == Avm::Settings.issue_status_blocked.id
+          new_integer_value('status_id') == RedmineAvm::Settings.issue_status_blocked.id
         end
 
         def new_integer_value(attr)

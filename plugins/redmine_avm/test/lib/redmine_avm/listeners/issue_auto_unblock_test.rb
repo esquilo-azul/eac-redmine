@@ -2,7 +2,7 @@
 
 require 'test_helper'
 
-module Avm
+module RedmineAvm
   module Listeners
     class IssueAutoUnblockTest < ActiveSupport::TestCase
       fixtures :enumerations, :issues, :issue_relations, :issue_statuses, :projects, :trackers,
@@ -12,13 +12,13 @@ module Avm
       setup do
         @blocked = issues(:issues_009) # rubocop:disable Naming/VariableNumber
         @blocking = issues(:issues_010) # rubocop:disable Naming/VariableNumber
-        @blocked.status = Avm::Settings.issue_status_blocked
+        @blocked.status = RedmineAvm::Settings.issue_status_blocked
         @blocked.description += "\nh3. Dependencies\n\n" + # rubocop:disable Style/StringConcatenation
                                 @blocked.dependencies.map { |d| "##{d.id}" }.join(', ')
         @blocked.save!
         @blocked.reload
         assert @blocked.relations_to.where(issue_from: @blocking).any?
-        assert_equal Avm::Settings.issue_status_blocked, @blocked.status
+        assert_equal RedmineAvm::Settings.issue_status_blocked, @blocked.status
       end
 
       test 'unblock by issue relation delete' do
@@ -31,40 +31,40 @@ module Avm
         blocked.dependencies.each do |d|
           assert d.closed?, "#{d} is not closed"
         end
-        assert_equal Avm::Settings.issue_status_unblocked, blocked.status
+        assert_equal RedmineAvm::Settings.issue_status_unblocked, blocked.status
       end
 
       test 'unblock by issue delete' do
         blocked = issues(:issues_009) # rubocop:disable Naming/VariableNumber
         blocking = issues(:issues_010) # rubocop:disable Naming/VariableNumber
-        blocked.status = Avm::Settings.issue_status_blocked
+        blocked.status = RedmineAvm::Settings.issue_status_blocked
         blocked.save!
         assert blocked.relations_to.where(issue_from: blocking).any?
-        assert_equal Avm::Settings.issue_status_blocked, blocked.status
+        assert_equal RedmineAvm::Settings.issue_status_blocked, blocked.status
         blocking.destroy!
         blocked.reload
         blocked.dependencies.each do |d|
           assert d.closed?, "#{d} is not closed"
         end
-        assert_equal Avm::Settings.issue_status_unblocked, blocked.status
+        assert_equal RedmineAvm::Settings.issue_status_unblocked, blocked.status
       end
 
       test 'unblock by issue blocking closed' do
-        blocking.init_journal(Avm::Settings.admin_user, '')
+        blocking.init_journal(RedmineAvm::Settings.admin_user, '')
         blocking.status = issue_statuses(:issue_statuses_005) # rubocop:disable Naming/VariableNumber
         blocking.save!
         blocked.reload
         blocked.dependencies.each { |d| assert d.closed?, "#{d} is not closed" }
-        assert_equal Avm::Settings.issue_status_unblocked, blocked.status
+        assert_equal RedmineAvm::Settings.issue_status_unblocked, blocked.status
       end
 
       test 'unblock by issue blocking' do
         test_unblock_by_issue_blocking_closed
-        blocked.init_journal(Avm::Settings.admin_user, '')
-        blocked.status = Avm::Settings.issue_status_blocked
+        blocked.init_journal(RedmineAvm::Settings.admin_user, '')
+        blocked.status = RedmineAvm::Settings.issue_status_blocked
         blocked.save!
         blocked.reload
-        assert_equal Avm::Settings.issue_status_unblocked, blocked.status
+        assert_equal RedmineAvm::Settings.issue_status_unblocked, blocked.status
       end
     end
   end

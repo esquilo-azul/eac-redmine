@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Listeners
     class IssueAutoUndefine
       module IssueUpdate
@@ -23,11 +23,11 @@ module Avm
         end
 
         def status_changed_to_undefined?
-          new_integer_value('status_id') == Avm::Settings.issue_status_undefined.id
+          new_integer_value('status_id') == RedmineAvm::Settings.issue_status_undefined.id
         end
 
         def status_changed_from_undefined?
-          old_integer_value('status_id') == Avm::Settings.issue_status_undefined.id
+          old_integer_value('status_id') == RedmineAvm::Settings.issue_status_undefined.id
         end
 
         def parent_changed_and_undefined?

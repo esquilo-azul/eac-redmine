@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Listeners
     class IssueAutoAssign
       attr_reader :event
@@ -11,7 +11,7 @@ module Avm
 
       def run
         issue = issue_to_check
-        Avm::Issue::Assign.new(issue).run if issue
+        RedmineAvm::Issue::Assign.new(issue).run if issue
       end
 
       private

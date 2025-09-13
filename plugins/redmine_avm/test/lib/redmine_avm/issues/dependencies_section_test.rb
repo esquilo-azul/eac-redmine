@@ -3,7 +3,7 @@
 require 'test_helper'
 require 'eac_ruby_gem_support/source_target_fixtures'
 
-module Avm
+module RedmineAvm
   module Issues
     class DependenciesSectionTest < ActiveSupport::TestCase
       fixtures :enumerations, :issues, :issue_relations, :issue_statuses, :projects, :trackers,

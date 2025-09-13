@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Listeners
     class IssueAutoUndefine
       include IssueCreate
@@ -27,7 +27,7 @@ module Avm
 
           issues.each do |issue|
             Rails.logger.debug { "#{m}: #{issue}" }
-            Avm::Issue::Undefine.new(issue).run
+            RedmineAvm::Issue::Undefine.new(issue).run
           end
           true
         end

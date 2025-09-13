@@ -10,7 +10,7 @@ module RedmineAvm
 
       module InstanceMethods
         def undefined?
-          status == ::Avm::Settings.issue_status_undefined
+          status == ::RedmineAvm::Settings.issue_status_undefined
         end
 
         def description_section(section_title)
@@ -37,7 +37,7 @@ module RedmineAvm
         end
 
         def dependencies_section
-          description_section(::Avm::Settings.dependencies_section_title)
+          description_section(::RedmineAvm::Settings.dependencies_section_title)
         end
 
         def dependencies_section_dependencies
@@ -62,7 +62,7 @@ module RedmineAvm
         end
 
         def motivation_section
-          description_section(::Avm::Settings.motivation_section_title)
+          description_section(::RedmineAvm::Settings.motivation_section_title)
         end
       end
     end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   class Settings
     class << self
       def issue_status_undefined(raise_if_empty = true) # rubocop:disable Style/OptionalBooleanParameter

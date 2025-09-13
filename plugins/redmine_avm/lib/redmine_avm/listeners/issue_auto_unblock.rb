@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Listeners
     class IssueAutoUnblock
       include IssueDelete
@@ -26,7 +26,7 @@ module Avm
 
           issues.each do |issue|
             Rails.logger.debug { "#{m}: #{issue}" }
-            Avm::Issue::Unblock.new(issue).run
+            RedmineAvm::Issue::Unblock.new(issue).run
           end
           true
         end

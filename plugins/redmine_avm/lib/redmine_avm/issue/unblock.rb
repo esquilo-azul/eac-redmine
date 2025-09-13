@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Issue
     class Unblock
       def initialize(issue)
@@ -26,7 +26,7 @@ module Avm
       end
 
       def status_blocked?
-        @issue.status == Avm::Settings.issue_status_blocked
+        @issue.status == RedmineAvm::Settings.issue_status_blocked
       end
 
       def open_dependencies?
@@ -35,10 +35,10 @@ module Avm
 
       def unblock
         @issue.init_journal(
-          Avm::Settings.admin_user,
+          RedmineAvm::Settings.admin_user,
           I18n.t(:issue_unblock_message)
         )
-        @issue.status = Avm::Settings.issue_status_unblocked
+        @issue.status = RedmineAvm::Settings.issue_status_unblocked
         @issue.save!
       end
     end

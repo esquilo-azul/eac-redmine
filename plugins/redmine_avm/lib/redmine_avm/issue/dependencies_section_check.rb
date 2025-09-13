@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Issue
     class DependenciesSectionCheck
       def initialize(issue)
@@ -31,20 +31,20 @@ module Avm
 
       def undefine_no_dependencies_secion
         @issue.init_journal(
-          Avm::Settings.admin_user,
-          Avm::Settings.no_dependencies_section_message
+          RedmineAvm::Settings.admin_user,
+          RedmineAvm::Settings.no_dependencies_section_message
         )
-        @issue.status = Avm::Settings.issue_status_undefined
+        @issue.status = RedmineAvm::Settings.issue_status_undefined
         @issue.save!
       end
 
       def undefine_no_all_dependencies
         @issue.init_journal(
-          Avm::Settings.admin_user,
-          format(Avm::Settings.dependencies_section_missing_dependencies_message,
+          RedmineAvm::Settings.admin_user,
+          format(RedmineAvm::Settings.dependencies_section_missing_dependencies_message,
                  ids: no_dependencies_section_ids_string)
         )
-        @issue.status = Avm::Settings.issue_status_undefined
+        @issue.status = RedmineAvm::Settings.issue_status_undefined
         @issue.save!
       end
 

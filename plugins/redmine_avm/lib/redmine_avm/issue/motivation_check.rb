@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Issue
     class MotivationCheck
       def initialize(issue)
@@ -22,10 +22,10 @@ module Avm
 
       def undefine
         @issue.init_journal(
-          Avm::Settings.admin_user,
-          Avm::Settings.unmotivated_message
+          RedmineAvm::Settings.admin_user,
+          RedmineAvm::Settings.unmotivated_message
         )
-        @issue.status = Avm::Settings.issue_status_undefined
+        @issue.status = RedmineAvm::Settings.issue_status_undefined
         @issue.save!
       end
     end

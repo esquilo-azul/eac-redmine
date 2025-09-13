@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avm
+module RedmineAvm
   module Issue
     class Assign
       attr_reader :issue
@@ -37,7 +37,7 @@ module Avm
         Rails.logger.debug { "Assigning #{user} to #{issue}" }
         user_label = user ? user.to_s : 'NENHUM'
         @issue.init_journal(
-          Avm::Settings.admin_user,
+          RedmineAvm::Settings.admin_user,
           I18n.t(:issue_assign_message, user: user_label, issue_status: issue.status,
                                         issue_field: issue_status_assign.issue_field.name)
         )

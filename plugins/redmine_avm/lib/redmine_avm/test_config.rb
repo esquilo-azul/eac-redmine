@@ -9,7 +9,7 @@ module RedmineAvm
       s['issue_status_unblocked_id'] = 2
       s['admin_user_id'] = 1
       ::Setting.plugin_redmine_avm = s
-      ::ListenerOption.listener_enable('Avm::Listeners::IssueMotivationCheck', false)
+      ::ListenerOption.listener_enable('RedmineAvm::Listeners::IssueMotivationCheck', false)
     end
   end
 end

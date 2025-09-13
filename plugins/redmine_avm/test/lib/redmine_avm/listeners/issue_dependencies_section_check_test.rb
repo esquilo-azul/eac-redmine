@@ -2,7 +2,7 @@
 
 require 'test_helper'
 
-module Avm
+module RedmineAvm
   module Listeners
     class IssueDependenciesSectionCheckTest < ActiveSupport::TestCase
       fixtures :enumerations, :issues, :issue_relations, :issue_statuses, :projects, :trackers,
@@ -12,11 +12,11 @@ module Avm
       setup do
         @blocked = issues(:issues_009) # rubocop:disable Naming/VariableNumber
         @blocking = issues(:issues_010) # rubocop:disable Naming/VariableNumber
-        @blocked.status = Avm::Settings.issue_status_blocked
+        @blocked.status = RedmineAvm::Settings.issue_status_blocked
         @blocked.save!
         @blocked.reload
         assert @blocked.relations_to.where(issue_from: @blocking).any?
-        @status = Avm::Settings.issue_status_blocked
+        @status = RedmineAvm::Settings.issue_status_blocked
         assert_equal @status, @blocked.status
       end
 
@@ -24,7 +24,7 @@ module Avm
         assert_status(<<~MESSAGE,
           There is not dependencies section.
         MESSAGE
-                      Avm::Settings.issue_status_undefined)
+                      RedmineAvm::Settings.issue_status_undefined)
       end
 
       test 'dependencies ids with empty dependencies section' do
@@ -35,7 +35,7 @@ module Avm
 
           Here is the dependencies section
         MESSAGE
-                      Avm::Settings.issue_status_undefined)
+                      RedmineAvm::Settings.issue_status_undefined)
       end
 
       test 'dependencies ids without dependency writed' do
@@ -48,7 +48,7 @@ module Avm
           dependency two: #456
           other dependencies: #234 #34
         MESSAGE
-                      Avm::Settings.issue_status_undefined)
+                      RedmineAvm::Settings.issue_status_undefined)
       end
 
       test 'dependencies ids with dependency writed' do
