@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-namespace :avm do
-  namespace :issue do
+namespace :avm do # rubocop:disable Metrics/BlockLength
+  namespace :issue do # rubocop:disable Metrics/BlockLength
     desc 'Verifica auto-indefinição de uma tarefa'
     task :undefine, [:issue_id] => :environment do |_t, args|
       Avm::Issue::Undefine.new(Issue.find(args.issue_id)).run

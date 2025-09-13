@@ -1,9 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Metrics/BlockLength:
-  Exclude:
-  - lib/tasks/issue.rake
 Naming/VariableNumber:
   Exclude:
   - test/lib/avm/issues/dependencies_section_test.rb
