@@ -11,9 +11,9 @@ default_value = {
   unmotivated_message: 'This issue is not motivated.'
 }
 
-if ::RedminePluginsHelper::Available.model?(::User)
-  default_admin = ::User.where(id: 1, admin: true).first
+if RedminePluginsHelper::Available.model?(User)
+  default_admin = User.where(id: 1, admin: true).first
   default_value[:admin_user_id] = default_admin.id if default_admin
 end
 
-::RedminePluginsHelper::Settings.default(:redmine_avm, default_value)
+RedminePluginsHelper::Settings.default(:redmine_avm, default_value)

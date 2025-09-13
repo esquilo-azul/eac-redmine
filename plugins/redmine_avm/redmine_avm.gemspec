@@ -8,10 +8,10 @@ require 'redmine_avm/version'
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
   s.name        = 'redmine_avm'
-  s.version     = ::RedmineAvm::VERSION
-  s.authors     = [::RedmineAvm::AUTHOR]
-  s.summary     = ::RedmineAvm::SUMMARY
-  s.homepage    = ::RedmineAvm::HOMEPAGE
+  s.version     = RedmineAvm::VERSION
+  s.authors     = [RedmineAvm::AUTHOR]
+  s.summary     = RedmineAvm::SUMMARY
+  s.homepage    = RedmineAvm::HOMEPAGE
 
   s.files = Dir['{app,config,db,lib}/**/*', 'init.rb']
   s.required_ruby_version = '>= 2.7'

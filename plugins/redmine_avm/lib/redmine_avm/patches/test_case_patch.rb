@@ -11,6 +11,6 @@ module RedmineAvm
 end
 
 if Rails.env.test? &&
-   !(::ActiveSupport::TestCase.included_modules.include? ::RedmineAvm::Patches::TestCasePatch)
-  ::ActiveSupport::TestCase.include ::RedmineAvm::Patches::TestCasePatch # rubocop:disable Rails/ActiveSupportOnLoad
+   !(ActiveSupport::TestCase.included_modules.include? RedmineAvm::Patches::TestCasePatch)
+  ActiveSupport::TestCase.include RedmineAvm::Patches::TestCasePatch # rubocop:disable Rails/ActiveSupportOnLoad
 end

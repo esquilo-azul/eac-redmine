@@ -69,6 +69,6 @@ module RedmineAvm
   end
 end
 
-unless ::Issue.included_modules.include? ::RedmineAvm::Patches::IssuePatch
-  ::Issue.include ::RedmineAvm::Patches::IssuePatch
+unless Issue.included_modules.include? RedmineAvm::Patches::IssuePatch
+  Issue.include RedmineAvm::Patches::IssuePatch
 end
