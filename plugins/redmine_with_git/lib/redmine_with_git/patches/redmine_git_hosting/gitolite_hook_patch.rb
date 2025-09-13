@@ -63,7 +63,7 @@ module RedmineWithGit
 
           # @return [String]
           def shebang_to
-            "\#\!#{send("#{shebang_replacement}_shebang")}\n"
+            "#!#{send("#{shebang_replacement}_shebang")}\n"
           end
 
           # @return [String]

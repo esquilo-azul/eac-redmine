@@ -4,7 +4,7 @@ namespace :redmine_with_git do # rubocop:disable Metrics/BlockLength
   %w[database files git all].each do |a|
     namespace :dump do
       desc <<~DESCRIPTION
-        Dump backup file for \"#{a}\" resource(s).
+        Dump backup file for "#{a}" resource(s).
 
         Arguments:
         * <path>: path to the dump.
