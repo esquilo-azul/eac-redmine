@@ -43,7 +43,7 @@ class BackupController < ApplicationController
 
   def import_respond_to_html
     if @load.errors.empty?
-      redirect_to backup_path, notice: 'Backup imported'
+      redirect_to backup_path, notice: 'Backup imported' # rubocop:disable Rails/I18nLocaleTexts
     else
       render :index
     end
