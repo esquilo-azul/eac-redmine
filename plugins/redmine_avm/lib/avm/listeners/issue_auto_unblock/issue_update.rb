@@ -7,7 +7,8 @@ module Avm
         def issue_updated
           return unless issue_update_event?
           return [issue] if status_changed_to_blocked?
-          return issue.r_dependencies if status_changed_to_closed?
+
+          issue.r_dependencies if status_changed_to_closed?
         end
 
         private

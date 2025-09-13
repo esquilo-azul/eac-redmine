@@ -21,8 +21,9 @@ module Avm
 
       def issue_to_check
         return event.data.issue if event.issue_update?
-        return event.data.issue_to if event.issue_relation_create? &&
-                                      event.data.relation_type == IssueRelation::TYPE_BLOCKS
+
+        event.data.issue_to if event.issue_relation_create? &&
+                               event.data.relation_type == IssueRelation::TYPE_BLOCKS
       end
     end
   end

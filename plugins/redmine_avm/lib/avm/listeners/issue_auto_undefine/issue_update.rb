@@ -8,7 +8,8 @@ module Avm
           return unless issue_update_event?
           return journal.issue.r_dependencies if status_changed_to_undefined?
           return [journal.issue] if status_changed_from_undefined?
-          return [journal.issue.parent] if parent_changed_and_undefined?
+
+          [journal.issue.parent] if parent_changed_and_undefined?
         end
 
         private

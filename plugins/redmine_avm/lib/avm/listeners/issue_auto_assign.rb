@@ -18,7 +18,8 @@ module Avm
 
       def issue_to_check
         return event.data if event.issue_create?
-        return event.data.issue if event.issue_update?
+
+        event.data.issue if event.issue_update?
       end
     end
   end
