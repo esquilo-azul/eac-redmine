@@ -1,9 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Rails/UniqueValidationWithoutIndex:
-  Exclude:
-  - app/models/issue_status_assign.rb
 Style/OptionalBooleanParameter:
   Exclude:
   - lib/avm/settings.rb
