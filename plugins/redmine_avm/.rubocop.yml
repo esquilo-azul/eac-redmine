@@ -1,9 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Rails/ActiveSupportOnLoad:
-  Exclude:
-  - lib/redmine_avm/patches/test_case_patch.rb
 Rails/EagerEvaluationLogMessage:
   Exclude:
   - lib/avm/issue/assign.rb
