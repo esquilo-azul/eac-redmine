@@ -50,7 +50,7 @@ module Avm
         update_relation(data[:blocked_by])
       end
 
-      def update_blocked(description)
+      def update_blocked(description) # rubocop:disable Metrics/AbcSize
         blocked.init_journal(users(:users_001), '')
         blocked.description = description
         blocked.status_id = issue_statuses(:issue_statuses_002).id
