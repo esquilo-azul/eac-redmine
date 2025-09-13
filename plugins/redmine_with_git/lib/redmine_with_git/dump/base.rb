@@ -50,7 +50,7 @@ module RedmineWithGit
         Rails.logger.info("#{path}: #{number_to_human_size(::File.size(path))}, #{path_type}")
       end
 
-      def run_if_overwrite_denied
+      def run_if_overwrite_denied # rubocop:disable Naming/PredicateMethod
         if ::File.exist?(path) && overwrite == OVERWRITE_DENIED
           Rails.logger.warn "File \"#{path}\" already exists"
           false
@@ -59,7 +59,7 @@ module RedmineWithGit
         end
       end
 
-      def run_if_rotate
+      def run_if_rotate # rubocop:disable Naming/PredicateMethod
         if ::File.exist?(path) && overwrite == OVERWRITE_ROTATE
           rotate = ::Avm::Data::Rotate.new(path, space_limit: space_limit)
           ::Rails.logger.info "Rotating \"#{rotate.source_path}\"..."

@@ -1,9 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Naming/PredicateMethod:
-  Exclude:
-  - lib/redmine_with_git/dump/base.rb
 Rails/I18nLocaleTexts:
   Exclude:
   - app/controllers/backup_controller.rb
