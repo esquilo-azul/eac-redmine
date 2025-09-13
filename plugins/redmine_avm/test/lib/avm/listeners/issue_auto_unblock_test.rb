@@ -10,8 +10,8 @@ module Avm
       attr_reader :blocked, :blocking
 
       setup do
-        @blocked = issues(:issues_009)
-        @blocking = issues(:issues_010)
+        @blocked = issues(:issues_009) # rubocop:disable Naming/VariableNumber
+        @blocking = issues(:issues_010) # rubocop:disable Naming/VariableNumber
         @blocked.status = Avm::Settings.issue_status_blocked
         @blocked.description += "\nh3. Dependencies\n\n" +
                                 @blocked.dependencies.map { |d| "\##{d.id}" }.join(', ')
@@ -35,8 +35,8 @@ module Avm
       end
 
       test 'unblock by issue delete' do
-        blocked = issues(:issues_009)
-        blocking = issues(:issues_010)
+        blocked = issues(:issues_009) # rubocop:disable Naming/VariableNumber
+        blocking = issues(:issues_010) # rubocop:disable Naming/VariableNumber
         blocked.status = Avm::Settings.issue_status_blocked
         blocked.save!
         assert blocked.relations_to.where(issue_from: blocking).any?
@@ -51,7 +51,7 @@ module Avm
 
       test 'unblock by issue blocking closed' do
         blocking.init_journal(Avm::Settings.admin_user, '')
-        blocking.status = issue_statuses(:issue_statuses_005)
+        blocking.status = issue_statuses(:issue_statuses_005) # rubocop:disable Naming/VariableNumber
         blocking.save!
         blocked.reload
         blocked.dependencies.each { |d| assert d.closed?, "#{d} is not closed" }

@@ -51,17 +51,17 @@ module Avm
       end
 
       def update_blocked(description) # rubocop:disable Metrics/AbcSize
-        blocked.init_journal(users(:users_001), '')
+        blocked.init_journal(users(:users_001), '') # rubocop:disable Naming/VariableNumber
         blocked.description = description
-        blocked.status_id = issue_statuses(:issue_statuses_002).id
+        blocked.status_id = issue_statuses(:issue_statuses_002).id # rubocop:disable Naming/VariableNumber
         blocked.save!
         blocked.reload
         assert_not blocked.undefined?, blocked.status
       end
 
       def update_blocker
-        blocker.init_journal(users(:users_001), '')
-        blocker.status_id = issue_statuses(:issue_statuses_002).id
+        blocker.init_journal(users(:users_001), '') # rubocop:disable Naming/VariableNumber
+        blocker.status_id = issue_statuses(:issue_statuses_002).id # rubocop:disable Naming/VariableNumber
         blocker.save!
         blocker.reload
         assert_not blocker.undefined?, blocker.status
@@ -79,11 +79,11 @@ module Avm
       end
 
       def blocked
-        @blocked ||= issues(:issues_009)
+        @blocked ||= issues(:issues_009) # rubocop:disable Naming/VariableNumber
       end
 
       def blocker
-        @blocker ||= issues(:issues_010)
+        @blocker ||= issues(:issues_010) # rubocop:disable Naming/VariableNumber
       end
     end
   end

@@ -1,12 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Naming/VariableNumber:
-  Exclude:
-  - test/lib/avm/issues/dependencies_section_test.rb
-  - test/lib/avm/issues/motivation_test.rb
-  - test/lib/avm/listeners/issue_auto_unblock_test.rb
-  - test/lib/avm/listeners/issue_dependencies_section_check_test.rb
 Rails/ActiveSupportOnLoad:
   Exclude:
   - lib/redmine_avm/patches/test_case_patch.rb

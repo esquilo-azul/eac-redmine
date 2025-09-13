@@ -30,12 +30,12 @@ module Avm
       end
 
       def issue_with_description(description)
-        issue = issues(:issues_009)
-        issue.init_journal(users(:users_001), '')
+        issue = issues(:issues_009) # rubocop:disable Naming/VariableNumber
+        issue.init_journal(users(:users_001), '') # rubocop:disable Naming/VariableNumber
         issue.description = description
         issue.save!
         issue.reload
-        blocking = issues(:issues_010)
+        blocking = issues(:issues_010) # rubocop:disable Naming/VariableNumber
         assert issue.relations_to.where(issue_from: blocking).any?
         issue
       end

@@ -10,8 +10,8 @@ module Avm
       attr_reader :blocked, :blocking
 
       setup do
-        @blocked = issues(:issues_009)
-        @blocking = issues(:issues_010)
+        @blocked = issues(:issues_009) # rubocop:disable Naming/VariableNumber
+        @blocking = issues(:issues_010) # rubocop:disable Naming/VariableNumber
         @blocked.status = Avm::Settings.issue_status_blocked
         @blocked.save!
         @blocked.reload
@@ -67,7 +67,7 @@ module Avm
       private
 
       def assert_status(description, status)
-        @blocked.init_journal(users(:users_001), '')
+        @blocked.init_journal(users(:users_001), '') # rubocop:disable Naming/VariableNumber
         @blocked.description = description
         @blocked.save!
         @blocked.reload
