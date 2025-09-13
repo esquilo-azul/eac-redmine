@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.homepage    = ::RedmineAvm::HOMEPAGE
 
   s.files = Dir['{app,config,db,lib}/**/*', 'init.rb']
+  s.required_ruby_version = '>= 2.7'
 
   s.add_development_dependency 'eac_rails_gem_support', '~> 0.11'
 end

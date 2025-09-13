@@ -1,9 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Gemspec/RequiredRubyVersion:
-  Exclude:
-  - redmine_avm.gemspec
 Layout/LineEndStringConcatenationIndentation:
   Exclude:
   - config/initializers/redmine_plugins_helper.rb
