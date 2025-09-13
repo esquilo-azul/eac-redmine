@@ -38,8 +38,8 @@ module Avm
         user_label = user ? user.to_s : 'NENHUM'
         @issue.init_journal(
           Avm::Settings.admin_user,
-          I18n.translate(:issue_assign_message, user: user_label, issue_status: issue.status,
-                                                issue_field: issue_status_assign.issue_field.name)
+          I18n.t(:issue_assign_message, user: user_label, issue_status: issue.status,
+                                        issue_field: issue_status_assign.issue_field.name)
         )
         @issue.assigned_to = user
         @issue.save!

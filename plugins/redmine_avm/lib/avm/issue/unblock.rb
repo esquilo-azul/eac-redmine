@@ -35,7 +35,7 @@ module Avm
       def unblock
         @issue.init_journal(
           Avm::Settings.admin_user,
-          I18n.translate(:issue_unblock_message)
+          I18n.t(:issue_unblock_message)
         )
         @issue.status = Avm::Settings.issue_status_unblocked
         @issue.save!

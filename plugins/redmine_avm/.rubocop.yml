@@ -1,11 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Rails/ShortI18n:
-  Exclude:
-  - lib/avm/issue/assign.rb
-  - lib/avm/issue/unblock.rb
-  - lib/avm/issue/undefine.rb
 Rails/UniqueValidationWithoutIndex:
   Exclude:
   - app/models/issue_status_assign.rb

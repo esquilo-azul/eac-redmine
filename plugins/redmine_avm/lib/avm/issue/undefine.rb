@@ -30,7 +30,7 @@ module Avm
       def undefine
         @issue.init_journal(
           Avm::Settings.admin_user,
-          I18n.translate(
+          I18n.t(
             :issue_undefine_message,
             undefined_dependencies_ids: undefined_dependency_ids_string
           )
