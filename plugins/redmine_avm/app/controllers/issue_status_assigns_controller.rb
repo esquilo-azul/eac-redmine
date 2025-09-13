@@ -18,6 +18,6 @@ class IssueStatusAssignsController < ApplicationController
 
   def issue_field_options
     CustomField.where(type: 'IssueCustomField', field_format: 'user')
-               .map { |cf| [cf.id, cf.to_s] }
+      .map { |cf| [cf.id, cf.to_s] }
   end
 end

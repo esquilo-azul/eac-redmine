@@ -16,7 +16,7 @@ module RedmineAvm
         def description_section(section_title)
           ['h\1\.', '----', '$'].each do |e|
             m = /h([0-9])\.\s*#{Regexp.escape(section_title)}(.+)#{e}/m
-                .match(description)
+                  .match(description)
             return m[2].strip + "\r\n" if m
           end
           nil

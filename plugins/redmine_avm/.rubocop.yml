@@ -1,11 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Layout/MultilineMethodCallIndentation:
-  Exclude:
-  - app/controllers/issue_status_assigns_controller.rb
-  - lib/redmine_avm/patches/issue_patch.rb
-  - lib/tasks/issue.rake
 Metrics/AbcSize:
   Exclude:
   - test/lib/avm/issues/motivation_test.rb

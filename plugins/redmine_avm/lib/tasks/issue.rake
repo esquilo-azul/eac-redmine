@@ -38,7 +38,7 @@ namespace :avm do
     desc 'Verifica a seção de dependências de todas as tarefas'
     task dependencies_section_check_all: :environment do |_t, _args|
       Issue.where(closed_on: nil)
-           .where.not(status: Avm::Settings.issue_status_undefined).each do |i|
+        .where.not(status: Avm::Settings.issue_status_undefined).each do |i|
         Avm::Issue::DependenciesSectionCheck.new(i).run
       end
     end
@@ -46,7 +46,7 @@ namespace :avm do
     desc 'Verifica a ausência de motivação em todas as tarefas'
     task motivation_check_all: :environment do |_t, _args|
       Issue.where(closed_on: nil)
-           .where.not(status: Avm::Settings.issue_status_undefined).each do |i|
+        .where.not(status: Avm::Settings.issue_status_undefined).each do |i|
         Avm::Issue::MotivationCheck.new(i).run
       end
     end
