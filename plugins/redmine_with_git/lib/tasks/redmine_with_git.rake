@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-namespace :redmine_with_git do
+namespace :redmine_with_git do # rubocop:disable Metrics/BlockLength
   %w[database files git all].each do |a|
     namespace :dump do
       desc <<~DESCRIPTION

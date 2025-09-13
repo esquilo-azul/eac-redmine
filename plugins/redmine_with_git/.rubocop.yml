@@ -1,9 +1,6 @@
 ---
 inherit_gem:
   eac_rails_gem_support: ".rubocop.yml"
-Metrics/BlockLength:
-  Exclude:
-  - lib/tasks/redmine_with_git.rake
 Naming/PredicateMethod:
   Exclude:
   - lib/redmine_with_git/dump/base.rb
