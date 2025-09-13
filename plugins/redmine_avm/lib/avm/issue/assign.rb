@@ -34,7 +34,7 @@ module Avm
 
       def assign
         user = issue_status_user
-        Rails.logger.debug("Assigning #{user} to #{issue}")
+        Rails.logger.debug { "Assigning #{user} to #{issue}" }
         user_label = user ? user.to_s : 'NENHUM'
         @issue.init_journal(
           Avm::Settings.admin_user,

@@ -12,7 +12,7 @@ module Avm
         if msg
           Rails.logger.debug(msg)
         else
-          Rails.logger.debug("##{@issue.id} has undefined dependencies. Undefining...")
+          Rails.logger.debug { "##{@issue.id} has undefined dependencies. Undefining..." }
           undefine
         end
       end

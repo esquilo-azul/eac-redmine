@@ -12,7 +12,7 @@ module Avm
         if msg
           Rails.logger.debug(msg)
         else
-          Rails.logger.debug("##{@issue.id} has no open dependencies. Unblocking...")
+          Rails.logger.debug { "##{@issue.id} has no open dependencies. Unblocking..." }
           unblock
         end
       end

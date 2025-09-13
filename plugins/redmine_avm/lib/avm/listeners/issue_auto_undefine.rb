@@ -16,7 +16,7 @@ module Avm
       def run
         return if check_conditions
 
-        Rails.logger.debug("Undefine condition not found for #{@event}")
+        Rails.logger.debug { "Undefine condition not found for #{@event}" }
       end
 
       def check_conditions
@@ -26,7 +26,7 @@ module Avm
           next unless issues
 
           issues.each do |issue|
-            Rails.logger.debug("#{m}: #{issue}")
+            Rails.logger.debug { "#{m}: #{issue}" }
             Avm::Issue::Undefine.new(issue).run
           end
           true
