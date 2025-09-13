@@ -17,7 +17,7 @@ module RedmineAvm
           ['h\1\.', '----', '$'].each do |e|
             m = /h([0-9])\.\s*#{Regexp.escape(section_title)}(.+)#{e}/m
                   .match(description)
-            return m[2].strip + "\r\n" if m
+            return m[2].strip + "\r\n" if m # rubocop:disable Style/StringConcatenation
           end
           nil
         end

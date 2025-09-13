@@ -5,7 +5,7 @@ default_value = {
   no_dependencies_section_message: "Dependencies section not found.\n" \
                                    "Customize this message in plugin AVM's configuration.",
   dependencies_section_missing_dependencies_message:
-    "Missing dependencies found dependencies section: %{ids}.\n" + # rubocop:disable Style/FormatStringToken
+    "Missing dependencies found dependencies section: %{ids}.\n" + # rubocop:disable Style/FormatStringToken, Style/StringConcatenation
     "Customize this message in plugin AVM's configuration.",
   motivation_section_title: 'Motivation',
   unmotivated_message: 'This issue is not motivated.'

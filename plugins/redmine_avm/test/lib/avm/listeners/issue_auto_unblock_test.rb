@@ -13,7 +13,7 @@ module Avm
         @blocked = issues(:issues_009) # rubocop:disable Naming/VariableNumber
         @blocking = issues(:issues_010) # rubocop:disable Naming/VariableNumber
         @blocked.status = Avm::Settings.issue_status_blocked
-        @blocked.description += "\nh3. Dependencies\n\n" +
+        @blocked.description += "\nh3. Dependencies\n\n" + # rubocop:disable Style/StringConcatenation
                                 @blocked.dependencies.map { |d| "##{d.id}" }.join(', ')
         @blocked.save!
         @blocked.reload
