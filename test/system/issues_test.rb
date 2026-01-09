@@ -17,15 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../application_system_test_case', __FILE__)
+require_relative '../application_system_test_case'
 
 class IssuesSystemTest < ApplicationSystemTestCase
-  fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles,
-           :trackers, :projects_trackers, :enabled_modules, :issue_statuses, :issues,
-           :enumerations, :custom_fields, :custom_values, :custom_fields_trackers,
-           :watchers, :journals, :journal_details, :versions,
-           :workflows
-
   def test_create_issue
     log_user('jsmith', 'jsmith')
     visit '/projects/ecookbook/issues/new'
@@ -40,12 +34,14 @@ class IssuesSystemTest < ApplicationSystemTestCase
       find('input[name=commit]').click
     end
 
+    assert_text /Issue #\d+ created./
+
     # find created issue
     issue = Issue.find_by_subject("new test issue")
     assert_kind_of Issue, issue
 
     # check redirection
-    find 'div#flash_notice', :visible => true, :text => "Issue \##{issue.id} created."
+    find 'div#flash_notice', :visible => true, :text => "Issue ##{issue.id} created."
     assert_equal issue_path(:id => issue), current_path
 
     # check issue attributes
@@ -92,6 +88,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
     fill_in field2.name, :with => 'CF2 value'
     assert_difference 'Issue.count' do
       page.first(:button, 'Create').click
+      assert_text /Issue #\d+ created./
     end
 
     issue = Issue.order('id desc').first
@@ -131,6 +128,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
     end
     assert_difference 'Issue.count' do
       find('input[name=commit]').click
+      assert_text /Issue #\d+ created./
     end
 
     issue = Issue.order('id desc').first
@@ -147,6 +145,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
       attach_file 'attachments[dummy][file]', Rails.root.join('test/fixtures/files/testfile.txt')
       fill_in 'attachments[1][description]', :with => 'Some description'
       click_on 'Create'
+      assert_text /Issue #\d+ created./
     end
     assert_equal 1, issue.attachments.count
     assert_equal 'Some description', issue.attachments.first.description
@@ -169,6 +168,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
       attach_file 'attachments[dummy][file]', Rails.root.join('test/fixtures/files/testfile.txt')
       fill_in 'attachments[1][description]', :with => 'Some description'
       click_on 'Create'
+      assert_text /Issue #\d+ created./
     end
     assert_equal 1, issue.attachments.count
     assert_equal 'Some description', issue.attachments.first.description
@@ -187,6 +187,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
           click_on 'Create'
         end
         click_on 'Create'
+        assert_text /Issue #\d+ created./
       end
     end
 
@@ -206,6 +207,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
     end
     assert_difference 'Issue.count' do
       click_button('Create')
+      assert_text /Issue #\d+ created./
     end
 
     issue = Issue.order('id desc').first
@@ -236,6 +238,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
     fill_in 'Form update CF', :with => 'CF value'
     assert_no_difference 'Issue.count' do
       page.first(:button, 'Submit').click
+      assert_text 'Successful update.'
     end
     assert page.has_css?('#flash_notice')
     issue = Issue.find(1)
@@ -251,6 +254,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
     page.find("#issue_status_id").select("Closed")
     assert_no_difference 'Issue.count' do
       page.first(:button, 'Submit').click
+      assert_text 'Successful update.'
     end
     assert page.has_css?('#flash_notice')
     assert_equal 5, issue.reload.status.id
@@ -273,7 +277,8 @@ class IssuesSystemTest < ApplicationSystemTestCase
 
     click_on 'Submit'
 
-    assert_equal 1, Issue.find(2).attachments.count
+    assert_text 'Successful update.'
+    assert_equal 3, Issue.find(2).attachments.count
   end
 
   test "removing issue shows confirm dialog" do
@@ -283,6 +288,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
       first('#content span.icon-actions').click
       first('#content a.icon-del').click
     end
+    assert_selector 'h2', text: 'Confirmation'
   end
 
   def test_remove_issue_watcher_from_sidebar
@@ -417,7 +423,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
 
     page.find('#issue_status_id').select('Assigned')
     assert_no_difference 'Issue.count' do
-      submit_buttons[0].click
+      click_button('commit')
       # wait for ajax response
       assert page.has_css?('#flash_notice')
       assert_current_path '/issues', :ignore_query => true
@@ -442,14 +448,14 @@ class IssuesSystemTest < ApplicationSystemTestCase
     # wait for ajax response
     assert page.has_select?('issue_project_id', selected: 'OnlineStore')
 
+    assert_selector 'input[type=submit]', count: 2
     submit_buttons = page.all('input[type=submit]')
-    assert_equal 2, submit_buttons.size
     assert_equal 'Move', submit_buttons[0].value
     assert_equal 'Move and follow', submit_buttons[1].value
 
     page.find('#issue_status_id').select('Feedback')
     assert_no_difference 'Issue.count' do
-      submit_buttons[1].click
+      click_button('follow')
       # wait for ajax response
       assert page.has_css?('#flash_notice')
       assert_current_path '/projects/onlinestore/issues', :ignore_query => true
@@ -503,11 +509,13 @@ class IssuesSystemTest < ApplicationSystemTestCase
     assert_equal 'Copy', submit_buttons[0].value
 
     page.find('#issue_project_id').select('OnlineStore')
-    # wait for ajax response
-    assert page.has_select?('issue_project_id', selected: 'OnlineStore')
+    # Verify that the target version field has been rewritten by the OnlineStore project settings
+    # and wait for the project change to complete.
+    assert_select 'issue_fixed_version_id', options: ['(No change)', 'none', 'Alpha', 'Systemwide visible version']
 
+    assert_selector 'input[type=submit]', count: 2
     submit_buttons = page.all('input[type=submit]')
-    assert_equal 2, submit_buttons.size
+
     assert_equal 'Copy', submit_buttons[0].value
     assert_equal 'Copy and follow', submit_buttons[1].value
     page.find('#issue_priority_id').select('High')
@@ -579,7 +587,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
 
     csv = CSV.read(downloaded_file("issues.csv"))
     subject_index = csv.shift.index('Subject')
-    subjects = csv.map {|row| row[subject_index]}
+    subjects = csv.pluck(subject_index)
     assert_equal subjects.sort, subjects
   end
 
@@ -644,7 +652,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
     wait_for_ajax
 
     # assert log time form does not exist anymore for user without required permissions on the new project
-    assert_not page.has_css?('#log_time')
+    assert page.has_no_css?('#log_time')
   end
 
   def test_update_issue_form_should_include_add_notes_form_only_for_users_with_permission
@@ -664,6 +672,6 @@ class IssuesSystemTest < ApplicationSystemTestCase
     wait_for_ajax
 
     # assert add notes form does not exist anymore for user without required permissions on the new project
-    assert_not page.has_css?('#add_notes')
+    assert page.has_no_css?('#add_notes')
   end
 end

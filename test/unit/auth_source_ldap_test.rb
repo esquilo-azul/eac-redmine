@@ -17,12 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class AuthSourceLdapTest < ActiveSupport::TestCase
   include Redmine::I18n
-  fixtures :auth_sources
-
   def setup
     User.current = nil
   end
@@ -75,7 +73,7 @@ class AuthSourceLdapTest < ActiveSupport::TestCase
 
     a = AuthSourceLdap.new(:name => 'My LDAP', :host => 'ldap.example.net', :port => 389, :attr_login => 'sn')
     a.filter = "(mail=*@redmine.org"
-    assert !a.valid?
+    assert a.invalid?
     assert_include "LDAP filter is invalid", a.errors.full_messages
 
     a.filter = "(mail=*@redmine.org)"

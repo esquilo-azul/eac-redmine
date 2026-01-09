@@ -17,15 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../../test_helper', __FILE__)
+require_relative '../../test_helper'
 
 class Redmine::ApiTest::RepositoriesTest < Redmine::ApiTest::Base
-  fixtures :users,
-           :projects, :enabled_modules,
-           :members, :roles, :member_roles,
-           :issues,
-           :repositories, :changesets, :changes
-
   test 'POST /projects/:id/repository/:repository_id/revisions/:rev/issues.xml should add related issue' do
     changeset = Changeset.find(103)
     assert_equal [], changeset.issue_ids

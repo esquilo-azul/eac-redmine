@@ -17,36 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../../test_helper', __FILE__)
+require_relative '../../test_helper'
 
 class Redmine::ApiTest::IssuesTest < Redmine::ApiTest::Base
-  fixtures(
-    :projects,
-    :users,
-    :roles,
-    :members,
-    :member_roles,
-    :issues,
-    :issue_statuses,
-    :issue_relations,
-    :versions,
-    :trackers,
-    :projects_trackers,
-    :issue_categories,
-    :enabled_modules,
-    :enumerations,
-    :attachments,
-    :workflows,
-    :custom_fields,
-    :custom_values,
-    :custom_fields_projects,
-    :custom_fields_trackers,
-    :time_entries,
-    :journals,
-    :journal_details,
-    :queries,
-    :attachments)
-
   test "GET /issues.xml should contain metadata" do
     get '/issues.xml'
     assert_select 'issues[type=array][total_count][limit="25"][offset="0"]'
@@ -231,7 +204,7 @@ class Redmine::ApiTest::IssuesTest < Redmine::ApiTest::Base
     json = ActiveSupport::JSON.decode(response.body)
     status_ids_used = json['issues'].collect {|j| j['status']['id']}
     assert_equal 3, status_ids_used.length
-    assert status_ids_used.all? {|id| id == 5}
+    assert status_ids_used.all?(5)
   end
 
   test "GET /issues/:id.xml with journals" do
@@ -969,7 +942,8 @@ class Redmine::ApiTest::IssuesTest < Redmine::ApiTest::Base
   end
 
   def test_create_issue_with_uploaded_file
-    token = xml_upload('test_create_with_upload', credentials('jsmith'))
+    file_content = 'test_create_with_upload'
+    token = xml_upload(file_content, credentials('jsmith'))
     attachment = Attachment.find_by_token(token)
 
     # create the issue with the upload's token
@@ -991,7 +965,7 @@ class Redmine::ApiTest::IssuesTest < Redmine::ApiTest::Base
     attachment.reload
     assert_equal 'test.txt', attachment.filename
     assert_equal 'text/plain', attachment.content_type
-    assert_equal 'test_create_with_upload'.size, attachment.filesize
+    assert_equal file_content.size, attachment.filesize
     assert_equal 2, attachment.author_id
 
     # get the issue with its attachments

@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../../../../../test_helper', __FILE__)
+require_relative '../../../../../test_helper'
 
 class GitAdapterTest < ActiveSupport::TestCase
   REPOSITORY_PATH = Rails.root.join('tmp/test/git_repository').to_s
@@ -42,13 +42,6 @@ class GitAdapterTest < ActiveSupport::TestCase
     WINDOWS_SKIP_STR = "TODO: This test fails in Git for Windows above 1.7.10"
 
     def setup
-      adapter_class = Redmine::Scm::Adapters::GitAdapter
-      assert adapter_class
-      assert adapter_class.client_command
-      assert_equal true, adapter_class.client_available
-      assert_equal true, adapter_class.client_version_above?([1])
-      assert_equal true, adapter_class.client_version_above?([1, 0])
-
       @adapter =
         Redmine::Scm::Adapters::GitAdapter.
           new(
@@ -59,6 +52,8 @@ class GitAdapterTest < ActiveSupport::TestCase
             'ISO-8859-1'
           )
       assert @adapter
+      skip "SCM is unavailable" unless @adapter.class.client_available
+
       @char_1 = 'Ü'
       @str_felix_hex  = "Felix Sch\xC3\xA4fer".b
     end
@@ -437,6 +432,10 @@ class GitAdapterTest < ActiveSupport::TestCase
       assert_equal "7234cb2750b63f47bff735edc50a1c0a433c2518",
                    annotate.revisions[4].identifier
       assert_equal "jsmith", annotate.revisions[4].author
+      assert_equal "4a79347ea4b7184938d9bbea0fd421a6079f71bb",
+                   annotate.previous_annotations[22].split[0]
+      assert_equal "sources/watchers_controller.rb",
+                   annotate.previous_annotations[22].split[1]
     end
 
     def test_annotate_latin_1_identifier
@@ -610,7 +609,7 @@ class GitAdapterTest < ActiveSupport::TestCase
     end
 
     def test_entry
-      entry = @adapter.entry()
+      entry = @adapter.entry
       assert_equal "", entry.path
       assert_equal "dir", entry.kind
       entry = @adapter.entry('')

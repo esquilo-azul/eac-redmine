@@ -778,6 +778,10 @@
     width: 100%; /* let subject have one full width column */
   }
 
+  #issue_tree .issue:has(.buttons a) > td.subject, #relations .issue:has(.buttons a) > td.subject {
+    padding-right: 40px;
+  }
+
   #issue_tree .issue > td:not(.subject), #relations .issue > td:not(.subject) {
     width: 20%; /* three columns for all cells that are not subject */
   }
@@ -818,6 +822,38 @@
   .attachments_fields input.description {
     margin-left: 0;
     width: 100%;
+  }
+
+  /* Calendar */
+  ul.cal {
+    display: block
+  }
+  .cal .calhead {
+    display: none
+  }
+
+  .cal .calbody {
+    min-height: calc(1.2em * 3);
+  }
+
+  .cal .calbody .abbr-day {
+    display: inline;
+  }
+
+  .cal .week-number {
+    border: 1px solid #c0c0c0;
+    text-align: left;
+    font-weight: bold;
+    background-color: #def;
+  }
+
+  .cal .week-number .label-week {
+    display: inline;
+  }
+
+  .cal .calbody p.day-num {
+    font-size: 1.1em;
+    text-align: left;
   }
 }
 

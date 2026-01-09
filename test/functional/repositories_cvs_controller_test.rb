@@ -17,13 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class RepositoriesCvsControllerTest < Redmine::RepositoryControllerTest
   tests RepositoriesController
-
-  fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles,
-           :repositories, :enabled_modules
 
   REPOSITORY_PATH = Rails.root.join('tmp/test/cvs_repository').to_s
   REPOSITORY_PATH.tr!('/', "\\") if Redmine::Platform.mswin?
@@ -43,6 +40,7 @@ class RepositoriesCvsControllerTest < Redmine::RepositoryControllerTest
                                           :url          => MODULE_NAME,
                                           :log_encoding => 'UTF-8')
     assert @repository
+    skip "SCM command is unavailable" unless @repository.class.scm_available
   end
 
   if File.directory?(REPOSITORY_PATH)

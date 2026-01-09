@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../../../../../test_helper', __FILE__)
+require_relative '../../../../../test_helper'
 
 if Object.const_defined?(:CommonMarker)
   require 'redmine/wiki_formatting/common_mark/sanitization_filter'
@@ -47,10 +47,14 @@ if Object.const_defined?(:CommonMarker)
     end
 
     def test_should_support_footnotes
-      input = %(<a href="#fn-1" id="fnref-1">foo</a>)
-      assert_equal input, filter(input)
-      input = %(<ol><li id="fn-1">footnote</li></ol>)
-      assert_equal input, filter(input)
+      [
+        %(<a href="#fn-1" id="fnref-1">foo</a>),
+        %(<a href="#fn-1" id="fnref-1-2">foo</a>),
+        %(<ol><li id="fn-1">footnote</li></ol>),
+      ].each do |input|
+        assert_equal input, filter(input)
+        assert_equal input, filter(input)
+      end
     end
 
     def test_should_remove_invalid_ids

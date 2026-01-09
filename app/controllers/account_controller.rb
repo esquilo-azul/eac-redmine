@@ -36,6 +36,7 @@ class AccountController < ApplicationController
         redirect_back_or_default home_url, :referer => true
       end
     end
+    no_store
   rescue AuthSourceException => e
     logger.error "An error occurred when authenticating #{params[:username]}: #{e.message}"
     render_error :message => e.message
@@ -95,6 +96,7 @@ class AccountController < ApplicationController
           end
         end
       end
+      no_store
       render :template => "account/password_recovery"
       return
     else
@@ -103,7 +105,9 @@ class AccountController < ApplicationController
         user = User.find_by_mail(email)
         # user not found
         unless user
-          flash.now[:error] = l(:notice_account_unknown_email)
+          # Don't show an error indicating a non-existent email address
+          # to prevent email harvesting
+          flash[:notice] = l(:notice_account_lost_email_sent)
           return
         end
         unless user.active?
@@ -167,6 +171,8 @@ class AccountController < ApplicationController
         end
       end
     end
+
+    no_store
   end
 
   # Token based account activation
@@ -216,6 +222,7 @@ class AccountController < ApplicationController
 
   def twofa_confirm
     @twofa_view = @twofa.otp_confirm_view_variables
+    no_store
   end
 
   def twofa
@@ -378,7 +385,7 @@ class AccountController < ApplicationController
       flash[:notice] = l(:notice_account_register_done, :email => ERB::Util.h(user.mail))
       redirect_to signin_path
     else
-      yield if block_given?
+      yield if block
     end
   end
 
@@ -394,7 +401,7 @@ class AccountController < ApplicationController
       flash[:notice] = l(:notice_account_activated)
       redirect_to my_account_path
     else
-      yield if block_given?
+      yield if block
     end
   end
 
@@ -407,7 +414,7 @@ class AccountController < ApplicationController
       Mailer.deliver_account_activation_request(user)
       account_pending(user)
     else
-      yield if block_given?
+      yield if block
     end
   end
 

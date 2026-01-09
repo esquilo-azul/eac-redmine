@@ -17,16 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class QueriesControllerTest < Redmine::ControllerTest
-  fixtures :projects, :enabled_modules,
-           :users, :email_addresses,
-           :members, :member_roles, :roles,
-           :trackers, :issue_statuses, :issue_categories, :enumerations, :versions,
-           :issues, :custom_fields, :custom_values,
-           :queries
-
   def setup
     User.current = nil
   end
@@ -585,6 +578,32 @@ class QueriesControllerTest < Redmine::ControllerTest
     assert q.valid?
   end
 
+  def test_create_admin_projects_query_should_redirect_to_admin_projects
+    @request.session[:user_id] = 1
+
+    q = new_record(ProjectAdminQuery) do
+      post(
+        :create,
+        :params => {
+          :type => 'ProjectAdminQuery',
+          :default_columns => '1',
+          :f => ["status"],
+          :op => {
+            "status" => "="
+          },
+          :v => {
+            "status" => ['1']
+          },
+          :query => {
+            "name" => "test_new_project_public_query", "visibility" => "2"
+          }
+        }
+      )
+    end
+
+    assert_redirected_to :controller => 'admin', :action => 'projects', :query_id => q.id
+  end
+
   def test_edit_global_public_query
     @request.session[:user_id] = 1
     get(:edit, :params => {:id => 4})
@@ -688,6 +707,32 @@ class QueriesControllerTest < Redmine::ControllerTest
     assert q.is_public?
     assert q.has_default_columns?
     assert q.valid?
+  end
+
+  def test_update_admin_projects_query
+    q = ProjectAdminQuery.create(:name => 'project_query')
+    @request.session[:user_id] = 1
+
+    put(
+      :update,
+      :params => {
+        :id => q.id,
+        :default_columns => '1',
+        :fields => ["status"],
+        :operators => {
+          "status" => "="
+        },
+        :values => {
+          "status" => ['1']
+        },
+        :query => {
+          "name" => "test_project_query_updated", "visibility" => "2"
+        }
+      }
+    )
+
+    assert_redirected_to :controller => 'admin', :action => 'projects', :query_id => q.id
+    assert Query.find_by_name('test_project_query_updated')
   end
 
   def test_update_with_failure
@@ -940,5 +985,45 @@ class QueriesControllerTest < Redmine::ControllerTest
     assert_include ["Design", "9"], json
     assert_include ["Development", "10"], json
     assert_include ["Inactive Activity", "14"], json
+  end
+
+  def test_new_query_is_for_all_checkbox_not_disabled
+    @request.session[:user_id] = 1
+    get :new
+    assert_response :success
+    # Verify that the "For all projects" checkbox is not disabled when creating a new query
+    assert_select 'input[name=query_is_for_all][type=checkbox][checked]:not([disabled])'
+  end
+
+  def test_new_project_query_is_for_all_checkbox_not_disabled
+    @request.session[:user_id] = 1
+    get(:new, :params => {:project_id => 1})
+    assert_response :success
+    # Verify that the checkbox is not disabled when creating a new query within a project
+    assert_select 'input[name=query_is_for_all][type=checkbox]:not([checked]):not([disabled])'
+  end
+
+  def test_edit_global_query_is_for_all_checkbox_disabled
+    @request.session[:user_id] = 1
+    # Create a global query (project_id = nil)
+    query = IssueQuery.create!(:name => 'test_global_query', :user_id => 1, :project_id => nil)
+
+    get(:edit, :params => {:id => query.id})
+    assert_response :success
+
+    # Verify that the "For all projects" checkbox is disabled when editing an existing global query
+    assert_select 'input[name=query_is_for_all][type=checkbox][checked][disabled]'
+  end
+
+  def test_edit_project_query_is_for_all_checkbox_not_disabled
+    @request.session[:user_id] = 1
+    # Create a project-specific query
+    query = IssueQuery.create!(:name => 'test_project_query', :user_id => 1, :project_id => 1)
+
+    get(:edit, :params => {:id => query.id})
+    assert_response :success
+
+    # Verify that the checkbox is not disabled when editing a project-specific query
+    assert_select 'input[name=query_is_for_all][type=checkbox]:not([checked]):not([disabled])'
   end
 end

@@ -48,6 +48,7 @@ class Attachment < ActiveRecord::Base
     :scope =>
       proc do
         select("#{Attachment.table_name}.*").
+          where(container_type: ['Version', 'Project']).
           joins(
             "LEFT JOIN #{Version.table_name} " \
               "ON #{Attachment.table_name}.container_type='Version' " \
@@ -219,7 +220,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def image?
-    !!(self.filename =~ /\.(bmp|gif|jpg|jpe|jpeg|png)$/i)
+    !!(self.filename =~ /\.(bmp|gif|jpg|jpe|jpeg|png|webp)$/i)
   end
 
   def thumbnailable?
@@ -245,6 +246,7 @@ class Attachment < ActiveRecord::Base
       target = thumbnail_path(size)
 
       begin
+        # TODO: Stop passing the deprecated is_pdf flag in Redmine 7.0
         Redmine::Thumbnail.generate(self.diskfile, target, size, is_pdf?)
       rescue => e
         if logger
@@ -524,9 +526,7 @@ class Attachment < ActiveRecord::Base
 
   # Physically deletes the file from the file system
   def delete_from_disk!
-    if disk_filename.present? && File.exist?(diskfile)
-      File.delete(diskfile)
-    end
+    FileUtils.rm_f(diskfile) if disk_filename.present?
     Dir[thumbnail_path("*")].each do |thumb|
       File.delete(thumb)
     end

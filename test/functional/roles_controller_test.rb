@@ -17,11 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class RolesControllerTest < Redmine::ControllerTest
-  fixtures :roles, :users, :members, :member_roles, :workflows, :trackers
-
   def setup
     User.current = nil
     @request.session[:user_id] = 1 # admin

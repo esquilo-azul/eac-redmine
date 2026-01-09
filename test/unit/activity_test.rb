@@ -17,13 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class ActivityTest < ActiveSupport::TestCase
-  fixtures :projects, :versions, :attachments, :users, :roles, :members, :member_roles, :issues, :journals, :journal_details,
-           :trackers, :projects_trackers, :issue_statuses, :enabled_modules, :enumerations, :boards, :messages, :time_entries,
-           :wikis, :wiki_pages, :wiki_contents, :wiki_content_versions
-
   def setup
     User.current = nil
     @project = Project.find(1)

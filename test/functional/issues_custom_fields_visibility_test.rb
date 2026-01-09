@@ -17,23 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class IssuesCustomFieldsVisibilityTest < Redmine::ControllerTest
   tests IssuesController
-  fixtures :projects,
-           :users, :email_addresses, :user_preferences,
-           :roles,
-           :members,
-           :member_roles,
-           :issue_statuses,
-           :trackers,
-           :projects_trackers,
-           :enabled_modules,
-           :enumerations,
-           :workflows,
-           :custom_fields, :custom_fields_trackers
-
   def setup
     CustomField.destroy_all
     Issue.delete_all
@@ -242,9 +229,9 @@ class IssuesCustomFieldsVisibilityTest < Redmine::ControllerTest
     user = User.generate!
     User.add_to_project(user, p1, Role.where(:id => [1, 3]).to_a)
     User.add_to_project(user, p2, Role.where(:id => 3).to_a)
-    Issue.generate!(:project => p1, :tracker_id => 1, :custom_field_values => {@field2.id => 'ValueA'})
-    Issue.generate!(:project => p2, :tracker_id => 1, :custom_field_values => {@field2.id => 'ValueB'})
-    Issue.generate!(:project => p1, :tracker_id => 1, :custom_field_values => {@field2.id => 'ValueC'})
+    Issue.generate!(:project => p1, :tracker_id => 1, :author_id => 1, :custom_field_values => {@field2.id => 'ValueA'})
+    Issue.generate!(:project => p2, :tracker_id => 1, :author_id => 1, :custom_field_values => {@field2.id => 'ValueB'})
+    Issue.generate!(:project => p1, :tracker_id => 1, :author_id => 1, :custom_field_values => {@field2.id => 'ValueC'})
 
     @request.session[:user_id] = user.id
     get(

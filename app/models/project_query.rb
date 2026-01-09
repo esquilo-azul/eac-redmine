@@ -26,6 +26,13 @@ class ProjectQuery < Query
     errors.add(:project_id, :exclusion) if query.project_id.present?
   end
 
+  # Inheriting ProjectAdminQuery from ProjectQuery introduces the problem that
+  # ProjectQuery.visible also yields ProjectAdminQueries, as
+  # well. We fix that by adding a condition on the actual class name.
+  def self.visible(*)
+    super.where type: name
+  end
+
   self.available_columns = [
     QueryColumn.new(:name, :sortable => "#{Project.table_name}.name"),
     QueryColumn.new(:status, :sortable => "#{Project.table_name}.status"),

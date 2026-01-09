@@ -17,15 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../application_system_test_case', __FILE__)
+require_relative '../application_system_test_case'
 
-class InlineAutocompleteSystemTest < ApplicationSystemTestCase
-  fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles,
-           :trackers, :projects_trackers, :enabled_modules, :issue_statuses, :issues,
-           :enumerations, :custom_fields, :custom_values, :custom_fields_trackers,
-           :watchers, :journals, :journal_details, :versions,
-           :workflows
-
+class KeyboardShortcutsTest < ApplicationSystemTestCase
   def test_keyboard_shortcuts_to_switch_edit_preview_tabs
     log_user('jsmith', 'jsmith')
     visit 'issues/new'
@@ -116,7 +110,8 @@ class InlineAutocompleteSystemTest < ApplicationSystemTestCase
     within('.jstBlock .jstElements') do
       assert_equal "Strong (#{modifier_key_title}B)", find('button.jstb_strong')['title']
       assert_equal "Italic (#{modifier_key_title}I)", find('button.jstb_em')['title']
-      assert_equal "Underline (#{modifier_key_title}U)", find('button.jstb_ins')['title']
+      # assert button without shortcut
+      assert_equal "Deleted", find('button.jstb_del')['title']
     end
   end
 

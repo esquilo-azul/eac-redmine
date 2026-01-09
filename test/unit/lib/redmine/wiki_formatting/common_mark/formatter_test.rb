@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../../../../../test_helper', __FILE__)
+require_relative '../../../../../test_helper'
 
 class Redmine::WikiFormatting::CommonMark::FormatterTest < ActionView::TestCase
   if Object.const_defined?(:CommonMarker)
@@ -205,6 +205,21 @@ class Redmine::WikiFormatting::CommonMark::FormatterTest < ActionView::TestCase
 
       assert_section_with_hash STR_WITH_PRE[1..2].join("\n\n"), text, 2
       assert_section_with_hash STR_WITH_PRE[2], text, 3
+    end
+
+    def test_get_section_should_not_recognize_double_hash_issue_reference_as_heading
+      text = <<~STR
+        ## Section A
+
+        This text is a part of Section A.
+
+        ##1 : This is an issue reference, not an ATX heading.
+
+        This text is also a part of Section A.
+        <!-- Section A ends here -->
+      STR
+
+      assert_section_with_hash text.chomp, text, 1
     end
 
     def test_update_section_should_not_escape_pre_content_outside_section

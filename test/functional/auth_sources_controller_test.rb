@@ -17,11 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class AuthSourcesControllerTest < Redmine::ControllerTest
-  fixtures :users, :auth_sources
-
   def setup
     @request.session[:user_id] = 1
   end
@@ -34,6 +32,7 @@ class AuthSourcesControllerTest < Redmine::ControllerTest
   def test_new
     get :new
     assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
 
     assert_select 'form#auth_source_form' do
       assert_select 'input[name=type][value=AuthSourceLdap]'
@@ -90,6 +89,7 @@ class AuthSourcesControllerTest < Redmine::ControllerTest
         }
       )
       assert_response :success
+      assert_includes @response.headers['Cache-Control'], 'no-store'
     end
     assert_select_error /host cannot be blank/i
   end
@@ -102,6 +102,7 @@ class AuthSourcesControllerTest < Redmine::ControllerTest
       }
     )
     assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
 
     assert_select 'form#auth_source_form' do
       assert_select 'input[name=?]', 'auth_source[host]'
@@ -165,6 +166,8 @@ class AuthSourcesControllerTest < Redmine::ControllerTest
       }
     )
     assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
+
     assert_select_error /host cannot be blank/i
   end
 

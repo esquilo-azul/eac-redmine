@@ -82,6 +82,13 @@ module ActionView
       end
     end
 
+    module FormHelper
+      alias :date_field_without_max :date_field
+      def date_field(object_name, method, options = {})
+        date_field_without_max(object_name, method, options.reverse_merge(max: '9999-12-31'))
+      end
+    end
+
     module FormTagHelper
       alias :select_tag_without_non_empty_blank_option :select_tag
       def select_tag(name, option_tags = nil, options = {})
@@ -89,6 +96,11 @@ module ActionView
           options[:prompt] = '&nbsp;'.html_safe
         end
         select_tag_without_non_empty_blank_option(name, option_tags, options)
+      end
+
+      alias :date_field_tag_without_max :date_field_tag
+      def date_field_tag(name, value = nil, options = {})
+        date_field_tag_without_max(name, value, options.reverse_merge(max: '9999-12-31'))
       end
     end
 
@@ -140,6 +152,14 @@ module ActionController
       $stderr.puts "Please remove config/initializers/session_store.rb and run `rake generate_secret_token`.\n" +
         "Setting the session secret with ActionController.session= is no longer supported."
       exit 1
+    end
+  end
+end
+
+module ActionController
+  module ConditionalGet
+    def no_store
+      response.cache_control.replace(no_store: true)
     end
   end
 end

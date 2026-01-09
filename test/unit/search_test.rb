@@ -17,25 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class SearchTest < ActiveSupport::TestCase
-  fixtures :users,
-           :members,
-           :member_roles,
-           :projects,
-           :projects_trackers,
-           :roles,
-           :enabled_modules,
-           :issues,
-           :trackers,
-           :issue_statuses,
-           :enumerations,
-           :journals,
-           :journal_details,
-           :repositories,
-           :changesets
-
   def setup
     User.current = nil
     @project = Project.find(1)
@@ -175,7 +159,7 @@ class SearchTest < ActiveSupport::TestCase
   end
 
   def test_search_should_be_case_insensitive_with_accented_characters
-    unless sqlite?
+    unless sqlite? || postgresql?
       issue1 = Issue.generate!(:subject => "Special chars: ÖÖ")
       issue2 = Issue.generate!(:subject => "Special chars: Öö")
       r = Issue.search_results('ÖÖ')

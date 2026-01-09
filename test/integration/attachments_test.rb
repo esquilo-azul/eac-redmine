@@ -17,18 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class AttachmentsTest < Redmine::IntegrationTest
-  fixtures :projects, :enabled_modules,
-           :users, :email_addresses,
-           :roles, :members, :member_roles,
-           :trackers, :projects_trackers,
-           :issues, :issue_statuses, :enumerations,
-           :attachments,
-           :wiki_content_versions, :wiki_contents, :wiki_pages,
-           :journals, :journal_details
-
   def test_upload_should_set_default_content_type
     log_user('jsmith', 'jsmith')
     assert_difference 'Attachment.count' do
@@ -58,7 +49,8 @@ class AttachmentsTest < Redmine::IntegrationTest
   def test_upload_as_js_and_attach_to_an_issue
     log_user('jsmith', 'jsmith')
 
-    token = ajax_upload('myupload.txt', 'File content')
+    file_content = 'File content'
+    token = ajax_upload('myupload.txt', file_content)
 
     assert_difference 'Issue.count' do
       post(
@@ -84,7 +76,7 @@ class AttachmentsTest < Redmine::IntegrationTest
     attachment = issue.attachments.first
     assert_equal 'myupload.txt', attachment.filename
     assert_equal 'My uploaded file', attachment.description
-    assert_equal 'File content'.length, attachment.filesize
+    assert_equal file_content.length, attachment.filesize
   end
 
   def test_upload_as_js_and_preview_as_inline_attachment
@@ -121,7 +113,8 @@ class AttachmentsTest < Redmine::IntegrationTest
   def test_upload_and_resubmit_after_validation_failure
     log_user('jsmith', 'jsmith')
 
-    token = ajax_upload('myupload.txt', 'File content')
+    file_content = 'File content'
+    token = ajax_upload('myupload.txt', file_content)
 
     assert_no_difference 'Issue.count' do
       post(
@@ -167,13 +160,14 @@ class AttachmentsTest < Redmine::IntegrationTest
     attachment = issue.attachments.first
     assert_equal 'myupload.txt', attachment.filename
     assert_equal 'My uploaded file', attachment.description
-    assert_equal 'File content'.length, attachment.filesize
+    assert_equal file_content.length, attachment.filesize
   end
 
   def test_upload_filename_with_plus
     log_user('jsmith', 'jsmith')
     filename = 'a+b.txt'
-    token = ajax_upload(filename, 'File content')
+    file_content = 'File content'
+    token = ajax_upload(filename, file_content)
     assert_difference 'Issue.count' do
       post(
         '/projects/ecookbook/issues',
@@ -191,7 +185,7 @@ class AttachmentsTest < Redmine::IntegrationTest
     attachment = issue.attachments.first
     assert_equal filename, attachment.filename
     assert_equal '', attachment.description
-    assert_equal 'File content'.length, attachment.filesize
+    assert_equal file_content.length, attachment.filesize
   end
 
   def test_upload_as_js_and_destroy
@@ -270,6 +264,16 @@ class AttachmentsTest < Redmine::IntegrationTest
     with_settings :login_required => '1' do
       get "/attachments/journals/3/download"
       assert_redirected_to "/login?back_url=http%3A%2F%2Fwww.example.com%2Fattachments%2Fjournals%2F3%2Fdownload"
+    end
+  end
+
+  def test_unauthorized_named_download_link_should_redirect_to_login
+    with_settings login_required: '1' do
+      get "/attachments/download/1"
+      assert_redirected_to "/login?back_url=http%3A%2F%2Fwww.example.com%2Fattachments%2Fdownload%2F1"
+
+      get "/attachments/download/1/error281.txt"
+      assert_redirected_to "/login?back_url=http%3A%2F%2Fwww.example.com%2Fattachments%2Fdownload%2F1%2Ferror281.txt"
     end
   end
 

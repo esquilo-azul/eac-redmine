@@ -17,20 +17,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class MailerLocalisationTest < ActiveSupport::TestCase
   include Redmine::I18n
   include Rails::Dom::Testing::Assertions
-  fixtures :projects, :enabled_modules, :issues, :users, :email_addresses, :user_preferences, :members,
-           :member_roles, :roles, :documents, :attachments, :news,
-           :tokens, :journals, :journal_details, :changesets,
-           :trackers, :projects_trackers,
-           :issue_statuses, :enumerations, :messages, :boards, :repositories,
-           :wikis, :wiki_pages, :wiki_contents, :wiki_content_versions,
-           :versions,
-           :comments
-
   def setup
     ActionMailer::Base.deliveries.clear
     Setting.plain_text_mail = '0'

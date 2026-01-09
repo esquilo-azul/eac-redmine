@@ -20,8 +20,6 @@
 class EmailAddress < ActiveRecord::Base
   include Redmine::SafeAttributes
 
-  EMAIL_REGEXP = /\A([^@\s]+)@((?:[-a-z0-9]+\.)+(?:(?:xn--[-a-z0-9]+)|(?:[a-z]{2,})))\z/i
-
   belongs_to :user
 
   after_update :destroy_tokens
@@ -32,7 +30,7 @@ class EmailAddress < ActiveRecord::Base
   after_destroy_commit :deliver_security_notification_destroy
 
   validates_presence_of :address
-  validates_format_of :address, :with => EMAIL_REGEXP, :allow_blank => true
+  validates_format_of :address, :with => URI::MailTo::EMAIL_REGEXP, :allow_blank => true
   validates_length_of :address, :maximum => User::MAIL_LENGTH_LIMIT, :allow_nil => true
   validates_uniqueness_of :address, :case_sensitive => false,
     :if => Proc.new {|email| email.address_changed? && email.address.present?}
@@ -68,7 +66,7 @@ class EmailAddress < ActiveRecord::Base
 
   # Returns true if domain belongs to domains list.
   def self.domain_in?(domain, domains)
-    domain = domain.downcase
+    domain = domain.to_s.downcase
     domains = domains.to_s.split(/[\s,]+/) unless domains.is_a?(Array)
     domains.reject(&:blank?).map(&:downcase).any? do |s|
       s.start_with?('.') ? domain.end_with?(s) : domain == s
@@ -143,6 +141,18 @@ class EmailAddress < ActiveRecord::Base
   end
 
   def validate_email_domain
-    errors.add(:address, :invalid) unless self.class.valid_domain?(address)
+    domain = address.partition('@').last
+    # Skip domain validation if the email does not contain a domain part,
+    # to avoid an incomplete error message like "domain not allowed ()"
+    return if domain.empty?
+
+    return if self.class.valid_domain?(domain)
+
+    if User.current.logged?
+      errors.add(:address, :domain_not_allowed, :domain => domain)
+    else
+      # Don't display a detailed error message for anonymous users
+      errors.add(:address, :invalid)
+    end
   end
 end

@@ -17,17 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../../../../test_helper', __FILE__)
+require_relative '../../../../test_helper'
 require 'redmine/field_format'
 
 class AttachmentFormatVisibilityTest < ActionView::TestCase
-  fixtures :projects, :enabled_modules, :projects_trackers,
-           :roles, :members, :member_roles,
-           :users, :email_addresses,
-           :trackers, :issue_statuses, :enumerations, :issue_categories,
-           :custom_fields, :custom_fields_trackers,
-           :versions, :issues
-
   def setup
     User.current = nil
     set_tmp_attachments_directory

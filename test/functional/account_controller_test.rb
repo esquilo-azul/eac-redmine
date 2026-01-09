@@ -17,11 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class AccountControllerTest < Redmine::ControllerTest
-  fixtures :users, :email_addresses, :roles
-
   def setup
     User.current = nil
   end
@@ -29,9 +27,10 @@ class AccountControllerTest < Redmine::ControllerTest
   def test_get_login
     get :login
     assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
 
-    assert_select 'input[name=username]'
-    assert_select 'input[name=password]'
+    assert_select 'input[name=username][autocomplete=username]'
+    assert_select 'input[name=password][autocomplete=current-password]'
   end
 
   def test_get_login_while_logged_in_should_redirect_to_back_url_if_present
@@ -290,6 +289,7 @@ class AccountControllerTest < Redmine::ControllerTest
     with_settings :self_registration => '3' do
       get :register
       assert_response :success
+      assert_includes @response.headers['Cache-Control'], 'no-store'
 
       assert_select 'input[name=?]', 'user[password]'
       assert_select 'input[name=?]', 'user[password_confirmation]'
@@ -354,6 +354,27 @@ class AccountControllerTest < Redmine::ControllerTest
       assert user.check_password?('secret123')
       assert user.active?
     end
+  end
+
+  def test_post_register_with_failure
+    post(
+      :register,
+      :params => {
+        :user => {
+          :login => 'register',
+          :password => 'secret123',
+          :password_confirmation => 'secret1234567890',
+          :firstname => 'John',
+          :lastname => 'Doe',
+          :mail => 'register@example.com'
+        }
+      }
+    )
+
+    assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
+
+    assert_select_error /Password doesn't match confirmation/i
   end
 
   def test_post_register_with_registration_off_should_redirect
@@ -476,6 +497,7 @@ class AccountControllerTest < Redmine::ControllerTest
         }
       )
       assert_response :success
+      assert_equal I18n.t(:notice_account_lost_email_sent), flash[:notice]
     end
   end
 
@@ -522,6 +544,7 @@ class AccountControllerTest < Redmine::ControllerTest
 
     get :lost_password
     assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
 
     assert_select 'input[type=hidden][name=token][value=?]', token.value
   end

@@ -17,15 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class MyControllerTest < Redmine::ControllerTest
-  fixtures :users, :email_addresses, :user_preferences,
-           :roles, :projects, :members, :member_roles,
-           :issues, :issue_statuses, :trackers, :enumerations,
-           :custom_fields, :auth_sources, :queries, :enabled_modules,
-           :journals, :projects_trackers
-
   def setup
     @request.session[:user_id] = 2
   end
@@ -444,24 +438,22 @@ class MyControllerTest < Redmine::ControllerTest
 
     assert_select 'form[data-cm-url=?]', '/issues/context_menu'
 
-    assert_select 'table.cal' do
-      assert_select 'tr' do
-        assert_select 'td' do
+    assert_select 'ul.cal' do
+      assert_select 'li' do
+        assert_select(
+          'div.issue.hascontextmenu.tooltip.starting.ending',
+          :text => /eCookbook.*#{subject}/m
+        ) do
           assert_select(
-            'div.issue.hascontextmenu.tooltip.starting.ending',
-            :text => /eCookbook.*#{subject}/m
-          ) do
-            assert_select(
-              'a.issue[href=?]', "/issues/#{issue.id}",
-              :text => "Bug ##{issue.id}"
-            )
-            assert_select(
-              'input[name=?][type=?][value=?]',
-              'ids[]',
-              'checkbox',
-              issue.id.to_s
-            )
-          end
+            'a.issue[href=?]', "/issues/#{issue.id}",
+            :text => "Bug ##{issue.id}"
+          )
+          assert_select(
+            'input[name=?][type=?][value=?]',
+            'ids[]',
+            'checkbox',
+            issue.id.to_s
+          )
         end
       end
     end
@@ -607,9 +599,10 @@ class MyControllerTest < Redmine::ControllerTest
   def test_change_password
     get :password
     assert_response :success
-    assert_select 'input[type=password][name=password]'
-    assert_select 'input[type=password][name=new_password]'
-    assert_select 'input[type=password][name=new_password_confirmation]'
+    assert_includes @response.headers['Cache-Control'], 'no-store'
+    assert_select 'input[type=password][name=password][autocomplete=current-password]'
+    assert_select 'input[type=password][name=new_password][autocomplete=new-password]'
+    assert_select 'input[type=password][name=new_password_confirmation][autocomplete=new-password]'
   end
 
   def test_update_password

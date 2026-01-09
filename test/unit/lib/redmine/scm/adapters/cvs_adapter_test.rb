@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../../../../../test_helper', __FILE__)
+require_relative '../../../../../test_helper'
 
 class CvsAdapterTest < ActiveSupport::TestCase
   REPOSITORY_PATH = Rails.root.join('tmp/test/cvs_repository').to_s
@@ -27,6 +27,7 @@ class CvsAdapterTest < ActiveSupport::TestCase
   if File.directory?(REPOSITORY_PATH)
     def setup
       @adapter = Redmine::Scm::Adapters::CvsAdapter.new(MODULE_NAME, REPOSITORY_PATH)
+      skip "SCM command is unavailable" unless @adapter.class.client_available
     end
 
     def test_scm_version

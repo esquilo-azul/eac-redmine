@@ -17,15 +17,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class GroupsHelperTest < Redmine::HelperTest
   include ERB::Util
   include GroupsHelper
   include AvatarsHelper
   include Rails.application.routes.url_helpers
-
-  fixtures :users
 
   def test_render_principals_for_new_group_users
     group = Group.generate!

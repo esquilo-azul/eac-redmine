@@ -108,7 +108,11 @@ Rails.application.routes.draw do
   match 'my/twofa/backup_codes', :controller => 'twofa_backup_codes', :action => 'show', :via => [:get]
   match 'users/:user_id/twofa/deactivate', :controller => 'twofa', :action => 'admin_deactivate', :via => :post
 
+  match '/users/context_menu', to: 'context_menus#users', as: :users_context_menu, via: [:get, :post]
   resources :users do
+    collection do
+      delete 'bulk_destroy'
+    end
     resources :memberships, :controller => 'principal_memberships'
     resources :email_addresses, :only => [:index, :create, :update, :destroy]
   end
@@ -128,6 +132,7 @@ Rails.application.routes.draw do
   resources :projects do
     collection do
       get 'autocomplete'
+      delete 'bulk_destroy'
     end
 
     member do
@@ -308,7 +313,7 @@ Rails.application.routes.draw do
 
   # additional routes for having the file name at the end of url
   get 'attachments/:id/:filename', :to => 'attachments#show', :id => /\d+/, :filename => /.*/, :as => 'named_attachment', :format => 'html'
-  get 'attachments/download/:id/:filename', :to => 'attachments#download', :id => /\d+/, :filename => /.*/, :as => 'download_named_attachment'
+  get 'attachments/download/:id/:filename', :to => 'attachments#download', :id => /\d+/, :filename => /.*/, :as => 'download_named_attachment', :format => 'html'
   get 'attachments/download/:id', :to => 'attachments#download', :id => /\d+/
   get 'attachments/thumbnail/:id(/:size)', :to => 'attachments#thumbnail', :id => /\d+/, :size => /\d+/, :as => 'thumbnail'
   resources :attachments, :only => [:show, :update, :destroy]
@@ -367,6 +372,8 @@ Rails.application.routes.draw do
   post 'admin/test_email', :to => 'admin#test_email', :as => 'test_email'
   post 'admin/default_configuration', :to => 'admin#default_configuration'
 
+  match '/admin/projects_context_menu', :to => 'context_menus#projects', :as => 'projects_context_menu', :via => [:get, :post]
+
   resources :auth_sources do
     member do
       get 'test_connection', :as => 'try_connection'
@@ -399,15 +406,11 @@ Rails.application.routes.draw do
 
   get 'robots.:format', :to => 'welcome#robots', :constraints => {:format => 'txt'}
 
-  Dir.glob File.expand_path("#{Redmine::Plugin.directory}/*") do |plugin_dir|
-    file = File.join(plugin_dir, "config/routes.rb")
-    if File.exist?(file)
-      begin
-        instance_eval File.read(file)
-      rescue SyntaxError, StandardError => e
-        puts "An error occurred while loading the routes definition of #{File.basename(plugin_dir)} plugin (#{file}): #{e.message}."
-        exit 1
-      end
-    end
+  Redmine::Plugin.directory.glob("*/config/routes.rb").sort.each do |plugin_routes_path|
+    instance_eval(plugin_routes_path.read, plugin_routes_path.to_s)
+  rescue SyntaxError, StandardError => e
+    plugin_name = plugin_routes_path.parent.parent.basename.to_s
+    puts "An error occurred while loading the routes definition of #{plugin_name} plugin (#{plugin_routes_path}): #{e.message}."
+    exit 1
   end
 end

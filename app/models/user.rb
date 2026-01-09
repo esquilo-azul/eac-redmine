@@ -87,8 +87,8 @@ class User < Principal
                           :after_remove => Proc.new {|user, group| group.user_removed(user)}
   has_many :changesets, :dependent => :nullify
   has_one :preference, :dependent => :destroy, :class_name => 'UserPreference'
-  has_one :atom_token, lambda {where "action='feeds'"}, :class_name => 'Token'
-  has_one :api_token, lambda {where "action='api'"}, :class_name => 'Token'
+  has_one :atom_token, lambda {where "#{table.name}.action='feeds'"}, :class_name => 'Token'
+  has_one :api_token, lambda {where "#{table.name}.action='api'"}, :class_name => 'Token'
   has_one :email_address, lambda {where :is_default => true}, :autosave => true
   has_many :email_addresses, :dependent => :delete_all
   belongs_to :auth_source
@@ -110,7 +110,8 @@ class User < Principal
   # Login must contain letters, numbers, underscores only
   validates_format_of :login, :with => /\A[a-z0-9_\-@\.]*\z/i
   validates_length_of :login, :maximum => LOGIN_LENGTH_LIMIT
-  validates_length_of :firstname, :lastname, :maximum => 30
+  validates_length_of :firstname, :maximum => 30
+  validates_length_of :lastname, :maximum => 255
   validates_inclusion_of :mail_notification, :in => MAIL_NOTIFICATION_OPTIONS.collect(&:first), :allow_blank => true
   Setting::PASSWORD_CHAR_CLASSES.each do |k, v|
     validates_format_of :password, :with => v, :message => :"must_contain_#{k}", :allow_blank => true, :if => Proc.new {Setting.password_required_char_classes.include?(k)}
@@ -235,8 +236,6 @@ class User < Principal
     end
     user.update_last_login_on! if user && !user.new_record? && user.active?
     user
-  rescue => text
-    raise text
   end
 
   # Returns the user who matches the given autologin +key+ or nil
@@ -750,7 +749,7 @@ class User < Principal
       roles.any? do |role|
         (context.is_public? || role.member?) &&
         role.allowed_to?(action) &&
-        (block_given? ? yield(role, self) : true)
+        (block ? yield(role, self) : true)
       end
     elsif context && context.is_a?(Array)
       if context.empty?
@@ -769,7 +768,7 @@ class User < Principal
       roles = self.roles.to_a | [builtin_role]
       roles.any? do |role|
         role.allowed_to?(action) &&
-        (block_given? ? yield(role, self) : true)
+        (block ? yield(role, self) : true)
       end
     else
       false

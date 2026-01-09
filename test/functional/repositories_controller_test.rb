@@ -17,13 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class RepositoriesControllerTest < Redmine::RepositoryControllerTest
-  fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles, :enabled_modules,
-           :repositories, :issues, :issue_statuses, :changesets, :changes,
-           :issue_categories, :enumerations, :custom_fields, :custom_values, :trackers
-
   def setup
     super
     User.current = nil
@@ -38,6 +34,8 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
       }
     )
     assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
+
     assert_select 'select[name=?]', 'repository_scm' do
       assert_select 'option[value=?][selected=selected]', 'Subversion'
     end
@@ -114,6 +112,8 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
       )
     end
     assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
+
     assert_select_error /URL is invalid/
     assert_select 'select[name=?]', 'repository_scm' do
       assert_select 'option[value=?][selected=selected]', 'Subversion'
@@ -124,6 +124,8 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
     @request.session[:user_id] = 1
     get(:edit, :params => {:id => 11})
     assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
+
     assert_select 'input[name=?][value=?][disabled=disabled]', 'repository[url]', 'svn://localhost/test'
   end
 
@@ -154,6 +156,8 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
       }
     )
     assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
+
     assert_select_error /Password is too long/
   end
 
@@ -190,6 +194,7 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
 
   def test_show_without_main_repository_should_display_first_repository
     skip unless repository_configured?('subversion')
+    skip unless Repository::Subversion.scm_available
 
     project = Project.find(1)
     repos = project.repositories
@@ -212,6 +217,7 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
 
   def test_show_should_show_diff_button_depending_on_browse_repository_permission
     skip unless repository_configured?('subversion')
+    skip unless Repository::Subversion.scm_available
 
     @request.session[:user_id] = 2
     role = Role.find(1)

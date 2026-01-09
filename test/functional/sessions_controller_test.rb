@@ -17,13 +17,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class SessionsControllerTest < Redmine::ControllerTest
   include Redmine::I18n
   tests WelcomeController
-
-  fixtures :users, :email_addresses
 
   def setup
     Rails.application.config.redmine_verify_sessions = true

@@ -47,7 +47,7 @@
       <td class="checkbox"><%= check_box_tag 'ids[]', issue.id, false, :id => nil %></td>
       <td class="assigned_to"><%= assignee_avatar(issue.assigned_to, :size => 16) %></td>
       <td class="subject"><%= link_to_issue(issue, :project => (@project != issue.project)) %></td>
-      <td class="buttons"><%= link_to_context_menu %></td>
+      <td class="buttons hide-when-print"><%= link_to_context_menu %></td>
     </tr>
   <% end %>
   </table>
@@ -55,6 +55,10 @@
 <%= context_menu %>
 <% end %>
 </div>
+
+<% other_formats_links do |f| %>
+  <%= f.link_to_with_query_parameters 'TXT' %>
+<% end %>
 
 <%= call_hook :view_versions_show_bottom, :version => @version %>
 

@@ -17,11 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class RepositorySubversionTest < ActiveSupport::TestCase
-  fixtures :projects, :repositories, :enabled_modules, :users, :roles
-
   include Redmine::I18n
 
   NUM_REV = 14
@@ -32,6 +30,7 @@ class RepositorySubversionTest < ActiveSupport::TestCase
     @repository = Repository::Subversion.create(:project => @project,
                     :url => self.class.subversion_repository_url)
     assert @repository
+    skip "SCM command is unavailable" unless @repository.class.scm_available
   end
 
   def test_invalid_url
@@ -66,11 +65,11 @@ class RepositorySubversionTest < ActiveSupport::TestCase
     Redmine::Configuration.with 'scm_subversion_path_regexp' => 'file:///svnpath/[a-z]+' do
       repo = Repository::Subversion.new(:project => @project, :identifier => 'test')
       repo.url = 'http://foo'
-      assert !repo.valid?
+      assert repo.invalid?
       assert repo.errors[:url].present?
 
       repo.url = 'file:///svnpath/foo/bar'
-      assert !repo.valid?
+      assert repo.invalid?
       assert repo.errors[:url].present?
 
       repo.url = 'file:///svnpath/foo'
@@ -82,7 +81,7 @@ class RepositorySubversionTest < ActiveSupport::TestCase
     Redmine::Configuration.with 'scm_subversion_path_regexp' => 'file:///svnpath/%project%(\.[a-z]+)?' do
       repo = Repository::Subversion.new(:project => @project, :identifier => 'test')
       repo.url = 'file:///svnpath/invalid'
-      assert !repo.valid?
+      assert repo.invalid?
       assert repo.errors[:url].present?
 
       repo.url = 'file:///svnpath/subproject1'

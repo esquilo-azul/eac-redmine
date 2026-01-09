@@ -17,15 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../../test_helper', __FILE__)
+require_relative '../../test_helper'
 
 class Redmine::ApiTest::IssueCategoriesTest < Redmine::ApiTest::Base
-  fixtures :projects, :users, :issue_categories, :issues,
-           :roles,
-           :member_roles,
-           :members,
-           :enabled_modules
-
   test "GET /projects/:project_id/issue_categories.xml should return the issue categories" do
     get '/projects/1/issue_categories.xml', :headers => credentials('jsmith')
     assert_response :success

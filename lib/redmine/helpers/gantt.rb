@@ -117,7 +117,7 @@ module Redmine
         return @number_of_rows if @number_of_rows
 
         rows = projects.inject(0) {|total, p| total += number_of_rows_on_project(p)}
-        rows > @max_rows ? @max_rows : rows
+        [rows, @max_rows].min
       end
 
       # Returns the number of rows that will be used to list a project on
@@ -198,7 +198,7 @@ module Redmine
 
       # Returns the distinct versions of the issues that belong to +project+
       def project_versions(project)
-        project_issues(project).collect(&:fixed_version).compact.uniq
+        project_issues(project).filter_map(&:fixed_version).uniq
       end
 
       # Returns the issues that belong to +project+ and are assigned to +version+
@@ -396,7 +396,15 @@ module Redmine
             Redmine::Configuration['rmagick_font_path'].presence
         img = MiniMagick::Image.create(".#{format}", false)
         if Redmine::Configuration['imagemagick_convert_command'].present?
-          MiniMagick.cli_path = File.dirname(Redmine::Configuration['imagemagick_convert_command'])
+          if MiniMagick.respond_to?(:cli_path)
+            MiniMagick.cli_path = File.dirname(Redmine::Configuration['imagemagick_convert_command'])
+          else
+            Rails.logger.warn(
+              'imagemagick_convert_command option is ignored ' \
+              'because MiniMagick has removed the option to define a custom path for the binary. ' \
+              'Please ensure the convert binary is available in your PATH.'
+            )
+          end
         end
         MiniMagick::Tool::Convert.new do |gc|
           gc.size('%dx%d' % [subject_width + g_width + 1, height])

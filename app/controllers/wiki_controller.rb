@@ -240,6 +240,7 @@ class WikiController < ApplicationController
     # don't load text
     @versions = @page.content.versions.
       select("id, author_id, comments, updated_on, version").
+      preload(:author).
       reorder('version DESC').
       limit(@version_pages.per_page + 1).
       offset(@version_pages.offset).
@@ -390,7 +391,7 @@ class WikiController < ApplicationController
   def initial_page_content(page)
     helper = Redmine::WikiFormatting.helper_for(Setting.text_formatting)
     extend helper unless self.instance_of?(helper)
-    helper.instance_method(:initial_page_content).bind(self).call(page)
+    helper.instance_method(:initial_page_content).bind_call(self, page)
   end
 
   def load_pages_for_index

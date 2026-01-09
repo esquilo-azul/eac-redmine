@@ -17,22 +17,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class ProjectsHelperTest < Redmine::HelperTest
   include ApplicationHelper
   include ProjectsHelper
   include ERB::Util
   include Rails.application.routes.url_helpers
-
-  fixtures :projects, :trackers, :issue_statuses, :issues,
-           :enumerations, :users, :issue_categories,
-           :versions,
-           :projects_trackers,
-           :member_roles,
-           :members,
-           :groups_users,
-           :enabled_modules
 
   def test_link_to_version_within_project
     @project = Project.find(2)

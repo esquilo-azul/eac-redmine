@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative '../test_helper'
 
 class SudoModeTest < Redmine::IntegrationTest
-  fixtures :projects, :members, :member_roles, :roles, :users, :email_addresses
-
   def setup
     Redmine::SudoMode.stubs(:enabled?).returns(true)
   end
@@ -259,6 +257,14 @@ class SudoModeTest < Redmine::IntegrationTest
         assert_response :created
       end
     end
+  end
+
+  def test_sudo_mode_should_include_cache_control_no_store
+    log_user("admin", "admin")
+    expire_sudo_mode!
+    get '/settings'
+    assert_response :success
+    assert_includes @response.headers['Cache-Control'], 'no-store'
   end
 
   private

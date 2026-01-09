@@ -58,9 +58,8 @@ file 'config/database.yml' do
   case database
   when /(mysql|mariadb)/
     dev_conf =  {'adapter' => 'mysql2',
-                 'database' => dev_db_name, 'host' => (ENV['CI_MYSQL_HOST'] || 'localhost'),
-                 'encoding' => 'utf8',
-                 'ssl_mode' => 'disabled'}
+                 'database' => dev_db_name, 'host' => 'localhost',
+                 'encoding' => 'utf8'}
     if ENV['RUN_ON_NOT_OFFICIAL']
       dev_conf['username'] = 'root'
     else
@@ -70,7 +69,7 @@ file 'config/database.yml' do
     test_conf = dev_conf.merge('database' => test_db_name)
   when /postgresql/
     dev_conf =  {'adapter' => 'postgresql', 'database' => dev_db_name,
-                 'host' => (ENV['CI_PG_HOST'] || 'localhost')}
+                 'host' => 'localhost'}
     if ENV['RUN_ON_NOT_OFFICIAL']
       dev_conf['username'] = 'postgres'
     else

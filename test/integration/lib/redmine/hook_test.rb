@@ -17,11 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../../../test_helper', __FILE__)
+require_relative '../../../test_helper'
 
 class HookTest < Redmine::IntegrationTest
-  fixtures :users, :roles, :projects, :members, :member_roles
-
   # Hooks that are manually registered later
   class ProjectBasedTemplate < Redmine::Hook::ViewListener
     def view_layouts_base_html_head(context)
