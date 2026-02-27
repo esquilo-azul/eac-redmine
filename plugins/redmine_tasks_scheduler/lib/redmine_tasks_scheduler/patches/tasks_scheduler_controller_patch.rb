@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'redmine_tasks_scheduler/permissions'
-
 module RedmineTasksScheduler
   module Patches
     module TasksSchedulerControllerPatch
