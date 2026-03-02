@@ -70,7 +70,7 @@ PATH
     redmine_plugins_helper (0.16.0)
       bigdecimal (~> 1.4, >= 1.4.4)
       eac_rails_gem_support (~> 0.11, >= 0.11.1)
-      eac_ruby_utils (~> 0.128, >= 0.128.3)
+      eac_ruby_utils (~> 0.130)
       launchy (~> 2.5, >= 2.5.2)
       sass-rails (~> 5.1)
 
