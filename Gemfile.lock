@@ -61,7 +61,6 @@ PATH
       eac_active_scaffold (~> 0.8)
       eac_rails_utils (~> 0.27)
       eac_ruby_utils (~> 0.130)
-      i18n-recursive-lookup (~> 0.0, >= 0.0.5)
       jquery-rails (~> 4.6, >= 4.6.1)
 
 PATH
@@ -391,9 +390,6 @@ GEM
     htmlentities (4.4.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    i18n-recursive-lookup (0.0.5)
-      activesupport
-      i18n
     ice_nine (0.11.2)
     imgkit (1.6.3)
     jquery-rails (4.6.1)
