@@ -62,7 +62,7 @@ PATH
       eac_rails_utils (~> 0.27)
       eac_ruby_utils (~> 0.130)
       i18n-recursive-lookup (~> 0.0, >= 0.0.5)
-      jquery-rails (~> 4.6)
+      jquery-rails (~> 4.6, >= 4.6.1)
 
 PATH
   remote: plugins/redmine_plugins_helper
