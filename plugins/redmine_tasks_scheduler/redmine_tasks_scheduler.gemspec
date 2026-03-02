@@ -18,5 +18,5 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'tasks_scheduler', '~> 0.10', '>= 0.10.1'
 
-  s.add_development_dependency 'eac_rails_gem_support', '~> 0.11'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.11', '>= 0.11.1'
 end
