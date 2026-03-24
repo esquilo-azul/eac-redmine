@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'filesize'
+
 module EacFs
   class Logs
     class File
