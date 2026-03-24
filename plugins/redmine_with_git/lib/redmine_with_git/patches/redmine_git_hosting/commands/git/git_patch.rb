@@ -25,4 +25,4 @@ end
 
 patch = RedmineWithGit::Patches::RedmineGitHosting::Commands::GitPatch
 target = RedmineGitHosting::Commands::Git
-target.send(:include, patch) unless target.included_modules.include?(patch)
+target.send(:include, patch) unless target.include?(patch)
