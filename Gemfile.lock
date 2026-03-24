@@ -265,7 +265,6 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.6.2)
     docile (1.4.1)
-    drb (2.2.3)
     dry-core (1.2.0)
       concurrent-ruby (~> 1.0)
       logger
@@ -422,9 +421,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     minitar (0.12.1)
-    minitest (6.0.2)
-      drb (~> 2.0)
-      prism (~> 1.5)
+    minitest (5.27.0)
     mocha (3.1.0)
       ruby2_keywords (>= 0.0.5)
     multipart-post (2.4.1)
@@ -720,6 +717,7 @@ DEPENDENCIES
   addressable
   asciidoctor
   bullet
+  capybara (>= 3.39)
   commonmarker (~> 0.23.8)
   creole
   csv (~> 3.2.6)
@@ -740,12 +738,13 @@ DEPENDENCIES
   marcel
   mini_magick (~> 4.12.0)
   mini_mime (~> 1.1.0)
+  minitest (< 6.0)
   mocha (>= 2.0.1)
   net-imap (~> 0.3.9)
   net-ldap (~> 0.17.0)
   net-pop (~> 0.1.2)
   net-smtp (~> 0.3.3)
-  nokogiri (~> 1.18, >= 1.18.3)
+  nokogiri (~> 1.18, >= 1.18.9)
   notifyme!
   org-ruby
   pg (~> 1.5.3)

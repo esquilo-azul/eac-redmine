@@ -10,7 +10,7 @@ gem "actionpack-xml_parser"
 gem 'roadie-rails', '~> 3.1.0'
 gem 'marcel'
 gem 'mail', '~> 2.8.1'
-gem 'nokogiri', '~> 1.18', '>= 1.18.3'
+gem 'nokogiri', '~> 1.18', '>= 1.18.9'
 gem 'i18n', '~> 1.14.1'
 gem 'rbpdf', '~> 1.21.3'
 gem 'addressable'
@@ -107,7 +107,7 @@ group :test do
   gem "ffi", platforms: [:mingw, :x64_mingw, :mswin]
   # For running system tests
   gem 'puma'
-  # gem "capybara", ">= 3.39"
+  gem "capybara", ">= 3.39"
   if Gem.ruby_version < Gem::Version.new('3.0')
     gem "selenium-webdriver", "<= 4.9.0"
     gem "webdrivers", require: false
@@ -119,6 +119,8 @@ group :test do
   # gem 'rubocop-ast', '~> 1.40.0', require: false
   # gem 'rubocop-performance', '~> 1.19.0', require: false
   # gem 'rubocop-rails', '~> 2.22.1', require: false
+  # `bin/rails test` fails at startup with minitest >= 6.0
+  gem 'minitest', '< 6.0'
 end
 
 local_gemfile = File.join(File.dirname(__FILE__), "Gemfile.local")

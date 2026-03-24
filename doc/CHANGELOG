@@ -4,6 +4,18 @@ Redmine - project management software
 Copyright (C) 2006-  Jean-Philippe Lang
 https://www.redmine.org/
 
+== 2026-03-16 v5.1.12
+
+=== [Security]
+
+* Defect #43661: Unsafe eval usage in AttachmentsHelper
+* Defect #43690: Directory Traversal via Backslash-Separated Paths in Filesystem SCM
+* Defect #43691: DOM (Stored) XSS in @mention autocomplete via unescaped user name
+* Defect #43692: LDAP Injection (Unescaped Input in LDAP Search Filter)
+* Defect #43694: DOM XSS: HTML Injection via Custom Field Name in Query Filter Generation
+* Defect #43830: User who is allowed to view only their own time entries can retrieve other users’ time entry details by directly specifying the TimeEntry ID via the REST API
+* Defect #43864: Update Nokogiri to 1.18.9
+
 == 2026-01-05 v5.1.11
 
 === [Code cleanup/refactoring]
