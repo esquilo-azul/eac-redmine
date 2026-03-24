@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-EacRubyUtils.require_sub(__FILE__)
+EacRubyUtils.require_sub(__FILE__, recursive: true)
