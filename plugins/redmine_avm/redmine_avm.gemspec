@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.homepage    = RedmineAvm::HOMEPAGE
 
   s.files = Dir['{app,config,db,lib}/**/*', 'init.rb']
-  s.required_ruby_version = '>= 2.7'
+  s.required_ruby_version = '>= 3.2'
 
   s.add_development_dependency 'eac_rails_gem_support', '~> 0.13', '>= 0.13.1'
 end
