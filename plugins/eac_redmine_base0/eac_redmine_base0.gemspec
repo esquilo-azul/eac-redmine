@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.homepage    = EacRedmineBase0::HOMEPAGE
 
   s.files = Dir['{lib}/**/*', 'init.rb']
-  s.required_ruby_version = '>= 2.7'
+  s.required_ruby_version = '>= 3.2'
 
   # blankslate: required for the core 4.2.11 and not supplied in its Gemfile.
   s.add_dependency 'blankslate', '~> 3.1', '>= 3.1.3'
