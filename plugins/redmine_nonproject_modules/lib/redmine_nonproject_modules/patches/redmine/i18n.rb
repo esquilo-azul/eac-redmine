@@ -5,7 +5,7 @@ require 'redmine/i18n'
 module RedmineNonprojectModules
   module Patches
     module Redmine
-      module I18nPatch
+      module I18n
         common_concern do
           alias_method :original_l, :l
           alias_method :l, :fixed_l
@@ -13,7 +13,8 @@ module RedmineNonprojectModules
 
         def fixed_l(*args)
           if (args.first.is_a?(Time) || args.first.is_a?(Date)) && args.last.is_a?(Hash)
-            ::I18n.l(args.first, args.last)
+            options = args.extract_options!
+            ::I18n.l(*args, **options)
           else
             original_l(*args)
           end
@@ -23,7 +24,4 @@ module RedmineNonprojectModules
   end
 end
 
-x = Redmine::I18n
-y = RedmineNonprojectModules::Patches::Redmine::I18nPatch
-
-x.send(:include, y) unless x.include?(y)
+Redmine::I18n.patch_self(RedmineNonprojectModules::Patches::Redmine::I18n)
