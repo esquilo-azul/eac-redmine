@@ -91,7 +91,7 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
         }
       )
     end
-    assert_response 302
+    assert_response :found
     repository = Repository.order('id DESC').first
     assert_kind_of Repository::Subversion, repository
     assert_equal 'file:///test', repository.url
@@ -120,6 +120,31 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
     end
   end
 
+  def test_create_should_reject_subversion_url_with_newline_injection
+    @request.session[:user_id] = 1
+    [
+      "file:///test\nfoo",
+      "svn+ssh://example.com/repo\r\nbar"
+    ].each do |injected_url|
+      assert_no_difference 'Repository.count', "expected #{injected_url.inspect} to be rejected" do
+        post(
+          :create,
+          :params => {
+            :project_id => 'subproject1',
+            :repository_scm => 'Subversion',
+            :repository => {
+              :url => injected_url,
+              :is_default => '1',
+              :identifier => ''
+            }
+          }
+        )
+      end
+      assert_response :success
+      assert_select_error /URL is invalid/
+    end
+  end
+
   def test_edit
     @request.session[:user_id] = 1
     get(:edit, :params => {:id => 11})
@@ -140,7 +165,7 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
         }
       }
     )
-    assert_response 302
+    assert_response :found
     assert_equal 'test_update', Repository.find(11).password
   end
 
@@ -166,7 +191,7 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
     assert_difference 'Repository.count', -1 do
       delete(:destroy, :params => {:id => 11})
     end
-    assert_response 302
+    assert_response :found
     assert_nil Repository.find_by_id(11)
   end
 
@@ -243,7 +268,7 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
       role.add_permission! :manage_repository
       Repository::Subversion.any_instance.expects(:fetch_changesets).once
       post(:fetch_changesets, :params => {:id => 1, :repository_id => 10})
-      assert_response :success
+      assert_redirected_to '/projects/ecookbook/repository/10'
 
       role.remove_permission! :manage_repository
       Repository::Subversion.any_instance.expects(:fetch_changesets).never
@@ -285,7 +310,7 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
         :repository_id => 'foo'
       }
     )
-    assert_response 404
+    assert_response :not_found
   end
 
   def test_revision
@@ -529,7 +554,7 @@ class RepositoriesControllerTest < Redmine::RepositoryControllerTest
           }
         }
       )
-      assert_response 302
+      assert_response :found
       assert_equal User.find(2), c.reload.user
     end
   end

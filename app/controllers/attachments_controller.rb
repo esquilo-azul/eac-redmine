@@ -93,15 +93,15 @@ class AttachmentsController < ApplicationController
       end
     else
       # No thumbnail for the attachment or thumbnail could not be created
-      head 404
+      head :not_found
     end
   end
 
   def upload
     # Make sure that API users get used to set this content type
     # as it won't trigger Rails' automatic parsing of the request body for parameters
-    unless request.content_type == 'application/octet-stream'
-      head 406
+    unless request.media_type == 'application/octet-stream'
+      head :not_acceptable
       return
     end
 
@@ -234,6 +234,11 @@ class AttachmentsController < ApplicationController
   end
 
   def find_downloadable_attachments
+    unless @container.try(:attachments_visible?)
+      deny_access
+      return
+    end
+
     @attachments = @container.attachments.select(&:readable?)
     bulk_download_max_size = Setting.bulk_download_max_size.to_i.kilobytes
     if @attachments.sum(&:filesize) > bulk_download_max_size

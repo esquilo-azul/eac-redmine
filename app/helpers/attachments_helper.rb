@@ -18,7 +18,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 module AttachmentsHelper
-
   def container_attachments_edit_path(container)
     object_attachments_edit_path container.class.name.underscore.pluralize, container.id
   end
@@ -91,7 +90,7 @@ module AttachmentsHelper
 
   def render_file_content(attachment, content)
     if attachment.is_markdown?
-      render :partial => 'common/markup', :locals => {:markup_text_formatting => markdown_formatter, :markup_text => content}
+      render :partial => 'common/markup', :locals => {:markup_text_formatting => 'common_mark', :markup_text => content}
     elsif attachment.is_textile?
       render :partial => 'common/markup', :locals => {:markup_text_formatting => 'textile', :markup_text => content}
     else

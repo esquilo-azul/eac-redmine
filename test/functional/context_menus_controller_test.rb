@@ -205,7 +205,7 @@ class ContextMenusControllerTest < Redmine::ControllerTest
       assert_select 'a[href="#"]', :text => 'List'
       assert_select 'ul' do
         assert_select 'a', 3
-        assert_select 'a.icon.icon-checked', :text => 'Bar'
+        assert_select 'a.icon', :text => 'Bar'
       end
     end
   end
@@ -322,6 +322,25 @@ class ContextMenusControllerTest < Redmine::ControllerTest
     assert_select 'a', :text => 'eCookbook - Shared'
   end
 
+  def test_context_menu_should_respect_five_percent_increments
+    with_settings :issue_done_ratio => 'issue_field', :issue_done_ratio_interval => 5 do
+      @request.session[:user_id] = 2
+      get(
+        :issues,
+        :params => {
+          :ids => [1, 2]
+        }
+      )
+      assert_response :success
+
+      assert_select 'a[href*=?]', '/issues/bulk_update?ids%5B%5D=1&ids%5B%5D=2&issue%5Bdone_ratio%5D=0', :text => '0%'
+      assert_select 'a[href*=?]', '/issues/bulk_update?ids%5B%5D=1&ids%5B%5D=2&issue%5Bdone_ratio%5D=5', :text => '5%'
+      assert_select 'a[href*=?]', '/issues/bulk_update?ids%5B%5D=1&ids%5B%5D=2&issue%5Bdone_ratio%5D=10', :text => '10%'
+      assert_select 'a[href*=?]', '/issues/bulk_update?ids%5B%5D=1&ids%5B%5D=2&issue%5Bdone_ratio%5D=55', :text => '55%'
+      assert_select 'a[href*=?]', '/issues/bulk_update?ids%5B%5D=1&ids%5B%5D=2&issue%5Bdone_ratio%5D=100', :text => '100%'
+    end
+  end
+
   def test_context_menu_should_include_add_subtask_link
     @request.session[:user_id] = 2
     get(
@@ -368,12 +387,12 @@ class ContextMenusControllerTest < Redmine::ControllerTest
         :ids => [1, 4] # issue 4 is not visible
       }
     )
-    assert_response 302
+    assert_response :found
   end
 
   def test_should_respond_with_404_without_ids
     get :issues
-    assert_response 404
+    assert_response :not_found
   end
 
   def test_time_entries_context_menu
@@ -425,6 +444,49 @@ class ContextMenusControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_projects_context_menu_admin_user
+    @request.session[:user_id] = 1
+
+    get(
+      :projects,
+      :params => {
+        :ids => [1, 2]
+      }
+    )
+
+    assert_response :success
+  end
+
+  def test_projects_context_menu_not_admin_user
+    @request.session[:user_id] = 2
+
+    get(
+      :projects,
+      :params => {
+        :ids => [1, 2]
+      }
+    )
+
+    assert_response :forbidden
+  end
+
+  def test_time_entries_context_menu_with_time_entry_that_is_not_visible_should_fail
+    project = Project.find(2)
+    project.enable_module!(:time_tracking)
+    time_entry = TimeEntry.generate!(project: project)
+
+    @request.session[:user_id] = 2
+
+    get(
+      :time_entries,
+      :params => {
+        :ids => [1, 5, time_entry.id]
+      }
+    )
+
+    assert_response :not_found
+  end
+
   def test_time_entries_context_menu_with_edit_own_time_entries_permission
     @request.session[:user_id] = 2
     Role.find_by_name('Manager').remove_permission! :edit_time_entries
@@ -453,5 +515,12 @@ class ContextMenusControllerTest < Redmine::ControllerTest
     assert_response :success
 
     assert_select 'a.disabled', :text => 'Bulk edit'
+  end
+
+  def test_users_context_menu_without_permission
+    @request.session[:user_id] = 2
+
+    get :users, :params => {:ids => [8]}
+    assert_response :forbidden
   end
 end

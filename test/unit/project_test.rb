@@ -96,6 +96,8 @@ class ProjectTest < ActiveSupport::TestCase
                "ab-12" => true,
                "ab_12" => true,
                "12" => false,
+               "autocomplete" => false,
+               'bulk_destroy' => false,
                "new" => false}
 
     to_test.each do |identifier, valid|
@@ -1140,5 +1142,12 @@ class ProjectTest < ActiveSupport::TestCase
     project.update_column :name, 'Eco_kbook'
     r = Project.like('eco_k')
     assert_include project, r
+  end
+
+  def test_last_activity_date
+    # Note with id 3 is the last activity on Project 1
+    assert_equal Journal.find(3).created_on, Project.find(1).last_activity_date
+    # Project without activity should return nil
+    assert_nil Project.find(4).last_activity_date
   end
 end

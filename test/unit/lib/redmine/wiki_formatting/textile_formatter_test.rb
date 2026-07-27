@@ -19,7 +19,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 require_relative '../../../../test_helper'
-require 'digest/md5'
 
 class Redmine::WikiFormatting::TextileFormatterTest < ActionView::TestCase
   def setup
@@ -491,13 +490,13 @@ class Redmine::WikiFormatting::TextileFormatterTest < ActionView::TestCase
     assert_equal(
       [STR_WITHOUT_PRE[0], replacement, STR_WITHOUT_PRE[2..4]].flatten.join("\n\n"),
       @formatter.new(TEXT_WITHOUT_PRE).
-        update_section(2, replacement, Digest::MD5.hexdigest(STR_WITHOUT_PRE[1]))
+        update_section(2, replacement, ActiveSupport::Digest.hexdigest(STR_WITHOUT_PRE[1]))
     )
   end
 
   def test_update_section_with_wrong_hash_should_raise_an_error
     assert_raise Redmine::WikiFormatting::StaleSectionError do
-      @formatter.new(TEXT_WITHOUT_PRE).update_section(2, "New text", Digest::MD5.hexdigest("Old text"))
+      @formatter.new(TEXT_WITHOUT_PRE).update_section(2, "New text", ActiveSupport::Digest.hexdigest("Old text"))
     end
   end
 
@@ -787,6 +786,43 @@ class Redmine::WikiFormatting::TextileFormatterTest < ActionView::TestCase
     assert_equal expected.gsub(%r{[\r\n\t]}, ''), to_html(text).gsub(%r{[\r\n\t]}, '')
   end
 
+  def test_restore_redmine_links_should_not_break_out_of_attribute_values
+    # An auto-linked URL whose text mimics the version:"..." wiki-link syntax.
+    # restore_redmine_links must not un-escape the &quot; entities that
+    # auto_link! placed inside the href attribute, otherwise they close the
+    # attribute and inject event handlers (stored XSS).
+    payload = %{https://example.com/?a:"onmouseover=alert(document.domain)//"}
+    html = to_html(payload)
+
+    assert_includes html, '&quot;', 'quotes inside the href must stay escaped'
+    assert_empty(
+      Nokogiri::HTML.fragment(html).css('[onmouseover]'),
+      "restore_redmine_links injected an attribute into the rendered HTML: #{html}"
+    )
+  end
+
+  def test_restore_redmine_links_should_not_bridge_across_tags
+    # Two auto-linked URLs: the first link's text carries an escaped quote that
+    # must not be paired with a quote inside the second link's href attribute,
+    # which would otherwise un-escape the attribute quote and inject markup.
+    payload = %{https://a.com/?p:"X https://b.com/?q:"onmouseover=alert(document.domain)//"}
+    html = to_html(payload)
+
+    assert_empty(
+      Nokogiri::HTML.fragment(html).css('[onmouseover]'),
+      "restore_redmine_links bridged across a tag boundary: #{html}"
+    )
+  end
+
+  def test_restore_redmine_links_restores_quoted_links_in_text
+    # The legitimate behaviour restore_redmine_links exists for: un-escape the
+    # quotes around values like version:"1.0" so the link parser can match them.
+    assert_includes to_html(%{version:"1.0"}), %{version:"1.0"}
+
+    # make sure handling of legitimate <> in version names etc stays the same
+    assert_includes to_html(%{version:"foo <bar>"}), %{version:"foo &lt;bar&gt;"}
+  end
+
   private
 
   def assert_html_output(to_test, expect_paragraph = true)
@@ -809,6 +845,6 @@ class Redmine::WikiFormatting::TextileFormatterTest < ActionView::TestCase
     assert_kind_of Array, result
     assert_equal 2, result.size
     assert_equal expected, result.first, "section content did not match"
-    assert_equal Digest::MD5.hexdigest(expected), result.last, "section hash did not match"
+    assert_equal ActiveSupport::Digest.hexdigest(expected), result.last, "section hash did not match"
   end
 end

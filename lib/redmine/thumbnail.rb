@@ -18,6 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 require 'fileutils'
+require 'timeout'
 
 module Redmine
   module Thumbnail
@@ -39,7 +40,7 @@ module Redmine
       unless File.exist?(target)
         # Make sure we only invoke Imagemagick if the file type is allowed
         mime_type = File.open(source) {|f| Marcel::MimeType.for(f)}
-        return nil if !ALLOWED_TYPES.include? mime_type
+        return nil unless ALLOWED_TYPES.include? mime_type
 
         directory = File.dirname(target)
         FileUtils.mkdir_p directory
@@ -53,8 +54,20 @@ module Redmine
         else
           cmd = "#{shell_quote CONVERT_BIN} #{shell_quote source} -auto-orient -thumbnail #{shell_quote size_option} #{shell_quote target}"
         end
-        unless system(cmd)
-          logger.error("Creating thumbnail failed (#{$?}):\nCommand: #{cmd}")
+
+        pid = nil
+        begin
+          Timeout.timeout(Redmine::Configuration['thumbnails_generation_timeout'].to_i) do
+            pid = Process.spawn(cmd)
+            _, status = Process.wait2(pid)
+            unless status.success?
+              logger.error("Creating thumbnail failed (#{status.exitstatus}):\nCommand: #{cmd}")
+              return nil
+            end
+          end
+        rescue Timeout::Error
+          Process.kill('KILL', pid)
+          logger.error("Creating thumbnail timed out:\nCommand: #{cmd}")
           return nil
         end
       end
@@ -89,17 +102,19 @@ module Redmine
 
     # Check PDF magic bytes to make sure the file looks like a PDF, not
     # PostScript.
-    #
-    # This method treats the file as PostScript instead of PDF and returns
-    # false if PostScript magic bytes appear before the PDF magic bytes.
-    # This behavior is based on the detection logic used by Ghostscript in
-    # the redefined `run` operator in pdf_main.ps.
     def self.valid_pdf_magic?(filename)
-      head_data = File.binread(filename, 1024)
-      pdf_magic_pos = head_data.index('%PDF-')
-      ps_magic_pos = head_data.index('%!PS')
+      begin
+        magic = File.binread(filename, 8)
+        if magic.start_with?("%PDF-".b) || magic == "\xEF\xBB\xBF%PDF-".b
+          return true
+        end
 
-      !pdf_magic_pos.nil? && (ps_magic_pos.nil? || pdf_magic_pos < ps_magic_pos)
+        logger.error "Source file does not appear be an actual PDF file!"
+      rescue => e
+        logger.error "Could not validate magic file header - #{e.class.name}: #{e.message}"
+      end
+
+      false
     end
 
     def self.logger

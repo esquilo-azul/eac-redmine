@@ -22,7 +22,7 @@ require_relative '../test_helper'
 class RepositorySubversionTest < ActiveSupport::TestCase
   include Redmine::I18n
 
-  NUM_REV = 14
+  NUM_REV = 16
 
   def setup
     User.current = nil
@@ -35,14 +35,19 @@ class RepositorySubversionTest < ActiveSupport::TestCase
 
   def test_invalid_url
     set_language_if_valid 'en'
-    ['invalid', 'http://', 'svn://', 'svn+ssh://', 'file://'].each do |url|
+    invalid_urls = [
+      'invalid', 'http://', 'svn://', 'svn+ssh://', 'file://',
+      "http://valid\nfoo",
+      "svn://valid\r\nbar"
+    ]
+    invalid_urls.each do |url|
       repo =
         Repository::Subversion.new(
           :project      => @project,
           :identifier   => 'test',
           :url => url
         )
-      assert !repo.save
+      assert !repo.save, "expected #{url.inspect} to be rejected"
       assert_equal ["is invalid"], repo.errors[:url]
     end
   end
@@ -99,7 +104,7 @@ class RepositorySubversionTest < ActiveSupport::TestCase
       @project.reload
 
       assert_equal NUM_REV, @repository.changesets.count
-      assert_equal 24, @repository.filechanges.count
+      assert_equal 26, @repository.filechanges.count
       assert_equal 'Initial import.', @repository.changesets.find_by_revision('1').comments
     end
 
