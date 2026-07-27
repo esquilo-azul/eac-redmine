@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-class RepositoryGitExtra < ActiveRecord::Base
+class RepositoryGitExtra < RedmineGitHosting.old_redmine? ? ActiveRecord::Base : ApplicationRecord
   include Redmine::SafeAttributes
+  include Redmine::I18n
 
   SMART_HTTP_OPTIONS = [[l(:label_disabled), '0'],
                         [l(:label_http_only), '3'],
@@ -33,7 +34,11 @@ class RepositoryGitExtra < ActiveRecord::Base
   validate :validate_urls_order
 
   ## Serializations
-  serialize :urls_order, Array
+  if RedmineGitHosting.old_redmine?
+    serialize :urls_order, Array
+  else
+    serialize :urls_order, type: Array
+  end
 
   ## Callbacks
   before_save :check_urls_order_consistency

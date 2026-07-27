@@ -1,7 +1,7 @@
 [subrepo]
   cmdver = 0.4.9
-  commit = ec0f3301271a6cae808fe37d361ed58b4150fce4
+  commit = 5a4729163cbf51561c09466f4f6f3d43d5545c18
   method = merge
-  parent = e8169d646196bba40b1d65cebec7753e0badc862
-  branch = redmine-5.1
+  parent = 5b32eb28666c504a86665409b24ec12a318b3f9e
+  branch = redmine-6.0
   remote = https://github.com/esquilo-azul/redmine_git_hosting.git
