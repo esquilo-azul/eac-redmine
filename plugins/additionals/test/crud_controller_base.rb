@@ -15,7 +15,7 @@ module CrudControllerBase
         return
       end
 
-      get :show, params: @crud[:show_params].presence || { id: @crud[:entity].id }
+      get :show, params: @crud[:show_params].presence || { id: id_value }
 
       if @crud[:show_assert_response].present?
         assert_response @crud[:show_assert_response]
@@ -29,7 +29,8 @@ module CrudControllerBase
     def test_show_without_permission
       return unless prepare_crud_test :show, no_permission: true
 
-      get :show, params: @crud[:show_params].presence || { id: @crud[:entity].id }
+      get :show, params: @crud[:show_params].presence || { id: id_value }
+
       assert_response :forbidden
     end
 
@@ -78,6 +79,7 @@ module CrudControllerBase
       end
 
       get :new, params: @crud[:new_params].presence || {}
+
       assert_response :success
     end
 
@@ -85,6 +87,7 @@ module CrudControllerBase
       return unless prepare_crud_test :new, no_permission: true
 
       get :new, params: @crud[:new_params].presence || {}
+
       assert_response :forbidden
     end
 
@@ -108,7 +111,7 @@ module CrudControllerBase
       if @crud[:create_redirect_to]
         assert_redirected_to @crud[:create_redirect_to]
       else
-        assert_response 302
+        assert_response :found
       end
 
       entity = @crud[:entity].class.last
@@ -153,7 +156,7 @@ module CrudControllerBase
         return
       end
 
-      get :edit, params: { id: @crud[:entity].id }
+      get :edit, params: { id: id_value }
 
       assert_response :success
       if @crud[:edit_assert_select].present?
@@ -166,7 +169,7 @@ module CrudControllerBase
     def test_edit_without_permission
       return unless prepare_crud_test :edit, no_permission: true
 
-      get :edit, params: { id: @crud[:entity].id }
+      get :edit, params: { id: id_value }
 
       assert_response :forbidden
     end
@@ -187,7 +190,7 @@ module CrudControllerBase
       if @crud[:update_redirect_to]
         assert_redirected_to @crud[:update_redirect_to]
       else
-        assert_response 302
+        assert_response :found
       end
 
       @crud[:entity]&.reload
@@ -221,6 +224,7 @@ module CrudControllerBase
       return if @crud[:update_equals].blank?
 
       @crud[:entity].reload
+
       @crud[:update_equals].each do |name, value|
         assert_not_equal value, @crud[:entity].send(name)
       end
@@ -238,7 +242,7 @@ module CrudControllerBase
       end
 
       assert_difference("#{@crud[:entity].class.name}.count", -1) do
-        delete :destroy, params: { id: @crud[:entity].id }
+        delete :destroy, params: { id: id_value }
       end
 
       return if @crud[:delete_redirect_to].blank?
@@ -250,7 +254,7 @@ module CrudControllerBase
       return unless prepare_crud_test :delete, no_permission: true
 
       assert_no_difference "#{@crud[:entity].class.name}.count" do
-        delete :destroy, params: { id: @crud[:entity].id }
+        delete :destroy, params: { id: id_value }
       end
 
       assert_response :forbidden
@@ -258,16 +262,21 @@ module CrudControllerBase
 
     private
 
+    def id_value
+      primary_field = @crud[:primary_field] ||= :id
+      @crud[:entity].send primary_field
+    end
+
     def form_params(action)
-      crud_params = @crud["#{action}_params".to_sym]
+      crud_params = @crud[:"#{action}_params"]
       if @crud[:form]
-        { id:  @crud[:entity].id, @crud[:form] => crud_params }
+        { id: id_value, @crud[:form] => crud_params }
       else
         crud_params
       end
     end
 
-    def prepare_crud_test(action, no_permission: false)
+    def prepare_crud_test(action, no_permission: false) # rubocop: disable Naming/PredicateMethod
       return false if @crud[:without_actions].present? && @crud[:without_actions].include?(action)
 
       @request.session[:user_id] = if no_permission

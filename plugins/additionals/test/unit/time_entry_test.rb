@@ -3,16 +3,6 @@
 require File.expand_path '../../test_helper', __FILE__
 
 class TimeEntryTest < Additionals::TestCase
-  fixtures :users, :email_addresses,
-           :issues, :projects, :time_entries,
-           :members, :roles, :member_roles,
-           :trackers, :issue_statuses,
-           :projects_trackers,
-           :journals, :journal_details,
-           :issue_categories, :enumerations,
-           :groups_users,
-           :enabled_modules
-
   def setup
     prepare_tests
   end
@@ -23,12 +13,14 @@ class TimeEntryTest < Additionals::TestCase
 
   def test_create_time_entry_without_issue
     entry = TimeEntry.generate project: projects(:projects_001)
+
     assert entry.valid?
     assert_save entry
   end
 
   def test_create_time_entry_with_open_issue
     entry = TimeEntry.generate issue: issues(:issues_002)
+
     assert_not entry.issue.closed?
     assert entry.valid?
     assert_save entry
@@ -38,6 +30,7 @@ class TimeEntryTest < Additionals::TestCase
     User.current = nil
 
     entry = TimeEntry.generate issue: issues(:issues_008)
+
     assert entry.issue.closed?
     assert_not entry.valid?
     assert_not entry.save
@@ -51,6 +44,7 @@ class TimeEntryTest < Additionals::TestCase
     Member.create! principal: User.current, project_id: project.id, role_ids: [role.id]
 
     entry = TimeEntry.generate issue: issues(:issues_008)
+
     assert entry.issue.closed?
     assert entry.valid?
     assert_save entry

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'additionals/plugin_version'
-
 loader = RedminePluginKit::Loader.new plugin_id: 'additionals'
 
 Redmine::Plugin.register :additionals do
@@ -9,10 +7,9 @@ Redmine::Plugin.register :additionals do
   author 'AlphaNodes GmbH'
   description 'Customizing Redmine, providing dashboards, wiki macros and other functions for better usability.' \
               ' As well as acting as a library/function provider for other Redmine plugins'
-  version Additionals::PluginVersion::VERSION
+  version Additionals::VERSION
   author_url 'https://alphanodes.com/'
   url 'https://github.com/alphanodes/additionals'
-  directory __dir__
 
   settings default: loader.default_settings,
            partial: 'additionals/settings/additionals'
@@ -42,10 +39,15 @@ Redmine::Plugin.register :additionals do
     permission :log_time_on_closed_issues, {}
   end
 
-  # required redmine version
-  requires_redmine version_or_higher: '5.0'
+  requires_redmine version_or_higher: '6.0'
 
-  menu :admin_menu, :additionals, { controller: 'settings', action: 'plugin', id: 'additionals' }, caption: :label_additionals
+  menu :admin_menu,
+       :additionals,
+       { controller: 'settings', action: 'plugin', id: 'additionals' },
+       caption: :label_additionals,
+       plugin: 'additionals',
+       html: { class: 'icon' },
+       icon: 'additionals'
 end
 
 RedminePluginKit::Loader.persisting do
@@ -57,8 +59,10 @@ RedminePluginKit::Loader.persisting do
 end
 
 RedminePluginKit::Loader.after_initialize do
-  # @TODO: this should be moved to AdditionalsFontAwesome and use an instance of it
-  FONTAWESOME_ICONS = { fab: AdditionalsFontAwesome.load_icons(:fab), # rubocop: disable Lint/ConstantDefinitionInBlock
-                        far: AdditionalsFontAwesome.load_icons(:far),
-                        fas: AdditionalsFontAwesome.load_icons(:fas) }.freeze
+  unless defined? FONTAWESOME_ICONS
+    # @TODO: this should be moved to AdditionalsFontAwesome and use an instance of it
+    FONTAWESOME_ICONS = { fab: AdditionalsFontAwesome.load_icons(:fab),
+                          far: AdditionalsFontAwesome.load_icons(:far),
+                          fas: AdditionalsFontAwesome.load_icons(:fas) }.freeze
+  end
 end

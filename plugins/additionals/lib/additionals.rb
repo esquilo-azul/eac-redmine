@@ -3,29 +3,31 @@
 require 'redmine_plugin_kit'
 
 module Additionals
+  VERSION = '4.1.0'
+
   MAX_CUSTOM_MENU_ITEMS = 5
-  SELECT2_INIT_ENTRIES = 30
-  API_LIMIT = 100
   DEFAULT_MODAL_WIDTH = '350px'
   GOTO_LIST = " \xc2\xbb"
-  LIST_SEPARATOR = "#{GOTO_LIST} "
-  EMOJI_ASSERT_PATH = 'plugin_assets/additionals/images/emojis'
+  LIST_SEPARATOR = "#{GOTO_LIST} ".freeze
+
+  SQL_NO_RESULT_CONDITION = '1=0'
+  SQL_WITH_TRUE_CONDITION = '1=1'
 
   include RedminePluginKit::PluginBase
 
   class << self
-    def full_url(path = nil)
-      "#{Setting.protocol}://#{Setting.host_name.chomp '/'}#{path}"
-    end
-
     def class_prefix(klass)
       klass_name = klass.is_a?(String) ? klass : klass.name
       klass_name.underscore.tr '/', '_'
     end
 
+    def uri_parser
+      defined?(::URI::RFC2396_PARSER) ? ::URI::RFC2396_PARSER : ::URI::DEFAULT_PARSER
+    end
+
     def now_with_user_time_zone(user = User.current)
       if user.time_zone.nil?
-        Time.zone.now
+        Time.current
       else
         user.time_zone.now
       end
@@ -47,8 +49,12 @@ module Additionals
       [value, options]
     end
 
+    def single_page_limit
+      Setting.per_page_options_array.second || Setting.per_page_options_array.first || 25
+    end
+
     def split_ids(phrase, limit: nil)
-      limit ||= Setting.per_page_options_array.first || 25
+      limit ||= single_page_limit
       raw_ids = phrase.strip_split
       ids = []
       raw_ids.each do |id|
@@ -99,13 +105,9 @@ module Additionals
     def setup
       RenderAsync.configuration.jquery = true
 
-      loader.incompatible? %w[redmine_editauthor
-                              redmine_changeauthor]
-
       loader.add_patch %w[ApplicationController
                           AutoCompletesController
                           Issue
-                          IssuePriority
                           TimeEntry
                           Mailer
                           Project
@@ -114,6 +116,7 @@ module Additionals
                           ProjectsController
                           WelcomeController
                           ReportsController
+                          SettingsController
                           Principal
                           Query
                           QueryFilter
@@ -122,20 +125,21 @@ module Additionals
                           UserPreference]
 
       loader.add_helper %w[Issues
-                           Settings
                            Wiki
                            CustomFields]
 
+      loader.add_helper({ controller: 'Issues', helper: 'AdditionalsCommonJournals' })
+
+      loader.add_patch [{ target: Redmine::Views::LabelledFormBuilder, patch: 'LabelledFormBuilder' }]
+
       loader.add_global_helper [Additionals::Helpers,
+                                AdditionalsIconsHelper,
                                 AdditionalsFontawesomeHelper,
                                 AdditionalsMenuHelper,
                                 AdditionalsSelect2Helper]
 
       Redmine::WikiFormatting.format_names.each do |format|
         case format
-        when 'markdown'
-          loader.add_patch [{ target: Redmine::WikiFormatting::Markdown::HTML, patch: 'FormatterMarkdown' },
-                            { target: Redmine::WikiFormatting::Markdown::Helper, patch: 'FormattingHelper' }]
         when 'common_mark'
           loader.add_patch [{ target: Redmine::WikiFormatting::CommonMark::Formatter, patch: 'FormatterCommonMark' }]
           loader.add_patch [{ target: Redmine::WikiFormatting::CommonMark::Helper, patch: 'FormattingHelper' }]
@@ -158,32 +162,6 @@ module Additionals
       loader.load_view_hooks!
     end
   end
-
-  # Run the classic redmine plugin initializer after rails boot
-  class Plugin < ::Rails::Engine
-    require 'tanuki_emoji'
-    require 'render_async'
-    require 'rss'
-    require 'slim'
-
-    config.after_initialize do
-      # engine_name could be used (additionals_plugin), but can
-      # create some side effencts
-      plugin_id = 'additionals'
-
-      # TODO: enable again, if fallback for emoji support
-      #       has been implemented for mail delivery and pdf
-      # Additionals::Gemify.install_emoji_assets
-
-      # if plugin is already in plugins directory, use this and leave here
-      next if Redmine::Plugin.installed? plugin_id
-
-      # gem is used as redmine plugin
-      require File.expand_path '../init', __dir__
-      Additionals::Gemify.install_assets plugin_id
-      Additionals::Gemify.create_plugin_hint plugin_id
-    end
-  end
 end
 
 class String
@@ -194,7 +172,7 @@ end
 
 class Array
   # alias for join with ', ' as seperator
-  def to_list
+  def to_comma_list
     join ', '
   end
 end

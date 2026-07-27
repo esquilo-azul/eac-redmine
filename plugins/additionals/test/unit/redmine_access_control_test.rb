@@ -3,17 +3,12 @@
 require File.expand_path '../../test_helper', __FILE__
 
 class RedmineAccessControlTest < Additionals::TestCase
-  fixtures :projects, :users, :members, :member_roles, :roles,
-           :trackers, :projects_trackers,
-           :enabled_modules,
-           :roles
-
   def setup
     prepare_tests
   end
 
   def test_available_project_modules_all
-    assert Redmine::AccessControl.available_project_modules_all.is_a? Array
+    assert_kind_of Array, Redmine::AccessControl.available_project_modules_all
   end
 
   def test_disabled_project_modules

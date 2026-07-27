@@ -4,29 +4,9 @@ require File.expand_path '../../../test_helper', __FILE__
 
 module ApiTest
   class IssuesTest < Additionals::ApiTest
-    fixtures :projects,
-             :users,
-             :roles,
-             :members,
-             :member_roles,
-             :issues,
-             :issue_statuses,
-             :issue_relations,
-             :versions,
-             :trackers,
-             :projects_trackers,
-             :issue_categories,
-             :enabled_modules,
-             :enumerations,
-             :attachments,
-             :workflows,
-             :time_entries,
-             :journals,
-             :journal_details,
-             :queries
-
     test 'GET /issues.xml should contain metadata' do
       get '/issues.xml'
+
       assert_select 'issues[type=array][total_count][limit="25"][offset="0"]'
     end
 
@@ -45,14 +25,14 @@ module ApiTest
                                           issue_auto_assign: '0',
                                           issue_auto_assign_status: ['1'],
                                           issue_auto_assign_role: '1' do
-        payload = <<-XML
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <issue>
-          <project_id>1</project_id>
-          <tracker_id>2</tracker_id>
-          <status_id>3</status_id>
-          <subject>API test</subject>
-        </issue>
+        payload = <<~XML
+          <?xml version="1.0" encoding="UTF-8" ?>
+          <issue>
+            <project_id>1</project_id>
+            <tracker_id>2</tracker_id>
+            <status_id>3</status_id>
+            <subject>API test</subject>
+          </issue>
         XML
 
         assert_difference 'Issue.count' do
@@ -61,6 +41,7 @@ module ApiTest
                headers: { 'CONTENT_TYPE' => 'application/xml' }.merge(credentials('jsmith'))
         end
         issue = Issue.last
+
         assert_equal 1, issue.project_id
         assert_nil issue.assigned_to_id
         assert_equal 'API test', issue.subject
@@ -76,12 +57,12 @@ module ApiTest
                                           issue_auto_assign: '1',
                                           issue_auto_assign_status: ['1'],
                                           issue_auto_assign_role: '1' do
-        payload = <<-XML
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <issue>
-          <project_id>1</project_id>
-          <subject>API test</subject>
-        </issue>
+        payload = <<~XML
+          <?xml version="1.0" encoding="UTF-8" ?>
+          <issue>
+            <project_id>1</project_id>
+            <subject>API test</subject>
+          </issue>
         XML
 
         assert_difference 'Issue.count' do
@@ -91,6 +72,7 @@ module ApiTest
         end
 
         issue = Issue.last
+
         assert_equal 1, issue.project_id
         assert_equal 2, issue.assigned_to_id
         assert_equal 'API test', issue.subject
@@ -108,6 +90,7 @@ module ApiTest
         assert_response :success
         assert_empty response.body
       end
+
       assert_nil Issue.find_by(id: 6)
     end
   end

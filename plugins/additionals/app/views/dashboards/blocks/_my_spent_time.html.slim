@@ -7,7 +7,7 @@ h3 = block_definition[:label]
         p
           = additionals_settings_numberfield :day,
                                               value: days,
-                                              label: l(:button_show),
+                                              label: :button_show,
                                               tag_name: "settings[#{block}][days]",
                                               min: 1, max: 1000, required: true
           '
@@ -15,9 +15,9 @@ h3 = block_definition[:label]
       p
         = submit_tag l(:button_save)
         '
-        = link_to_function l(:button_cancel), "$('#my_spent_time-settings').toggle();"
+        = link_to_function l(:button_cancel), "$('#my_spent_time-settings').toggle()"
 
-ul.reporting-list
+ul.dashboard-list
   li.today
     = l :label_today
     ' :
@@ -30,7 +30,7 @@ ul.reporting-list
 
 = link_to l(:label_spent_time), _time_entries_path(@project, nil, user_id: 'me')
 '
-= link_to l(:button_log_time),
+= link_to sprite_icon('time-add'),
           _new_time_entry_path(@project, nil),
-          class: 'icon-only icon-add',
+          class: 'icon-only icon-time-add',
           title: l(:button_log_time)

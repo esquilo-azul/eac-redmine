@@ -3,15 +3,6 @@
 require File.expand_path '../../test_helper', __FILE__
 
 class DashboardTest < Additionals::TestCase
-  fixtures :projects, :users, :members, :member_roles, :roles,
-           :trackers, :projects_trackers,
-           :enabled_modules,
-           :issue_statuses, :issue_categories, :workflows,
-           :enumerations,
-           :issues, :journals, :journal_details,
-           :custom_fields, :custom_fields_projects, :custom_fields_trackers, :custom_values,
-           :dashboards, :dashboard_roles
-
   def setup
     prepare_tests
     User.current = users :users_002
@@ -63,6 +54,7 @@ class DashboardTest < Additionals::TestCase
                               author_id: 2,
                               visibility: Dashboard::VISIBILITY_ROLES,
                               roles: [used_role]
+
     assert_save dashboard
     dashboard.reload
 
@@ -85,6 +77,7 @@ class DashboardTest < Additionals::TestCase
                               system_default: true,
                               author: User.current,
                               visibility: 2
+
     assert_save dashboard
 
     assert dashboard.system_default
@@ -97,6 +90,7 @@ class DashboardTest < Additionals::TestCase
                               system_default: true,
                               author: User.current,
                               visibility: 2
+
     assert dashboard.valid?
 
     assert_save dashboard
@@ -137,6 +131,7 @@ class DashboardTest < Additionals::TestCase
     assert dashboard.valid?
 
     dashboard.visibility = 0
+
     assert_not dashboard.valid?
   end
 
@@ -147,9 +142,11 @@ class DashboardTest < Additionals::TestCase
                               project_id: nil,
                               author: User.current,
                               visibility: 2)
+
     assert dashboard.valid?
 
     dashboard.visibility = 0
+
     assert_not dashboard.valid?
   end
 
@@ -170,22 +167,34 @@ class DashboardTest < Additionals::TestCase
     end
   end
 
+  def test_locked_dashboard_should_not_be_deletable
+    dashboard = dashboards :system_default_defined_project
+
+    assert_raise Exception do
+      dashboard.destroy
+    end
+  end
+
   def test_dashboard_with_unique_name_scope
     dashboard = Dashboard.new(dashboard_type: DashboardContentProject::TYPE_NAME,
                               author_id: 2,
                               visibility: 2)
 
     dashboard.name = 'Only for user 2'
+
     assert dashboard.valid?
 
     dashboard.project_id = 1
     dashboard.name = 'Private project for user 2'
+
     assert_not dashboard.valid?
     dashboard.name = 'Only for me - new'
+
     assert dashboard.valid?
 
     dashboard.name = 'Only for me - new'
     dashboard.project_id = 2
+
     assert dashboard.valid?
   end
 
@@ -199,6 +208,7 @@ class DashboardTest < Additionals::TestCase
 
   def test_destroy_dashboard_without_roles
     dashboard = dashboards :private_welcome2
+
     assert dashboard.roles.none?
     assert dashboard.deletable?(users(:users_002))
     assert_difference 'Dashboard.count', -1 do
@@ -208,22 +218,28 @@ class DashboardTest < Additionals::TestCase
 
   def test_create_dashboard_roles_relation
     dashboard = dashboards :welcome_for_roles
+
     assert_equal 2, dashboard.roles.count
 
     relation = DashboardRole.new role_id: 3, dashboard_id: dashboard.id
+
     assert_save relation
 
     dashboard.reload
+
     assert_equal 3, dashboard.roles.count
   end
 
   def test_create_dashboard_roles_relation_with_autosave
     dashboard = dashboards :welcome_for_roles
+
     assert_equal 2, dashboard.roles.count
 
     dashboard.roles << Role.generate!
+
     assert_save dashboard
     dashboard.reload
+
     assert_equal 3, dashboard.roles.count
   end
 
@@ -233,6 +249,7 @@ class DashboardTest < Additionals::TestCase
     # change system default
     dashboard2 = dashboards :public_welcome
     dashboard2.system_default = true
+
     assert_save dashboard2
 
     dashboard = dashboards :welcome_for_roles
@@ -251,6 +268,7 @@ class DashboardTest < Additionals::TestCase
 
   def test_disable_welcome_system_default_on_system_default_dashboard_should_not_possible
     dashboard = dashboards :system_default_welcome
+
     assert dashboard.system_default
 
     dashboard.system_default = false
@@ -281,15 +299,18 @@ class DashboardTest < Additionals::TestCase
     dashboard = dashboards :private_project_default
 
     dashboard.project_id = 1
+
     assert_save dashboard
   end
 
   def test_dashboard_name_should_strip_spaces
     dashboard = dashboards :system_default_welcome
     dashboard.name = ' new name '
+
     assert_save dashboard
 
     dashboard.reload
+
     assert_equal 'new name', dashboard.name
   end
 

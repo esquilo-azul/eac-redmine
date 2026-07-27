@@ -5,7 +5,7 @@ module Additionals
     module GmapMacro
       Redmine::WikiFormatting::Macros.register do
         desc <<-DESCRIPTION
-    Display a google map.  Examples:
+    Display a google map.
 
     Syntax:
 
@@ -78,7 +78,7 @@ module Additionals
             raise 'The correct usage is {{gmap([q=QUERY, mode=MODE, widths=x, height=y])}}'
           end
 
-          src = +"https://www.google.com/maps/embed/v1/#{mode}?key=" + Additionals.setting(:google_maps_api_key)
+          src = "https://www.google.com/maps/embed/v1/#{mode}?key=" + Additionals.setting(:google_maps_api_key)
           if options[:q].present?
             src << "&q=#{ERB::Util.url_encode options[:q]}"
           elsif mode == 'search'
@@ -90,7 +90,7 @@ module Additionals
           end
           src << "&#{mode}=" + ERB::Util.url_encode(options[:way_mode]) if options[:way_mode].present?
 
-          tag.iframe width: width, height: height, src: src, frameborder: 0, allowfullscreen: 'true'
+          tag.iframe width:, height:, src:, frameborder: 0, allowfullscreen: 'true'
         end
       end
     end

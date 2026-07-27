@@ -3,14 +3,6 @@
 require File.expand_path '../../test_helper', __FILE__
 
 class AccountControllerTest < Additionals::ControllerTest
-  fixtures :users, :groups_users, :email_addresses, :user_preferences,
-           :roles, :members, :member_roles,
-           :issues, :issue_statuses, :issue_relations,
-           :issues, :issue_statuses, :issue_categories,
-           :versions, :trackers,
-           :projects, :projects_trackers, :enabled_modules,
-           :enumerations
-
   def setup
     Setting.default_language = 'en'
     User.current = nil
@@ -20,6 +12,7 @@ class AccountControllerTest < Additionals::ControllerTest
     change_plugin_settings 'additionals', account_login_bottom: 'Lore impsuum'
 
     get :login
+
     assert_response :success
     assert_select 'input[name=username]'
     assert_select 'input[name=password]'
@@ -30,6 +23,7 @@ class AccountControllerTest < Additionals::ControllerTest
     change_plugin_settings 'additionals', account_login_bottom: ''
 
     get :login
+
     assert_response :success
     assert_select 'input[name=username]'
     assert_select 'input[name=password]'
@@ -47,9 +41,11 @@ class AccountControllerTest < Additionals::ControllerTest
                                firstname: 'John',
                                lastname: 'Doe',
                                mail: 'register@example.com' } }
+
         assert_redirected_to '/my/account'
       end
       user = User.last
+
       assert_equal 'register', user.login
       assert_equal 'John', user.firstname
       assert_equal 'Doe', user.lastname

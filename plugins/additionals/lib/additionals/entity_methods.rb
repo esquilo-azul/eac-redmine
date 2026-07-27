@@ -28,9 +28,9 @@ module Additionals
         # Author and assignee are always notified unless they have been
         # locked or don't want to be notified
         notified << author if author
-        notified += (assigned_to.is_a?(Group) ? assigned_to.users : [assigned_to]) if assigned_to
+        notified += assigned_to_notified_users if assigned_to
         notified += project.notified_users if project
-        Redmine::Hook.call_hook :model_notified_users, entity: self, notified: notified
+        Redmine::Hook.call_hook(:model_notified_users, entity: self, notified:)
 
         notified = notified.select(&:active?)
         notified.uniq!
@@ -63,10 +63,6 @@ module Additionals
         @last_notes ||= journals.where.not(notes: '').reorder(id: :desc).first.try(:notes)
       end
 
-      def new_status
-        true if created_on == updated_on
-      end
-
       # Returns the id of the last journal or nil
       def last_journal_id
         if new_record?
@@ -84,12 +80,17 @@ module Additionals
 
       # Returns the journals that are visible to user with their index
       # Used to display the issue history
-      # ! this is a replacement of Redmine method - no not change signature
-      def visible_journals_with_index(_user = User.current)
-        result = journals.preload(:details)
-                         .preload(user: :email_address)
-                         .reorder(:created_on, :id).to_a
-
+      # ! this is a replacement of Redmine method for all entities
+      def visible_journals_with_index(_user = User.current, scope: nil, includes: [])
+        scope ||= journals
+        result = scope.includes(%i[details updated_by])
+                      .includes(user: :email_address)
+        result = result.includes(includes) if includes.any?
+        result = if User.current.wants_comments_in_reverse_order?
+                   result.reorder created_on: :desc, id: :desc
+                 else
+                   result.reorder :created_on, :id
+                 end.to_a
         result.each_with_index { |j, i| j.indice = i + 1 }
         Journal.preload_journals_details_custom_fields result
         result.select! { |journal| journal.notes? || journal.visible_details.any? }

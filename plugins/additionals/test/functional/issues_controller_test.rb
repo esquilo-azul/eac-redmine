@@ -3,21 +3,6 @@
 require File.expand_path '../../test_helper', __FILE__
 
 class IssuesControllerTest < Additionals::ControllerTest
-  fixtures :users, :email_addresses, :roles,
-           :enumerations,
-           :projects, :projects_trackers, :enabled_modules,
-           :members, :member_roles,
-           :issues, :issue_statuses, :issue_categories, :issue_relations,
-           :versions,
-           :trackers,
-           :workflows,
-           :custom_fields, :custom_values, :custom_fields_projects, :custom_fields_trackers,
-           :time_entries,
-           :watchers,
-           :journals, :journal_details,
-           :repositories, :changesets,
-           :queries
-
   def setup
     manager_role = roles :roles_001
     manager_role.add_permission! :edit_issue_author
@@ -77,39 +62,12 @@ class IssuesControllerTest < Additionals::ControllerTest
     end
   end
 
-  test 'show assign-to-me on issue' do
-    with_plugin_settings 'additionals', issue_assign_to_me: 1 do
-      @request.session[:user_id] = 2
-      get :show,
-          params: { id: 2 }
-
-      assert_select 'a.assign-to-me'
-    end
-  end
-
-  test 'don\'t show assign-to-me on issue without activation' do
-    with_plugin_settings 'additionals', issue_assign_to_me: 0 do
-      @request.session[:user_id] = 2
-      get :show,
-          params: { id: 2 }
-      assert_select 'a.assign-to-me', count: 0
-    end
-  end
-
-  test 'don\'t show assign-to-me on issue with already assigned_to me' do
-    with_plugin_settings 'additionals', issue_assign_to_me: 1 do
-      @request.session[:user_id] = 2
-      get :show,
-          params: { id: 4 }
-      assert_select 'a.assign-to-me', count: 0
-    end
-  end
-
   test 'show change status in issue sidebar' do
     with_plugin_settings 'additionals', issue_change_status_in_sidebar: 1 do
       @request.session[:user_id] = 2
       get :show,
           params: { id: 2 }
+
       assert_select 'ul.issue-status-change-sidebar'
     end
   end
@@ -119,6 +77,7 @@ class IssuesControllerTest < Additionals::ControllerTest
       @request.session[:user_id] = 2
       get :show,
           params: { id: 2 }
+
       assert_select 'ul.issue-status-change-sidebar', count: 0
     end
   end
@@ -178,6 +137,7 @@ class IssuesControllerTest < Additionals::ControllerTest
     with_plugin_settings 'additionals', new_ticket_message: 'blub' do
       @request.session[:user_id] = 2
       get :new, params: { project_id: 1 }
+
       assert_select '.new-ticket-message'
     end
   end
@@ -185,12 +145,51 @@ class IssuesControllerTest < Additionals::ControllerTest
   def test_new_should_not_have_new_ticket_message_if_disabled_in_project
     project = projects :projects_001
     project.enable_new_ticket_message = 0
-    project.save!
+
+    assert_save project
 
     with_plugin_settings 'additionals', new_ticket_message: 'blub' do
       @request.session[:user_id] = 2
       get :new, params: { project_id: 1 }
+
       assert_select '.new-ticket-message', count: 0
+    end
+  end
+
+  def test_show_author_badge
+    with_plugin_settings 'additionals', issue_note_with_author: 1 do
+      get :show, params: { id: 1 }
+
+      assert_response :success
+      assert_select '#tab-content-history #note-1 .badge-author', count: 0
+      assert_select '#tab-content-history #note-2 .badge-author'
+    end
+  end
+
+  def test_do_not_show_author_badge_if_disabled
+    with_plugin_settings 'additionals', issue_note_with_author: 0 do
+      get :show, params: { id: 1 }
+
+      assert_response :success
+      assert_select 'h4.note-header .badge-author', count: 0
+    end
+  end
+
+  def test_show_attachments
+    with_plugin_settings 'additionals', issue_hide_max_attachments: 10 do
+      get :show, params: { id: 3 }
+
+      assert_response :success
+      assert_select 'fieldset.hide-attachments', count: 0
+    end
+  end
+
+  def test_show_attachments_as_hidden
+    with_plugin_settings 'additionals', issue_hide_max_attachments: 0 do
+      get :show, params: { id: 3 }
+
+      assert_response :success
+      assert_select 'fieldset.hide-attachments', count: 1
     end
   end
 end

@@ -3,24 +3,6 @@
 require File.expand_path '../../test_helper', __FILE__
 
 class ProjectTest < Additionals::TestCase
-  fixtures :projects, :trackers, :issue_statuses, :issues,
-           :journals, :journal_details,
-           :enumerations, :users, :issue_categories,
-           :projects_trackers,
-           :custom_fields,
-           :custom_fields_projects,
-           :custom_fields_trackers,
-           :custom_values,
-           :roles,
-           :member_roles,
-           :members,
-           :enabled_modules,
-           :groups_users,
-           :repositories,
-           :workflows,
-           :attachments,
-           :dashboards, :dashboard_roles
-
   def setup
     prepare_tests
     User.current = nil
@@ -29,21 +11,25 @@ class ProjectTest < Additionals::TestCase
   def test_assignable_users_amount
     with_settings issue_group_assignment: '1' do
       project = Project.find 5
+
       assert_equal project.assignable_users.count, project.assignable_principals.count
     end
     with_settings issue_group_assignment: '0' do
       project = Project.find 5
+
       assert_not_equal project.assignable_users.count, project.assignable_principals.count
     end
   end
 
   def test_visible_users
     project = projects :projects_005
+
     assert_equal 3, project.visible_users.count
   end
 
   def test_visible_principals
     project = projects :projects_005
+
     assert_equal 4, project.visible_principals.count
   end
 
@@ -68,6 +54,7 @@ class ProjectTest < Additionals::TestCase
 
     assert_kind_of Hash, principals_by_role
     role = Role.find 1
+
     assert_kind_of Array, principals_by_role[role]
     assert_includes principals_by_role[role], User.find(2)
   end
@@ -76,14 +63,17 @@ class ProjectTest < Additionals::TestCase
     role = Role.find 2
     role.hide = 1
     role.users_visibility = 'members_of_visible_projects'
-    role.save!
+
+    assert_save role
 
     # User.current = User.find 2
     principals_by_role = Project.find(1).principals_by_role
+
     assert_equal 1, principals_by_role.count
 
     User.current = User.find 1
     principals_by_role = Project.find(1).principals_by_role
+
     assert_equal 2, principals_by_role.count
   end
 
@@ -116,6 +106,7 @@ class ProjectTest < Additionals::TestCase
 
   def test_consider_hidden_roles_without_hide_roles
     project = projects :projects_001
+
     assert_not project.consider_hidden_roles?
   end
 
@@ -126,8 +117,8 @@ class ProjectTest < Additionals::TestCase
     role = Role.find 2
     role.hide = 1
     role.users_visibility = 'members_of_visible_projects'
-    role.save!
 
+    assert_save role
     assert_not project.consider_hidden_roles?
   end
 
@@ -137,8 +128,29 @@ class ProjectTest < Additionals::TestCase
     role = Role.find 2
     role.hide = 1
     role.users_visibility = 'members_of_visible_projects'
-    role.save!
 
+    assert_save role
     assert project.consider_hidden_roles?
+  end
+
+  def test_usable_status_ids
+    ids = Project.usable_status_ids
+
+    assert_sorted_equal ids, [Project::STATUS_ACTIVE, Project::STATUS_CLOSED]
+  end
+
+  def test_sql_for_usable_status
+    assert_equal "projects.status IN(#{Project::STATUS_ACTIVE}, #{Project::STATUS_CLOSED})",
+                 Project.sql_for_usable_status
+    assert_equal "projects.status IN(#{Project::STATUS_ACTIVE}, #{Project::STATUS_CLOSED})",
+                 Project.sql_for_usable_status(:projects)
+    assert_equal "subprojects.status IN(#{Project::STATUS_ACTIVE}, #{Project::STATUS_CLOSED})",
+                 Project.sql_for_usable_status('subprojects')
+  end
+
+  def test_available_status_ids
+    ids = Project.available_status_ids
+
+    assert_operator ids.count, :>, 3
   end
 end

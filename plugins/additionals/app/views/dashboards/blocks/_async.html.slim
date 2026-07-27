@@ -8,16 +8,16 @@
      (!block_definition.key?(:with_settings_if) || block_definition[:with_settings_if].call(@project))
   div id="#{block}-settings" class="#{'hidden' if with_async}"
     = form_tag _update_layout_setting_dashboard_path(@project, dashboard), remote: true do
-      = render partial: block_definition[:settings_partial].presence || "#{async[:partial]}_settings",
-              locals: build_dashboard_partial_locals(block,
-                                                     block_definition,
-                                                     settings,
-                                                     dashboard).merge(with_async: with_async)
+      = render block_definition[:settings_partial].presence || "#{async[:partial]}_settings",
+               build_dashboard_partial_locals(block,
+                                              block_definition,
+                                              settings,
+                                              dashboard).merge(with_async:)
 
       p
         = submit_tag l(:button_save)
         '
-        = link_to_function l(:button_cancel), "$('##{block}-settings').toggle();"
+        = link_to_function l(:button_cancel), "$('##{block}-settings').toggle()"
 
 - if with_async
   = render_async_cache(_dashboard_async_blocks_path(@project,
@@ -29,7 +29,7 @@
       '
       = l :label_loading
 
-  - if action_name == 'update_layout_setting' || action_name == 'create'
+  - if %w[update_layout_setting create].include? action_name
     = content_for :render_async
 
   javascript:

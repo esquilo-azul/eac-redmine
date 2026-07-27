@@ -2,25 +2,76 @@
 
 module Additionals
   module Helpers
+    def link_to_query_filter(url, title:)
+      link_to svg_icon_tag('filter', label: :button_filter),
+              url,
+              title: title.is_a?(Symbol) ? l(title) : title,
+              class: 'icon-only icon-list'
+    end
+
+    def render_breadcrumb(items)
+      cnt = items.length
+      titles = items.each_with_index.map do |item, index|
+        css_classes = +'breadcrumb-item'
+        css_classes << ' with-list-seperator' if index < cnt - 1
+
+        tag.span item, class: css_classes
+      end
+
+      safe_join titles
+    end
+
+    def entry_page_title(name, obj: nil, obj_link: nil, query: nil, icon_name: nil)
+      items = []
+      case obj
+      when Issue
+        items << link_to(h("#{obj.subject} ##{obj.id}"),
+                         issue_path(obj),
+                         class: obj.css_classes)
+      when User
+        items << user_with_avatar(obj, no_link: true, size: 50)
+      else
+        items << obj_link if obj_link
+      end
+
+      items << (name.is_a?(Symbol) ? l(name) : name)
+      items << h(query.name) if query && !query.new_record?
+
+      page_title = []
+      page_title << svg_icon_tag(icon_name, css_class: 'icon-padding', size: 24) if icon_name
+      page_title << render_breadcrumb(items)
+
+      safe_join page_title
+    end
+
+    def label_with_count(label, info, only_positive: false)
+      text = label.is_a?(Symbol) ? l(label) : label
+      if info.blank? || only_positive && !info.positive?
+        text
+      else
+        safe_join [text, ' (', info, ')']
+      end
+    end
+
     def render_query_group_view(query, locals = {})
       return if locals[:group_name].blank?
 
       render partial: 'queries/additionals_group_view',
-             locals: { query: query }.merge(locals)
+             locals: { query: }.merge(locals)
     end
 
     def render_query_block_columns(query, entry, tr_classes:, with_buttons: false, with_checkbox: true)
-      td_colspan = query.inline_columns.size + 1
+      td_colspan = query.inline_columns.size
       td_colspan += 1 if with_buttons
 
       content = []
       query.block_columns.each do |column|
         next if !(text = column_content column, entry) || text.blank?
 
-        content << tag.tr(class: "#{tr_classes} block_row") do # rubocop: disable Style/MethodCallWithArgsParentheses
+        content << tag.tr(class: "#{tr_classes} block-row") do
           tds = []
           tds << tag.td('', class: 'hide') if with_buttons && with_checkbox
-          tds << tag.td(colspan: td_colspan, class: "#{column.css_classes} block_column") do # rubocop: disable Style/MethodCallWithArgsParentheses
+          tds << tag.td(colspan: td_colspan, class: "#{column.css_classes} block_column") do
             td_content = []
             td_content << tag.span(column.caption) if query.block_columns.count > 1
             td_content << text
@@ -42,7 +93,7 @@ module Additionals
 
     def live_search_title_info(entity)
       fields = "LiveSearch::#{entity.to_s.classify}".constantize.info_fields
-      all_fields = fields.map { |f| "#{f}:term" }.to_list
+      all_fields = fields.map { |f| "#{f}:term" }.to_comma_list
       l :label_live_search_hints, value: all_fields
     end
 
@@ -59,7 +110,7 @@ module Additionals
     end
 
     def additionals_i18n_title(options, title)
-      i18n_title = "#{title}_#{::I18n.locale}".to_sym
+      i18n_title = :"#{title}_#{::I18n.locale}"
       if options.key? i18n_title
         options[i18n_title]
       elsif options.key? title
@@ -99,11 +150,7 @@ module Additionals
     end
 
     def additionals_library_load(module_names)
-      s = []
-      Array(module_names).each do |module_name|
-        s << send("additionals_load_#{module_name}")
-      end
-      safe_join s
+      safe_join(Array(module_names).map { |module_name| send(:"additionals_load_#{module_name}") })
     end
 
     def autocomplete_select_entries(name, type, option_tags, **options)
@@ -114,6 +161,10 @@ module Additionals
           # if option_tags is not an array, it should be an object
           option_tags = options_for_select [[option_tags.try(:name), option_tags.try(:id)]], option_tags.try(:id)
         end
+      else
+        # NOTE: without data select_tag raise error if include_blank is used,
+        # e.g. ActionView::Template::Error (no implicit conversion of DbEntry::ActiveRecord_Relation into String)
+        option_tags = ''
       end
 
       ajax_params = options.delete(:ajax_params) || {}
@@ -133,8 +184,8 @@ module Additionals
       s << render(layout: false,
                   partial: 'additionals/select2_ajax_call',
                   formats: [:js],
-                  locals: { field_id: sanitize_to_id(name),
-                            ajax_url: send("#{type}_path", ajax_params),
+                  locals: { field_name_id: sanitize_to_id(name),
+                            ajax_url: send(:"#{type}_path", ajax_params),
                             options: options })
       safe_join s
     end
@@ -150,14 +201,7 @@ module Additionals
     end
 
     def addtionals_textarea_cols(text, min: 8, max: 20)
-      [[min, text.to_s.length / 50].max, max].min
-    end
-
-    def title_with_fontawesome(title, symbole, wrapper = 'span')
-      tag.send wrapper do
-        concat tag.i class: "#{symbole} for-fa-title", 'aria-hidden': 'true'
-        concat title
-      end
+      RedminePluginKit.textarea_cols text, min:, max:
     end
 
     def format_yes(value, lowercase: false)
@@ -168,9 +212,93 @@ module Additionals
       end
     end
 
+    def user_with_avatar(user, no_link: false, css_class: 'additionals-avatar', size: 14, no_link_name: nil)
+      return unless user
+
+      if user.type == 'Group'
+        if no_link || !AdditionalsPlugin.active_hrm?
+          user.name
+        else
+          link_to_hrm_group user
+        end
+      else
+        s = []
+        s << avatar(user, size:, class: css_class)
+        s << if no_link
+               no_link_name || user.name
+             else
+               link_to_user user
+             end
+        safe_join s
+      end
+    end
+
+    def options_for_menu_select(active)
+      options_for_select({ l(:button_hide) => '',
+                           l(:label_top_menu) => 'top',
+                           l(:label_app_menu) => 'app' }, active)
+    end
+
+    def human_float_number(value, precision: 2, separator: '.')
+      ActionController::Base.helpers.number_with_precision(value,
+                                                           precision:,
+                                                           separator:,
+                                                           strip_insignificant_zeros: true)
+    end
+
+    def query_list_back_url_tag(project = nil, params = nil)
+      url = if controller_name == 'dashboard_async_blocks' && request.query_parameters.key?('dashboard_id')
+              dashboard_link_path project,
+                                  Dashboard.find_by(id: request.query_parameters['dashboard_id']),
+                                  refresh: 1
+            elsif params.nil?
+              url_for params: request.query_parameters
+            else
+              url_for(params:)
+            end
+
+      hidden_field_tag 'back_url', url, id: nil
+    end
+
+    def render_author_line(entry, created_field: :created_on, updated_field: :updated_on)
+      created = entry.send created_field
+      updated = entry.send updated_field
+      tag.p class: 'author' do
+        str = [authoring(created, entry.author)]
+        str << '.'
+        if created != updated
+          str << ' '
+          str << l(:label_updated_time, time_tag(updated)).html_safe
+          str << '.'
+        end
+        safe_join str
+      end
+    end
+
+    def render_label_sum(label, sum)
+      name = label.is_a?(Symbol) ? l(label) : label
+      "#{name} (#{sum})"
+    end
+
+    def labeled_line(label, value: nil, line_class: nil, label_class: nil, value_class: nil, icon: nil)
+      label_text = label.is_a?(Symbol) ? l(label) : label
+      label_text = "#{label_text}:"
+      label_text = svg_icon_tag(icon, label: label_text) if icon.present?
+
+      line_classes = 'line'
+      line_classes = [line_classes, line_class].join(' ') if line_class.present?
+      label_classes = 'label'
+      label_classes = [label_classes, label_class].join(' ') if label_class.present?
+      value_classes = 'value'
+      value_classes = [value_classes, value_class].join(' ') if value_class.present?
+      tag.div class: line_classes do
+        tag.div(label_text, class: label_classes) + tag.div(value, class: value_classes)
+      end
+    end
+
     private
 
-    def additionals_already_loaded(scope, js_name)
+    def additionals_already_loaded?(scope, js_name)
       locked = "#{js_name}.#{scope}"
       @alreaded_loaded = [] if @alreaded_loaded.nil?
       return true if @alreaded_loaded.include? locked
@@ -180,7 +308,7 @@ module Additionals
     end
 
     def additionals_include_js(js_name, core: false)
-      if additionals_already_loaded 'js', js_name
+      if additionals_already_loaded? 'js', js_name
         ''
       else
         javascript_include_tag js_name, plugin: core ? nil : 'additionals'
@@ -188,7 +316,7 @@ module Additionals
     end
 
     def additionals_include_css(css)
-      if additionals_already_loaded 'css', css
+      if additionals_already_loaded? 'css', css
         ''
       else
         stylesheet_link_tag css, plugin: 'additionals'
@@ -210,6 +338,10 @@ module Additionals
     end
 
     def additionals_load_chartjs
+      additionals_include_js 'chart.umd'
+    end
+
+    def additionals_load_chartjs_core
       additionals_include_js 'chart.min', core: true
     end
 
@@ -219,6 +351,10 @@ module Additionals
 
     def additionals_load_chartjs_datalabels
       additionals_include_js 'chartjs-plugin-datalabels.min'
+    end
+
+    def additionals_load_chartjs_annotation
+      additionals_include_js 'chartjs-plugin-annotation.min'
     end
 
     def additionals_load_chartjs_moment
@@ -242,69 +378,6 @@ module Additionals
 
     def additionals_load_d3plus
       additionals_include_js 'd3plus.min'
-    end
-
-    def user_with_avatar(user, no_link: false, css_class: 'additionals-avatar', size: 14, no_link_name: nil)
-      return unless user
-
-      if user.type == 'Group'
-        if no_link || !AdditionalsPlugin.active_hrm?
-          user.name
-        else
-          link_to_hrm_group user
-        end
-      else
-        s = []
-        s << avatar(user, size: size, class: css_class)
-        s << if no_link
-               no_link_name || user.name
-             else
-               link_to_user user
-             end
-        safe_join s
-      end
-    end
-
-    def options_for_menu_select(active)
-      options_for_select({ l(:button_hide) => '',
-                           l(:label_top_menu) => 'top',
-                           l(:label_app_menu) => 'app' }, active)
-    end
-
-    def human_float_number(value, precision: 2, separator: '.')
-      ActionController::Base.helpers.number_with_precision(value,
-                                                           precision: precision,
-                                                           separator: separator,
-                                                           strip_insignificant_zeros: true)
-    end
-
-    def query_list_back_url_tag(project = nil, params = nil)
-      url = if controller_name == 'dashboard_async_blocks' && request.query_parameters.key?('dashboard_id')
-              dashboard_link_path project,
-                                  Dashboard.find_by(id: request.query_parameters['dashboard_id']),
-                                  refresh: 1
-            elsif params.nil?
-              url_for params: request.query_parameters
-            else
-              url_for params: params
-            end
-
-      hidden_field_tag 'back_url', url, id: nil
-    end
-
-    def render_author_line(entry, created_field: :created_on, updated_field: :updated_on)
-      created = entry.send created_field
-      updated = entry.send updated_field
-      tag.p class: 'author' do
-        str = [authoring(created, entry.author)]
-        str << '.'
-        if created != updated
-          str << ' '
-          str << l(:label_updated_time, time_tag(updated)).html_safe # rubocop: disable Rails/OutputSafety
-          str << '.'
-        end
-        safe_join str
-      end
     end
   end
 end

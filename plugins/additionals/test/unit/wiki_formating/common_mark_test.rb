@@ -10,16 +10,11 @@ module WikiFormatting
       @options = {}
     end
 
-    def test_smilies
+    def test_smileys
       with_plugin_settings 'additionals', legacy_smiley_support: 1,
                                           emoji_support: 0 do
-        input = <<~HTML
-          A small test :) with an smiley
-        HTML
-        expected = <<~HTML
-          A small test <span class="additionals smiley smiley-smiley" title=":)"></span> with an smiley
-        HTML
-        assert_equal expected, smiley_filter(input)
+        assert_includes smiley_filter('A small test :) with an smiley'), '#icon--smiley-smiley'
+        assert_includes smiley_filter('A small test :) with an smiley'), 's18 icon-svg smiley'
       end
     end
 
@@ -33,7 +28,7 @@ module WikiFormatting
         </code></pre>
       HTML
       expected = <<~HTML
-        <img title="heavy black heart" class="inline_emojify" src="http://localhost:3000/#{Additionals::EMOJI_ASSERT_PATH}/emoji_u2764.png">
+        #{emoji_heart_tag}
         <pre><code>
         def foo
           :heart:
@@ -42,8 +37,7 @@ module WikiFormatting
       HTML
 
       with_plugin_settings 'additionals', legacy_smiley_support: 0,
-                                          emoji_support: 1,
-                                          disable_emoji_native_support: 1 do
+                                          emoji_support: 1 do
         assert_equal expected, emoji_filter(input)
       end
     end

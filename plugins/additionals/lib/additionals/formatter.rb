@@ -25,6 +25,8 @@ module Additionals
                 'success' => '[\[(]v[\])]', # (v)
                 'failure' => '[\[(]x[\])]' }.freeze # (x)
 
+    NON_SMILEY_COLOR = %w[exclamation question check success failure].freeze
+
     def render_inline_smileys(text)
       return text if text.blank?
 
@@ -40,8 +42,16 @@ module Additionals
           esc = Regexp.last_match 2
           smiley = Regexp.last_match 3
           if esc.nil?
-            leading.to_s + ActionController::Base.helpers.tag.span(class: "additionals smiley smiley-#{name}",
-                                                                   title: smiley)
+            css_class = NON_SMILEY_COLOR.exclude?(name) ? 'smiley' : 'info-smiley'
+            svg_code = ActionController::Base.helpers.svg_icon_tag "smiley-#{name}",
+                                                                   css_class:,
+                                                                   wrapper: :span,
+                                                                   wrapper_title: smiley
+
+            leading.to_s + ActionController::Base.helpers.tag.span(svg_code,
+                                                                   class: "additionals smiley icon smiley-#{name}",
+                                                                   wrapper: :span,
+                                                                   wrapper_title: smiley)
           else
             leading.to_s + smiley
           end
@@ -49,35 +59,16 @@ module Additionals
       end
     end
 
-    def emoji_tag(emoji, emoji_code)
-      if Additionals.setting? :disable_emoji_native_support
-        emoji_tag_fallback emoji, emoji_code
-      else
-        emoji_tag_native emoji, emoji_code
-      end
-    end
-
-    def emoji_tag_native(emoji, _emoji_code)
+    def emoji_tag(emoji, _emoji_code = nil)
       return unless emoji
 
       data = {
         name: emoji.name,
         unicode_version: emoji.unicode_version
       }
-      options = { title: emoji.description, data: data }
+      options = { title: emoji.description, data: }
 
       ActionController::Base.helpers.content_tag 'additionals-emoji', emoji.codepoints, options
-    end
-
-    def emoji_tag_fallback(emoji, _emoji_code)
-      ActionController::Base.helpers.image_tag emoji_image_path(emoji),
-                                               title: emoji.description,
-                                               class: 'inline_emojify'
-    end
-
-    def emoji_image_path(emoji, local: false)
-      base_url = local ? '/' : Additionals.full_url
-      File.join base_url, Additionals::EMOJI_ASSERT_PATH, emoji.image_name
     end
 
     def with_emoji?(text)

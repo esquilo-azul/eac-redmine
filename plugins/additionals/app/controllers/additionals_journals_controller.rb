@@ -9,7 +9,31 @@ class AdditionalsJournalsController < ApplicationController
   helper :journals
   helper :additionals_journals
 
+  def edit
+    return render_403 unless @journal.editable_by? User.current
+
+    respond_to do |format|
+      # TODO: implement non-JS journal update
+      format.js { render 'additionals_journals/edit' }
+    end
+  end
+
   def create; end
+
+  def update
+    return render_403 unless @journal.editable_by? User.current
+
+    journal_attributes = params[:journal]
+    journal_attributes[:updated_by] = User.current
+    @journal.safe_attributes = journal_attributes
+    @journal.save
+    @journal.destroy if @journal.details.empty? && @journal.notes.blank?
+    call_hook(:controller_additionals_journals_edit_post, { journal: @journal, params: })
+    respond_to do |format|
+      format.html { redirect_after_update }
+      format.js { render 'additionals_journals/update' }
+    end
+  end
 
   def diff
     @entry = @journal.journalized
@@ -29,31 +53,10 @@ class AdditionalsJournalsController < ApplicationController
     @diff = Redmine::Helpers::Diff.new @detail.value, @detail.old_value
   end
 
-  def edit
-    return render_403 unless @journal.editable_by? User.current
-
-    respond_to do |format|
-      # TODO: implement non-JS journal update
-      format.js
-    end
-  end
-
-  def update
-    return render_403 unless @journal.editable_by? User.current
-
-    @journal.safe_attributes = params[:journal]
-    @journal.save
-    @journal.destroy if @journal.details.empty? && @journal.notes.blank?
-    respond_to do |format|
-      format.html { redirect_after_update }
-      format.js
-    end
-  end
-
   private
 
   def redirect_after_update
-    raise 'overwrite it'
+    redirect_to @journal.journalized
   end
 
   def find_journal

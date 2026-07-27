@@ -6,10 +6,7 @@ class DashboardsController < ApplicationController
   before_action :find_dashboard, except: %i[index new create]
   before_action :find_optional_project, only: %i[index new create]
 
-  accept_atom_auth :index, :show
   accept_api_auth :index, :show, :create, :update, :destroy
-
-  rescue_from Query::StatementInvalid, with: :query_statement_invalid
 
   helper :queries
   helper :issues
@@ -64,29 +61,6 @@ class DashboardsController < ApplicationController
     @allowed_projects = @dashboard.allowed_target_projects
   end
 
-  def create
-    @dashboard = Dashboard.new author: User.current
-    @dashboard.safe_attributes = params[:dashboard]
-    @dashboard.dashboard_type = assign_dashboard_type
-    @dashboard.role_ids = params[:dashboard][:role_ids] if params[:dashboard].present?
-
-    @allowed_projects = @dashboard.allowed_target_projects
-
-    if @dashboard.save
-      flash[:notice] = l :notice_successful_create
-
-      respond_to do |format|
-        format.html { redirect_to dashboard_link_path(@project, @dashboard) }
-        format.api  { render action: 'show', status: :created, location: dashboard_url(@dashboard, project_id: @project) }
-      end
-    else
-      respond_to do |format|
-        format.html { render action: 'new' }
-        format.api  { render_validation_errors @dashboard }
-      end
-    end
-  end
-
   def edit
     return render_403 unless @dashboard.editable?
 
@@ -98,10 +72,34 @@ class DashboardsController < ApplicationController
     end
   end
 
+  def create
+    @dashboard = Dashboard.new author: User.current
+    @dashboard.safe_attributes = params[:dashboard]
+    @dashboard.dashboard_type = assign_dashboard_type
+    @dashboard.role_ids = params[:dashboard][:role_ids] if params[:dashboard].present?
+
+    @allowed_projects = @dashboard.allowed_target_projects
+
+    if @dashboard.save
+      respond_to do |format|
+        format.html do
+          flash[:notice] = flash_msg :create
+          redirect_to dashboard_link_path(@project, @dashboard)
+        end
+        format.api  { render action: :show, status: :created, location: dashboard_url(@dashboard, project_id: @project) }
+      end
+    else
+      respond_to do |format|
+        format.html { render :new }
+        format.api  { render_validation_errors @dashboard }
+      end
+    end
+  end
+
   def update
     return render_403 unless @dashboard.editable?
 
-    # should be set before dashboar object has modified
+    # should be set before dashboard object has modified
     @allowed_projects = @dashboard.allowed_target_projects
 
     @dashboard.safe_attributes = params[:dashboard]
@@ -110,14 +108,14 @@ class DashboardsController < ApplicationController
     @project = @dashboard.project if @project && @dashboard.project_id.present? && @dashboard.project != @project
 
     if @dashboard.save
-      flash[:notice] = l :notice_successful_update
+      flash[:notice] = flash_msg :update
       respond_to do |format|
         format.html { redirect_to dashboard_link_path(@project, @dashboard) }
         format.api  { render_api_ok }
       end
     else
       respond_to do |format|
-        format.html { render action: 'edit' }
+        format.html { render :edit }
         format.api  { render_validation_errors @dashboard }
       end
     end
@@ -128,21 +126,15 @@ class DashboardsController < ApplicationController
 
     begin
       @dashboard.destroy
-      flash[:notice] = l :notice_successful_delete
+      flash[:notice] = flash_msg :delete
       respond_to do |format|
         format.html { redirect_to @project.nil? ? home_path : project_path(@project) }
         format.api  { render_api_ok }
       end
     rescue ActiveRecord::RecordNotDestroyed
-      flash[:error] = l :error_remove_db_entry
+      flash[:error] = flash_msg :delete_error, obj: @dashboard
       redirect_to dashboard_path(@dashboard)
     end
-  end
-
-  def query_statement_invalid(exception)
-    logger&.error "Query::StatementInvalid: #{exception.message}"
-    session.delete additionals_query_session_key('dashboard')
-    render_error l(:error_query_statement_invalid)
   end
 
   def update_layout_setting

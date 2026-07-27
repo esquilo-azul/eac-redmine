@@ -3,12 +3,6 @@
 require File.expand_path '../../test_helper', __FILE__
 
 class AutoCompletesControllerTest < Additionals::ControllerTest
-  fixtures :projects, :email_addresses,
-           :enumerations, :users, :groups_users,
-           :roles,
-           :members, :member_roles,
-           :enabled_modules
-
   def setup
     prepare_tests
     Setting.default_language = 'en'
@@ -19,8 +13,10 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     icon = json.first
+
     assert_kind_of Hash, icon
     assert_equal 'far_address-book', icon['id']
     assert_equal 'Address Book', icon['text']
@@ -32,9 +28,11 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 5, json.count
     icon = json.first
+
     assert_kind_of Hash, icon
     assert_equal 'fas_cloud-sun', icon['id']
     assert_equal 'Cloud with Sun', icon['text']
@@ -46,16 +44,18 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 0, json.count
   end
 
   def test_issue_assignee
     with_settings issue_group_assignment: '0' do
-      get :issue_assignee
+      get :issue_assignee, xhr: true
 
       assert_response :success
       json = ActiveSupport::JSON.decode response.body
+
       assert_kind_of Array, json
       assert_equal 2, json.count
 
@@ -66,10 +66,11 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
   end
 
   def test_assignee
-    get :assignee
+    get :assignee, xhr: true
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 3, json.count
 
@@ -81,10 +82,11 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
   end
 
   def test_grouped_principals
-    get :grouped_principals
+    get :grouped_principals, xhr: true
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 2, json.count
 
@@ -96,10 +98,12 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
   def test_grouped_principals_with_me
     get :grouped_principals,
-        params: { with_me: true }
+        params: { with_me: true },
+        xhr: true
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
 
     assert_equal 3, json.count
@@ -111,10 +115,11 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
   end
 
   def test_grouped_users
-    get :grouped_users
+    get :grouped_users, xhr: true
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 1, json.count
 
@@ -124,10 +129,12 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
   def test_grouped_users_with_me
     get :grouped_users,
-        params: { with_me: true }
+        params: { with_me: true },
+        xhr: true
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 2, json.count
 
@@ -138,10 +145,12 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
   def test_grouped_users_with_ano
     get :grouped_users,
-        params: { with_ano: true }
+        params: { with_ano: true },
+        xhr: true
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 2, json.count
 
@@ -152,10 +161,12 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
   def test_grouped_users_for_project
     get :grouped_users,
-        params: { project_id: 1 }
+        params: { project_id: 1 },
+        xhr: true
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 1, json.count
 
@@ -165,10 +176,12 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
   def test_grouped_users_with_excluded_user
     get :grouped_users,
-        params: { user_id: 2 }
+        params: { user_id: 2 },
+        xhr: true
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 1, json.count
 
@@ -179,17 +192,21 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
   def test_grouped_users_with_search
     get :grouped_users,
-        params: { q: 'john' }
+        params: { q: 'john' },
+        xhr: true
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 1, json.count
 
     children = json.first['children']
+
     assert_equal 1, children.count
 
     entry = children.first
+
     assert_equal 2, entry['id']
     assert_equal 'John Smith', entry['text']
     assert_equal 'John Smith', entry['name']
@@ -199,10 +216,11 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
   def test_grouped_users_scope
     Role.anonymous.update! users_visibility: 'members_of_visible_projects'
     @request.session[:user_id] = nil
-    get :grouped_users
+    get :grouped_users, xhr: true
 
     assert_response :success
     json = ActiveSupport::JSON.decode response.body
+
     assert_kind_of Array, json
     assert_equal 1, json.count
 

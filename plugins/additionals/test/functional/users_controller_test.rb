@@ -11,14 +11,6 @@ class ViewUsersShowInfoRenderOn < Redmine::Hook::ViewListener
 end
 
 class UsersControllerTest < Additionals::ControllerTest
-  fixtures :users, :groups_users, :email_addresses, :user_preferences,
-           :roles, :members, :member_roles,
-           :issues, :issue_statuses, :issue_relations,
-           :issues, :issue_statuses, :issue_categories,
-           :versions, :trackers,
-           :projects, :projects_trackers, :enabled_modules,
-           :enumerations
-
   include Redmine::I18n
 
   def setup

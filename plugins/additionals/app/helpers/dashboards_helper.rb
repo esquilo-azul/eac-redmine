@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module DashboardsHelper
-  def dashboard_async_cache(dashboard, block, async, settings, &content_block)
-    cache render_async_cache_key(_dashboard_async_blocks_path(@project, dashboard.async_params(block, async, settings))),
+  def dashboard_async_cache(dashboard, block, async, settings, &)
+    cache(render_async_cache_key(_dashboard_async_blocks_path(@project, dashboard.async_params(block, async, settings))),
           expires_in: async[:cache_expires_in] || DashboardContent::RENDER_ASYNC_CACHE_EXPIRES_IN,
-          skip_digest: true, &content_block
+          skip_digest: true, &)
   end
 
   def dashboard_sidebar?(dashboard, params)
@@ -22,7 +22,12 @@ module DashboardsHelper
 
   def welcome_overview_name(dashboard = nil)
     name = [l(:label_home)]
-    name << dashboard.name if dashboard&.always_expose? || dashboard.present? && !dashboard.system_default?
+
+    if dashboard&.always_expose? || dashboard.present? && !dashboard.system_default?
+      default_dashboard = Dashboard.default DashboardContentWelcome::TYPE_NAME, nil, User.current, ''
+      name = [dashboard_link(default_dashboard, nil, name: l(:label_home))] if default_dashboard&.id != dashboard.id
+      name << dashboard.name
+    end
 
     safe_join name, Additionals::LIST_SEPARATOR
   end
@@ -56,14 +61,14 @@ module DashboardsHelper
       css_class = base_css
       dashboard_name = "#{l :label_dashboard}: #{dashboard.name}"
       out << if dashboard.id == active_dashboard.id
-               link_to dashboard_name, '#',
-                       onclick: 'return false;',
-                       class: "#{base_css} disabled"
+               link_to_function svg_icon_tag('dashboard', label: dashboard_name, css_class: 'disabled'),
+                                '',
+                                class: "#{base_css} disabled"
              else
                dashboard_link dashboard, project,
                               class: css_class,
                               title: l(:label_change_to_dashboard),
-                              name: dashboard_name
+                              name: svg_icon_tag('dashboard', label: dashboard_name)
              end
     end
 
@@ -109,7 +114,7 @@ module DashboardsHelper
     return '' unless dashboards.any?
 
     tag.h3(title, class: 'dashboards') +
-      tag.ul(class: 'dashboards') do # rubocop: disable Style/MethodCallWithArgsParentheses
+      tag.ul(class: 'dashboards') do
         dashboards.each do |dashboard|
           selected = dashboard.id == if params[:dashboard_id].present?
                                        params[:dashboard_id].to_i
@@ -125,14 +130,18 @@ module DashboardsHelper
           if dashboard.system_default?
             link << if dashboard.project_id.nil?
                       li_class = 'global'
-                      font_awesome_icon 'fas_cube',
-                                        title: l(:field_system_default),
-                                        class: "dashboard-system-default #{li_class}"
+                      svg_icon_tag 'cube',
+                                   wrapper: :span,
+                                   wrapper_title: :field_system_default,
+                                   size: 14,
+                                   css_class: "suffixed dashboard-system-default #{li_class}"
                     else
                       li_class = 'project'
-                      font_awesome_icon 'fas_cube',
-                                        title: l(:field_project_system_default),
-                                        class: "dashboard-system-default #{li_class}"
+                      svg_icon_tag 'cube',
+                                   wrapper: :span,
+                                   wrapper_title: :field_project_system_default,
+                                   size: 14,
+                                   css_class: "suffixed dashboard-system-default #{li_class}"
                     end
           end
 
@@ -159,22 +168,28 @@ module DashboardsHelper
     return unless dashboard
 
     if enabled
-      link_to l(:label_disable_sidebar),
+      link_to sprite_icon('chevrons-right', l(:label_disable_sidebar)),
               dashboard_link_path(project, dashboard, enable_sidebar: 0),
               class: 'icon icon-sidebar'
     else
-      link_to l(:label_enable_sidebar),
+      link_to sprite_icon('chevrons-left', l(:label_enable_sidebar)),
               dashboard_link_path(project, dashboard, enable_sidebar: 1),
               class: 'icon icon-sidebar'
     end
   end
 
-  def delete_dashboard_link(url)
-    options = { method: :delete,
-                data: { confirm: l(:text_are_you_sure) },
-                class: 'icon icon-del' }
+  def delete_dashboard_link(url, dashboard)
+    options = { class: +'icon icon-del' }
+    if dashboard.locked?
+      options[:title] = l :label_dashboard_lock_is_active
+      options[:class] << ' disabled'
+      url = '#'
+    else
+      options[:method] = :delete
+      options[:data] = { confirm: l(:text_are_you_sure) }
+    end
 
-    link_to l(:button_dashboard_delete), url, options
+    link_to sprite_icon('del', l(:button_dashboard_delete)), url, options
   end
 
   # Returns the select tag used to add or remove a block
@@ -214,17 +229,24 @@ module DashboardsHelper
     content = render_dashboard_block_content block, block_definition, dashboard, **overwritten_settings
     return if content.blank?
 
-    if dashboard.editable?
+    if dashboard.editable? && !dashboard.locked?
       icons = []
       if block_definition[:no_settings].blank? &&
          (!block_definition.key?(:with_settings_if) || block_definition[:with_settings_if].call(@project))
-        icons << link_to_function(l(:label_options),
-                                  "$('##{block}-settings').toggle();",
+        icons << link_to_function(sprite_icon('settings', l(:label_options)),
+                                  "$('##{block}-settings').toggle()",
                                   class: 'icon-only icon-settings',
                                   title: l(:label_options))
       end
-      icons << tag.span('', class: 'icon-only icon-sort-handle sort-handle', title: l(:button_move))
-      icons << delete_link(_remove_block_dashboard_path(@project, dashboard, block: block),
+      if block_definition.key? :async
+        icons << svg_icon_tag('warning',
+                              plugin: '',
+                              wrapper: :span,
+                              wrapper_class: 'icon-only',
+                              wrapper_title: dashboard_block_sync_info(block_definition))
+      end
+      icons << tag.span(sprite_icon('reorder', ''), class: 'icon-only icon-sort-handle sort-handle', title: l(:button_move))
+      icons << delete_link(_remove_block_dashboard_path(@project, dashboard, block:),
                            method: :post,
                            remote: true,
                            class: 'icon-only icon-close',
@@ -233,14 +255,14 @@ module DashboardsHelper
       content = tag.div(safe_join(icons), class: 'contextual') + content
     end
 
-    tag.div content, class: "mypage-box block-#{block_definition[:name]}", id: "block-#{block}"
+    tag.div content, class: "mypage-box dashboard-block block-#{block_definition[:name]}", id: "block-#{block}"
   end
 
   def build_dashboard_partial_locals(block, block_definition, settings, dashboard)
-    partial_locals = { dashboard: dashboard,
-                       settings: settings,
-                       block: block,
-                       block_definition: block_definition,
+    partial_locals = { dashboard:,
+                       settings:,
+                       block:,
+                       block_definition:,
                        user: User.current }
 
     if block_definition[:query_block]
@@ -303,9 +325,10 @@ module DashboardsHelper
 
     return unless title
 
-    font_awesome_icon('fas_info-circle',
-                      title: title,
-                      class: 'dashboard-block-alert')
+    svg_icon_tag('details',
+                 wrapper: :span,
+                 wrapper_title: title,
+                 css_class: 'suffixed')
   end
 
   def render_legacy_left_block(_block, _block_definition, _settings, _dashboard)
@@ -335,9 +358,7 @@ module DashboardsHelper
                      .limit(max_entries)
                      .to_a
 
-    render partial: 'dashboards/blocks/documents', locals: { block: block,
-                                                             max_entries: max_entries,
-                                                             documents: documents }
+    render 'dashboards/blocks/documents', block:, max_entries:, documents:
   end
 
   def render_news_block(block, _block_definition, settings, dashboard)
@@ -354,9 +375,7 @@ module DashboardsHelper
                       .to_a
            end
 
-    render partial: 'dashboards/blocks/news', locals: { block: block,
-                                                        max_entries: max_entries,
-                                                        news: news }
+    render 'dashboards/blocks/news', block:, max_entries:, news:
   end
 
   def render_my_spent_time_block(block, block_definition, settings, dashboard)
@@ -369,12 +388,12 @@ module DashboardsHelper
     entries_today = scope.where spent_on: User.current.today
     entries_days = scope.where spent_on: User.current.today - (days - 1)..User.current.today
 
-    render partial: 'dashboards/blocks/my_spent_time',
-           locals: { block: block,
-                     block_definition: block_definition,
-                     entries_today: entries_today,
-                     entries_days: entries_days,
-                     days: days }
+    render('dashboards/blocks/my_spent_time',
+           block:,
+           block_definition:,
+           entries_today:,
+           entries_days:,
+           days:)
   end
 
   def activity_dashboard_data(settings, dashboard)
@@ -401,8 +420,8 @@ module DashboardsHelper
         rss = RSS::Parser.parse rss_feed
         rss.items.each do |item|
           cnt += 1
-          feed[:items] << { title: item.title.try(:content)&.presence || item.title,
-                            link: item.link.try(:href)&.presence || item.link }
+          feed[:items] << { title: item.title.try(:content).presence || item.title,
+                            link: item.link.try(:href).presence || item.link }
           break if cnt >= max_entries
         end
       end
@@ -434,6 +453,15 @@ module DashboardsHelper
 
   private
 
+  def dashboard_block_sync_info(block_definition)
+    sec = block_definition[:async][:cache_expires_in].presence || DashboardContent::RENDER_ASYNC_CACHE_EXPIRES_IN
+    if sec < 60
+      l :label_dashboard_block_info_async, time: l(:seconds, sec)
+    else
+      l :label_dashboard_block_info_async, time: distance_of_time_in_words(sec)
+    end
+  end
+
   # Renders a single block content
   def render_dashboard_block_content(block, block_definition, dashboard, **overwritten_settings)
     settings = dashboard.layout_settings block
@@ -443,16 +471,16 @@ module DashboardsHelper
     partial_locals = build_dashboard_partial_locals block, block_definition, settings, dashboard
 
     if block_definition[:query_block] || block_definition[:async]
-      render partial: 'dashboards/blocks/async', locals: partial_locals
+      render 'dashboards/blocks/async', partial_locals
     elsif partial
       begin
-        render partial: partial, locals: partial_locals
+        render partial, partial_locals
       rescue ActionView::MissingTemplate
         Rails.logger.warn "Partial \"#{partial}\" missing for block \"#{block}\" found in #{dashboard.name} (id=#{dashboard.id})"
         nil
       end
     else
-      send "render_#{block_definition[:name]}_block",
+      send :"render_#{block_definition[:name]}_block",
            block,
            block_definition,
            settings,

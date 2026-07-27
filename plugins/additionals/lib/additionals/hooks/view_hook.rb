@@ -5,13 +5,14 @@ module Additionals
     class ViewHook < Redmine::Hook::ViewListener
       include IssuesHelper
       include AdditionalsIssuesHelper
+      include AdditionalsIconsHelper
 
       render_on :view_layouts_base_html_head, partial: 'additionals/html_head'
       render_on :view_layouts_base_body_top, partial: 'additionals/body_top'
       render_on :view_layouts_base_body_bottom, partial: 'additionals/body_bottom'
 
       render_on :view_account_login_bottom, partial: 'login_text'
-      render_on :view_issue_action_menu, partial: 'issues/additionals_action_menu'
+      render_on :view_issues_show_description_bottom, partial: 'issues/additionals_show_description_bottom'
       render_on :view_issues_context_menu_start, partial: 'additionals_closed_issues'
       render_on :view_issues_bulk_edit_details_bottom, partial: 'change_author_bulk'
       render_on :view_issues_form_details_bottom, partial: 'change_author'
@@ -25,7 +26,7 @@ module Additionals
 
       def helper_issues_show_detail_after_setting(context = {})
         detail = context[:detail]
-        return unless detail.prop_key == 'author_id'
+        return if detail.prop_key != 'author_id'
 
         detail[:value] = find_name_by_reflection('author', detail.value) || detail.value
         detail[:old_value] = find_name_by_reflection('author', detail.old_value) || detail.old_value
@@ -43,7 +44,8 @@ module Additionals
                   controller_name == 'account' && action_name == 'lost_password' ||
                   !Additionals.setting?(:add_go_to_top)
 
-        link_to l(:label_go_to_top), '#gototop', class: 'gototop'
+        tag.div link_to(svg_icon_tag('page-up', label: :label_go_to_top), '#gototop', class: 'icon icon-page-up'),
+                class: 'gototop'
       end
     end
   end

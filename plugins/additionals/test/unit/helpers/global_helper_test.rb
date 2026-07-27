@@ -2,7 +2,7 @@
 
 require File.expand_path '../../../test_helper', __FILE__
 
-class GlobalHelperTest < Redmine::HelperTest
+class GlobalHelperTest < Additionals::HelperTest
   include Additionals::Helpers
   include RedminePluginKit::Helpers::GlobalHelper
   include AdditionalsFontawesomeHelper
@@ -11,17 +11,6 @@ class GlobalHelperTest < Redmine::HelperTest
   include AvatarsHelper
   include Redmine::I18n
   include ERB::Util
-
-  fixtures :projects, :trackers, :issue_statuses, :issues,
-           :enumerations, :users, :issue_categories,
-           :projects_trackers,
-           :roles,
-           :member_roles,
-           :members,
-           :enabled_modules,
-           :custom_fields,
-           :attachments,
-           :versions
 
   def setup
     super
@@ -37,15 +26,19 @@ class GlobalHelperTest < Redmine::HelperTest
 
   def test_font_awesome_icon
     html = font_awesome_icon 'fas_cloud-upload-alt', class: 'test'
+
     assert_include 'class="fas fa-cloud-upload-alt test"', html
 
     html = font_awesome_icon 'fab_xing', class: 'test'
+
     assert_include 'class="fab fa-xing test"', html
 
     html = font_awesome_icon 'fas_cloud-upload-alt', pre_text: 'Testing'
+
     assert_include 'Testing <span', html
 
     html = font_awesome_icon 'fas_cloud-upload-alt', post_text: 'Testing'
+
     assert_include '</span> Testing', html
   end
 

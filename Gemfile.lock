@@ -17,16 +17,6 @@ GIT
       rack (>= 1.5.1)
 
 PATH
-  remote: plugins/additionals
-  specs:
-    additionals (3.0.6)
-      redmine_plugin_kit
-      render_async
-      rss
-      slim-rails
-      tanuki_emoji (~> 0.6)
-
-PATH
   remote: plugins/eac_redmine_base0
   specs:
     eac_redmine_base0 (0.6.4)
@@ -720,7 +710,6 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   actionpack-xml_parser
-  additionals!
   addressable
   asciidoctor
   bullet
@@ -770,6 +759,7 @@ DEPENDENCIES
   redmine_plugins_helper!
   redmine_tasks_scheduler!
   redmine_with_git!
+  render_async
   request_store (~> 1.5.0)
   rexml
   rinku
@@ -779,6 +769,7 @@ DEPENDENCIES
   rqrcode
   rspec
   rspec-rails
+  rss
   rubyzip (~> 2.3.0)
   sanitize (~> 6.0)
   selenium-webdriver (>= 4.11.0)
@@ -787,9 +778,11 @@ DEPENDENCIES
   shoulda-matchers (~> 4.0)
   sidekiq (< 7)
   simplecov (~> 0.22.0)
+  slim-rails
   spring
   spring-commands-rspec
   sshkey
+  tanuki_emoji (~> 0.13.0)
   tzinfo-data
   yard
 

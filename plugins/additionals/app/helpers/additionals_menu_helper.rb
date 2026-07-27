@@ -70,11 +70,12 @@ module AdditionalsMenuHelper
                      id: :changelog },
                    { title: 'Redmine Upgrade',
                      url: 'https://www.redmine.org/projects/redmine/wiki/RedmineUpgrade',
-                     id: :security_advisories },
+                     id: :redmine_upgrade },
                    { title: 'Redmine Security Advisories',
-                     url: 'https://www.redmine.org/projects/redmine/wiki/Security_Advisories' }]
+                     url: 'https://www.redmine.org/projects/redmine/wiki/Security_Advisories',
+                     id: :security_advisories }]
 
-    Redmine::Plugin.all.each do |plugin|
+    Redmine::Plugin.all.each do |plugin| # rubocop: disable Rails/FindEach
       next if plugin.id == :additionals
 
       plugin_item_base = nil
@@ -84,7 +85,7 @@ module AdditionalsMenuHelper
       rescue LoadError
         Rails.logger.debug { "Ignore plugin #{plugin.id} for help integration" }
       rescue StandardError => e
-        raise e unless e.class.to_s == 'NameError'
+        raise e unless e.instance_of? ::NameError
       end
 
       plugin_item = plugin_item_base.try :additionals_help_items unless plugin_item_base.nil?
@@ -131,7 +132,7 @@ module AdditionalsMenuHelper
       s << if item[:title] == '-'
              tag.li tag.hr
            else
-             html_options = { class: +"help_item_#{id}" }
+             html_options = { class: "help_item_#{id}" }
              if item[:url].include? '://'
                html_options[:class] << ' external'
                html_options[:target] = '_blank'
@@ -148,6 +149,9 @@ module AdditionalsMenuHelper
     plugins = { redmine_drawio: [{ title: 'draw.io usage',
                                    id: :drawio,
                                    url: 'https://github.com/mikitex70/redmine_drawio#usage' }],
+                redmine_agile: [{ title: 'Redmine Agile',
+                                  id: :agile,
+                                  url: 'https://www.redmineup.com/pages/help/agile' }],
                 redmine_contacts: [{ title: 'Redmine CRM',
                                      id: :crm,
                                      url: 'https://www.redmineup.com/pages/help/crm',

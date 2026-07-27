@@ -17,92 +17,6 @@ module AdditionalsQueriesHelper
     end
   end
 
-  def additionals_query_session_key(object_type)
-    "#{object_type}_query".to_sym
-  end
-
-  def additionals_retrieve_query(object_type, user_filter: nil, search_string: nil)
-    session_key = additionals_query_session_key object_type
-    query_class = Object.const_get "#{object_type.camelcase}Query"
-    if params[:query_id].present?
-      additionals_load_query_id query_class,
-                                session_key,
-                                params[:query_id],
-                                object_type,
-                                user_filter: user_filter,
-                                search_string: search_string
-    elsif api_request? ||
-          params[:set_filter] ||
-          session[session_key].nil? ||
-          session[session_key][:project_id] != (@project ? @project.id : nil)
-      # Give it a name, required to be valid
-      @query = query_class.new name: '_'
-      @query.project = @project
-      @query.user_filter = user_filter if user_filter
-      @query.search_string = search_string if search_string
-      @query.build_from_params params
-      session[session_key] = { project_id: @query.project_id }
-      # session has a limit to 4k, we have to use a cache for it for larger data
-      Rails.cache.write(additionals_query_cache_key(object_type),
-                        filters: @query.filters,
-                        group_by: @query.group_by,
-                        column_names: @query.column_names,
-                        totalable_names: @query.totalable_names,
-                        sort_criteria: params[:sort].presence || @query.sort_criteria.to_a)
-    else
-      # retrieve from session
-      @query = query_class.find_by id: session[session_key][:id] if session[session_key][:id]
-      session_data = Rails.cache.read additionals_query_cache_key(object_type)
-      @query ||= query_class.new(name: '_',
-                                 filters: session_data.nil? ? nil : session_data[:filters],
-                                 group_by: session_data.nil? ? nil : session_data[:group_by],
-                                 column_names: session_data.nil? ? nil : session_data[:column_names],
-                                 totalable_names: session_data.nil? ? nil : session_data[:totalable_names],
-                                 sort_criteria: params[:sort].presence || (session_data.nil? ? nil : session_data[:sort_criteria]))
-      @query.project = @project
-      @query.user_filter = user_filter if user_filter
-
-      if params[:sort].present?
-        @query.sort_criteria = params[:sort]
-        # we have to write cache for sort order
-        Rails.cache.write(additionals_query_cache_key(object_type),
-                          filters: @query.filters,
-                          group_by: @query.group_by,
-                          column_names: @query.column_names,
-                          totalable_names: @query.totalable_names,
-                          sort_criteria: params[:sort])
-      elsif session_data.present?
-        @query.sort_criteria = session_data[:sort_criteria]
-      end
-    end
-  end
-
-  def additionals_load_query_id(query_class, session_key, query_id, object_type, user_filter: nil, search_string: nil)
-    scope = query_class.where project_id: nil
-    scope = scope.or query_class.where(project_id: @project) if @project
-    @query = scope.find query_id
-    raise ::Unauthorized unless @query.visible?
-
-    @query.project = @project
-    @query.user_filter = user_filter if user_filter
-    @query.search_string = search_string if search_string
-    session[session_key] = { id: @query.id, project_id: @query.project_id }
-
-    @query.sort_criteria = params[:sort] if params[:sort].present?
-    # we have to write cache for sort order
-    Rails.cache.write(additionals_query_cache_key(object_type),
-                      filters: @query.filters,
-                      group_by: @query.group_by,
-                      column_names: @query.column_names,
-                      totalable_names: @query.totalable_names,
-                      sort_criteria: @query.sort_criteria)
-  end
-
-  def additionals_query_cache_key(object_type)
-    project_id = @project ? @project.id : 0
-    "#{object_type}_query_data_#{session.id}_#{project_id}"
-  end
-
   def render_grouped_users_with_select2(users, search_term: nil, with_me: true, with_ano: false, me_value: 'me')
     @users = { active: [], groups: [], registered: [], locked: [] }
 
@@ -110,9 +24,9 @@ module AdditionalsQueriesHelper
 
     sorted_users = users.select("users.*, #{User.table_name}.last_login_on IS NULL AS select_order")
                         .order("select_order ASC, #{User.table_name}.last_login_on DESC")
-                        .limit(Additionals::SELECT2_INIT_ENTRIES)
+                        .limit(AdditionalsConf.select2_init_entries)
                         .to_a
-                        .sort! { |x, y| x.name <=> y.name }
+                        .sort_by(&:name)
 
     with_users = false
     sorted_users.each do |user|
@@ -143,18 +57,24 @@ module AdditionalsQueriesHelper
     # Additionals.debug "locked: #{@users[:locked].pluck :id}"
     # Additionals.debug "groups: #{@users[:groups].pluck :id}"
 
-    render layout: false,
-           partial: 'auto_completes/grouped_users',
-           locals: { with_me: with_me && (search_term.blank? || l(:label_me).downcase.include?(search_term.downcase)),
-                     with_ano: with_ano && (search_term.blank? || l(:label_user_anonymous).downcase.include?(search_term.downcase)),
-                     me_value: me_value,
-                     sep_required: false }
+    respond_to do |format|
+      format.html { head :not_acceptable }
+      format.js do
+        render layout: false,
+               format: :json,
+               partial: 'auto_completes/grouped_users',
+               locals: { with_me: with_me && (search_term.blank? || l(:label_me).downcase.include?(search_term.downcase)),
+                         with_ano: with_ano && (search_term.blank? || l(:label_user_anonymous).downcase.include?(search_term.downcase)),
+                         me_value:,
+                         sep_required: false }
+      end
+    end
   end
 
   def additionals_query_to_xlsx(query, no_id_link: false)
     require 'write_xlsx'
 
-    options = { no_id_link: no_id_link,
+    options = { no_id_link:,
                 filename: StringIO.new(+'') }
 
     export_to_xlsx query.entries, query.columns, options
@@ -220,15 +140,15 @@ module AdditionalsQueriesHelper
       columns.each_with_index do |c, column_index|
         value = csv_content(c, line).dup
         if c.name == :id # ID
-          if options[:no_id_link].blank?
-            link = url_for controller: line.class.name.underscore.pluralize, action: 'show', id: line.id
-            worksheet.write line_index + 1, column_index, link, hyperlink_format, value
-          else
+          if options[:no_id_link]
             # id without link
             worksheet.write(line_index + 1,
                             column_index,
                             value,
                             workbook.add_format(xlsx_cell_format(:cell, value, line_index)))
+          else
+            link = send :"#{line.class.name.underscore}_url", id: line.id
+            worksheet.write line_index + 1, column_index, link, hyperlink_format, value
           end
         elsif xlsx_hyperlink_cell? value
           worksheet.write line_index + 1, column_index, value[0..254], hyperlink_format, value
@@ -257,7 +177,7 @@ module AdditionalsQueriesHelper
     # 1.1: margin
     width = (value_str.length + value_str.chars.count { |e| !e.ascii_only? }) * 1.1 + 1
     # 30: max width
-    width > 30 ? 30 : width
+    [width, 30].min
   end
 
   def xlsx_cell_format(type, value = 0, index = 0)
@@ -280,24 +200,22 @@ module AdditionalsQueriesHelper
   end
 
   def xlsx_hyperlink_cell?(token)
-    return if token.blank? || !token.is_a?(String)
+    return false if token.blank? || !token.is_a?(String)
 
     # Match http, https or ftp URL
-    if %r{\A[fh]tt?ps?://}.match?(token) ||
-       # Match mailto:
-       token.start_with?('mailto:') ||
-       # Match internal or external sheet link
-       /\A(?:in|ex)ternal:/.match?(token)
-      true
-    end
+    %r{\A[fh]tt?ps?://}.match?(token) ||
+      # Match mailto:
+      token.start_with?('mailto:') ||
+      # Match internal or external sheet link
+      /\A(?:in|ex)ternal:/.match?(token)
   end
 
   def set_flash_from_bulk_save(entries, unsaved_ids, name_plural:)
     if unsaved_ids.empty?
-      flash[:notice] = l :notice_successful_update unless entries.empty?
+      flash[:notice] = flash_msg :update unless entries.empty?
     else
       flash[:error] = l :notice_failed_to_save_entity,
-                        name_plural: name_plural,
+                        name_plural:,
                         count: unsaved_ids.size,
                         total: entries.size,
                         ids: "##{unsaved_ids.join ', #'}"
@@ -346,5 +264,9 @@ module AdditionalsQueriesHelper
 
   def link_to_nonzero(value, path)
     value.zero? ? value : link_to(value, path)
+  end
+
+  def link_to_issues(issues)
+    safe_join(issues.map { |issue| link_to_issue(issue, subject: false, tracker: false) }, ', ')
   end
 end

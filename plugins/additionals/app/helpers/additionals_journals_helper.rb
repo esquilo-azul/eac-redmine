@@ -3,6 +3,33 @@
 module AdditionalsJournalsHelper
   MultipleValuesDetail = Struct.new :property, :prop_key, :custom_field, :old_value, :value
 
+  def entity_history_tabs(entity, journals, template_dir: nil, force_history: false)
+    tabs = []
+    has_notes = false
+
+    template_dir ||= entity.class.name.underscore.pluralize
+
+    if force_history || journals.present?
+      tabs << { name: 'history',
+                partial: "#{template_dir}/tabs/history",
+                onclick: 'showIssueHistory("history", this.href)',
+                locals: { tab_name: 'history' },
+                label: :label_history }
+
+      has_notes = journals.any? { |value| value.notes.present? }
+    end
+
+    return tabs unless has_notes
+
+    tabs << { name: 'notes',
+              partial: "#{template_dir}/tabs/history",
+              onclick: 'showIssueHistory("notes", this.href)',
+              locals: { tab_name: 'notes' },
+              label: :label_issue_history_notes }
+
+    tabs
+  end
+
   # Returns the textual representation of a journal details
   # as an array of strings
   def entity_details_to_strings(entity, details, **options)
@@ -50,14 +77,14 @@ module AdditionalsJournalsHelper
 
     entity_type = entity.model_name.param_key
 
-    safe_join [link_to(l(:button_edit),
-                       send("edit_#{entity_type}_journal_path", journal),
+    safe_join [link_to(sprite_icon('edit', l(:button_edit)),
+                       send(:"edit_#{entity_type}_journal_path", journal),
                        remote: true,
                        method: 'get',
                        title: l(:button_edit),
                        class: 'icon-only icon-edit'),
-               link_to(l(:button_delete),
-                       send("#{entity_type}_journal_path", journal, journal: { notes: '' }),
+               link_to(sprite_icon('del', l(:button_delete)),
+                       send(:"#{entity_type}_journal_path", journal, journal: { notes: '' }),
                        remote: true,
                        method: 'put', data: { confirm: l(:text_are_you_sure) },
                        title: l(:button_delete),
@@ -65,8 +92,8 @@ module AdditionalsJournalsHelper
   end
 
   # Returns the textual representation of a single journal detail
-  # rubocop: disable Rails/OutputSafety
-  def entity_show_detail(entity, detail, no_html = false, **options) # rubocop:disable Style/OptionalBooleanParameter:
+  # rubocop: disable Style/OptionalBooleanParameter
+  def entity_show_detail(entity, detail, no_html = false, **options)
     multiple = false
     no_detail = false
     show_diff = false
@@ -91,9 +118,9 @@ module AdditionalsJournalsHelper
       end
 
       if no_detail
-        l :text_journal_changed_no_detail, label: label
+        l(:text_journal_changed_no_detail, label:)
       elsif show_diff
-        s = l :text_journal_changed_no_detail, label: label
+        s = l(:text_journal_changed_no_detail, label:)
         unless no_html
           diff_link = link_to l(:label_diff),
                               send(diff_url_method,
@@ -106,24 +133,24 @@ module AdditionalsJournalsHelper
         s
       elsif detail.value.present?
         if detail.old_value.present?
-          l :text_journal_changed, label: label, old: old_value, new: value
+          l :text_journal_changed, label:, old: old_value, new: value
         elsif multiple
-          l :text_journal_added, label: label, value: value
+          l(:text_journal_added, label:, value:)
         else
-          l :text_journal_set_to, label: label, value: value
+          l(:text_journal_set_to, label:, value:)
         end
       else
-        l :text_journal_deleted, label: label, old: old_value
+        l :text_journal_deleted, label:, old: old_value
       end.html_safe
     else
       # default implementation for journal detail rendering
       show_detail detail, no_html, options
     end
   end
-  # rubocop: enable Rails/OutputSafety
+  # rubocop: enable Style/OptionalBooleanParameter
 
   def render_email_attributes(entry, html: false)
-    items = send "email_#{entry.class.name.underscore}_attributes", entry, html
+    items = send :"email_#{entry.class.name.underscore}_attributes", entry, html
     if html
       tag.ul class: 'details' do
         items.map { |s| concat tag.li(s) }.join("\n")
@@ -158,6 +185,6 @@ module AdditionalsJournalsHelper
     custom_field = detail.custom_field
     return unless custom_field
 
-    return { show_diff: true, label: detail.custom_field.name } if custom_field.format.class.change_as_diff
+    { show_diff: true, label: detail.custom_field.name } if custom_field.format.class.change_as_diff
   end
 end

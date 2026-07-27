@@ -50,6 +50,8 @@ module Additionals
           return unless available_filters[field]
 
           initialize_user_values_for_select2 field, values
+
+          # NOTE: true is required for short filter support!
           true
         end
 
@@ -61,11 +63,18 @@ module Additionals
           @available_filters
         end
 
+        def ids_from_string(string)
+          string.to_s.scan(/\d+/).map(&:to_i)
+        end
+
         def export_limit
           Setting.issues_export_limit.to_i
         end
 
         def sql_aggr_condition(**options)
+          raise 'missing table' unless options[:table]
+          raise 'missing group_field' unless options[:group_field]
+
           options[:aggr] = 'COUNT' if options[:aggr].blank?
           options[:field] = 'id' if options[:field].blank?
           options[:operator] = '=' if options[:operator].blank?
@@ -91,9 +100,9 @@ module Additionals
                         " HAVING #{options[:aggr]}(#{options[:having_table]}.#{options[:field]})"
 
           null_all_sql = if options[:use_sub_query_for_all]
-                           +"#{options[:sub_query]} AND"
+                           "#{options[:sub_query]} AND"
                          else
-                           +"#{options[:sub_table]} WHERE"
+                           "#{options[:sub_table]} WHERE"
                          end
 
           null_all_sql << " #{options[:sub_table]}.#{options[:group_field]} = #{queried_table_name}.#{options[:join_field]})"

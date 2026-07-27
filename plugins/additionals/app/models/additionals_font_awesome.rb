@@ -3,7 +3,7 @@
 class AdditionalsFontAwesome
   include Redmine::I18n
 
-  FORMAT_REGEXP = /\Afa[rsb]_[a-zA-Z0-9]+[a-zA-Z0-9\-]*\z/.freeze
+  FORMAT_REGEXP = /\Afa[rsb]_[a-zA-Z0-9]+[a-zA-Z0-9-]*\z/
   SEARCH_LIMIT = 50
 
   class << self
@@ -133,7 +133,7 @@ class AdditionalsFontAwesome
                             end
 
       FONTAWESOME_ICONS[type].each do |fa_symbol, values|
-        break if SEARCH_LIMIT == cnt
+        break if cnt == SEARCH_LIMIT
 
         id = key2value(fa_symbol, type[-1])
         next if selected_store.exclude?(id) &&
@@ -141,7 +141,7 @@ class AdditionalsFontAwesome
                 (first_letter_search.present? && !values[:label].downcase.start_with?(first_letter_search) ||
                  first_letter_search.blank? && values[:label] !~ /#{search}/i)
 
-        icons << { id: id, text: values[:label] }
+        icons << { id:, text: values[:label] }
         cnt += 1
       end
 
@@ -154,7 +154,7 @@ class AdditionalsFontAwesome
       values = FONTAWESOME_ICONS[type][name]
       return {} if values.blank?
 
-      { unicode: "&#x#{values[:unicode]};".html_safe, label: values[:label] } # rubocop:disable Rails/OutputSafety
+      { unicode: "&#x#{values[:unicode]};".html_safe, label: values[:label] } # rubocop: disable Rails/OutputSafety
     end
   end
 end

@@ -1,5 +1,76 @@
 # Changelog
 
+## 4.1.0
+
+- fix deface checksum for admin/info
+- mermaid 11.6.0 support
+- fix bug with project dashboard, if only one single project exists
+
+## 4.0.0
+
+- Support for Redmine 6
+- Redmine 5 support dropped
+- Gemify support dropped
+- switch icons from fontawesome to tabler
+- broken tradingview macro removed
+- latest Chart.js support (version 4.4.7)
+- Chart.js Plugin datalabels 2.2.0
+- Chart.js Plugin annotation 3.0.1
+- moment 2.30.1 support
+- mermaid 11.4.1 support
+- gps macro has been added
+- add options for link to video with youtube macro
+- add options for link to video with vimeo macro
+- attachment_link macro has been added
+
+## 3.4.0
+
+- Move assign to me button to assign to block
+- svg icons support for Redmine 6
+- remove tooltip css style, which overwrote default redmine style
+
+## 3.3.2
+
+- Maintenance release
+- Ruby 3.1 required
+- Working on Tabler icons integration
+
+## 3.2.0
+
+- add option to hide issue attachments, if number of file is too high
+- add option to auto watch issues, which assigned to me
+- rubocop offenses has been fixed
+- D3 7.9.0 support
+
+## 3.1.0
+
+- Fix missing label for view all documents
+- Ruby 3 required
+
+## 3.0.9
+
+- Chart.js Plugin annotation 2.1.2 support
+- Chart.js Plugin matrix 2.0.1 support
+- D3 7.8.5 support
+- d3plus 2.0.3 support
+- Show author badge with notes
+- Allow fast edit of description for a issue
+
+## 3.0.8
+
+- Mermaid 9.3.0 support
+- Chart.js Plugin matrix 1.3.0 support
+- D3 7.8.0 support
+
+## 3.0.7
+
+- D3 7.6.1 support
+- Mermaid 9.1.7 support
+- moment 2.29.4 support
+- d3plus 2.0.2 support
+- Chart.js Plugin matrix 1.2.0 support
+- Chart.js Plugin datalabels 2.1.0 support
+
 ## 3.0.6
 
 - D3 7.4.5 support

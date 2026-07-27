@@ -105,7 +105,7 @@ class DashboardContent
   def find_block(block)
     block.to_s =~  /\A(.*?)(__\d+)?\z/
     name = Regexp.last_match 1
-    available_blocks.key?(name) ? available_blocks[name].merge(name: name) : nil
+    available_blocks.key?(name) ? available_blocks[name].merge(name:) : nil
   end
 
   # Returns the default layout for a new dashboard
@@ -118,8 +118,35 @@ class DashboardContent
 
   private
 
+  def issues_cache_expires_in
+    open_issue_count = Rails.cache.fetch issues_cache_key, expires_in: 1.hour do
+      query = if project
+                IssueQuery.new project:, name: '_'
+              else
+                IssueQuery.new name: '_'
+              end
+      query.issue_count
+    end
+
+    if open_issue_count > 1_000
+      86_400 # 1 day
+    elsif open_issue_count > 500
+      14_400 # 4 hour
+    elsif open_issue_count > 200
+      3_600 # 1 hour
+    elsif open_issue_count > 100
+      1_800 # 30 minutes
+    else
+      60
+    end
+  end
+
+  def issues_cache_key
+    Digest::SHA256.hexdigest [project&.id, User.current.id].compact.join('-')
+  end
+
   # if more the one permission is specified, all permissions are required
   def block_permission_allowed?(permission)
-    Array(permission).all? { |p| user.allowed_to?(p, project, global: true) }
+    Array(permission).all? { |p| user.allowed_to? p, project, global: true }
   end
 end

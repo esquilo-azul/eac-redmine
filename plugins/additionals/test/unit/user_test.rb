@@ -3,17 +3,6 @@
 require File.expand_path '../../test_helper', __FILE__
 
 class UserTest < Additionals::TestCase
-  fixtures :users, :groups_users, :email_addresses,
-           :members, :projects, :roles, :member_roles, :auth_sources,
-           :trackers, :issue_statuses,
-           :projects_trackers,
-           :watchers,
-           :issue_categories, :enumerations, :issues,
-           :journals, :journal_details,
-           :enabled_modules,
-           :tokens, :user_preferences,
-           :dashboards, :dashboard_roles
-
   def setup
     prepare_tests
     User.current = users :users_002
@@ -23,6 +12,7 @@ class UserTest < Additionals::TestCase
     admin_user = User.generate! admin: true
 
     users = User.visible.active.with_permission :save_dashboards
+
     assert_equal 5, users.count
     assert users.exists?(id: admin_user)
   end
@@ -44,7 +34,8 @@ class UserTest < Additionals::TestCase
 
     user = users :users_001
     user.sudoer = true
-    user.save!
+
+    assert_save user
     user.reload
 
     assert user.sudoer
@@ -52,7 +43,8 @@ class UserTest < Additionals::TestCase
     assert User.where(sudoer: true).first.can_be_admin?
 
     user.admin = false
-    user.save!
+
+    assert_save user
     user.reload
 
     assert user.sudoer
@@ -81,6 +73,7 @@ class UserTest < Additionals::TestCase
     user = users :users_002
 
     options = { skip_pre_condition: true, project: nil }
+
     assert_sorted_equal Project.where(Project.allowed_to_condition(user, :view_issues, **options)).ids,
                         user.allowed_project_ids_for(:view_issues, **options)
 

@@ -5,13 +5,8 @@ window.toggleFilter = function(field) {
   return additionals_transform_to_select2(field);
 };
 
-function filterAdditionalsFormatState (opt) {
-  var $opt = $('<span>' + opt.name_with_icon + '</span>');
-  return $opt;
-}
-
-/* global availableFilters, additionals_filter_urls, additionals_field_formats */
-function additionals_transform_to_select2(field){
+/* global availableFilters, additionals_filter_urls, additionals_field_formats, formatNameWithIcon */
+function additionals_transform_to_select2(field) {
   var field_format = availableFilters[field]['field_format'];
   var initialized_select2 = $('#tr_' + field + ' .values .select2');
   if (initialized_select2.length == 0 && (typeof additionals_field_formats !== 'undefined') && $.inArray(field_format, additionals_field_formats) >= 0) {
@@ -33,8 +28,8 @@ function additionals_transform_to_select2(field){
       placeholder: ' ',
       minimumInputLength: 1,
       width: '90%',
-      templateResult: filterAdditionalsFormatState
-    }).on('select2:open', function () {
+      templateResult: formatNameWithIcon
+    }).on('select2:open', function() {
       $(this).parent('span').find('.select2-search__field').val(' ').trigger($.Event('input', { which: 13 })).val('');
     });
   }
@@ -88,7 +83,7 @@ function setSelect2FilterValues(field, options, values) {
 
 function addSelectTag(field) {
   var fieldId = sanitizeToId(field);
-  $('#tr_' + fieldId).find('td.values').append(
+  $('#tr_' + fieldId).find('.values').append(
     '<span style="display: none;"><select class="value" id="values_'+fieldId+'_1" name="v['+field+'][]"></select></span>'
   );
 }
@@ -100,12 +95,12 @@ function addOptionTags($select, field, values) {
     var filterValue = filterValues[i];
     var option = $('<option>');
 
-    if ($.isArray(filterValue)) {
+    if (Array.isArray(filterValue)) {
       option.val(filterValue[1]).text(filterValue[0]);
-      if ($.inArray(filterValue[1], values) > -1) { option.attr('selected', true); }
+      if ($.inArray(filterValue[1], values) > -1) { option.prop('selected', true); }
     } else {
       option.val(filterValue).text(filterValue);
-      if ($.inArray(filterValue, values) > -1) { option.attr('selected', true); }
+      if ($.inArray(filterValue, values) > -1) { option.prop('selected', true); }
     }
 
     $select.append(option);
@@ -132,12 +127,20 @@ function findInRowBy(field, selector) {
 
 /* exported formatStateWithAvatar */
 function formatStateWithAvatar(opt) {
+  if (opt.loading) return opt.text;
   return $('<span>' + opt.avatar + '&nbsp;' + opt.text + '</span>');
 }
 
 /* exported formatStateWithMultiaddress */
 function formatStateWithMultiaddress(opt) {
+  if (opt.loading) return opt.text;
   return $('<span class="select2-contact">' + opt.avatar + '<p class="select2-contact__name">' + opt.text + '</p><p class="select2-contact__email">' + opt.email + '</p></span>');
+}
+
+/* exported formatSelectionWithEmails */
+function formatSelectionWithEmails(opt) {
+  var email = opt.email !== undefined && opt.email.trim().length ? ' <' + opt.email + '>' : '';
+  return (opt.text || opt.name || '') + email;
 }
 
 function transformToSelect2(field, options) {
@@ -148,7 +151,7 @@ function transformToSelect2(field, options) {
   selectField.select2(buildSelect2Options(options));
 
   var select2Instance = selectField.data('select2');
-  select2Instance.on('results:message', function(){
+  select2Instance.on('results:message', function() {
     this.dropdown._resizeDropdown();
     this.dropdown._positionDropdown();
   });
@@ -161,10 +164,12 @@ function select2Tag(id, options) {
     selectField.select2(buildSelect2Options(options));
 
     var select2Instance = selectField.data('select2');
-    select2Instance.on('results:message', function(){
-      this.dropdown._resizeDropdown();
-      this.dropdown._positionDropdown();
-    });
+    if (select2Instance !== undefined) {
+      select2Instance.on('results:message', function() {
+        this.dropdown._resizeDropdown();
+        this.dropdown._positionDropdown();
+      });
+    }
   });
 }
 
@@ -191,6 +196,11 @@ function addDataSourceOptions(target, options) {
       dataType: 'json',
       delay: SELECT2_DELAY,
       data: function (params) {
+        if (params === undefined) {
+          console.log('missing params for ajax call');
+          console.log(target);
+          console.log(options);
+        }
         return { q: params.term };
       },
       processResults: function (data) {
@@ -214,10 +224,63 @@ function addTagsOptions(target, options) {
 }
 
 function createTag(params) {
-  var term = $.trim(params.term);
+  var term = params.term.trim();
   if (term === '' || term.indexOf(',') > -1) {
     return null; // Return null to disable tag creation
   }
 
   return { id: term, text: term };
+}
+
+/* exported fixScopedTags */
+function fixScopedTags(e, eventSelect) {
+  var values = eventSelect.val();
+  var data = eventSelect.select2('data');
+
+  // console.log('fixScopeTags');
+
+  // new added tag
+  if (e.params.originalSelect2Event == undefined || data == undefined) { return; }
+  var new_tag = e.params.originalSelect2Event.data.id;
+  if (! new_tag.includes('::')) { return; }
+
+  // console.log('fixScopeTags - new_tag=' + new_tag);
+
+  var group_name = buildTagGroupName(new_tag);
+  var idToRemove = '';
+
+  // search for existing tags with same group name
+  var arrayLength = data.length;
+  var current_tag;
+  for (var i = 0; i < arrayLength; i++) {
+    current_tag = data[i].id;
+    if (new_tag != current_tag && current_tag.indexOf('::') >= 0 && buildTagGroupName(current_tag) == group_name) {
+      idToRemove = current_tag;
+      break;
+    }
+  }
+
+  // leave if no remove id has been found
+  if (idToRemove == '') { return; }
+
+  // remove id from existing data
+  if (values) {
+    var j = values.indexOf(idToRemove);
+    if (j >= 0) {
+      values.splice(j, 1);
+      eventSelect.val(values).trigger('change');
+    }
+  }
+}
+
+/* exported fixScopedTags */
+function buildTagGroupName(tag_name) {
+  // build labels
+  var labels = tag_name.split('::');
+  labels = labels.map(function (el) { return el.trim(); });
+
+  // first label is group name
+  // remove group value
+  labels.pop();
+  return labels.join('::');
 }

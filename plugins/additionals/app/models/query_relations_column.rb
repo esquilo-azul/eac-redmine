@@ -3,6 +3,12 @@
 class QueryRelationsColumn < QueryColumn
   # NOTE: used for CSV and PDF export
   def value_object(object)
-    (object.send name).map(&:name).join "#{Query.additional_csv_separator} "
+    entries = (object.send name)
+    entries = entries.visible if defined?(entries.visible)
+    entries.map(&:name).join "#{Query.additional_csv_separator} "
+  end
+
+  def css_classes
+    "entity-relation #{super}"
   end
 end

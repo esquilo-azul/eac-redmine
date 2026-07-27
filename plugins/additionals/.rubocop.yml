@@ -1,12 +1,13 @@
-require:
+plugins:
   - rubocop-performance
   - rubocop-rails
   - rubocop-minitest
 
 AllCops:
-  TargetRubyVersion: 2.7
-  TargetRailsVersion: 6.1
+  TargetRubyVersion: 3.1
+  TargetRailsVersion: 7.2
   NewCops: enable
+  ActiveSupportExtensionsEnabled: true
 
 Rails:
   Enabled: true
@@ -49,13 +50,7 @@ Metrics/ModuleLength:
 Metrics/PerceivedComplexity:
   Max: 25
 
-Rails/ApplicationJob:
-  Enabled: false
-
 Lint/AmbiguousOperatorPrecedence:
-  Enabled: false
-
-Rails/ApplicationRecord:
   Enabled: false
 
 Rails/CreateTableWithTimestamps:
@@ -81,7 +76,6 @@ Style/AutoResourceCleanup:
 Style/ExpandPathArguments:
   Enabled: true
   Exclude:
-    - additionals.gemspec
     - test/**/*
 
 Style/FrozenStringLiteralComment:
@@ -120,10 +114,10 @@ Style/MethodCallWithArgsParentheses:
   AllowParenthesesInChaining: true
   EnforcedStyle: omit_parentheses
 
-Style/Documentation:
+Style/SuperWithArgsParentheses:
   Enabled: false
 
-Style/HashTransformValues:
+Style/Documentation:
   Enabled: false
 
 Naming/VariableNumber:
@@ -135,7 +129,19 @@ Style/StringConcatenation:
   Exclude:
     - 'app/views/additionals/_select2_ajax_call.*'
 
+Layout/LineContinuationLeadingSpace:
+  Enabled: false
+
 # see https://github.com/rubocop/rubocop-rails/issues/578
 # redmine does not use load_defaults: https://rails.rubystyle.guide/#config-defaults
 Rails/RedundantPresenceValidationOnBelongsTo:
+  Enabled: false
+
+# this linter does not work with redirect_to
+Rails/ActionControllerFlashBeforeRender:
+  Enabled: true
+  Exclude:
+    - app/controllers/dashboards_controller.rb
+
+Bundler/DuplicatedGroup:
   Enabled: false

@@ -15,6 +15,8 @@ module Additionals
         before_validation :auto_assigned_to
         before_save :change_status_with_assigned_to_change
 
+        after_commit :add_assigned_watcher
+
         safe_attributes 'author_id',
                         if: proc { |issue, user|
                           issue.new_record? && user.allowed_to?(:change_new_issue_author, issue.project) ||
@@ -24,7 +26,7 @@ module Additionals
 
       class_methods do
         def join_issue_status(is_closed: nil)
-          sql = +"JOIN #{IssueStatus.table_name} ON #{IssueStatus.table_name}.id = #{table_name}.status_id"
+          sql = "JOIN #{IssueStatus.table_name} ON #{IssueStatus.table_name}.id = #{table_name}.status_id"
           return sql if is_closed.nil?
 
           sql << " AND #{IssueStatus.table_name}.is_closed = #{is_closed ? connection.quoted_true : connection.quoted_false}"
@@ -43,6 +45,16 @@ module Additionals
       end
 
       module InstanceMethods
+        def add_assigned_watcher
+          return unless assigned_to_id
+          return unless assigned_to.is_a? User
+          return unless author.pref.auto_watch_on? 'issue_assigned'
+          return if watcher_user_ids.include? assigned_to_id
+          return unless assigned_to.active?
+
+          set_watcher assigned_to, true
+        end
+
         def sidbar_change_status_allowed_to(user, new_status_id = nil)
           statuses = new_statuses_allowed_to user
           if new_status_id.present?
@@ -50,17 +62,6 @@ module Additionals
           else
             statuses.reject { |s| timelog_required? s.id }
           end
-        end
-
-        def add_autowatcher(user)
-          return if user.nil? ||
-                    !user.is_a?(User) ||
-                    user.anonymous? ||
-                    !user.active? ||
-                    watched_by?(user) ||
-                    watchers.detect { |watcher| watcher.user_id == user.id }
-
-          add_watcher user
         end
 
         def log_time_allowed?(user = User.current)

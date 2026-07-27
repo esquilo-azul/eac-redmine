@@ -84,8 +84,9 @@ module Additionals
                      .gsub('user.cf', 'user_cf')
                      .tr('.', '-')
 
-      spec = +"td.#{c}"
+      spec = "td.#{c}"
       spec << "[colspan='#{colspan}']" if colspan
+
       assert_select spec
     end
 
@@ -111,16 +112,16 @@ module Additionals
         end
       end
 
-      colspan = inline_columns.count + 2
-      colspan -= 1 unless with_checkbox
+      colspan = inline_columns.count
+      colspan += 1 if with_checkbox
       assert_select block_tr_select do
         block_columns.each do |column_name|
-          assert_select_td_column column_name, colspan: colspan
+          assert_select_td_column column_name, colspan:
         end
       end
     end
 
-    def with_plugin_settings(plugin, settings, &_block)
+    def with_plugin_settings(plugin, settings, &)
       change_plugin_settings plugin, settings
       yield
     ensure
@@ -128,20 +129,18 @@ module Additionals
     end
 
     def change_plugin_settings(plugin, settings)
-      instance_variable_set "@saved_#{plugin}_settings", Setting.send("plugin_#{plugin}").dup
-      new_settings = Setting.send("plugin_#{plugin}").dup
+      instance_variable_set :"@saved_#{plugin}_settings", Setting.send(:"plugin_#{plugin}").dup
+      new_settings = Setting.send(:"plugin_#{plugin}").dup
       settings.each do |key, value|
         new_settings[key] = value
       end
 
-      Setting.send "plugin_#{plugin}=", new_settings
       Setting.send :"plugin_#{plugin}=", new_settings
     end
 
     def restore_plugin_settings(plugin)
-      settings = instance_variable_get "@saved_#{plugin}_settings"
+      settings = instance_variable_get :"@saved_#{plugin}_settings"
       if settings
-        Setting.send "plugin_#{plugin}=", settings
         Setting.send :"plugin_#{plugin}=", settings
       else
         Rails.logger.warn "warning: restore_plugin_settings could not restore settings for #{plugin}"
@@ -161,17 +160,33 @@ module Additionals
       params[:sort] = "#{column}:asc"
       params[:c] = columns
 
-      get action, params: params
+      get(action, params:)
 
       assert_response :success
       assert_select "table.list.#{table_css}.sort-by-#{column_css}.sort-asc"
 
       params[:sort] = "#{column}:desc"
 
-      get action, params: params
+      get(action, params:)
 
       assert_response :success
       assert_select "table.list.#{table_css}.sort-by-#{column_css}.sort-desc"
+    end
+
+    def assert_locales_validness(plugin:, file_cnt:, locales:, control_string:, control_english:)
+      lang_files_count = Rails.root.glob("plugins/#{plugin}/config/locales/*.yml").size
+
+      assert_equal file_cnt, lang_files_count
+      valid_languages.each do |lang|
+        assert set_language_if_valid(lang)
+        if lang.to_s == 'en'
+          assert_equal control_english, l(control_string)
+        elsif locales.include? lang.to_s
+          assert_not l(control_string) == control_english, lang
+        end
+      end
+
+      set_language_if_valid 'en'
     end
 
     def assert_dashboard_query_blocks(blocks = [])
@@ -192,6 +207,22 @@ module Additionals
     # Return the columns that are displayed in the list
     def columns_in_projects_list
       css_select('table.projects thead th').map(&:text)
+    end
+
+    def WikiPage.generate(**options)
+      content = options.delete(:content) || 'Example text'
+
+      WikiPage.new(**options).tap do |page|
+        page.title ||= 'Wiki test page'
+        page.wiki ||= Project.find(1).wiki
+        page.author ||= User.find 2 if defined?(page.author)
+        page.content = WikiContent.new text: content
+      end
+    end
+
+    def WikiPage.generate!(**options)
+      WikiPage.find_by(title: options[:title])&.delete if options[:title]
+      WikiPage.generate(**options).tap(&:save!)
     end
   end
 end

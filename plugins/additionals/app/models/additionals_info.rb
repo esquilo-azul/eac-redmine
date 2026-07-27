@@ -29,8 +29,14 @@ class AdditionalsInfo
 
   def system_info
     if Redmine::Platform.mswin?
-      win_info = `wmic os get Caption,CSDVersion,BuildNumber /value`
-      return 'unknown' if win_info.blank?
+      unkwown_windows = 'Windows'
+      begin
+        win_info = `wmic os get Caption,CSDVersion,BuildNumber /value`
+        win_info = Redmine::CodesetUtil.replace_invalid_utf8 win_info
+        return unkwown_windows if win_info.blank?
+      rescue StandardError
+        return unkwown_windows
+      end
 
       windows_version = ''
       windows_build = ''
@@ -39,7 +45,7 @@ class AdditionalsInfo
         line_info = line.split '='
         if line_info[0] == 'Caption'
           windows_version = line_info[1]
-        elsif build_names.include?(line_info[0]) && line_info[1]&.present?
+        elsif build_names.include?(line_info[0]) && line_info[1].present?
           windows_build = line_info[1]
         end
       end
