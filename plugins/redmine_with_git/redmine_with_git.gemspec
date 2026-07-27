@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.summary     = 'Additional features for RedmineGitHosting.'
 
   s.files = Dir['{app,config,installer,lib}/**/*', 'init.rb']
-  s.required_ruby_version = '>= 2.7'
+  s.required_ruby_version = '>= 3.2'
 
   s.add_dependency 'avm', '~> 0.102', '>= 0.102.3'
   s.add_dependency 'eac_rails_utils', '~> 0.29', '>= 0.29.3'
