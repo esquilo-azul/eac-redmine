@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.homepage    = RedmineTasksScheduler::HOMEPAGE
 
   s.files = Dir['{app,config,lib}/**/*', 'init.rb']
-  s.required_ruby_version = '>= 2.7.0'
+  s.required_ruby_version = '>= 3.2'
 
   s.add_dependency 'tasks_scheduler', '~> 0.11', '>= 0.11.1'
 
