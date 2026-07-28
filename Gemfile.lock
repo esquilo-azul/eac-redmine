@@ -76,6 +76,7 @@ PATH
       avm (~> 0.102, >= 0.102.3)
       eac_rails_utils (~> 0.29, >= 0.29.4)
       eac_ruby_utils (~> 0.131, >= 0.131.4)
+      redcarpet
 
 PATH
   remote: sub/eac_rails_utils
