@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'eac_ruby_utils/core_ext'
-
 module EacRedmineBase0
   module Tasks
     class System
