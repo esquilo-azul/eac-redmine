@@ -1,0 +1,9 @@
+//= require jMenu.jquery.min
+//= require bootstrap-sprockets
+//= require input_searchable
+//= require jquery.maskMoney
+//= require currency_field
+//= require nested_form_fields
+//= require datatables.min
+//= require dataTables.bootstrap.min
+//= require eac_rails_utils/url_helper
