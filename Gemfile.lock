@@ -57,10 +57,9 @@ PATH
   remote: plugins/redmine_plugins_helper
   specs:
     redmine_plugins_helper (0.16.3)
-      eac_rails_gem_support (~> 0.13, >= 0.13.1)
+      eac_rails_gem_support (~> 0.13, >= 0.13.2)
       eac_ruby_utils (~> 0.131, >= 0.131.4)
       launchy (~> 2.5, >= 2.5.2)
-      sass-rails (~> 5.1)
 
 PATH
   remote: plugins/redmine_tasks_scheduler
@@ -304,16 +303,16 @@ GEM
     eac_docker (0.8.1)
       eac_ruby_base1 (~> 0.1, >= 0.1.1)
       eac_templates (~> 0.9)
-    eac_envs-http (0.7.1)
-      eac_fs (~> 0.20)
-      eac_ruby_utils (~> 0.129)
-      faraday (~> 2.14, >= 2.14.1)
+    eac_envs-http (0.7.2)
+      eac_fs (~> 0.20, >= 0.20.2)
+      eac_ruby_base1 (~> 0.1, >= 0.1.1)
+      faraday (~> 2.14, >= 2.14.3)
       faraday-follow_redirects (~> 0.5)
-      faraday-gzip (~> 0.1)
+      faraday-gzip (~> 3.1)
       faraday-multipart (~> 1.2)
       faraday-retry (~> 2.4)
-      random-port (~> 0.7, >= 0.7.6)
-      webrick
+      random-port (~> 0.8)
+      webrick (~> 1.9, >= 1.9.2)
     eac_fs (0.20.2)
       content-type (~> 0.0, >= 0.0.2)
       eac_ruby_utils (~> 0.131)
@@ -364,9 +363,9 @@ GEM
       logger
     faraday-follow_redirects (0.5.0)
       faraday (>= 1, < 3)
-    faraday-gzip (0.1.0)
-      faraday (>= 1.0)
-      zlib (~> 2.1)
+    faraday-gzip (3.1.0)
+      faraday (>= 2.0, < 3)
+      zlib (~> 3.0)
     faraday-multipart (1.2.0)
       multipart-post (~> 2.0)
     faraday-net_http (3.4.4)
@@ -591,17 +590,6 @@ GEM
     sanitize (6.1.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    sass (3.7.4)
-      sass-listen (~> 4.0.0)
-    sass-listen (4.0.0)
-      rb-fsevent (~> 0.9, >= 0.9.4)
-      rb-inotify (~> 0.9, >= 0.9.7)
-    sass-rails (5.1.0)
-      railties (>= 5.2.0)
-      sass (~> 3.1)
-      sprockets (>= 2.8, < 4.0)
-      sprockets-rails (>= 2.0, < 4.0)
-      tilt (>= 1.1, < 3)
     sassc (2.4.0)
       ffi (~> 1.9)
     selenium-webdriver (4.44.0)
@@ -632,10 +620,10 @@ GEM
     spring (4.7.0)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
-    sprockets (3.7.5)
-      base64
+    sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
-      rack (> 1, < 3)
+      logger
+      rack (>= 2.2.4, < 4)
     sprockets-rails (3.5.2)
       actionpack (>= 6.1)
       activesupport (>= 6.1)
@@ -698,7 +686,7 @@ GEM
       nokogiri (~> 1.8)
     yard (0.9.45)
     zeitwerk (2.8.2)
-    zlib (2.1.1)
+    zlib (3.2.3)
 
 PLATFORMS
   x86_64-linux-gnu
