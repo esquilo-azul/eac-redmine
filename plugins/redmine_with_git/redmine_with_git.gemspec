@@ -15,9 +15,9 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,installer,lib}/**/*', 'init.rb']
   s.required_ruby_version = '>= 2.7'
 
-  s.add_dependency 'avm', '~> 0.98', '>= 0.98.5'
-  s.add_dependency 'eac_rails_utils', '~> 0.28'
-  s.add_dependency 'eac_ruby_utils', '~> 0.130'
+  s.add_dependency 'avm', '~> 0.102', '>= 0.102.3'
+  s.add_dependency 'eac_rails_utils', '~> 0.29', '>= 0.29.3'
+  s.add_dependency 'eac_ruby_utils', '~> 0.131', '>= 0.131.4'
 
-  s.add_development_dependency 'eac_rails_gem_support', '~> 0.12', '>= 0.12.1'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.13', '>= 0.13.1'
 end
