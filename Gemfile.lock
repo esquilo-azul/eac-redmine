@@ -61,6 +61,7 @@ PATH
       eac_ruby_utils (~> 0.131, >= 0.131.4)
       launchy (~> 2.5, >= 2.5.2)
       sassc-rails (~> 2.1, >= 2.1.2)
+      sprockets (~> 4.2)
 
 PATH
   remote: plugins/redmine_tasks_scheduler
