@@ -87,22 +87,6 @@ PATH
       eac_ruby_utils (~> 0.131, >= 0.131.4)
 
 PATH
-  remote: sub/eac_rails_gem_support
-  specs:
-    eac_rails_gem_support (0.13.2)
-      avm-eac_ruby_base1 (~> 0.43, >= 0.43.2)
-      capybara (~> 3.40)
-      eac_ruby_base1 (~> 0.1, >= 0.1.1)
-      eac_ruby_gem_support (~> 0.14)
-      eac_templates (~> 0.9)
-      factory_bot_rails (~> 6.5, >= 6.5.1)
-      launchy (~> 2.5, >= 2.5.2)
-      letter_opener (~> 1.10)
-      rails (>= 6.1.7.10)
-      rspec-rails (>= 6.1.5)
-      sqlite3 (~> 1.7, >= 1.7.3)
-
-PATH
   remote: sub/eac_rails_utils
   specs:
     eac_rails_utils (0.29.4)
@@ -345,6 +329,18 @@ GEM
       eac_ruby_utils (~> 0.131)
       filesize (~> 0.2)
       ruby-filemagic (~> 0.7, >= 0.7.3)
+    eac_rails_gem_support (0.13.2)
+      avm-eac_ruby_base1 (~> 0.43, >= 0.43.2)
+      capybara (~> 3.40)
+      eac_ruby_base1 (~> 0.1, >= 0.1.1)
+      eac_ruby_gem_support (~> 0.14)
+      eac_templates (~> 0.9)
+      factory_bot_rails (~> 6.5, >= 6.5.1)
+      launchy (~> 2.5, >= 2.5.2)
+      letter_opener (~> 1.10)
+      rails (>= 6.1.7.10)
+      rspec-rails (>= 6.1.5)
+      sqlite3 (~> 1.7, >= 1.7.3)
     eac_ruby_base1 (0.1.1)
       eac_ruby_utils (~> 0.131, >= 0.131.2)
     eac_ruby_gem_support (0.14.0)
@@ -735,7 +731,6 @@ DEPENDENCIES
   dalli
   database_cleaner-active_record
   deckar01-task_list (= 2.3.2)
-  eac_rails_gem_support!
   eac_rails_utils!
   eac_redmine_base0!
   escape_utils

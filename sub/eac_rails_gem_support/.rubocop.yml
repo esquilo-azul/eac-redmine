@@ -1,7 +1,0 @@
----
-inherit_gem:
-  eac_ruby_gem_support: ".rubocop.yml"
-Rails/ApplicationRecord:
-  Enabled: false
-Rails/FindEach:
-  Enabled: true
