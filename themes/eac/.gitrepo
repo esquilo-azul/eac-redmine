@@ -2,6 +2,6 @@
   cmdver = 0.4.1
   commit = a7510120d2ac34df9baa90ebcce99e9a123099ba
   method = merge
-  parent = 4ca467268c2096e10c6d97b56f81f27ad03e2eec
+  parent = 7e2c8b7d3499e3f050879ddd42c9d6877713ca0e
   branch = master
   remote = https://github.com/esquilo-azul/eac_redmine_theme.git
