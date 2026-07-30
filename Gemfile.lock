@@ -72,7 +72,7 @@ PATH
 PATH
   remote: plugins/redmine_with_git
   specs:
-    redmine_with_git (0.8.4)
+    redmine_with_git (0.9.0)
       avm (~> 0.102, >= 0.102.3)
       eac_rails_utils (~> 0.29, >= 0.29.4)
       eac_ruby_utils (~> 0.131, >= 0.131.4)
