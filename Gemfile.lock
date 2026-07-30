@@ -79,7 +79,7 @@ PATH
 PATH
   remote: sub/eac_rails_utils
   specs:
-    eac_rails_utils (0.29.4)
+    eac_rails_utils (0.29.5)
       bootstrap-sass (~> 3.4, >= 3.4.1)
       eac_ruby_base1 (~> 0.1, >= 0.1.1)
       nested_form_fields (~> 0.8, >= 0.8.4)
