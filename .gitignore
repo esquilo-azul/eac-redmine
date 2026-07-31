@@ -50,3 +50,4 @@ yarn-error.log
 /config/install.sh
 /config/secrets_key.txt
 /log/**/*
+!/themes/eac
