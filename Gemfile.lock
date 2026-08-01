@@ -47,7 +47,7 @@ PATH
 PATH
   remote: plugins/redmine_nonproject_modules
   specs:
-    redmine_nonproject_modules (0.6.2)
+    redmine_nonproject_modules (0.6.3)
       eac_active_scaffold (~> 0.8, >= 0.8.1)
       eac_rails_utils (~> 0.29, >= 0.29.5)
       eac_ruby_utils (~> 0.131, >= 0.131.4)
