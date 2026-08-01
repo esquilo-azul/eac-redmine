@@ -1,0 +1,5 @@
+en:
+  menu_redmine_tasks_scheduler: Tasks scheduler
+  redmine_tasks_scheduler:
+    daemon_autostart_description: Start Daemon automatically along with
+      the server?
