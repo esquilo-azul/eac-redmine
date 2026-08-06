@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'eac_rails_utils', '~> 0.29', '>= 0.29.5'
   s.add_dependency 'eac_ruby_utils', '~> 0.131', '>= 0.131.5'
   s.add_dependency 'redcarpet'
+  s.add_dependency 'sidekiq'
 
   s.add_development_dependency 'eac_rails_gem_support', '~> 0.13', '>= 0.13.2'
 end
