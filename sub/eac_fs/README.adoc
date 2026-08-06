@@ -1,0 +1,9 @@
+= E.A.C.'s Filesystem
+
+== About
+
+A set of filesystem utilities.
+
+== Known external dependencies
+
+* https://github.com/lsof-org/lsof[lsof]

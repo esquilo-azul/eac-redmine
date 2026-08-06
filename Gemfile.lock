@@ -78,6 +78,15 @@ PATH
       eac_ruby_utils (~> 0.131, >= 0.131.4)
       redcarpet
 
+PATH
+  remote: sub/eac_fs
+  specs:
+    eac_fs (0.20.2)
+      content-type (~> 0.0, >= 0.0.2)
+      eac_ruby_utils (~> 0.131)
+      filesize (~> 0.2)
+      ruby-filemagic (~> 0.7, >= 0.7.3)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -337,11 +346,6 @@ GEM
       faraday-retry (~> 2.4)
       random-port (~> 0.8)
       webrick (~> 1.9, >= 1.9.2)
-    eac_fs (0.20.2)
-      content-type (~> 0.0, >= 0.0.2)
-      eac_ruby_utils (~> 0.131)
-      filesize (~> 0.2)
-      ruby-filemagic (~> 0.7, >= 0.7.3)
     eac_rails_gem_support (0.13.2)
       avm-eac_ruby_base1 (~> 0.43, >= 0.43.2)
       capybara (~> 3.40)
@@ -834,6 +838,7 @@ DEPENDENCIES
   debug
   doorkeeper (~> 5.8.2)
   doorkeeper-i18n (~> 5.2)
+  eac_fs!
   eac_redmine_base0!
   escape_utils
   ffi
