@@ -81,7 +81,7 @@ PATH
 PATH
   remote: sub/eac_fs
   specs:
-    eac_fs (0.20.2)
+    eac_fs (0.20.3)
       content-type (~> 0.0, >= 0.0.2)
       eac_ruby_base1 (~> 0.1, >= 0.1.1)
       filesize (~> 0.2)
