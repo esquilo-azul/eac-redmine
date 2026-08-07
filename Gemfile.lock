@@ -58,7 +58,7 @@ PATH
   specs:
     redmine_plugins_helper (0.17.0)
       eac_rails_gem_support (~> 0.13, >= 0.13.2)
-      eac_ruby_utils (~> 0.131, >= 0.131.4)
+      eac_ruby_utils (~> 0.131, >= 0.131.5)
       launchy (~> 2.5, >= 2.5.2)
       sassc-rails (~> 2.1, >= 2.1.2)
       sprockets (~> 4.2, >= 4.2.2)
