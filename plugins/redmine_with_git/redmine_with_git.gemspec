@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'avm', '~> 0.102', '>= 0.102.3'
   s.add_dependency 'eac_rails_utils', '~> 0.29', '>= 0.29.5'
-  s.add_dependency 'eac_ruby_utils', '~> 0.131', '>= 0.131.5'
+  s.add_dependency 'eac_ruby_utils', '~> 0.132'
   s.add_dependency 'redcarpet'
   s.add_dependency 'sidekiq'
 

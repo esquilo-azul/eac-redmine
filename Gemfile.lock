@@ -75,7 +75,7 @@ PATH
     redmine_with_git (0.9.1)
       avm (~> 0.102, >= 0.102.3)
       eac_rails_utils (~> 0.29, >= 0.29.5)
-      eac_ruby_utils (~> 0.131, >= 0.131.5)
+      eac_ruby_utils (~> 0.132)
       redcarpet
       sidekiq
 
