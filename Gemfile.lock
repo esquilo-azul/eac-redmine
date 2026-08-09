@@ -27,10 +27,10 @@ PATH
   remote: plugins/notifyme
   specs:
     notifyme (0.5.1)
-      eac_ruby_utils (~> 0.131, >= 0.131.4)
+      eac_ruby_utils (~> 0.132)
       htmlentities (~> 4.4, >= 4.4.2)
       imgkit (~> 1.6, >= 1.6.3)
-      telegram-bot-ruby (~> 2.8)
+      telegram-bot-ruby (~> 2.8, >= 2.8.1)
       wkhtmltoimage-binary (~> 0.12, >= 0.12.5)
 
 PATH
