@@ -41,7 +41,7 @@ PATH
 PATH
   remote: plugins/redmine_events_manager
   specs:
-    redmine_events_manager (0.5.3)
+    redmine_events_manager (0.5.4)
       delayed_job_active_record (~> 4.1, >= 4.1.11)
 
 PATH
