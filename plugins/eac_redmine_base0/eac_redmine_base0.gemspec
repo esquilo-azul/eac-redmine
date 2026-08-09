@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
 
   # blankslate: required for the core 4.2.11 and not supplied in its Gemfile.
   s.add_dependency 'blankslate', '~> 3.1', '>= 3.1.3'
-  s.add_dependency 'eac_ruby_utils', '~> 0.131', '>= 0.131.4'
+  s.add_dependency 'eac_ruby_utils', '~> 0.132'
 
-  s.add_development_dependency 'eac_rails_gem_support', '~> 0.13', '>= 0.13.1'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.13', '>= 0.13.2'
 end
