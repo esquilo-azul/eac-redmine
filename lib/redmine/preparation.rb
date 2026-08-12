@@ -22,6 +22,7 @@ module Redmine
     def self.prepare
       ApplicationRecord.include Redmine::Acts::Positioned
       ApplicationRecord.include Redmine::Acts::Mentionable
+      ApplicationRecord.include Redmine::Acts::Webhookable
       ApplicationRecord.include Redmine::I18n
 
       Scm::Base.add "Subversion"
@@ -48,6 +49,9 @@ module Redmine
         # Queries
         map.permission :manage_public_queries, {:queries => [:new, :create, :edit, :update, :destroy]}, :require => :member
         map.permission :save_queries, {:queries => [:new, :create, :edit, :update, :destroy]}, :require => :loggedin
+
+        # Webhooks
+        map.permission :use_webhooks, {}, :require => :member
 
         map.project_module :issue_tracking do |map|
           # Issues
@@ -176,6 +180,10 @@ module Redmine
         menu.push :login, :signin_path, :if => Proc.new {!User.current.logged?}
         menu.push :register, :register_path,
                   :if => Proc.new {!User.current.logged? && Setting.self_registration?}
+        menu.push :my_profile, {:controller => 'users', :action => 'show', :id => 'current'},
+                  :if => Proc.new {User.current.logged?},
+                  :caption => :label_profile,
+                  :first => true
         menu.push :my_account, {:controller => 'my', :action => 'account'},
                   :if => Proc.new {User.current.logged?}
         menu.push :logout, :signout_path, :html => {:method => 'post'},

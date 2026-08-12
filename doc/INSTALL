@@ -7,7 +7,7 @@ https://www.redmine.org/
 
 == Requirements
 
-* Ruby 3.2, 3.3, 3.4
+* Ruby 3.2, 3.3, 3.4, 4.0
 
 * A database:
   * MySQL (tested with MySQL 8)
@@ -19,6 +19,9 @@ Optional:
 * SCM binaries (e.g. svn, git...), for repository browsing (must be
   available in PATH)
 * ImageMagick (to enable Gantt export to png images)
+* Pandoc, to enable previews for Microsoft Office (.docx, .xlsx, .pptx) and
+  LibreOffice Writer (.odt) documents. Version 3.8.3 or later is recommended.
+  Older versions of Pandoc supports only .docx and .odt documents.
 
 Supported browsers:
 The current version of Firefox, Safari, Chrome, Chromium and Microsoft Edge.
@@ -140,6 +143,10 @@ edit this file to adjust your SMTP settings.
 Do not forget to restart the application after any change to this file.
 
 Please do not enter your SMTP settings in environment.rb.
+
+== Known Issues
+
+* Redmine running on Ruby versions 4.0.0 through 4.0.2 has a known performance issue when rendering wiki syntax. For more details, see https://www.redmine.org/issues/43650.
 
 == References
 
