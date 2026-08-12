@@ -76,6 +76,7 @@ PATH
       avm (~> 0.102, >= 0.102.4)
       eac_rails_utils (~> 0.31)
       eac_ruby_utils (~> 0.133)
+      html-pipeline (< 3)
       redcarpet
       sidekiq
 
@@ -416,6 +417,9 @@ GEM
     hashie (5.1.0)
       logger
     hiredis (0.6.3)
+    html-pipeline (2.14.3)
+      activesupport (>= 2)
+      nokogiri (>= 1.4)
     htmlentities (4.4.2)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
