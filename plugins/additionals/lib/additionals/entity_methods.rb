@@ -7,9 +7,24 @@ module Additionals
 
     included do
       include Additionals::EntityMethodsGlobal
+      include Additionals::Concerns::JournalizedRealChanges
       include InstanceMethods
 
       attr_reader :current_journal
+
+      # Set by copy_from implementations, mirrors Redmine core's Issue#@copied_from.
+      attr_accessor :copied_from
+
+      # Registered for every entity, unlike the opt-in force_updated_on_change below:
+      # "an assignee must be assignable" is an invariant of assigned_to, not a per-entity
+      # preference, and opting in is exactly the step that gets forgotten on the next
+      # entity. Entities without an assigned_to column skip it at runtime.
+      # Guarded because EntityMethods is also included by plain Ruby classes, which have
+      # no validation callbacks.
+      if self < ActiveRecord::Base
+        before_validation :clear_unassignable_assignee
+        validate :validate_assignee
+      end
     end
 
     class_methods do
@@ -40,23 +55,83 @@ module Additionals
         notified
       end
 
-      # used with assignable_principal (user AND groups)
+      # Assignable principals for custom entities (Users AND Groups).
+      #
+      # IMPORTANT: This method ALWAYS includes groups, regardless of Setting.issue_group_assignment?
+      # That setting is for Issues only! Custom entities like Password need group assignment
+      # independently - a user may disable group assignment for issues but still want to
+      # assign passwords to groups for access control.
+      #
+      # Uses project_assignable_principals (NOT project_assignable_users!) to ensure
+      # groups are always available. See AssignableUsersOptimizer for details.
+      #
+      # @param prj [Project, nil] Optional project context
+      # @return [Array<Principal>] Assignable users and groups
       def assignable_users(prj = nil)
         prj = project if project
-        users = if prj
-                  prj.assignable_principals.to_a
-                else
-                  Principal.assignable.to_a
-                end
 
-        users << author if author&.active?
+        # Use optimized implementation that:
+        # - ALWAYS includes Users AND Groups (not depending on issue settings!)
+        # - Respects hidden roles security
+        # - Prevents N+1 queries
+        principals = if prj
+                       Additionals::AssignableUsersOptimizer.project_assignable_principals prj
+                     else
+                       # For entities without project context, use global assignable principals
+                       # This is a fallback and should be used carefully
+                       Additionals::AssignableUsersOptimizer.global_assignable_principals
+                     end
+
+        # Add author if active (authors should always be assignable to their own entities)
+        principals << author if author&.active? && principals.exclude?(author)
+
+        # Add previous assignee if it was changed (to allow reassigning back)
         if assigned_to_id_was.present?
           assignee = Principal.find_by id: assigned_to_id_was
-          users << assignee if assignee
+          principals << assignee if assignee && principals.exclude?(assignee)
         end
 
-        users.uniq!
-        users.sort
+        principals.uniq!
+        principals.sort
+      end
+
+      # Accepts the literal 'me' as an alias for the current user. Placed on the setter rather
+      # than in each controller so every entry path resolves it the same way - form, API, bulk
+      # edit, import and console. Without it 'me' would cast to integer 0 and be rejected by
+      # validate_assignee.
+      def assigned_to_id=(value)
+        super(value == 'me' ? User.current.id : value)
+      end
+
+      # Mirrors Redmine core's Issue#project= ("Clear the assignee if not available in the new
+      # project for new issues (eg. copy)"): a copy inherits the source assignee, who may not be
+      # assignable in the target project. That assignee is dropped instead of failing validation,
+      # because the user did not pick it - unlike a plain create, which must reach
+      # validate_assignee. Dirty tracking cannot tell the two apart on a new record
+      # (project_id_was is nil there either way), so copy_from flags the copy explicitly.
+      def clear_unassignable_assignee
+        return unless copied_from && new_record?
+        return unless respond_to?(:assigned_to) && has_attribute?(:assigned_to_id)
+        return if assigned_to.blank? || assignable_users.include?(assigned_to)
+
+        self.assigned_to_id = nil
+      end
+
+      # Mirrors Redmine core's assignee check (Issue#validate_issue): an assignee that is not
+      # assignable in the entity's project is rejected. Without it such a value reaches the
+      # database, where it either violates an assigned_to_id foreign key (500) or is silently
+      # stored as an unusable reference. Any non-numeric value casts to integer 0, so this also
+      # catches a picker or API client submitting a token the setter above does not resolve.
+      #
+      # Skipped for entities without an assigned_to column (Dashboard, HrmHoliday, ...) and for
+      # entities without a project: a global entity has no project membership to check against.
+      def validate_assignee
+        return unless respond_to?(:assigned_to) && has_attribute?(:assigned_to_id)
+        return if assigned_to_id.blank? || !assigned_to_id_changed?
+        return unless respond_to?(:project) && project.present?
+        return if assignable_users.include? assigned_to
+
+        errors.add :assigned_to_id, :invalid
       end
 
       def last_notes
@@ -76,6 +151,30 @@ module Additionals
       # Called after_save
       def create_journal
         current_journal&.save
+      end
+
+      # Bump updated_on for journal-only edits (notes, relations) whose data lives
+      # outside the entity's own table, so the entity sorts/feeds correctly as
+      # changed. Without this, a note- or relation-only edit would leave updated_on
+      # untouched (only custom field changes are covered, via Redmine-core's
+      # acts_as_customizable touch).
+      #
+      # Shared here as opt-in: register it per model with
+      # `before_save :force_updated_on_change`. It is deliberately NOT registered
+      # as a callback in EntityMethods, so entities that do not want it (or do not
+      # journalize) are unaffected.
+      #
+      # We use this "dumb" variant (any initialized journal) rather than
+      # Redmine-core's Issue#force_updated_on_change, which only touches when the
+      # journal already has notes/details: relation details are written *after*
+      # save (controller after-save hooks), so at this point the journal still
+      # looks empty and the smart check would miss relation-only changes. The
+      # downside - a truly empty save also bumps updated_on - is filtered out for
+      # reporting by JournalizedRealChanges#real_changes? (the two are a pair).
+      def force_updated_on_change
+        return unless @current_journal || changed?
+
+        self.updated_on = current_time_from_proper_timezone
       end
 
       # Returns the journals that are visible to user with their index

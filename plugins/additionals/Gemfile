@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 gem 'redmine_plugin_kit'
-gem 'render_async'
 gem 'rss'
 gem 'slim-rails'
 gem 'tanuki_emoji', '~> 0.13.0'
@@ -33,7 +32,6 @@ end
 if File.file? File.expand_path './.enable_linters', __dir__
   group :development, :test do
     gem 'brakeman', require: false
-    gem 'pandoc-ruby', require: false
     gem 'rubocop', require: false
     gem 'rubocop-minitest', require: false
     gem 'rubocop-performance', require: false
@@ -52,6 +50,7 @@ if File.file? File.expand_path './.enable_test', __dir__
     gem 'rails_best_practices', require: false
   end
   group :test do
+    gem 'i18n-tasks', require: false
     gem 'minitest-reporters'
     gem 'simplecov-cobertura' if ENV['COVERAGE_COBERTURA']
     gem 'timecop'

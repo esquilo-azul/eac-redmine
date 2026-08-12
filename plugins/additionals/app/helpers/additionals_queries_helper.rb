@@ -17,16 +17,30 @@ module AdditionalsQueriesHelper
     end
   end
 
-  def render_grouped_users_with_select2(users, search_term: nil, with_me: true, with_ano: false, me_value: 'me')
+  # me_value is the id the "<< me >>" entry carries. The default 'me' is the query filter
+  # contract (Query resolves it per user at runtime). Form fields writing to an *_id column
+  # MUST pass me_value: User.current.id instead - a literal 'me' casts to integer 0 there and
+  # produces an invalid foreign key (see Redmine core's principals_options_for_select).
+  def render_grouped_users_with_select2(users, search_term: nil, with_me: true, with_ano: false, me_value: 'me',
+                                        involved_principals: nil, use_assignment_frequency: false,
+                                        apply_assignee_format: false)
     @users = { active: [], groups: [], registered: [], locked: [] }
+    @involved_principals = involved_principals&.map { |p| { id: p.id, name: p.name, obj: p } } || []
 
-    users = users.like search_term if search_term.present?
-
-    sorted_users = users.select("users.*, #{User.table_name}.last_login_on IS NULL AS select_order")
-                        .order("select_order ASC, #{User.table_name}.last_login_on DESC")
-                        .limit(AdditionalsConf.select2_init_entries)
-                        .to_a
-                        .sort_by(&:name)
+    sorted_users = if search_term.present?
+                     users.like(search_term)
+                          .limit(AdditionalsConf.select2_init_entries)
+                          .to_a
+                          .sort_by(&:name)
+                   elsif use_assignment_frequency
+                     select_by_assignment_frequency users
+                   else
+                     users.select("users.*, #{User.table_name}.last_login_on IS NULL AS select_order")
+                          .order("select_order ASC, #{User.table_name}.last_login_on DESC")
+                          .limit(AdditionalsConf.select2_init_entries)
+                          .to_a
+                          .sort_by(&:name)
+                   end
 
     with_users = false
     sorted_users.each do |user|
@@ -57,11 +71,14 @@ module AdditionalsQueriesHelper
     # Additionals.debug "locked: #{@users[:locked].pluck :id}"
     # Additionals.debug "groups: #{@users[:groups].pluck :id}"
 
+    # Ordered [label, user_hashes] optgroup sections rendered by the partial.
+    # For assignee contexts the order/grouping follows Setting.assignee_dropdown_display_format.
+    @grouped_user_sections = grouped_user_select2_sections apply_assignee_format: apply_assignee_format
+
     respond_to do |format|
       format.html { head :not_acceptable }
-      format.js do
+      format.json do
         render layout: false,
-               format: :json,
                partial: 'auto_completes/grouped_users',
                locals: { with_me: with_me && (search_term.blank? || l(:label_me).downcase.include?(search_term.downcase)),
                          with_ano: with_ano && (search_term.blank? || l(:label_user_anonymous).downcase.include?(search_term.downcase)),
@@ -268,5 +285,105 @@ module AdditionalsQueriesHelper
 
   def link_to_issues(issues)
     safe_join(issues.map { |issue| link_to_issue(issue, subject: false, tracker: false) }, ', ')
+  end
+
+  private
+
+  # Builds the ordered list of [label, user_hashes] optgroup sections for the
+  # grouped_users select2 partial. Without assignee format the legacy order
+  # (active, groups, registered, locked) is preserved. In an assignee context
+  # the order/grouping follows Setting.assignee_dropdown_display_format.
+  def grouped_user_select2_sections(apply_assignee_format:)
+    groups_section = [l(:label_group_plural), @users[:groups]] if @users[:groups].present?
+
+    return legacy_grouped_user_sections unless apply_assignee_format && groups_section
+
+    users_sections = user_status_sections
+
+    case Setting.assignee_dropdown_display_format.to_s
+    when 'groups_then_users'
+      [groups_section, *users_sections]
+    when 'users_by_group'
+      grouped_user_sections_by_group
+    else # users_then_groups (default)
+      [*users_sections, groups_section]
+    end
+  end
+
+  # Legacy order kept identical to the previous partial output.
+  def legacy_grouped_user_sections
+    %i[active groups registered locked].filter_map do |key|
+      next if @users[key].blank?
+
+      label = key == :groups ? l(:label_group_plural) : l("status_#{key}")
+      [label, @users[key]]
+    end
+  end
+
+  def user_status_sections
+    %i[active registered locked].filter_map do |status|
+      [l("status_#{status}"), @users[status]] if @users[status].present?
+    end
+  end
+
+  # Groups first (so a group itself stays selectable), then each group's members,
+  # then remaining ungrouped users - mirrors Redmine core's
+  # principal_users_by_group_optgroups_for_select.
+  def grouped_user_sections_by_group
+    all_users = @users[:active] + @users[:registered] + @users[:locked]
+    member_ids_by_group = user_ids_by_group @users[:groups].pluck(:id), all_users.pluck(:id)
+
+    sections = [[l(:label_group_plural), @users[:groups]]]
+
+    grouped_ids = []
+    @users[:groups].each do |group|
+      member_ids = member_ids_by_group[group[:id]] || []
+      members = all_users.select { |u| member_ids.include? u[:id] }
+      next if members.blank?
+
+      grouped_ids.concat member_ids
+      sections << [group[:name], members]
+    end
+
+    ungrouped = all_users.reject { |u| grouped_ids.include? u[:id] }
+    sections << [l(:label_user_plural), ungrouped] if ungrouped.present?
+    sections
+  end
+
+  # Single query mapping group_id => [user_id, ...] to avoid N+1 over groups.
+  def user_ids_by_group(group_ids, user_ids)
+    return {} if group_ids.blank? || user_ids.blank?
+
+    User.where(id: user_ids)
+        .joins(:groups)
+        .where(groups: { id: group_ids })
+        .pluck(Arel.sql('groups_users.group_id'), :id)
+        .group_by(&:first)
+        .transform_values { |rows| rows.map(&:last) }
+  end
+
+  def select_by_assignment_frequency(scope)
+    limit = AdditionalsConf.select2_init_entries
+
+    # Subquery: principal IDs ranked by issue assignment count
+    frequency_ids = Issue.where(assigned_to_id: scope.select(:id))
+                         .group(:assigned_to_id)
+                         .order('COUNT(assigned_to_id) DESC')
+                         .limit(limit)
+                         .pluck(:assigned_to_id)
+
+    # Fill remaining slots with principals that have no assignments
+    if frequency_ids.length < limit
+      remaining = limit - frequency_ids.length
+      filler_ids = Principal.where(id: scope.where.not(id: frequency_ids).select(:id))
+                            .order(:lastname, :firstname)
+                            .limit(remaining)
+                            .pluck(:id)
+      frequency_ids.concat filler_ids
+    end
+
+    scope.where(id: frequency_ids)
+         .to_a
+         .sort_by(&:name)
   end
 end

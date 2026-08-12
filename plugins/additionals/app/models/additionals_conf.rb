@@ -1,17 +1,8 @@
 # frozen_string_literal: true
 
 class AdditionalsConf
-  SELECT2_INIT_ENTRIES = 30
+  SELECT2_INIT_ENTRIES = 50
   API_LIMIT = 100
-
-  # NOTE: :unprocessable_content requires rack 3 or newer. This is only the case with Redmine 6
-  # SEE https://www.redmine.org/projects/redmine/repository/svn/diff/trunk?utf8=%E2%9C%93&rev=22876&rev_to=22875
-  # SEE https://github.com/rails/rails/pull/52097
-  UNPROCESSABLE_CONTENT = if Rack::Utils::SYMBOL_TO_STATUS_CODE[:unprocessable_content]
-                            :unprocessable_content
-                          else
-                            :unprocessable_entity
-                          end
 
   class << self
     def api_limit
@@ -22,6 +13,26 @@ class AdditionalsConf
       @select2_init_entries ||= with_system_default 'SELECT2_INIT_ENTRIES'
     end
 
+    # Retrieves configuration values with flexible override mechanism
+    #
+    # Priority order (highest to lowest):
+    # 1. ENV variable (e.g., export REPORTING_DISABLE_RAILS_LOGGER_DB=1)
+    # 2. configuration.yml (e.g., reporting_disable_rails_logger_db: true)
+    # 3. default parameter (can be dynamic, e.g., Rails.env.test?)
+    # 4. Constant from this class
+    #
+    # @param const_var [String] Variable name in UPPERCASE (e.g., 'API_LIMIT')
+    # @param type [String] 'string', 'bool' (via RedminePluginKit.true?), 'array' (space-separated)
+    # @param default [Object] Default value if not found in ENV or configuration.yml
+    #
+    # @example Boolean with environment-aware default
+    #   AdditionalsConf.with_system_default 'REPORTING_DISABLE_RAILS_LOGGER_DB',
+    #                                        type: 'bool',
+    #                                        default: Rails.env.test?
+    #   # → Test: true (disabled), Production: false (enabled), ENV/config.yml overrides
+    #
+    # NOTE: ENV uses UPPERCASE, configuration.yml uses lowercase (e.g., reporting_disable_rails_logger_db)
+    #
     def with_system_default(const_var, type: 'string', default: nil)
       if ENV[const_var].present?
         env_var = ENV.fetch const_var

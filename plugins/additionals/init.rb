@@ -20,11 +20,11 @@ Redmine::Plugin.register :additionals do
              require: :loggedin,
              read: true
   permission :share_dashboards,
-             { dashboards: %i[index new create edit update destroy] },
+             { dashboards: %i[index new create edit update destroy lock unlock] },
              require: :member,
              read: true
   permission :save_dashboards,
-             { dashboards: %i[index new create edit update destroy] },
+             { dashboards: %i[index new create edit update destroy lock unlock] },
              require: :loggedin,
              read: true
 
@@ -35,11 +35,7 @@ Redmine::Plugin.register :additionals do
     permission :issue_timelog_never_required, {}
   end
 
-  project_module :time_tracking do
-    permission :log_time_on_closed_issues, {}
-  end
-
-  requires_redmine version_or_higher: '6.0'
+  requires_redmine version_or_higher: '7.0'
 
   menu :admin_menu,
        :additionals,
@@ -56,13 +52,4 @@ RedminePluginKit::Loader.persisting do
 
   # Hooks
   loader.load_model_hooks!
-end
-
-RedminePluginKit::Loader.after_initialize do
-  unless defined? FONTAWESOME_ICONS
-    # @TODO: this should be moved to AdditionalsFontAwesome and use an instance of it
-    FONTAWESOME_ICONS = { fab: AdditionalsFontAwesome.load_icons(:fab),
-                          far: AdditionalsFontAwesome.load_icons(:far),
-                          fas: AdditionalsFontAwesome.load_icons(:fas) }.freeze
-  end
 end

@@ -1,0 +1,50 @@
+#global-search-overlay.global-search-overlay data=global_search_data
+  .global-search-modal role="dialog" aria-modal="true"
+    .global-search-header
+      input.global-search-input(type="text"
+        placeholder=(l :label_global_search_placeholder)
+        autocomplete="off"
+        spellcheck="false"
+        data-global-search-target="input"
+        data-action="input->global-search#onInput")
+      button.global-search-clear(type="button"
+        data-global-search-target="clearButton"
+        data-action="click->global-search#clearInput"
+        style="display:none")
+        == (svg_icon_tag 'x', size: 16, icon_only: true)
+      .global-search-header-actions
+        button.global-search-scope-toggle(type="button"
+          data-action="click->global-search#toggleScopePanel"
+          title=(l :label_search_scope))
+          == sprite_icon 'settings', size: 16
+    .global-search-scope-panel(data-global-search-target="scopePanel" style="display:none")
+      - if @project
+        label.global-search-scope-option
+          input(type="radio" name="global-search-scope" value="project"
+            data-action="change->global-search#onScopeChange")
+          = @project.name
+      label.global-search-scope-option
+        input(type="radio" name="global-search-scope" value="bookmarks"
+          data-action="change->global-search#onScopeChange")
+        = l :label_my_bookmarks
+      label.global-search-scope-option
+        input(type="radio" name="global-search-scope" value="always_bookmarks"
+          data-action="change->global-search#onScopeChange")
+        = l :label_global_search_always_bookmarks
+      label.global-search-scope-option
+        input(type="radio" name="global-search-scope" value="global"
+          data-action="change->global-search#onScopeChange")
+        = l :label_project_all
+      label.global-search-scope-option
+        input(type="radio" name="global-search-scope" value="always_global"
+          data-action="change->global-search#onScopeChange")
+        = l :label_global_search_always_global
+      .global-search-scope-divider
+      label.global-search-scope-option
+        input(type="checkbox" name="global-search-titles-only"
+          data-global-search-target="titlesOnly"
+          data-action="change->global-search#onTitlesOnlyChange")
+        = l :label_search_titles_only
+    .global-search-results#global-search-results(data-global-search-target="results"
+      data-action="click->global-search#onResultClick")
+      p.global-search-hint(data-global-search-target="hint") = l :label_search

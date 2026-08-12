@@ -35,8 +35,7 @@ fr:
   alert_only_visible_by_admins: "Ne peut être vu que par les utilisateurs ayant les droits d'administrateur"
   alert_only_visible_by_yourself: "Ne peut être vu que par vous"
   button_assign_to_me: M'affecter
-  button_dashboard_delete: "Supprimer le tableau de bord"
-  button_dashboard_edit: "Modifier le tableau de bord"
+  button_copy_object: "Copier %{object_name}"
   button_merge: Fusionner
   disabled_modules_info: "Les modules qui ne devraient pas être disponibles pour la sélection dans le cadre des projets. Si ces modules sont déjà activés dans des projets existants, vous devez d'abord modifier et sauvegarder à nouveau les paramètres projet respectifs."
   emoji_support_info_html: 'Convertir les emojis en texte. Activate this option if :heart:, :+1: etc are to be converted to emojis. In the <a href="https://www.webfx.com/tools/emoji-cheat-sheet/" class="external">Emoji cheat sheet</a> the available emoji codes can be used.'
@@ -44,6 +43,7 @@ fr:
   error_issues_could_not_be_assigned_to_me: "La tâche n'a pas pu m'être affectée"
   errors_no_or_invalid_arguments: "Pas d'arguments ou arguments invalides"
   field_always_expose: "Toujours afficher le nom du tableau de bord"
+  field_attachments_count: "Nombre de fichiers"
   field_color: Couleur
   field_dashboard_locked: Locked
   field_enable_new_ticket_message: "Activer le message d'émission"
@@ -58,12 +58,14 @@ fr:
   field_visibility: "Visibilité"
   field_website: Site Web
   global_footer_info: 'Entrez un projet en bas de page wiki ici.'
+  global_search_info: "Si actif, une boite de dialogue de recherche globale (Cmd+K) est disponible sur toutes les pages."
   global_sidebar_info: "Saisissez ici un message texte disponible pour l'ensemble du projet. Ce texte latéral sera affiché dans la vue d'ensemble du projet, les pages d'édition et les pages wiki."
   global_wiki_sidebar_info: "Entrez ici un message texte disponible pour l'ensemble du projet pour votre barre latérale wiki. Ce texte de la barre latérale sera affiché uniquement sur les pages wiki. Use this space for Macros like \"Last changed pages\" for example. Dans le cas où une barre latérale spécifique au projet est utilisée (page wiki), celle-ci sera de préférence affichée dans la barre latérale."
   google_maps_embed_api_html: "Si vous souhaitez utiliser la macro Gmap pour afficher les cartes de Goole, veuillez implémenter votre clé API Google Maps ici. Ensuite, vous pouvez utiliser la macro et divers paramètres. Pour plus d'informations sur l'utilisation des paramètres, voir <a href=\"https://developers.google.com/maps/documentation/embed/guide\">https://developers.google.com/maps/documentation/embed/guide</a>. La macro Gmap ne fonctionne qu'en combinaison avec la clé intégrée."
   hidden_macros_in_toolbar_info: "Toutes les macros disponibles que l'utilisateur connecté peut utiliser sont listées via le bouton macro de la barre d'outils wiki. Les macros marquées ici ne sont pas proposées à la sélection. Ceci vous permet de limiter la portée de la liste."
   info_hidden_roles_html: "Les rôles cachés ne peuvent être utilisés qu'avec la visibilité utilisateur \"Membres de projets visibles\". Si l'utilisateur n'est pas dans un rôle visible par l'utilisateur actuel, ce rôle, y compris l'utilisateur, est masqué sur la page de synthèse du projet et dans les listes de requêtes."
   info_issue_hide_max_attachments: "Si le nombre de fichiers saisis ici est supérieur, toutes les pièces jointes d'une question sont affichées de manière masquée."
+  info_issue_link_category: "Lie la catégorie (sur la page de la demande et dans les colonnes des listes de demandes) à la liste des demandes du projet concerné filtrée par cette catégorie."
   info_live_search_result_restriction: "Les résultats de LiveSearch sont limités à %{value} résultats limités. Essaie de décrire ta recherche plus précisément."
   label_account_login_bottom: "Texte pour la page de connexion"
   label_activate_quickstart: "Activer quickstart"
@@ -73,9 +75,12 @@ fr:
   label_additionals: Additionals
   label_additionals_feed: Flux Atom+RSS
   label_additionals_message: Message
+  label_all_active_users: "Tous les utilisateurs actifs"
   label_all_projects: Tous les projets
+  label_all_users: "Tous les utilisateurs"
   label_app_menu: Menu applicatif
   label_auto_watch_on_issue_assigned: "Les tâches qui m'ont été confiées"
+  label_calendar_week: "CW %{week}"
   label_change_is_private: Changer Privé/non privé
   label_change_to_dashboard: "Passer au tableau de bord"
   label_chart_color_schema: Schéma de couleur graphique
@@ -83,7 +88,6 @@ fr:
   label_chartjs_colorscheme_info: "Liste des couleurs"
   label_content_plural: Contenus
   label_copied_to_clipboard: "Copié !"
-  label_copy_to_clipboard: "Copie dans le presse-papiers"
   label_custom_field_editable_info: If disabled changes are only possible with API calls or via bulk edit.
   label_custom_fields_distribution: "Champs personnalisés pour la distribution"
   label_daily: tous les jours
@@ -92,8 +96,10 @@ fr:
   label_dashboard_block_info_async: "Ce bloc est chargé de manière asynchrone et mis en cache pendant %{time}."
   label_dashboard_legacy_left: "Contenu standard à gauche"
   label_dashboard_legacy_right: "Droit au contenu standard"
+  label_dashboard_lock: Activer le verrouillage du tableau de bord
   label_dashboard_lock_is_active: "Dashboard blocage est activé"
   label_dashboard_plural: Tableaux de bord
+  label_dashboard_unlock: Supprimer le verrouillage du tableau de bord
   label_day: Jour
   label_default_sort_by: "Tri par défaut"
   label_disable_sidebar: "Désactiver la sidebar"
@@ -104,6 +110,16 @@ fr:
   label_enable_auto_refresh: "Activer le rafraîchissement automatique"
   label_enable_sidebar: "Activer la sidebar"
   label_global_footer: "Pied de page projet"
+  label_global_search: "Recherche globale"
+  label_global_search_always_bookmarks: "Mes favoris (toujours)"
+  label_global_search_always_global: "Tous les projets (toujours)"
+  label_global_search_clear_all: "Tout effacer"
+  label_global_search_in_all_projects: "dans tous les projets"
+  label_global_search_in_my_bookmarks: "dans mes projets favoris"
+  label_global_search_in_titles: "dans les titres"
+  label_global_search_placeholder: "Saisissez pour rechercher..."
+  label_global_search_recent_projects: "Projets récemment utilisés"
+  label_global_search_recent_searches: "Recherches récentes"
   label_global_sidebar: "Barre latéral globale"
   label_global_wiki_sidebar: "Barre latéral global du wiki"
   label_go_to_top: "Revenir en haut"
@@ -124,6 +140,8 @@ fr:
   label_issue_freezed_with_close: "Interdire l'édition des tâches fermées (freeze)"
   label_issue_genitive: "problème"
   label_issue_hide_max_attachments: "Afficher les fichiers max."
+  label_issue_link_category: "Lier la catégorie"
+  label_issue_link_category_title: "Afficher les demandes de cette catégorie"
   label_issue_note_with_author: "Afficher l'auteur de la tâche avec une note"
   label_issue_status_change: "Si \"Assignee\" est inchangé et que le statut de la question est passé de x à y, l'auteur est assigné à la question."
   label_issue_timelog_required: Saisie de temps obligatoire pour une tâche
@@ -152,6 +170,7 @@ fr:
   label_percentage: Percentage
   label_project_information: "Informations sur le projet"
   label_project_list: "liste des projets"
+  label_project_scope: "du projet"
   label_project_setting: "Projet"
   label_quantity: "Quantité"
   label_query_delete: Annuler la requête
@@ -159,12 +178,15 @@ fr:
   label_query_name_search: Rechercher un nom
   label_query_with_name: "Requête: %{value}"
   label_quickstart: Quickstart
+  label_recently_updated_pages: Pages mises à jour
   label_reddit_subject: Sujet Reddit
   label_reddit_user_account: Compte utilisateur Reddit
   label_redmine_org_issue: Redmine.org issue
   label_redmine_org_wiki: Redmine.org wiki page
+  label_relation_remove: Supprimer la relation
   label_remove_help: "Retirer 'Aide' du menu"
   label_search_by_name: Recherche par nom
+  label_search_scope: "Portee de la recherche"
   label_settings_macros: "Macros"
   label_settings_menu: "Menu"
   label_shared_dashboard_plural: "Tableaux de bord partagés"
@@ -183,6 +205,7 @@ fr:
   label_uptime: Uptime
   label_user_is_author_of: "Cet utilisateur est l'auteur de cette %{entity}."
   label_user_list: "Liste des utilisateurs"
+  label_visibility_groups: uniquement pour ces groupes
   label_web_apis: APIs Web
   label_weekly: hebdomadaire
   label_wiki_pdf_remove_attachments: "Supprimer les pièces jointes de la vue PDF"
@@ -204,7 +227,6 @@ fr:
   permission_edit_closed_issues: "Éditer les dossiers fermés"
   permission_edit_issue_author: "Modifier l'auteur"
   permission_issue_timelog_never_required: Enregistrements de temps non requis
-  permission_log_time_on_closed_issues: "Enregistrer le temps passé sur les tâches fermées"
   permission_save_dashboards: "Sauvegarder les tableaux de bord"
   permission_set_system_dashboards: "Définir les tableaux de bord du système"
   permission_share_dashboards: "Partager les tableaux de bord"
@@ -224,3 +246,5 @@ fr:
   field_watched_by_me: "Surveillé par moi"
   label_with_amount: "Montant %{value}"
   label_list_all_entries: "Liste complète %{value}"
+  text_dashboard_lock_confirmation: Êtes-vous sûr de vouloir verrouiller ce tableau de bord?
+  text_dashboard_unlock_confirmation: Êtes-vous sûr de vouloir déverrouiller ce tableau de bord?

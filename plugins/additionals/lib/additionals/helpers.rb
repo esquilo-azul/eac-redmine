@@ -21,7 +21,36 @@ module Additionals
       safe_join titles
     end
 
-    def entry_page_title(name, obj: nil, obj_link: nil, query: nil, icon_name: nil)
+    # Renders wiki pages grouped by the day of their last change.
+    #
+    # Shared by the recently_updated macro and by plugins that render the same
+    # list elsewhere, so it looks the same wherever it is used.
+    #
+    # @param pages [Enumerable<WikiPage>] pages, already ordered by change date
+    # @param title [String, nil] heading above the list, omitted if blank
+    # @return [String] empty string if there is nothing to show
+    def render_recently_updated_wiki_pages(pages, title: nil)
+      grouped_pages = pages.group_by { |page| page.content.updated_on.to_date }
+      return '' if grouped_pages.empty?
+
+      content = []
+      content << tag.h3(title) if title.present?
+      content += grouped_pages.flat_map do |date, date_pages|
+        [tag.strong(format_date(date)), render_recently_updated_wiki_page_group(date_pages)]
+      end
+
+      tag.div safe_join(content), class: 'recently-updated'
+    end
+
+    def entity_headline(object_name:, type:, capitalize: true, obj: nil) # rubocop: disable Lint/UnusedMethodArgument
+      object_name = l object_name if object_name.is_a? Symbol
+
+      headline = l("button_#{type}_object", object_name:)
+      headline.capitalize! if capitalize
+      headline
+    end
+
+    def entry_page_title(name, obj: nil, obj_link: nil, query: nil, icon_name: nil, icon_plugin: 'additionals', icon_sprite: nil)
       items = []
       case obj
       when Issue
@@ -38,10 +67,46 @@ module Additionals
       items << h(query.name) if query && !query.new_record?
 
       page_title = []
-      page_title << svg_icon_tag(icon_name, css_class: 'icon-padding', size: 24) if icon_name
+      page_title << svg_icon_tag(icon_name, css_class: 'icon-padding', size: 24, plugin: icon_plugin, sprite: icon_sprite) if icon_name
       page_title << render_breadcrumb(items)
 
       safe_join page_title
+    end
+
+    # Whether a custom value has something to show.
+    #
+    # A multi value custom field without any value comes as [nil]: that is
+    # present? and would render an empty row. Redmine core avoids this by looking
+    # at the rendered value (see render_custom_field_values).
+    #
+    # @param custom_value [CustomValue, CustomFieldValue]
+    # @return [Boolean]
+    def custom_field_value?(custom_value)
+      Array.wrap(custom_value.value).any?(&:present?)
+    end
+
+    # Label of an attribute row, as used in the sidebar_attributes lists and
+    # wherever a label and a value sit next to each other.
+    #
+    # A custom field carries its description as tooltip, the same way Redmine does
+    # it for the attributes of an issue (see custom_field_name_tag). Rebuilt here
+    # instead of calling that helper, because CustomFieldsHelper is only available
+    # in some controllers, while this helper is global.
+    #
+    # @param label [String, Symbol, CustomField] text, locale key or custom field
+    # @param title [String, nil] tooltip, taken from the custom field if not given
+    # @return [String]
+    def attribute_label(label, title: nil)
+      if label.is_a? CustomField
+        title ||= label.description.presence
+        label = label.name
+      end
+
+      label = l label if label.is_a? Symbol
+
+      tag.span "#{label}:",
+               class: ['label', title.present? ? 'field-description' : nil].compact,
+               title: title.presence
     end
 
     def label_with_count(label, info, only_positive: false)
@@ -73,7 +138,7 @@ module Additionals
           tds << tag.td('', class: 'hide') if with_buttons && with_checkbox
           tds << tag.td(colspan: td_colspan, class: "#{column.css_classes} block_column") do
             td_content = []
-            td_content << tag.span(column.caption) if query.block_columns.count > 1
+            td_content << tag.span(column.caption) if query.block_columns.many?
             td_content << text
             safe_join td_content
           end
@@ -149,10 +214,6 @@ module Additionals
       end
     end
 
-    def additionals_library_load(module_names)
-      safe_join(Array(module_names).map { |module_name| send(:"additionals_load_#{module_name}") })
-    end
-
     def autocomplete_select_entries(name, type, option_tags, **options)
       if option_tags.present?
         if option_tags.is_a? ActiveRecord::Relation
@@ -175,10 +236,19 @@ module Additionals
       end
 
       s = []
-      s << hidden_field_tag("#{name}[]", '') if options[:multiple]
+      if options[:multiple]
+        # Only append the array brackets when the name does not already end in
+        # "[]" (as it does for multiple custom fields), otherwise the hidden
+        # field name becomes "[][]" and Rack parses a nested ["", ...] value.
+        hidden_name = name.to_s.end_with?('[]') ? name : "#{name}[]"
+        s << hidden_field_tag(hidden_name, '', id: nil)
+      end
+      # No blank option for multiple selects: the hidden field above already
+      # clears the value, and a blank <option> gets selected by select2's
+      # "clear all" button, showing up as a stray empty choice (#15425)
       s << select_tag(name,
                       option_tags,
-                      include_blank: options[:include_blank],
+                      include_blank: !options[:multiple] && options[:include_blank],
                       multiple: options[:multiple],
                       disabled: options[:disabled])
       s << render(layout: false,
@@ -277,7 +347,25 @@ module Additionals
 
     def render_label_sum(label, sum)
       name = label.is_a?(Symbol) ? l(label) : label
-      "#{name} (#{sum})"
+      # safe_join keeps an html_safe label (e.g. link_to_attachment) intact;
+      # a plain string interpolation would drop the html_safe flag and get
+      # escaped by the caller (e.g. the entity mailer's attachment list).
+      safe_join [name, " (#{sum})"]
+    end
+
+    # Attachments to list in an entity notification. On creation (no journal)
+    # every attachment is new, so list them all. On update, list only the ones
+    # added in this journal - so the notification shows what this change added,
+    # not the entity's whole attachment history.
+    def entity_mail_attachments(entity, journal)
+      return entity.attachments if journal.nil?
+
+      added_ids = journal.details.filter_map do |detail|
+        detail.prop_key.to_i if detail.property == 'attachment' && detail.value.present?
+      end
+      return [] if added_ids.empty?
+
+      entity.attachments.select { |attachment| added_ids.include? attachment.id }
     end
 
     def labeled_line(label, value: nil, line_class: nil, label_class: nil, value_class: nil, icon: nil)
@@ -296,88 +384,23 @@ module Additionals
       end
     end
 
+    def remove_relation_link_function
+      link_to_function sprite_icon('link-break', l(:label_relation_remove), icon_only: true),
+                       "$(this).prev('input[type=hidden]').val('1');$(this).parent().hide()",
+                       class: 'icon-only icon-link-break link-remove',
+                       title: l(:label_relation_remove)
+    end
+
     private
 
-    def additionals_already_loaded?(scope, js_name)
-      locked = "#{js_name}.#{scope}"
-      @alreaded_loaded = [] if @alreaded_loaded.nil?
-      return true if @alreaded_loaded.include? locked
-
-      @alreaded_loaded << locked
-      false
-    end
-
-    def additionals_include_js(js_name, core: false)
-      if additionals_already_loaded? 'js', js_name
-        ''
-      else
-        javascript_include_tag js_name, plugin: core ? nil : 'additionals'
+    def render_recently_updated_wiki_page_group(pages)
+      tag.ul class: 'wiki-flat' do
+        safe_join(
+          pages.map do |page|
+            tag.li link_to(page.pretty_title, project_wiki_page_path(page.project, page.title))
+          end
+        )
       end
-    end
-
-    def additionals_include_css(css)
-      if additionals_already_loaded? 'css', css
-        ''
-      else
-        stylesheet_link_tag css, plugin: 'additionals'
-      end
-    end
-
-    def additionals_load_select2
-      additionals_include_css('select2') +
-        additionals_include_js('select2.min') +
-        additionals_include_js('select2_helpers')
-    end
-
-    def additionals_load_clipboardjs
-      additionals_include_js 'clipboard.min'
-    end
-
-    def additionals_load_font_awesome
-      additionals_include_css 'fontawesome-all.min'
-    end
-
-    def additionals_load_chartjs
-      additionals_include_js 'chart.umd'
-    end
-
-    def additionals_load_chartjs_core
-      additionals_include_js 'chart.min', core: true
-    end
-
-    def additionals_load_chartjs_colorschemes
-      additionals_include_js 'chartjs-plugin-colorschemes.min'
-    end
-
-    def additionals_load_chartjs_datalabels
-      additionals_include_js 'chartjs-plugin-datalabels.min'
-    end
-
-    def additionals_load_chartjs_annotation
-      additionals_include_js 'chartjs-plugin-annotation.min'
-    end
-
-    def additionals_load_chartjs_moment
-      additionals_include_js('moment-with-locales.min') +
-        additionals_include_js('chartjs-adapter-moment.min')
-    end
-
-    def additionals_load_chartjs_matrix
-      additionals_load_chartjs_moment +
-        additionals_include_js('chartjs-chart-matrix.min')
-    end
-
-    def additionals_load_mermaid
-      additionals_include_js('mermaid.min') +
-        additionals_include_js('mermaid_load')
-    end
-
-    def additionals_load_d3
-      additionals_include_js 'd3.min'
-    end
-
-    def additionals_load_d3plus
-      additionals_include_js 'd3plus.min'
     end
   end
 end

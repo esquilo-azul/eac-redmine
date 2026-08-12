@@ -4,13 +4,17 @@
 coverage/
 tmp/
 Gemfile.lock
+CLAUDE.md
+.claude/
 .project
 .vscode
 .bundle
+test-results/
 .settings/
 docs/_build
 docs/_static
 docs/_templates
+docs/plans
 .enable_*
 /node_modules
 /yarn.lock

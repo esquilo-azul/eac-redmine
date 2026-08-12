@@ -7,8 +7,11 @@ module Additionals
 
       included do
         include InstanceMethods
+
         before_action :enable_smileys
         helper :additionals_js_heads
+        helper :additionals_render_async
+        helper :additionals_remote_form
       end
 
       module InstanceMethods
@@ -63,10 +66,11 @@ module Additionals
         end
 
         def enable_smileys
+          rules_class = Additionals.textile_rules_class
           return if !Additionals.setting?(:legacy_smiley_support) ||
-                    Redmine::WikiFormatting::Textile::Formatter::RULES.include?(:inline_smileys)
+                    rules_class::RULES.include?(:inline_smileys)
 
-          Redmine::WikiFormatting::Textile::Formatter::RULES << :inline_smileys
+          rules_class::RULES << :inline_smileys
         end
       end
     end

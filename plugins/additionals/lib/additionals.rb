@@ -3,7 +3,7 @@
 require 'redmine_plugin_kit'
 
 module Additionals
-  VERSION = '4.1.0'
+  VERSION = '4.6.0-main'
 
   MAX_CUSTOM_MENU_ITEMS = 5
   DEFAULT_MODAL_WIDTH = '350px'
@@ -31,11 +31,6 @@ module Additionals
       else
         user.time_zone.now
       end
-    end
-
-    def time_zone_correct(time, user: User.current)
-      timezone = user.time_zone || Time.zone
-      timezone.utc_offset - Time.zone.local_to_utc(time).localtime.utc_offset
     end
 
     def hash_remove_with_default(field, options, default = nil)
@@ -92,6 +87,84 @@ module Additionals
       end
     end
 
+    # Check if PostgreSQL with pg_trgm extension is available.
+    # Safe to call on MySQL (returns false).
+    def postgresql_with_pg_trgm?
+      return false unless ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+
+      ActiveRecord::Base.connection.execute(
+        "SELECT 1 FROM pg_extension WHERE extname = 'pg_trgm'"
+      ).any?
+    rescue StandardError
+      false
+    end
+
+    # Build a WHERE condition for case/accent-insensitive LIKE search.
+    # Returns [sql_string, *bind_values] suitable for ActiveRecord .where(*).
+    # Avoids string interpolation in where() which triggers Brakeman warnings.
+    #
+    # Usage:
+    #   scope.where *Additionals.like_condition(columns: %w[issues.subject issues.description], value: "%term%")
+    #   scope.where *Additionals.like_condition(columns: 'contacts.email', value: "%#{email}%")
+    def like_condition(columns:, value:)
+      cols = Array columns
+      sql = cols.map { |col| Redmine::Database.like col, '?' }.join ' OR '
+      [sql, *([value] * cols.size)]
+    end
+
+    # Create a GIN trigram expression index using f_unaccent() for fast ILIKE searches.
+    # Requires f_unaccent() IMMUTABLE wrapper function.
+    # No-op if f_unaccent() is not available or index already exists.
+    def add_trgm_index(table, column)
+      return unless postgresql_f_unaccent?
+
+      conn = ActiveRecord::Base.connection
+      name = trgm_index_name table, column
+      return if trgm_index_exists? conn, name
+
+      trgm_execute_ddl conn,
+                       'CREATE INDEX %<name>s ON %<table>s USING gin (f_unaccent(%<column>s) gin_trgm_ops)',
+                       table, column, name
+    end
+
+    # Remove a GIN trigram index if it exists.
+    # Safe to call on MySQL (no-op).
+    def remove_trgm_index(table, column)
+      return unless ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+
+      conn = ActiveRecord::Base.connection
+      name = trgm_index_name table, column
+      return unless trgm_index_exists? conn, name
+
+      trgm_execute_ddl conn, 'DROP INDEX IF EXISTS %<name>s', table, column, name
+    end
+
+    def trgm_index_name(table, column)
+      "idx_#{table}_#{column}_trgm"
+    end
+
+    def trgm_execute_ddl(conn, template, table, column, name)
+      conn.execute format(template,
+                          name: name,
+                          table: conn.quote_table_name(table),
+                          column: conn.quote_column_name(column))
+    end
+
+    def trgm_index_exists?(conn, name)
+      conn.select_value("SELECT 1 FROM pg_indexes WHERE indexname = '#{name}'").present?
+    end
+
+    # Check if f_unaccent() IMMUTABLE wrapper function is available
+    def postgresql_f_unaccent?
+      return false unless ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+
+      ActiveRecord::Base.connection.select_value(
+        "SELECT 1 FROM pg_proc WHERE proname = 'f_unaccent'"
+      ).present?
+    rescue StandardError
+      false
+    end
+
     def debug(message = 'running', console: false)
       if console
         RedminePluginKit::Debug.msg message
@@ -100,12 +173,20 @@ module Additionals
       end
     end
 
+    # Returns the class containing the RULES constant for Textile formatting.
+    # The Filter class inherits from RedCloth3 and holds RULES.
+    def textile_rules_class
+      Redmine::WikiFormatting::Textile::Filter
+    end
+
     private
 
     def setup
-      RenderAsync.configuration.jquery = true
+      require_supported_database!
 
-      loader.add_patch %w[ApplicationController
+      loader.add_patch %w[AdminController
+                          ApplicationController
+                          ApplicationHelper
                           AutoCompletesController
                           Issue
                           TimeEntry
@@ -113,6 +194,7 @@ module Additionals
                           Project
                           ProjectQuery
                           Wiki
+                          WikiPage
                           ProjectsController
                           WelcomeController
                           ReportsController
@@ -130,11 +212,19 @@ module Additionals
 
       loader.add_helper({ controller: 'Issues', helper: 'AdditionalsCommonJournals' })
 
-      loader.add_patch [{ target: Redmine::Views::LabelledFormBuilder, patch: 'LabelledFormBuilder' }]
+      loader.add_patch [{ target: Redmine::Views::LabelledFormBuilder, patch: 'LabelledFormBuilder' },
+                        { target: WatchersHelper, patch: 'WatchersHelper' },
+                        { target: QueriesHelper, patch: 'QueriesHelper' },
+                        { target: Redmine::FieldFormat::UserFormat, patch: 'UserFormat' }]
+
+      # Filter search types based on disabled modules
+      Redmine::Search.singleton_class.prepend Additionals::Patches::SearchPatch
 
       loader.add_global_helper [Additionals::Helpers,
+                                AdditionalsAssetLoaderHelper,
+                                AdditionalsClipboardHelper,
+                                AdditionalsGlobalSearchHelper,
                                 AdditionalsIconsHelper,
-                                AdditionalsFontawesomeHelper,
                                 AdditionalsMenuHelper,
                                 AdditionalsSelect2Helper]
 
@@ -144,13 +234,13 @@ module Additionals
           loader.add_patch [{ target: Redmine::WikiFormatting::CommonMark::Formatter, patch: 'FormatterCommonMark' }]
           loader.add_patch [{ target: Redmine::WikiFormatting::CommonMark::Helper, patch: 'FormattingHelper' }]
         when 'textile'
-          loader.add_patch [{ target: Redmine::WikiFormatting::Textile::Formatter, patch: 'FormatterTextile' },
+          loader.add_patch [{ target: textile_rules_class, patch: 'FormatterTextile' },
                             { target: Redmine::WikiFormatting::Textile::Helper, patch: 'FormattingHelper' }]
         end
       end
 
-      # Clients
-      loader.require_files File.join('wiki_formatting', 'common_mark', '**/*_filter.rb')
+      # Load Loofah scrubbers for CommonMark formatting
+      loader.require_files File.join('wiki_formatting', 'common_mark', '**/*_scrubber.rb')
 
       # Apply patches and helper
       loader.apply!
@@ -160,17 +250,31 @@ module Additionals
 
       # Load view hooks
       loader.load_view_hooks!
+
+      # Discover and load global search providers from all plugins
+      GlobalSearch.load_providers
+    end
+
+    # Read adapter from database.yml without opening a connection, so the check
+    # also works during db:create / db:drop when no database exists yet.
+    def require_supported_database!
+      adapter = ActiveRecord::Base.connection_db_config.adapter.to_s.downcase
+      return if %w[mysql2 trilogy postgresql].include? adapter
+
+      raise "\n\033[31madditionals plugin requires MySQL or PostgreSQL. " \
+            "Detected adapter: #{adapter}. " \
+            "See https://github.com/alphanodes/additionals#requirements\033[0m"
     end
   end
 end
 
-class String
+class String # rubocop:disable Style/OneClassPerFile
   def strip_split(sep = ',')
     split(sep).map(&:strip).compact_blank
   end
 end
 
-class Array
+class Array # rubocop:disable Style/OneClassPerFile
   # alias for join with ', ' as seperator
   def to_comma_list
     join ', '

@@ -35,8 +35,7 @@ zh:
   alert_only_visible_by_admins: "只有拥有管理员权限的用户才能看到"
   alert_only_visible_by_yourself: "只能被你看到"
   button_assign_to_me: 指派给我
-  button_dashboard_delete: 删除仪表盘
-  button_dashboard_edit: "编辑仪表盘"
+  button_copy_object: "复制%{object_name}"
   button_merge: "合并"
   disabled_modules_info: "项目中无法选择模块。如果这些模块已经在现有项目中激活，则必须首先更改并重新保存响应的项目设置。"
   emoji_support_info_html: 'Convert emojis in text. Activate this option if :heart:, :+1: etc are to be converted to emojis. In the <a href="https://www.webfx.com/tools/emoji-cheat-sheet/" class="external">Emoji cheat sheet</a> the available emoji codes can be used.'
@@ -44,6 +43,7 @@ zh:
   error_issues_could_not_be_assigned_to_me: 问题无法被指派给自己
   errors_no_or_invalid_arguments: 参数无效或不存在。
   field_always_expose: 始终显示仪表盘名称
+  field_attachments_count: 文件数量
   field_color: 颜色
   field_dashboard_locked: Locked
   field_enable_new_ticket_message: "激活任务信息"
@@ -58,12 +58,14 @@ zh:
   field_visibility: 可见性
   field_website: 网站
   global_footer_info: '请在此处输入项目范围内 Wiki 页尾信息。'
+  global_search_info: "启用后，全局搜索对话框(Cmd+K)在所有页面上可用。"
   global_sidebar_info: "请在此处输入项目范围内侧边栏信息。自定义侧边栏信息将在项目概述页、问题列表页及 Wiki 页显示。"
   global_wiki_sidebar_info: '请在此处输入项目范围内的 Wiki 侧边栏信息。该侧边栏信息将只显示在 Wiki 页内。在此空间内输入诸如 "Last changed pages" 的宏命令。若项目内使用指定的侧边栏（Wiki 页），则该信息将优先显示在侧边栏内。'
   google_maps_embed_api_html: 如果你想使用 Gmap 宏以现实 Google 地图，请在此处使用你的 Google 地图 API Key。之后你就可以使用宏和多种参数。关于如何使用参数的更多信息请查看 <a href="https://developers.google.com/maps/documentation/embed/guide" class="external">https://developers.google.com/maps/documentation/embed/guide</a>. Gmap 宏只有在此处提供 Key 的情况下才可用。
   hidden_macros_in_toolbar_info: 登录用户可以使用的所有可用宏都可通过 Wiki 页面工具栏 的 宏 按钮列出。请在此处选择不希望列出的宏。
   info_hidden_roles_html: 隐藏功能只能与"用户可见度"选项一起使用。如果某用户不在对当前用户可见的角色，则此用户及其角色在项目概述页和查询列表中将对当前用户隐藏。
   info_issue_hide_max_attachments: "如果超过此处输入的文件数量，则会隐藏显示问题的所有文件附件。"
+  info_issue_link_category: "将问题页面和问题列表列中的类别链接到相应项目按此类别筛选的问题列表。"
   info_live_search_result_restriction: "LiveSearch的结果仅限于 %{value}。命中率。尝试更详细地描述你的搜索。"
   label_account_login_bottom: "用于登陆页的文本"
   label_activate_quickstart: Activate quickstart
@@ -73,9 +75,12 @@ zh:
   label_additionals: Additionals
   label_additionals_feed: "Atom+RSS Feed"
   label_additionals_message: "讯息"
+  label_all_active_users: "所有活动用户"
   label_all_projects: 所有项目
+  label_all_users: "所有用户"
   label_app_menu: 应用菜单
   label_auto_watch_on_issue_assigned: "分配给我的机票"
+  label_calendar_week: "CW %{week}"
   label_change_is_private: 修改私有/非私有
   label_change_to_dashboard: "切换到仪表盘"
   label_chart_color_schema: 图表配色主题
@@ -83,7 +88,6 @@ zh:
   label_chartjs_colorscheme_info: "颜色清单"
   label_content_plural: 内容
   label_copied_to_clipboard: "已复制!"
-  label_copy_to_clipboard: "复制到剪贴板"
   label_custom_field_editable_info: "如果禁用，则只能通过调用 API 或批量编辑进行更改。"
   label_custom_fields_distribution: "用于分发的自定义字段"
   label_daily: 每天
@@ -92,8 +96,10 @@ zh:
   label_dashboard_block_info_async: "这个区块是异步加载的，并缓存到 %{time}."
   label_dashboard_legacy_left: "标准左侧内容"
   label_dashboard_legacy_right: "标准右侧内容"
+  label_dashboard_lock: 激活仪表盘锁定
   label_dashboard_lock_is_active: "Dashboard 锁定已激活"
   label_dashboard_plural: 仪表盘
+  label_dashboard_unlock: 移除仪表盘锁定
   label_day: 天
   label_default_sort_by: "默认排序方式"
   label_disable_sidebar: 禁用侧边栏
@@ -104,6 +110,16 @@ zh:
   label_enable_auto_refresh: "启用自动刷新"
   label_enable_sidebar: 启用侧边栏
   label_global_footer: "项目范围内的页脚设置"
+  label_global_search: "全局搜索"
+  label_global_search_always_bookmarks: "我的书签 (始终)"
+  label_global_search_always_global: "所有项目 (始终)"
+  label_global_search_clear_all: "全部清除"
+  label_global_search_in_all_projects: "在所有项目中"
+  label_global_search_in_my_bookmarks: "在我的书签项目中"
+  label_global_search_in_titles: "在标题中"
+  label_global_search_placeholder: "输入以搜索..."
+  label_global_search_recent_projects: "最近使用的项目"
+  label_global_search_recent_searches: "最近搜索"
   label_global_sidebar: "全局侧边栏设置"
   label_global_wiki_sidebar: "全局 Wiki 侧边栏设置"
   label_go_to_top: "回到顶部"
@@ -124,6 +140,8 @@ zh:
   label_issue_freezed_with_close: 禁止修改已关闭的问题 (冻结)
   label_issue_genitive: "问题"
   label_issue_hide_max_attachments: "显示最大文件数"
+  label_issue_link_category: "链接类别"
+  label_issue_link_category_title: "显示此类别的问题"
   label_issue_note_with_author: "显示任务的作者与注释"
   label_issue_status_change: "若 \"指派给\" 的值未修改，且问题状态要从 X 变更为 Y，那么该问题必须指派给问题作者自己。"
   label_issue_timelog_required: 问题需要登记工时
@@ -152,6 +170,7 @@ zh:
   label_percentage: Percentage
   label_project_information: "项目信息"
   label_project_list: "项目列表"
+  label_project_scope: "来自项目"
   label_project_setting: "项目"
   label_quantity: "Quantity"
   label_query_delete: 删除查询
@@ -159,12 +178,15 @@ zh:
   label_query_name_search: "搜索名字"
   label_query_with_name: "查询: %{value}"
   label_quickstart: Quickstart
+  label_recently_updated_pages: Updated pages
   label_reddit_subject: Reddit 主题
   label_reddit_user_account: Reddit 账号
   label_redmine_org_issue: Redmine.org 问题
   label_redmine_org_wiki: Redmine.org Wiki 页面
+  label_relation_remove: 移除关联
   label_remove_help: "从顶部菜单栏中移除 '帮助' 项"
   label_search_by_name: 按名称搜索
+  label_search_scope: "搜索范围"
   label_settings_macros: "宏"
   label_settings_menu: "菜单"
   label_shared_dashboard_plural: 共享的仪表盘
@@ -183,6 +205,7 @@ zh:
   label_uptime: 上线时间
   label_user_is_author_of: "这个用户是这个的作者 %{entity}."
   label_user_list: "用户列表"
+  label_visibility_groups: 仅限于这些组
   label_web_apis: Web APIs
   label_weekly: 每周
   label_wiki_pdf_remove_attachments: 从 PDF 中删除附件
@@ -204,7 +227,6 @@ zh:
   permission_edit_closed_issues: "修改已关闭的问题"
   permission_edit_issue_author: 修改已创建问题的问题作者
   permission_issue_timelog_never_required: 无需登记工时
-  permission_log_time_on_closed_issues: "在已关闭的问题中登记工时"
   permission_save_dashboards: "保存仪表盘"
   permission_set_system_dashboards: "设置系统仪表盘"
   permission_share_dashboards: "共享仪表盘"
@@ -224,3 +246,5 @@ zh:
   field_watched_by_me: "由我观看"
   label_with_amount: "金额 %{value}"
   label_list_all_entries: "列出所有 %{value}"
+  text_dashboard_lock_confirmation: 您确定要锁定此仪表盘吗？
+  text_dashboard_unlock_confirmation: 您确定要解锁此仪表盘吗？

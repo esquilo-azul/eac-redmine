@@ -35,8 +35,7 @@ cs:
   alert_only_visible_by_admins: "Vidí je pouze uživatelé s oprávněními správce"
   alert_only_visible_by_yourself: "Vidíte jen vy"
   button_assign_to_me: "Přiřaďte mi"
-  button_dashboard_delete: "Vymazat dashboard"
-  button_dashboard_edit: "Upravit dashboard"
+  button_copy_object: "Kopírovat %{object_name}"
   button_merge: "Sloučení"
   disabled_modules_info: "Moduly, které by neměly být k dispozici pro výběr v rámci projektů. Pokud jsou tyto moduly již aktivovány ve stávajících projektech, musíte nejprve změnit a znovu uložit příslušná nastavení projektu."
   emoji_support_info_html: 'Převod emoji do textu. Activate this option if :heart:, :+1: etc are to be converted to emojis. In the <a href="https://www.webfx.com/tools/emoji-cheat-sheet/" class="external">Emoji cheat sheet</a> the available emoji codes can be used.'
@@ -44,6 +43,7 @@ cs:
   error_issues_could_not_be_assigned_to_me: "Problém se mi nepodařilo přiřadit"
   errors_no_or_invalid_arguments: "Žádné nebo neplatné argumenty"
   field_always_expose: "Vždy zobrazit název palubní desky"
+  field_attachments_count: "Počet souborů"
   field_color: Barva
   field_dashboard_locked: "Uzamčené"
   field_enable_new_ticket_message: "Aktivace zprávy o vydání"
@@ -58,12 +58,14 @@ cs:
   field_visibility: "Viditelnost"
   field_website: Website
   global_footer_info: 'Sem zadejte zápatí široké wiki projektu.'
+  global_search_info: "Pokud je aktivni, globalni vyhledavaci dialog (Cmd+K) je dostupny na vsech strankach."
   global_sidebar_info: "Sem zadejte textovou zprávu dostupnou pro celý projekt. Tento text postranního panelu se zobrazí v přehledu projektu, na problémových stránkách a na wiki stránkách."
   global_wiki_sidebar_info: 'Zde zadejte textovou textovou zprávu, která je k dispozici pro váš postranní panel wiki. Tento text postranního panelu se zobrazí pouze na stránkách wiki. Tento prostor použijte například pro makra, například „Last changed pages“. V případě, že je použit boční panel specifický pro projekt (wiki stránka), bude to místo toho zobrazen na postranním panelu.'
   google_maps_embed_api_html: "V případě, že chcete k zobrazení map Goole použít makro Gmap, implementujte zde klíč API Google Maps API. Poté můžete použít makro a různé parametry. Více informací o tom, jak používat parametry, naleznete na <a href=\"https://developers.google.com/maps/documentation/embed/guide\" class=\"external\">https://developers.google.com/maps/documentation/embed/guide</a>. Makro Gmap zde funguje pouze v kombinaci s vloženým klíčem."
   hidden_macros_in_toolbar_info: "Všechna dostupná makra, která může přihlášený uživatel použít, jsou uvedena prostřednictvím tlačítka makro na panelu nástrojů wiki. Makra zde označená nejsou nabízena k výběru. To vám umožní omezit rozsah seznamu."
   info_hidden_roles_html: "Skryté role lze použít pouze spolu s viditelností uživatele \"Members of visible projects\". Pokud uživatel není v roli, která je viditelná pro aktuálního uživatele, je tato role včetně uživatele skryta na stránce s přehledem projektu a v seznamech dotazů."
   info_issue_hide_max_attachments: "Pokud je zde zadán vyšší počet souborů, zobrazí se všechny přílohy k danému vydání skrytě."
+  info_issue_link_category: "Propojí kategorii (na stránce úkolu a ve sloupcích seznamů úkolů) se seznamem úkolů příslušného projektu filtrovaným podle této kategorie."
   info_live_search_result_restriction: "Výsledky vyhledávání LiveSearch jsou omezeny na %{value} zásahy. Zkuste své hledání popsat podrobněji."
   label_account_login_bottom: "Text pro přihlašovací stránku"
   label_activate_quickstart: Aktivovat quickstart
@@ -73,9 +75,12 @@ cs:
   label_additionals: Additionals
   label_additionals_feed: Atom+RSS Feed
   label_additionals_message: "Zpráva"
+  label_all_active_users: "Všichni aktivní uživatelé"
   label_all_projects: "Všechny projekty"
+  label_all_users: "Všichni uživatelé"
   label_app_menu: App menu
   label_auto_watch_on_issue_assigned: "Lístky, které mi byly přiděleny"
+  label_calendar_week: "CW %{week}"
   label_change_is_private: "Změnit soukromé / neveřejné"
   label_change_to_dashboard: "Přepnout na Dashboard"
   label_chart_color_schema: "Barevné schéma grafů"
@@ -83,7 +88,6 @@ cs:
   label_chartjs_colorscheme_info: Seznam barev
   label_content_plural: Obsah
   label_copied_to_clipboard: "Zkopírováno!"
-  label_copy_to_clipboard: "Zkopírovat do schránky"
   label_custom_field_editable_info: "Pokud jsou změny zakázány, jsou možné pouze pomocí volání API nebo prostřednictvím hromadných úprav."
   label_custom_fields_distribution: "Vlastní pole pro distribuci"
   label_daily: denně
@@ -92,8 +96,10 @@ cs:
   label_dashboard_block_info_async: "Tento blok se načítá asynchronně a ukládá se do mezipaměti po dobu %{time}."
   label_dashboard_legacy_left: "Zbývá standardní obsah"
   label_dashboard_legacy_right: "Standardní obsahové právo"
+  label_dashboard_lock: Aktivovat zámek dashboardu
   label_dashboard_lock_is_active: "Dashboard Zámek je aktivní"
   label_dashboard_plural: Dashboards
+  label_dashboard_unlock: Odstranit zámek dashboardu
   label_day: den
   label_default_sort_by: "Výchozí třídění podle"
   label_disable_sidebar: "Zakázat sidebar"
@@ -104,6 +110,16 @@ cs:
   label_enable_auto_refresh: "Povolit automatické obnovení"
   label_enable_sidebar: "Umožnit sidebar"
   label_global_footer: "Široká zápatí projektu"
+  label_global_search: "Globalni vyhledavani"
+  label_global_search_always_bookmarks: "Moje záložky (vždy)"
+  label_global_search_always_global: "Vsechny projekty (vzdy)"
+  label_global_search_clear_all: "Vymazat vše"
+  label_global_search_in_all_projects: "ve všech projektech"
+  label_global_search_in_my_bookmarks: "v mých projektech ze záložek"
+  label_global_search_in_titles: "v názvech"
+  label_global_search_placeholder: "Zadejte pro vyhledavani..."
+  label_global_search_recent_projects: "Nedávno použité projekty"
+  label_global_search_recent_searches: "Nedávno hledané"
   label_global_sidebar: "Globální postranní panel"
   label_global_wiki_sidebar: "Globální postranní panel wiki"
   label_go_to_top: "Go to top"
@@ -119,11 +135,13 @@ cs:
   label_issue_auto_assign: "Pokud \"Assigned to\" není přiřazeno uživateli a nový stav problému je x, pak je problém automaticky přiřazen první skupině s uživateli s předdefinovanou rolí."
   label_issue_change_status: "Změnit stav"
   label_issue_change_status_in_sidebar: "Stav vydání na postranním panelu"
-  label_issue_current_user_status: "Current issue status x is only allowed if \"Assignee\" is the current user."
+  label_issue_current_user_status: "Aktuální status úkolu x je povolen pouze pokud \"Řešitel\" je aktuální uživatel."
   label_issue_fast_description_edit: "Rychlá úprava popisu"
   label_issue_freezed_with_close: "Zakázat úpravy uzavřených čísel (Freeze)"
   label_issue_genitive: "Úkol"
   label_issue_hide_max_attachments: "Zobrazit max. soubory"
+  label_issue_link_category: "Propojit kategorii"
+  label_issue_link_category_title: "Zobrazit úkoly s touto kategorií"
   label_issue_note_with_author: "Zobrazit autora úlohy s poznámkou"
   label_issue_status_change: "If \"Assignee\" is unchanged and the issue status changed from x to y, than the author is assigned to the issue"
   label_issue_timelog_required: "Časový záznam potřebných problémů"
@@ -152,6 +170,7 @@ cs:
   label_percentage: "Procento"
   label_project_information: "Informace o projektu"
   label_project_list: "Seznam projektů"
+  label_project_scope: "z projektu"
   label_project_setting: "Projekt"
   label_quantity: "Množství"
   label_query_delete: "Smazat dotaz"
@@ -159,12 +178,15 @@ cs:
   label_query_name_search: "Hledejte jméno"
   label_query_with_name: "Query: %{value}"
   label_quickstart: Quickstart
+  label_recently_updated_pages: Updated pages
   label_reddit_subject: Reddit subject
   label_reddit_user_account: Reddit user account
   label_redmine_org_issue: Redmine.org issue
   label_redmine_org_wiki: Redmine.org wiki page
+  label_relation_remove: Odstranit vazbu
   label_remove_help: "Remove 'Help' from top menu"
   label_search_by_name: "Hledat podle jména"
+  label_search_scope: "Rozsah hledani"
   label_settings_macros: "Makra"
   label_settings_menu: "Menu"
   label_shared_dashboard_plural: "Sdíleno dashboards"
@@ -183,6 +205,7 @@ cs:
   label_uptime: Uptime
   label_user_is_author_of: "Tento uživatel je autorem tohoto %{entity}."
   label_user_list: "Seznam uživatelů"
+  label_visibility_groups: pouze pro tyto skupiny
   label_web_apis: Web APIs
   label_weekly: "týdně"
   label_wiki_pdf_remove_attachments: "Odebrat přílohy ze zobrazení PDF"
@@ -204,14 +227,13 @@ cs:
   permission_edit_closed_issues: "Upravit uzavřené úkoly"
   permission_edit_issue_author: "Upravit autora úkolu"
   permission_issue_timelog_never_required: "Časování není nutné"
-  permission_log_time_on_closed_issues: "Zapisovat čas na uzavřené úkoly"
   permission_save_dashboards: "Uložte řídicí panely"
   permission_set_system_dashboards: "Nastavit systémové panely"
   permission_share_dashboards: "Sdílejte řídicí panely"
   permission_show_hidden_roles_in_memberbox: "Zobrazit skryté role"
-  remove_help_info: "Remove the item 'Help' from the top menu."
+  remove_help_info: "Odebrat položku 'Nápověda' z hlavního menu."
   rule_issue_auto_assign_info: "Případ použití: Autor úkolu neví, komu úkol přiřadit nebo kdo bude odpovědný za jeho vyřešení. V takovém případě je například úloha se stavem „Úkol“ automaticky přiřazena k první skupině, která obsahuje uživatele předvolené role vedoucího projektu."
-  rule_issue_current_user_status_info_html: "This function together with the setting \"Issue status on sidebar\" automatically assigns the current user to the newly selected status.<br />Use Case: A user should only be able to set the status to \"In Progress\" for oneself when working on the ticket by oneself."
+  rule_issue_current_user_status_info_html: "Tato funkce společně s nastavením \"Issue status on sidebar\" automaticky přiřadí aktuálního uživatele k nově vybranému statusu.<br />Příklad použití: Uživatel by měl mít možnost nastavit status na \"Probíhá\" pouze pro sebe, pokud na úkolu pracuje sám."
   rule_issue_freezed_with_close_info: "Pokud je tato možnost aktivována, již uzavřené problémy již nelze upravovat a komentovat. Ani přes mail nebo API. Toto omezení se nevztahuje na uživatelské role s povolením \"Edit closed issues\"."
   rule_issue_status_change_info: "Případ použití: problémy by měly být automaticky přiřazeny autorovi, pokud se stav změní na \"Approval\"."
   rule_issue_timelog_required_info_html: 'Pro každý úkol vybraných sledovačů je nutná časová rezervace, pokud má lístek obdržet jednu z definovaných stavových vlastností. Rezervace času není nutná, pokud:<br />- neexistují žádná práva na vytvoření časových rezervací.<br />- uživatel má oprávnění "Time logging not required"<br />Případ použití: Pro přijetí tipu se stavem "To verify" je vyžadován také strávený čas.'
@@ -224,3 +246,5 @@ cs:
   field_watched_by_me: "Sledováno mnou"
   label_with_amount: "Částka %{value}"
   label_list_all_entries: "Seznam všech %{value}"
+  text_dashboard_lock_confirmation: Opravdu chcete zamknout tento dashboard?
+  text_dashboard_unlock_confirmation: Opravdu chcete odemknout tento dashboard?

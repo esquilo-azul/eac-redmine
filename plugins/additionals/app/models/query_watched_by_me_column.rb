@@ -5,6 +5,7 @@ class QueryWatchedByMeColumn < QueryColumn
     super :watched_by_me, caption: :field_watched_by_me, sortable: order_sql(queried_class)
   end
 
+  # NOTE: we overwrite value_object, because we cannot change method name
   def value_object(object)
     object.watched_by? User.current
   end

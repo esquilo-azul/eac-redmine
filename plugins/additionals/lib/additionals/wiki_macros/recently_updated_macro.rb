@@ -9,7 +9,7 @@ module Additionals
 
     Syntax:
 
-      {{recently_updated([days])}}
+      {{recently_updated([days, title=STRING, limit=NUMBER])}}
 
     Scope:
 
@@ -17,44 +17,31 @@ module Additionals
 
     Examples:
 
-      {{recently_updated}} - List last updated pages (of the last 5 days)
-      {{recently_updated(15)}} - List last updated pages of the last 15 days
+      {{recently_updated}} - List last updated pages with default i18n title
+      {{recently_updated(15)}} - List last updated pages of the last 15 days with default i18n title
+      {{recently_updated(7, title=Recent changes)}} - List with custom title
+      {{recently_updated(7, title=false)}} - List without title (also works: title=none, title=off)
+      {{recently_updated(7, limit=10)}} - List at most 10 pages
         DESCRIPTION
 
         macro :recently_updated do |obj, args|
           page = obj.page
-          return unless page
+          return '' unless page&.project
 
-          project = page.project
-          return unless project
+          args, options = extract_macro_options args, :title, :limit
+          days = args.first&.strip&.to_i || 7
+          return '' if days < 1
 
-          days = 5
-          days = args[0].strip.to_i unless args.empty?
+          pages = WikiPage.recently_updated page.wiki, days:, limit: options[:limit]
 
-          return if days < 1
+          # title handling: not specified = i18n default, title=false/none/off = no title, title=text = custom text
+          title = if options.key? :title
+                    options[:title] if options[:title].present? && %w[false none off].exclude?(options[:title])
+                  else
+                    l :label_recently_updated_pages
+                  end
 
-          pages = WikiPage.joins(:content)
-                          .where(wiki_id: page.wiki_id)
-                          .where(wiki_contents: { updated_on: (User.current.today - days)... })
-                          .order("#{WikiContent.table_name}.updated_on desc")
-
-          pages = pages.visible User.current, project: project if pages.respond_to? :visible
-
-          s = []
-          date = nil
-          pages.each do |page_raw|
-            content = page_raw.content
-            updated_on = Date.new content.updated_on.year, content.updated_on.month, content.updated_on.day
-            if date != updated_on
-              date = updated_on
-              s << tag.strong(format_date(date))
-              s << tag.br
-            end
-            s << link_to(content.page.pretty_title,
-                         controller: 'wiki', action: 'show', project_id: content.page.project, id: content.page.title)
-            s << tag.br
-          end
-          tag.div safe_join(s), class: 'recently-updated'
+          render_recently_updated_wiki_pages pages, title:
         end
       end
     end

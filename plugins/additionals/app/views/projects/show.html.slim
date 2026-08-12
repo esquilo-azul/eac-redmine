@@ -11,7 +11,7 @@
                              wrapper_css: 'dashboard-locked',
                              plugin: ''
     - else
-      = form_tag _add_block_dashboard_path(@project, @dashboard), remote: true, id: 'block-form', authenticity_token: true do
+      = remote_form_tag _add_block_dashboard_path(@project, @dashboard), id: 'block-form', authenticity_token: true do
         = dashboard_block_select_tag @dashboard
 
   = actions_dropdown do
@@ -49,9 +49,24 @@
                 new_project_dashboard_path(@project),
                 class: 'icon icon-add new-additionals-dashboard'
       - if @dashboard&.editable?
-        = link_to sprite_icon('edit', l(:button_dashboard_edit)),
+        = link_to sprite_icon('edit', entity_headline(object_name: :label_dashboard, type: :edit)),
                   edit_project_dashboard_path(@project, @dashboard),
                   class: 'icon icon-edit'
+        = link_to sprite_icon('copy', entity_headline(object_name: :label_dashboard, type: :copy)),
+                  new_project_dashboard_path(@project, copy: @dashboard.id),
+                  class: 'icon icon-copy'
+        - if @dashboard.locked?
+          = link_to svg_icon_tag('unlock', label: :label_dashboard_unlock, plugin: ''),
+                    unlock_project_dashboard_path(@project, @dashboard),
+                    data: { confirm: l(:text_dashboard_unlock_confirmation) },
+                    method: :put,
+                    class: 'icon icon-unlock'
+        - else
+          = link_to svg_icon_tag('lock', label: :label_dashboard_lock, plugin: ''),
+                    lock_project_dashboard_path(@project, @dashboard),
+                    data: { confirm: l(:text_dashboard_lock_confirmation) },
+                    method: :put,
+                    class: 'icon icon-lock'
 
     - if @dashboard&.deletable?
       = delete_dashboard_link project_dashboard_path(@project, @dashboard), @dashboard
@@ -67,14 +82,7 @@
 
 h2 = project_overview_name @project, @dashboard
 
-- unless @project.active?
-  p.warning
-    =
-    span.icon.icon-lock
-      = sprite_icon 'lock', l(:text_project_closed)
-
 = render 'common/dashboard', dashboard: @dashboard
-= content_for :render_async
 
 javascript:
   $(function() {

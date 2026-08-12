@@ -1,13 +1,18 @@
 {
-  "extends": "stylelint-config-standard",
+  "extends": [
+    "stylelint-config-standard",
+    "@stylistic/stylelint-config"
+  ],
+  "plugins": [
+    "stylelint-declaration-strict-value"
+  ],
   "rules": {
-    "string-quotes": "single",
-    "selector-nested-pattern": "false",
-    "selector-class-pattern": "^([a-z][a-z0-9]*)(-[a-z0-9]+)*$|block_column",
+    "@stylistic/string-quotes": "single",
+    "color-named": "never",
+    "comment-word-disallowed-list": ["TODO", "FIXME", "HACK", "XXX"],
+    "declaration-block-no-redundant-longhand-properties": null,
     "declaration-property-unit-disallowed-list": {
-      "font-size": [
-        "px"
-      ]
+      "font-size": ["px"]
     },
     "font-family-no-missing-generic-family-keyword": [
       true,
@@ -21,6 +26,38 @@
           "Noto Color Emoji"
         ]
       }
-    ]
+    ],
+    "max-nesting-depth": 3,
+    "media-feature-range-notation": null,
+    "no-unknown-animations": true,
+    "property-no-deprecated": null,
+    "scale-unlimited/declaration-strict-value": [
+      [
+        "color",
+        "background-color",
+        "border-color",
+        "border-top-color",
+        "border-right-color",
+        "border-bottom-color",
+        "border-left-color",
+        "outline-color",
+        "fill",
+        "stroke",
+        "font-size"
+      ],
+      {
+        "ignoreValues": ["inherit", "initial", "transparent", "currentColor", "currentcolor", "none", "0", "100%"],
+        "disableFix": true,
+        "message": "Use CSS variables instead of hardcoded values for '${types}'"
+      }
+    ],
+    "selector-class-pattern": "^([a-z][a-z0-9]*)([a-z0-9_-])*$",
+    "selector-id-pattern": "^([a-z][a-z0-9]*)([a-z0-9_-])*$",
+    "selector-max-combinators": 3,
+    "selector-max-compound-selectors": 4,
+    "selector-max-id": 1,
+    "selector-max-type": 3,
+    "selector-max-universal": 0,
+    "selector-nested-pattern": "false"
   }
 }

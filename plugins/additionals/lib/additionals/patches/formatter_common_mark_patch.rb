@@ -10,16 +10,22 @@ module Additionals
       end
 
       module InstanceOverwriteMethods
+        # Smileys and emojis are applied on top of core's finished html rather
+        # than by restating its pipeline (parser, sanitizer, scrubber order).
+        #
+        # They cannot join core's scrubber run either: each replaces its text
+        # node, so within one pass the second one would no longer find the node
+        # the first has swapped out - ":) and :smile:" would lose the emoji.
+        # Hence the separate passes, in that order.
         def to_html(*_args)
-          return super unless Additionals.setting?(:legacy_smiley_support) || Additionals.setting?(:emoji_support)
+          html = super
+          return html unless Additionals.setting?(:legacy_smiley_support) || Additionals.setting?(:emoji_support)
 
-          filters = Redmine::WikiFormatting::CommonMark::MarkdownPipeline.filters.dup
-          filters << Additionals::WikiFormatting::CommonMark::SmileyFilter if Additionals.setting? :legacy_smiley_support
-          filters << Additionals::WikiFormatting::CommonMark::EmojiFilter if Additionals.setting? :emoji_support
-          pipeline = HTML::Pipeline.new filters, Redmine::WikiFormatting::CommonMark::PIPELINE_CONFIG
+          fragment = Redmine::WikiFormatting::HtmlParser.parse html
+          fragment.scrub! Additionals::WikiFormatting::CommonMark::SmileyScrubber.new if Additionals.setting? :legacy_smiley_support
+          fragment.scrub! Additionals::WikiFormatting::CommonMark::EmojiScrubber.new if Additionals.setting? :emoji_support
 
-          result = pipeline.call @text
-          result[:output].to_s
+          fragment.to_s
         end
       end
     end

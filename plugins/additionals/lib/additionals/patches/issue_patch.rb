@@ -8,6 +8,11 @@ module Additionals
       included do
         prepend InstanceOverwriteMethods
         include InstanceMethods
+        # EntityMethodsGlobal is meant for every entity including core ones, but
+        # Issue only received it because additional_tags happened to mix it in.
+        # Plugins call Issue.load_visible_notes_count and friends, so the entity
+        # this plugin family revolves around has to carry them on its own.
+        include Additionals::EntityMethodsGlobal
 
         validate :validate_change_on_closed
         validate :validate_timelog_required
@@ -15,7 +20,11 @@ module Additionals
         before_validation :auto_assigned_to
         before_save :change_status_with_assigned_to_change
 
-        after_commit :add_assigned_watcher
+        # Redmine core auto-watches the assignee only when the assignment changes
+        # on an existing issue (Journal#watchable_users, issue_assigned_to_me
+        # preference); it does not cover assigning directly on issue creation.
+        # Fill that gap here using the same core preference.
+        after_create_commit :add_assigned_watcher
 
         safe_attributes 'author_id',
                         if: proc { |issue, user|
@@ -46,26 +55,21 @@ module Additionals
 
       module InstanceMethods
         def add_assigned_watcher
-          return unless assigned_to_id
           return unless assigned_to.is_a? User
-          return unless author.pref.auto_watch_on? 'issue_assigned'
+          return unless assigned_to.pref.auto_watch_on? 'issue_assigned_to_me'
           return if watcher_user_ids.include? assigned_to_id
           return unless assigned_to.active?
 
           set_watcher assigned_to, true
         end
 
-        def sidbar_change_status_allowed_to(user, new_status_id = nil)
+        def sidebar_change_status_allowed_to(user, new_status_id = nil)
           statuses = new_statuses_allowed_to user
           if new_status_id.present?
             statuses.detect { |s| new_status_id == s.id && !timelog_required?(s.id) }
           else
             statuses.reject { |s| timelog_required? s.id }
           end
-        end
-
-        def log_time_allowed?(user = User.current)
-          !status_was.is_closed || user.allowed_to?(:log_time_on_closed_issues, project)
         end
       end
 
@@ -102,7 +106,7 @@ module Additionals
         principals_by_role = project.principals_by_role
         return if principals_by_role[manager_role].blank?
 
-        users_list = principals_by_role[manager_role].select { |u| u.is_a? User }
+        users_list = principals_by_role[manager_role].grep User
         return if users_list.blank?
 
         users_list.first.id

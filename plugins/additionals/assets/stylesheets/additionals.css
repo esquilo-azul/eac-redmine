@@ -1,4 +1,4 @@
-#top-menu a.top-submenu {
+.top-menu a.top-submenu {
   padding-bottom: 10px;
 }
 
@@ -29,7 +29,7 @@ input[type='search']:active#search {
 .dashboard-description {
   color: var(--a-color-dark);
   margin-bottom: 15px;
-  font-size: 95%;
+  font-size: var(--a-font-size-md);
 }
 
 span.dashboard-locked {
@@ -72,12 +72,37 @@ em.info a.external {
   padding-right: 2px;
 }
 
-.icon-svg.disabled { stroke: #aaa; }
+.icon-svg.disabled { stroke: var(--a-color-disabled); }
+
+/* async loading spinner (dashboard blocks) */
+svg.icon-svg.additionals-spin {
+  transform-origin: center;
+  animation: additionals-spin 1s linear infinite;
+}
+
+@keyframes additionals-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* {{fa}} wiki macro icon: follow the surrounding text color (or the color
+   option set on the wrapper) */
+svg.icon-svg.additionals-macro-icon { stroke: currentcolor; }
 
 svg.icon-svg.smiley {
-  fill: #edae40;
+  fill: var(--a-color-smiley);
   stroke-width: 2;
 }
+
+svg.icon-svg.info-smiley { stroke-width: 2; }
+
+.icon-smiley-check svg.icon-svg.info-smiley,
+.icon-smiley-success svg.icon-svg.info-smiley { stroke: var(--a-color-success); }
+
+.icon-smiley-exclamation svg.icon-svg.info-smiley,
+.icon-smiley-failure svg.icon-svg.info-smiley { stroke: var(--a-color-warning); }
+
+.icon-smiley-question svg.icon-svg.info-smiley { stroke: var(--a-color-help); }
 
 ul.dashboard-list {
   padding-left: 20px;
@@ -114,6 +139,16 @@ svg.s64 {
   height: 64px;
 }
 
+svg.s50 {
+  width: 50px;
+  height: 50px;
+}
+
+svg.s40 {
+  width: 40px;
+  height: 40px;
+}
+
 svg.s32 {
   width: 32px;
   height: 32px;
@@ -122,6 +157,11 @@ svg.s32 {
 svg.s24 {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+svg.s22 {
+  width: 22px;
+  height: 22px;
 }
 
 svg.s16 {
@@ -146,7 +186,11 @@ svg.dashboard-system-default.global {
   text-decoration: none;
 }
 
-.sudo-admin { color: var(--a-color-alert); }
+/* Warning ring around the account avatar while redmine_sudo admin permission is
+   active. redmine_sudo adds the `sudo-active` class to #account. */
+#account.sudo-active .dropdown-trigger .avatar {
+  box-shadow: 0 0 0 2px var(--a-color-alert);
+}
 
 .nodata.nodata-left { text-align: left; }
 
@@ -154,20 +198,30 @@ svg.dashboard-system-default.global {
 .gototop {
   margin-top: 20px;
   text-align: right;
-  padding: 10px 0;
+}
+
+/* Padding on the link itself, so the clickable area is a comfortably sized
+   target on the right instead of spanning the full page width */
+.gototop a {
+  display: inline-block;
+  padding: 10px 15px;
+}
+
+.gototop a:hover {
+  background-color: var(--a-color-bg-subtle);
 }
 
 /* Footer */
 .additionals-footer {
   text-align: center;
-  font-size: 90%;
+  font-size: var(--a-font-size-sm);
 }
 
 .login-additionals {
   margin-left: auto;
   margin-right: auto;
   max-width: 490px;
-  font-size: 95%;
+  font-size: var(--a-font-size-md);
 }
 
 /* stylelint-disable selector-class-pattern */
@@ -183,7 +237,7 @@ additionals-emoji {
   display: inline-flex;
   vertical-align: baseline;
   font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  font-size: 1.2em;
+  font-size: var(--a-font-size-emoji);
   line-height: 1;
 }
 /* stylelint-enable selector-type-no-unknown */
@@ -208,7 +262,7 @@ div.clear-both { clear: both; }
 
 .clipboard-text { cursor: pointer; }
 
-img.additionals-avatar { margin-right: 0.25em; }
+.additionals-avatar { margin-right: 0.25em; }
 
 .dashboard-block h3 svg,
 #page-title svg {
@@ -223,7 +277,7 @@ h2#page-title {
 }
 
 h2#page-title input {
-  font-size: 1rem;
+  font-size: var(--a-font-size-lg);
 }
 
 .with-list-seperator::after {
@@ -248,38 +302,55 @@ div.macro-desc {
   border-bottom: 1px solid #eee;
 }
 
-#top-menu li:hover ul.menu-children,
-#top-menu li ul.menu-children.visible { display: block; }
-
-#top-menu .menu-children {
-  display: none;
-  position: absolute;
-  width: inherit;
-  z-index: 45;
-  background-color: var(--a-color-white);
-  box-shadow: 2px 2px 14px var(--a-color-black);
-  top: 17px;
-  font-size: 110%;
+/* Top-menu submenu flyouts. On pointer devices they open on hover; touch
+   devices toggle the `visible` class via JS (see top_menu_dropdown.js). */
+@media (hover: hover) {
+  .top-menu li:hover ul.menu-children { display: block; }
 }
 
-#top-menu .menu-children li {
+.top-menu li ul.menu-children.visible { display: block; }
+
+.top-menu .menu-children {
+  display: none;
+  position: absolute;
+  min-width: 160px;
+  z-index: 45;
+  background-color: var(--oc-white);
+  border: 1px solid var(--oc-gray-4);
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
+  top: 17px;
+  max-height: calc(100vh - 60px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-size: var(--a-font-size-sm);
+}
+
+.top-menu .menu-children li {
   float: left;
   clear: both;
   width: 100%;
 }
 
-#top-menu .menu-children li a {
-  display: block;
-  color: var(--a-color-dark);
-  padding: 5px 10px;
-  background-color: var(--a-color-white);
+.top-menu .menu-children li a {
+  display: flex;
+  gap: 0.4em; /* flex layout trims the whitespace between a leading icon and its label */
+  color: var(--oc-blue-9);
+  padding: 8px 16px;
   font-weight: normal;
   margin-right: 0;
 }
 
-#top-menu .menu-children li a:hover {
-  color: var(--a-color-white);
-  background-color: #759fcf;
+/* submenu icons follow the link text color (the dropdown has a light
+   background, so they must not inherit the top-menu bar's white stroke) */
+.top-menu .menu-children a svg.icon-svg {
+  stroke: currentcolor;
+}
+
+.top-menu .menu-children li a:hover {
+  color: var(--oc-blue-9);
+  background-color: var(--oc-gray-1);
+  text-decoration: none;
 }
 
 input.livesearch {
@@ -298,14 +369,22 @@ div.additionals-projects li.project a.icon {
   margin-left: 3px;
 }
 
-.relation-links a.icon-del {
+.relation-links a.icon-del,
+.relation-links a.icon-link-break {
   opacity: 0.4;
-  margin-left: 5px;
 }
 
-.relation-links a.icon-del:hover {
+.relation-links a.icon-del:hover,
+.relation-links a.icon-link-break:hover {
   opacity: 1;
 }
+
+#sidebar .relation-links a.icon-del,
+#sidebar .relation-links a.icon-link-break {
+  opacity: unset;
+}
+
+a.link-remove { margin-left: 5px; }
 
 div.additionals-projects li.project.even,
 div.additionals-projects li.project.odd {
@@ -355,8 +434,34 @@ table.table-of-values caption {
   padding-left: 0;
 }
 
-.additionals-number-positive { color: green; }
-.additionals-number-negative { color: #cb2525; }
+.additionals-number-positive { color: var(--a-color-success); }
+.additionals-number-negative { color: var(--a-color-alert); }
+
+/* Name/value pairs in a sidebar: a list of properties, label in front of the
+   value. Shared here so every plugin renders sidebar attributes alike - Redmine
+   uses the same list markup for user attributes in its core view.
+
+   Flowing instead of fixed columns on purpose: a sidebar is narrow, and a long
+   value (address, link) wraps below its label rather than being squeezed into a
+   rest column. Margin, padding and bullets already come from Redmine's
+   "#sidebar ul" rules, so only the label needs styling here. */
+.sidebar-attributes span.label {
+  margin-right: 3px;
+  font-weight: bold;
+  line-height: 1.3em;
+}
+
+/* String and text values are rendered as wiki content, so their paragraph would
+   add vertical margins inside the row. Written per field type, like Redmine does
+   for issue attributes. */
+.sidebar-attributes .string_cf .wiki p,
+.sidebar-attributes .link_cf .wiki p {
+  margin-block: 0;
+}
+
+.sidebar-attributes .text_cf .wiki p:first-of-type {
+  margin-block-start: 0;
+}
 
 /* stylelint-disable selector-class-pattern */
 .jstb_macros {
@@ -370,19 +475,30 @@ div.relation-list-header {
   padding-bottom: 2px;
 }
 
-div.splitcontent.dashboard {
+.splitcontent.dashboard {
   margin-bottom: 20px;
 }
 
-.splitcontentbottom {
+.dashboard .splitcontentbottom {
   flex: 1;
   flex-basis: 100%;
+}
+
+.dashboard .splitcontenttop,
+.dashboard .splitcontentbottom {
+  width: 100%;
+}
+
+.dashboard .splitcontentright,
+.dashboard .splitcontentleft {
+  width: 50%;
 }
 
 select.dashboard-block-select {
   min-width: 200px;
 }
 
+/* stylelint-disable selector-max-id */
 #my-page.dashboard #list-left .tabular.settings p,
 #my-page.dashboard #list-right .tabular.settings p {
   padding-left: 0;
@@ -394,13 +510,14 @@ select.dashboard-block-select {
   width: 100%;
   text-align: left;
 }
+/* stylelint-enable selector-max-id */
 
 div.drdn-items a.disabled,
-div.drdn-items a.disabled:hover { color: #aaa; }
+div.drdn-items a.disabled:hover { color: var(--a-color-disabled); }
 
 table.entity-list td.block_column {
   color: var(--a-color-info);
-  font-size: 90%;
+  font-size: var(--a-font-size-sm);
   padding: 4px 4px 4px 2px;
   text-align: left;
   white-space: normal;
@@ -427,18 +544,61 @@ table.entity-list td.block_column pre {
 }
 
 .badge-author {
-  color: #696969;
-  border: 1px solid #696969;
+  color: var(--a-color-author);
+  border: 1px solid var(--a-color-author);
 }
 
-#history.entity .note-header span {
+#history.entity .journal-header .journal-info span {
   margin-left: 4px;
+}
+
+#sidebar div.wiki ul.wiki-flat {
+  margin: 0;
+  padding: 0;
+}
+
+#sidebar div.wiki ul.wiki-flat li {
+  list-style-type: none;
+  margin: 0 2px 0 0;
+  padding: 0;
+}
+
+.nowrap { white-space: nowrap; }
+
+/* Dashboard block: summary stats */
+
+.dashboard-block li.summary-stat {
+  display: flex;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--a-color-border-light);
+}
+
+.dashboard-block .summary-stat-label {
+  flex: 1;
+  color: var(--a-color-text-muted);
+}
+
+.dashboard-block .summary-stat-value {
+  font-weight: 600;
+}
+
+.dashboard-block .summary-section-label {
+  display: block;
+  font-size: var(--a-font-size-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 8px 0 4px;
+  color: var(--a-color-text-muted);
 }
 
 @media screen and (max-width: 899px) {
   .gototop { display: none; }
 
-  .splitcontentbottom {
+  .dashboard .splitcontentleft,
+  .dashboard .splitcontentright,
+  .dashboard .splitcontentbottom {
     width: 100%;
     flex: auto;
     margin-right: 0;

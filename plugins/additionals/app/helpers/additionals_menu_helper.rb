@@ -7,7 +7,7 @@ module AdditionalsMenuHelper
     if Additionals.setting? :remove_help
       Redmine::MenuManager.map(:top_menu).delete(:help) if Redmine::MenuManager.map(:top_menu).exists?(:help)
     elsif User.current.logged?
-      handle_top_submenu_item :help, url: '#', symbol: 'fas_question', last: true
+      handle_top_submenu_item :help, url: Redmine::Info.help_url, symbol: 'fas_question', last: true
       @additionals_help_items = additionals_help_menu_items
     else
       handle_top_menu_item :help, url: Redmine::Info.help_url, symbol: 'fas_question', last: true
@@ -31,15 +31,15 @@ module AdditionalsMenuHelper
 
     html_options[:title] = title if title.present?
 
-    menu_options = { parent: parent.present? ? parent.to_sym : nil,
+    menu_options = { parent: parent.presence&.to_sym,
                      html: html_options }
 
     menu_options[:if] = onlyif if onlyif.present?
 
     menu_options[:caption] = if symbol.present? && name.present?
-                               font_awesome_icon symbol, post_text: name
+                               additionals_icon symbol, post_text: name
                              elsif symbol.present?
-                               font_awesome_icon symbol
+                               additionals_icon symbol
                              elsif name.present?
                                name.to_s
                              end
@@ -68,9 +68,6 @@ module AdditionalsMenuHelper
     admin_items = [{ title: 'Redmine Changelog',
                      url: "https://www.redmine.org/projects/redmine/wiki/Changelog_#{Redmine::VERSION::MAJOR}_#{Redmine::VERSION::MINOR}",
                      id: :changelog },
-                   { title: 'Redmine Upgrade',
-                     url: 'https://www.redmine.org/projects/redmine/wiki/RedmineUpgrade',
-                     id: :redmine_upgrade },
                    { title: 'Redmine Security Advisories',
                      url: 'https://www.redmine.org/projects/redmine/wiki/Security_Advisories',
                      id: :security_advisories }]

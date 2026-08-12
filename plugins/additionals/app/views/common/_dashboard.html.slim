@@ -1,9 +1,7 @@
 = call_hook :view_dashboard_top, dashboard:, project: @project
 
 #my-page.splitcontent class="#{dashboard_css_classes dashboard}"
-  - dashboard.available_groups.each do |group|
-    .block-receiver id="list-#{group}" class="splitcontent#{group}"
-      = render_dashboard_blocks dashboard.layout[group], dashboard
+  = render_dashboard_groups dashboard, can_sort: dashboard.editable? && !dashboard.locked?
 
 = call_hook :view_dashboard_bottom, dashboard:, project: @project
 
@@ -13,9 +11,10 @@
 / (this should always set, because to support new entries)
 - include_calendar_headers_tags
 
-- if dashboard.content.with_chartjs?
+- libraries = dashboard_required_libraries dashboard
+- if libraries.any?
   - content_for :header_tags do
-    = additionals_library_load %i[chartjs chartjs_colorschemes chartjs_datalabels chartjs_annotation chartjs_matrix]
+    = additionals_library_load libraries
 
 javascript:
   $(function() {

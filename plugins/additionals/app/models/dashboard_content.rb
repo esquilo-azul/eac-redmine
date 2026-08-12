@@ -9,14 +9,14 @@ class DashboardContent
   DEFAULT_MAX_ENTRIES = 10
   RENDER_ASYNC_CACHE_EXPIRES_IN = 30
 
+  # Groups spanning the full width as their own row (as opposed to the 50%
+  # left/right columns). Empty ones may be skipped in read-only layouts.
+  FULL_WIDTH_GROUPS = %w[top bottom].freeze
+
   class << self
     def types
       descendants.map { |dc| dc::TYPE_NAME }
     end
-  end
-
-  def with_chartjs?
-    false
   end
 
   def initialize(attr = {})
@@ -26,6 +26,15 @@ class DashboardContent
 
   def groups
     %w[top left right bottom]
+  end
+
+  def full_width_group?(group)
+    FULL_WIDTH_GROUPS.include? group.to_s
+  end
+
+  # The 50% column groups (left/right) as opposed to the full-width rows.
+  def column_groups
+    groups - FULL_WIDTH_GROUPS
   end
 
   def block_definitions

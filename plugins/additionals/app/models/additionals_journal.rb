@@ -1,6 +1,18 @@
 # frozen_string_literal: true
 
-class AdditionalsJournal
+class AdditionalsJournal < Journal
+  # Safe defaults for non-Issue journal subclasses.
+  # Prevents errors from third-party plugins (e.g. redmine_contacts_helpdesk)
+  # that patch Journal#css_classes or #send_note and access associations
+  # not available on subclasses due to Rails _reflections fork.
+  def journal_message
+    nil
+  end
+
+  def send_note
+    nil
+  end
+
   class << self
     def save_journal_history(journal, prop_key, ids_old, ids)
       ids_all = (ids_old + ids).uniq
@@ -20,7 +32,9 @@ class AdditionalsJournal
                                              prop_key:,
                                              old_value:,
                                              value:)
-        journal.save
+        # Use save! to bypass Journal#save's journalize_changes override which
+        # would overwrite the manually built details we just appended.
+        journal.save!
       end
 
       journal
@@ -35,14 +49,24 @@ class AdditionalsJournal
       return false if new_entries.count != new_entries.uniq.count
 
       old_entries.map! { |entry| entry.send entry_id }
-      return false unless (old_entries & new_entries).count.zero?
-
-      true
+      !old_entries.intersect? new_entries
     end
 
     def set_relation_detail(entity, detail, value_key)
       value = detail.send value_key
       detail[value_key] = (entity.find_by(id: value) || value) if value.present?
+    end
+
+    # Add a system note to a journalized entity (Issue, Contact, DbEntry, etc.)
+    # Returns true if note was added successfully, false otherwise
+    def add_system_note(entity, note, user: User.current)
+      return false unless entity.respond_to? :init_journal
+
+      entity.init_journal user, note
+      entity.save!
+      true
+    rescue ActiveRecord::RecordInvalid
+      false
     end
   end
 end

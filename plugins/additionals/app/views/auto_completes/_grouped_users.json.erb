@@ -1,0 +1,42 @@
+[
+<% if with_me %>
+  <%= raw({ 'id' => me_value,
+            'text' => l(:label_me),
+            'name' => l(:label_me),
+            'value' => me_value }.to_json) %>
+  <% sep_required = true %>
+<% end %>
+<% if @involved_principals.present? %>
+<%= ',' if sep_required %>
+{
+  "text": "<%= l(:label_involved_principals) %>",
+  "children": <%= raw @involved_principals.map { |user| {
+                        'id' => user[:id],
+                        'text' => user[:name],
+                        'name' => user[:name],
+                        'value' => user[:id] } }.to_json %>
+  <% sep_required = true %>
+}
+<% end %>
+<% @grouped_user_sections.each do |label, users| %>
+<% next if users.blank? %>
+<%= ',' if sep_required %>
+{
+  "text": "<%= label %>",
+  "children": <%= raw users.map { |user| {
+                        'id' => user[:id],
+                        'text' => user[:name],
+                        'name' => user[:name],
+                        'value' => user[:id] } }.to_json %>
+  <% sep_required = true %>
+}
+<% end %>
+
+<% if with_ano %>
+  <%= ',' if sep_required %>
+  <%= raw({ 'id' => User.anonymous.id,
+            'text' => l(:label_user_anonymous),
+            'name' => l(:label_user_anonymous),
+            'value' => User.anonymous.id }.to_json) %>
+<% end %>
+]

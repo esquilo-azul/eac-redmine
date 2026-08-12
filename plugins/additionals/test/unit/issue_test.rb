@@ -7,11 +7,6 @@ class IssueTest < Additionals::TestCase
 
   def setup
     prepare_tests
-    set_language_if_valid 'en'
-  end
-
-  def teardown
-    User.current = nil
   end
 
   def test_create
@@ -160,7 +155,7 @@ class IssueTest < Additionals::TestCase
 
   def test_assigned_to_should_add_watcher
     user = users :users_003
-    user.pref.auto_watch_on = ['issue_assigned']
+    user.pref.auto_watch_on = ['issue_assigned_to_me']
     user.pref.save
     issue = Issue.new author_id: user.id, project_id: 1, tracker_id: 1, assigned_to_id: user.id, subject: 'test_assigned_should_add_watcher'
 
@@ -179,6 +174,47 @@ class IssueTest < Additionals::TestCase
       assert_no_difference 'Watcher.count' do
         assert_save issue
       end
+    end
+  end
+
+  # Regression for redmine_automation#15432: the auto-watch preference belongs
+  # to the assignee, not to the author. Stephan reported that auto-watch did
+  # not fire when he was assigned to a helpdesk ticket he had not created.
+  def test_assigned_to_should_add_watcher_when_assignee_has_pref_but_author_does_not
+    author = users :users_002
+    author.pref.auto_watch_on = []
+    author.pref.save!
+
+    assignee = users :users_003
+    assignee.pref.auto_watch_on = ['issue_assigned_to_me']
+    assignee.pref.save!
+
+    issue = Issue.new author_id: author.id, project_id: 1, tracker_id: 1, assigned_to_id: assignee.id,
+                      subject: 'test_assigned_should_add_watcher_when_assignee_has_pref'
+
+    assert_difference 'Watcher.count' do
+      assert_save issue
+    end
+    assert_includes issue.reload.watcher_user_ids, assignee.id
+  end
+
+  # Regression for redmine_automation#15432: when only the author has the
+  # auto-watch preference but the assignee does not, the assignee must NOT be
+  # added as a watcher (the buggy implementation did exactly that).
+  def test_assigned_to_should_not_add_watcher_when_only_author_has_pref
+    author = users :users_002
+    author.pref.auto_watch_on = ['issue_assigned_to_me']
+    author.pref.save!
+
+    assignee = users :users_003
+    assignee.pref.auto_watch_on = []
+    assignee.pref.save!
+
+    issue = Issue.new author_id: author.id, project_id: 1, tracker_id: 1, assigned_to_id: assignee.id,
+                      subject: 'test_assigned_should_not_add_watcher_when_only_author_has_pref'
+
+    assert_no_difference 'Watcher.count' do
+      assert_save issue
     end
   end
 end

@@ -4,6 +4,6 @@ module WikiEdit
   Deface::Override.new virtual_path: 'wiki/edit',
                        name: 'wiki-edit',
                        insert_before: 'fieldset',
-                       original: '8c202edfea8a0a74e4c3c0c4ae53e129b1d2b1ee',
+                       original: '00ce4e80d56c9bfb7d743b040266a725336fe773',
                        partial: 'hooks/view_wiki_form_bottom'
 end

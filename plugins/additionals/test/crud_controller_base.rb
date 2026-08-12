@@ -114,7 +114,7 @@ module CrudControllerBase
         assert_response :found
       end
 
-      entity = @crud[:entity].class.last
+      entity = @crud[:entity].class.order(:id).last
 
       if @crud[:created_assert].present?
         @crud[:created_assert].each do |name|
@@ -131,7 +131,12 @@ module CrudControllerBase
       return if @crud[:create_assert_equals].blank?
 
       @crud[:create_assert_equals].each do |name, value|
-        assert_equal value, entity.send(name), "Field #{name} test failed"
+        actual = entity.send name
+        if name == :tag_list
+          assert_sorted_equal value, actual.to_a, "Field #{name} test failed"
+        else
+          assert_equal value, actual, "Field #{name} test failed"
+        end
       end
     end
 
@@ -276,7 +281,7 @@ module CrudControllerBase
       end
     end
 
-    def prepare_crud_test(action, no_permission: false) # rubocop: disable Naming/PredicateMethod
+    def prepare_crud_test(action, no_permission: false)
       return false if @crud[:without_actions].present? && @crud[:without_actions].include?(action)
 
       @request.session[:user_id] = if no_permission

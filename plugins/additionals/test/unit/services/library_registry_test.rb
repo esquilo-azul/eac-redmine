@@ -1,0 +1,145 @@
+# frozen_string_literal: true
+
+require File.expand_path '../../../test_helper', __FILE__
+
+module Additionals
+  class LibraryRegistryTest < Additionals::TestCase
+    Registry = Additionals::LibraryRegistry
+
+    def test_resolves_single_atom_package
+      result = Registry.resolve :d3plus
+
+      assert_equal 1, result.size
+      assert_equal :js, result.first.type
+      assert_equal 'vendor/d3plus.min', result.first.path
+      assert_not result.first.core
+    end
+
+    def test_resolves_composite_package_in_order
+      result = Registry.resolve :chartjs
+      paths = result.map(&:path)
+
+      assert_equal %w[vendor/chart.umd vendor/chartjs-plugin-colorschemes.min], paths
+    end
+
+    def test_resolves_nested_composite_package
+      paths = Registry.resolve(:chartjs_meta).map(&:path)
+
+      assert_equal %w[vendor/chart.umd
+                      vendor/chartjs-plugin-colorschemes.min
+                      vendor/chartjs-plugin-datalabels.min
+                      vendor/chartjs-plugin-annotation.min],
+                   paths
+    end
+
+    def test_resolves_chartjs_matrix_pulls_in_moment
+      paths = Registry.resolve(:chartjs_matrix).map(&:path)
+
+      assert_includes paths, 'vendor/moment-with-locales.min'
+      assert_includes paths, 'vendor/chartjs-adapter-moment.min'
+      assert_includes paths, 'vendor/chartjs-chart-matrix.min'
+    end
+
+    def test_dedups_across_multiple_packages
+      paths = Registry.resolve(%i[chartjs chartjs]).map(&:path)
+
+      assert_equal 2, paths.size
+    end
+
+    def test_dedups_across_overlapping_packages
+      # chartjs_meta already includes chartjs; chartjs alongside it must not
+      # add chart.umd a second time.
+      paths = Registry.resolve(%i[chartjs_meta chartjs]).map(&:path)
+
+      assert_equal paths.uniq, paths
+      assert_includes paths, 'vendor/chart.umd'
+    end
+
+    def test_dedups_atoms_reachable_via_different_packages
+      # Both chartjs (composite) and chartjs_colorschemes (single atom) point
+      # at the same colorschemes file; resolution should emit it once.
+      paths = Registry.resolve(%i[chartjs chartjs_colorschemes]).map(&:path)
+      colorschemes_count = paths.count 'vendor/chartjs-plugin-colorschemes.min'
+
+      assert_equal 1, colorschemes_count
+    end
+
+    def test_resolves_dhtmlxgantt_emits_css_and_js
+      result = Registry.resolve :dhtmlxgantt
+      types = result.map(&:type)
+
+      assert_includes types, :css
+      assert_includes types, :js
+    end
+
+    def test_marks_core_assets_with_core_flag
+      actioncable = Registry.resolve(:actioncable).first
+
+      assert actioncable.core, 'actioncable atom should set core:true'
+    end
+
+    def test_raises_for_unknown_package_name
+      assert_raises ArgumentError do
+        Registry.resolve :totally_not_a_real_package
+      end
+    end
+
+    def test_resolve_accepts_single_symbol_or_array
+      single = Registry.resolve :d3plus
+      arr = Registry.resolve [:d3plus]
+
+      assert_equal single.map(&:path), arr.map(&:path)
+    end
+
+    def test_resolve_accepts_string_names
+      assert_equal Registry.resolve(:d3plus).map(&:path),
+                   Registry.resolve('d3plus').map(&:path)
+    end
+
+    def test_default_atom_plugin_is_additionals
+      assert_equal 'additionals', Registry.resolve(:d3plus).first.plugin
+    end
+
+    def test_register_makes_package_resolvable
+      Registry.register :test_pkg,
+                        [Registry::Asset.new(type: :css, path: 'my-styles', plugin: 'redmine_test')]
+      asset = Registry.resolve(:test_pkg).first
+
+      assert_equal :css, asset.type
+      assert_equal 'my-styles', asset.path
+      assert_equal 'redmine_test', asset.plugin
+    ensure
+      Registry.send(:registered).delete :test_pkg
+    end
+
+    def test_register_can_reference_built_in_packages
+      Registry.register :test_pkg,
+                        [:d3plus, Registry::Asset.new(type: :css, path: 'my-styles', plugin: 'redmine_test')]
+      paths = Registry.resolve(:test_pkg).map(&:path)
+
+      assert_equal %w[vendor/d3plus.min my-styles], paths
+    ensure
+      Registry.send(:registered).delete :test_pkg
+    end
+
+    def test_register_raises_on_built_in_collision
+      assert_raises ArgumentError do
+        Registry.register :chartjs, [Registry::Asset.new(type: :js, path: 'evil', plugin: 'redmine_test')]
+      end
+    end
+
+    def test_dedups_same_path_across_plugins_kept_separate
+      # Same file name in two different plugins must NOT be deduplicated into
+      # one -- the dedup key includes the plugin.
+      Registry.register :test_pkg,
+                        [Registry::Asset.new(type: :css, path: 'shared', plugin: 'redmine_a'),
+                         Registry::Asset.new(type: :css, path: 'shared', plugin: 'redmine_b')]
+      result = Registry.resolve :test_pkg
+
+      assert_equal 2, result.size
+      assert_equal %w[redmine_a redmine_b], result.map(&:plugin)
+    ensure
+      Registry.send(:registered).delete :test_pkg
+    end
+  end
+end

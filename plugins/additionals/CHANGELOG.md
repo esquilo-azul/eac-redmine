@@ -1,5 +1,94 @@
 # Changelog
 
+## 4.6.0
+
+- The `tabler` and `fa` macros accept a `repeat` option that renders the same icon several times, e.g. `{{tabler(star-filled, repeat=3)}}` for a rating. `text`, `title`, `color` and `link` keep applying to the group of icons instead of to each one. The count is capped at 20 rather than rejected: anyone allowed to edit a page could otherwise put thousands of svg nodes on it, while a rating scale never needs more
+- The plugin settings form falls back to the default of a setting that is missing from the stored hash. Redmine keeps the settings of a plugin in one hash and replaces it as a whole when the form is saved, so a setting introduced by a plugin update is absent from the stored hash of every installation that ever saved that form. The form rendered such a setting as empty or unchecked although the default was what actually applied, saving the form then wrote those wrong values, and a required field made the tab unsavable altogether. Applies to every configurable plugin, not only to this one
+- The `recently_updated` macro accepts a `limit` argument (`{{recently_updated(7, limit=10)}}`). Without it an active wiki fills the page with every page changed within the period, which made the macro unusable wherever the list has to stay short. Query and markup now live in `WikiPage.recently_updated` and the global helper `render_recently_updated_wiki_pages`, so plugins rendering that list somewhere else show the same pages in the same way. The scope applies the `visible` filter only if it is defined, since it is added by a plugin and absent in a plain additionals install
+- New global helper `attribute_label` renders the label of an attribute row. For a custom field it shows the description as tooltip, the same way Redmine does it for the attributes of an issue. Used by the attribute lists of wiki pages, contacts, users, tags and the project information dashboard block, where the project custom fields now show their description as well. The new `custom_field_value?` helper goes with it: a multi value custom field without any value arrives as `[nil]`, which is `present?` and would render a label without a value.
+- Require Redmine 7.0 or newer and drop Redmine 6.x compatibility
+- Replace FontAwesome with Redmine 7's Tabler SVG sprite icons throughout. Stored icon values are now plain Tabler names; legacy FontAwesome values (`fas_car`, ...) are still translated on the fly, so existing data keeps rendering. The `additionals_icon` helper and the `additionals_icon_select` / `additionals_icon_select_tag` pickers replace `font_awesome_icon` and `additionals_fontawesome_select`, and the new `{{tabler}}` wiki macro replaces `{{fa}}` (kept as a backward compatible alias). The FontAwesome webfonts, stylesheet, helper and `AdditionalsFontAwesome` model have been removed
+- The `{{fa}}` / `{{tabler}}` wiki macros resolve bare FontAwesome icon names (e.g. `{{fa(file-alt)}}`, `{{fa(wrench)}}`, `{{fa(list-ol)}}`) through the icon map, and the `size` option renders at the requested size again instead of an oversized fallback. The Tabler sprite gained additional icons (numbered list, gender, message, alert, floppy disk, ...) so heavily used legacy macro content keeps its intended symbols
+- The issue sidebar "change status" panel now uses a hollow circle for open target statuses and a check circle for closed ones, making the open/closed distinction clear (previously an ambiguous chevron square)
+- Added selectable Shelly, Victron and Zabbix brand icons to the Tabler icon picker
+- CommonMark and Textile formatting now use Redmine 7's native Loofah scrubbers; the HTML::Pipeline-based smiley and emoji filters (which Redmine 7 no longer ships) have been removed
+- Restyle the top-menu submenu dropdowns to match Redmine 7 core (open-color variables): on touch devices a submenu opens on tap, and menus taller than the viewport now scroll instead of being cut off
+- Assignee auto-watch on issue creation now uses Redmine core's `issue_assigned_to_me` preference; core already handles assignment changes on existing issues, so additionals only fills the create-time gap
+- select2 fields now match the height of Redmine 7 form controls (they were still sized for Redmine 6.1 and rendered too flat next to a native select, most visibly in query filters and the tag field). Heights derive from the new `--a-control-height` / `--a-control-line-height` / `--a-control-padding-block` variables instead of hardcoded pixels, and the multi-select choice list uses flexbox rather than floats with negative margins
+- `User.admin_column_field` falls back to `admin` while the `sudoer` column does not exist yet, so `redmine_sudo` can be installed together with other plugins in a single `redmine:plugins:migrate` (previously their migrations could run before `redmine_sudo` added the column and fail with `column users.sudoer does not exist`)
+- The `issue_assignee` and `custom_field_users` autocomplete endpoints now honour the `me_value` parameter, like `grouped_users` and `grouped_principals` already did. The `<< me >>` entry defaults to the literal `me` required by query filters, but form selects write to an `*_id` column where `me` casts to integer 0 and violates the foreign key - those callers pass the real user id instead
+- `EntityMethods` now enforces the assignee rules Redmine core applies to issues, for every entity that includes it (passwords, DB entries, AI prompts, contacts, invoices, templates, ...): an assignee who is not assignable in the entity's project is rejected with a validation error instead of reaching the database, a copy drops an assignee who is not assignable in the target project, and the literal `me` resolves to the current user on every path (form, API, bulk edit, import). Plugins previously translated `me` in their controllers, which covered only the two actions that were touched
+- Adding a dashboard block runs through AJAX again instead of reloading the whole page. The block select submitted its form with jQuery, which never emits a submit event and therefore bypassed the Stimulus `remote-form` controller introduced with the rails-ujs removal
+- d3plus updated to 4.3.0
+- mermaid 11.16.1 support (includes an upstream prototype pollution fix)
+- New shared attachment count for every entity that includes `EntityMethods`: the `attachments_count` reader with a page-wide `load_attachments_count` preload, the `QueryAttachmentsCountColumn` list column and the `initialize_attachments_count_filter` / `sql_for_attachments_count_field` query filter. Core only offers the file list, which turns into a wall of names in a list, while the count answers what is actually asked - is anything attached and how much
+- The issue attachments section can now be linked to as `#attachments`. Redmine gives `#relations` and `#issue_tree` an anchor but never gave the files one; since this plugin already replaces that block (to collapse long file lists), the anchor belongs here. Jumping straight at it expands a collapsed list, so the link never lands on a closed drawer
+- MariaDB is now documented and tested as a database of its own (11.8 or newer). It was always the mysql variant most installations actually run, since Debian and Ubuntu ship it instead of MySQL, but it was never covered by the test suite
+- Raised the minimum database versions to releases that are still supported upstream: MySQL 8.4 (8.0 reached end of life in April 2026) and PostgreSQL 16 (14 reaches it in November 2026). Every documented minimum now runs in CI, so the requirement table is backed by tests instead of assumption, and the current PostgreSQL release is additionally covered across the full ruby matrix
+- Raised the minimum ruby version to 3.3, since 3.2 reached end of life in March 2026 and no longer receives security fixes. Redmine itself still accepts 3.2, so the plugin keeps working there, but it is no longer tested against it
+- New shared style for sidebar attributes: a list marked with the class `sidebar-attributes` renders name/value pairs the same way everywhere - label in front of the value, long values wrapping below their label instead of being squeezed into a rest column, and paragraph margins removed for string, link and text custom field values. Used by the contact attributes (servicedesk), the user attributes (hrm) and the wiki page attributes (wiki_guide), which each carried their own formatting before - the hrm rule even applied to every sidebar in the application
+- New extension point `wiki_pdf_before_content` in the wiki PDF export: plugins can render content between the title line and the page body without overriding `wiki_page_to_pdf` again, which would silently drop the existing settings for removing the title line and the attachment list, depending on load order
+
+## 4.5.0
+
+- Add a configurable user scope to the core "user" custom field format (all users / all active users / project members / by role), selectable per field and available to any entity that assigns a user field. Dependent plugins enable it for their entities via `customized_class_names << 'Entity'`
+- Raise a clear, actionable error in the dashboard defaults migration when no usable owner user is found, instead of a cryptic NoMethodError #186
+- Do not convert emoji shortcodes inside links (CommonMark), so URLs containing segments like `:v:` are no longer turned into emoji #176
+- Removed `Additionals.time_zone_correct` - the method had asymmetric DST semantics (static `utc_offset` minus OS-dependent `localtime.utc_offset`) and could not correctly handle cross-timezone display. Use Rails standard timezone mechanics (`in_time_zone`, `Time.use_zone`) instead.
+- Replace the (unmaintained) `render_async` gem with a native Stimulus controller. The public `render_async` / `render_async_cache` / `render_async_cache_key` helper API is preserved; `DashboardContent::RENDER_ASYNC_CACHE_EXPIRES_IN` and the `auto_refresh` block setting behave exactly as before.
+- `DashboardAsyncBlocksController#show` now responds with `format.html` (was `format.js` with a `text/html` content-type override). Frontend requests use `Accept: text/html` plus `X-Requested-With: XMLHttpRequest`.
+- Polling-mode async blocks (blocks with `auto_refresh` enabled) automatically pause when the browser tab becomes hidden and resume with an immediate refresh when it returns. Reduces backend load for inactive tabs.
+- Copy project dashboards when a project is copied via `Project#copy`
+- Fix `NoMethodError` in `DashboardContentProject` `projectinformation` block when adding blocks to a system-default project dashboard outside any project context
+- Fix dashboard left and right columns not stacking on mobile viewports below the 899px breakpoint (regression from #200)
+- Fix PostgreSQL error in `Project#assignable_principals` and `Principal.assignable_for_issues` when chained with `.sorted`
+- Add option to include subproject news in the dashboard news block #164
+- d3plus updated to 3.1.6
+- mermaid 11.16.0 support
+
+## 4.4.0
+
+- Add global search modal (Cmd+K) with Redmine Core Fetcher and scope toggle #15206
+- Add GlobalSearch provider API with auto-discovery for plugins
+- Add plugin setting to enable/disable global search
+- Convert clipboard_feedback to Stimulus controller (jQuery removed)
+- Convert sticky_header_goto_top to Stimulus controller (jQuery removed)
+- Convert observeLiveSearchField to Stimulus controller (jQuery removed)
+- Remove jQuery dependency from additionals.js (all functions now vanilla JS)
+- Remove dead code: nativeEmojiSupport function
+- Add Vitest test suite with 107 tests and GitHub Actions workflow
+- Add dashboard copy feature with security check for editable permission #123
+- Add dashboard lock/unlock actions to action menu
+- Fix Textile RULES compatibility for Redmine Master where Filter class replaces Formatter
+- d3plus updated to 3.1.4
+- Chart.js updated to 4.5.1
+- Chart.js Plugin matrix updated to 3.0.0
+- mermaid 11.13.0 support
+- add dhtmlxgantt 9.1.4
+- remote d3.min library
+- sortable.js updated to 1.15.7
+
+## 4.3.0
+
+- Redmine 6.0 support dropped
+- Redmine 6.1 required
+- Ruby 3.2 required
+- mermaid 11.12.2 support
+- recently_updated macro uses (i18n) title as default
+- **BREAKING**: Removed clipboard.js library in favor of Redmine Core's native clipboard functionality
+  - Removed `AdditionalsClipboardjsHelper`, `clipboard.min.js`, and `setClipboardJS()` function
+  - Added `AdditionalsClipboardHelper` with `clipboard_copy_button()` and `render_text_with_clipboard()` methods
+  - Uses Redmine Core's `copyToClipboard()` with visual feedback (available since Redmine 6.1)
+  - Uses Redmine Core's i18n string `button_copy` instead of custom `label_copy_to_clipboard`
+  - Plugins using clipboard functionality need to migrate (see README for migration guide)
+
+## 4.2.0
+
+- mermaid 11.12.0 support
+- improve compatibility with other plugins #182
+- Ukrainian translation provided, thanks to Victor Вовк!
+- sortable.js added
+
 ## 4.1.0
 
 - fix deface checksum for admin/info

@@ -5,7 +5,6 @@ require File.expand_path '../../test_helper', __FILE__
 class ProjectTest < Additionals::TestCase
   def setup
     prepare_tests
-    User.current = nil
   end
 
   def test_assignable_users_amount
@@ -19,6 +18,38 @@ class ProjectTest < Additionals::TestCase
 
       assert_not_equal project.assignable_users.count, project.assignable_principals.count
     end
+  end
+
+  # PostgreSQL strict mode rejects `SELECT DISTINCT … ORDER BY users.type`
+  # when `users.type` is not in the SELECT list (raises
+  # PG::InvalidColumnReference). MySQL silently tolerates it. Materializing
+  # the relation into an Array forces query execution and surfaces the bug
+  # on PG without needing adapter-specific test branches.
+  def test_assignable_principals_can_be_materialized_with_sorted_chain
+    project = projects :projects_005
+
+    result = nil
+    assert_nothing_raised do
+      result = project.assignable_principals.to_a
+    end
+    assert_kind_of Array, result
+  end
+
+  def test_assignable_principals_returns_unique_principals
+    project = projects :projects_005
+    ids = project.assignable_principals.pluck :id
+
+    assert_equal ids.size, ids.uniq.size,
+                 'assignable_principals returned duplicate principals'
+  end
+
+  def test_assignable_principals_is_sorted_by_principal_order
+    project = projects :projects_005
+    ids = project.assignable_principals.pluck :id
+    expected = Principal.where(id: ids).sorted.pluck(:id)
+
+    assert_equal expected, ids,
+                 'assignable_principals does not respect Principal.sorted order'
   end
 
   def test_visible_users
@@ -152,5 +183,137 @@ class ProjectTest < Additionals::TestCase
     ids = Project.available_status_ids
 
     assert_operator ids.count, :>, 3
+  end
+
+  def test_assignable_users_performance
+    project = projects :projects_001
+
+    # Create sufficient test data to detect N+1 problems (minimum 15 assignable users)
+    project_role = Role.create!(
+      name: 'Project Performance Role',
+      assignable: true,
+      permissions: %i[view_issues add_issues]
+    )
+
+    # Create 15 additional users to have enough data for N+1 detection
+    created_users = []
+    15.times do |i|
+      user = User.create!(
+        login: "projectperf#{i}",
+        firstname: "ProjectPerf#{i}",
+        lastname: 'User',
+        mail: "projectperf#{i}@example.com",
+        status: User::STATUS_ACTIVE
+      )
+      created_users << user
+      Member.create! project: project, principal: user, roles: [project_role]
+    end
+
+    # Test that assignable_users doesn't cause N+1 queries
+    # With 15+ assignable users, N+1 problem would show significantly more queries
+    queries_before = count_sql_queries { project.assignable_users }
+
+    # Clear the cache and test again - should use same number of queries
+    project.reload
+    queries_after = count_sql_queries { project.assignable_users }
+
+    # The optimized version should use consistent number of queries
+    assert_operator queries_after, :<=, queries_before, 'assignable_users should not cause N+1 queries'
+    # Should be reasonable number of queries (not N+1)
+    # With N+1 problem, this would be 30+ queries (2 per user)
+    assert_operator queries_after, :<=, 10, 'assignable_users should use limited number of queries'
+
+    # Verify we actually have enough test data
+    assignable_users = project.assignable_users
+
+    assert_operator assignable_users.size, :>=, 15, 'Should have at least 15 assignable users for valid N+1 test'
+  end
+
+  def test_assignable_users_with_hidden_roles
+    project = projects :projects_001
+
+    # Create a hidden role
+    hidden_role = Role.create!(
+      name: 'Hidden Role',
+      assignable: true,
+      hide: true,
+      users_visibility: 'members_of_visible_projects',
+      permissions: %i[view_issues add_issues]
+    )
+
+    # Create a user with the hidden role
+    user = User.create!(
+      login: 'hiddenuser',
+      firstname: 'Hidden',
+      lastname: 'User',
+      mail: 'hidden@example.com',
+      status: User::STATUS_ACTIVE
+    )
+
+    Member.create! project: project, principal: user, roles: [hidden_role]
+
+    # Create a regular user without show_hidden_roles permission
+    regular_user = User.create!(
+      login: 'regularuser',
+      firstname: 'Regular',
+      lastname: 'User',
+      mail: 'regular@example.com',
+      status: User::STATUS_ACTIVE
+    )
+
+    # Create a role without show_hidden_roles permission
+    regular_role = Role.create!(
+      name: 'Regular Role',
+      permissions: %i[view_project view_issues]
+    )
+
+    Member.create! project: project, principal: regular_user, roles: [regular_role]
+
+    # Regular user should not see users with hidden roles
+    User.current = regular_user
+    assignable = project.assignable_users
+
+    assert_not_includes assignable, user, 'User with hidden role should not be visible to regular users'
+
+    # Admin should see all users - use system admin (users_001 is admin: true)
+    User.current = users :users_001
+    project.reload # Clear any cached values
+    assignable_admin = project.assignable_users
+
+    assert_includes assignable_admin, user, 'Admin should see users with hidden roles'
+  end
+
+  def test_assignable_users_no_caching
+    project = projects :projects_001
+
+    # No longer caching due to ActiveRecord::Relation compatibility
+    users1 = project.assignable_users
+    users2 = project.assignable_users
+
+    # Relations are not cached, but they should return equivalent results
+    assert_equal users1.to_a, users2.to_a, 'assignable_users should return equivalent results'
+
+    # Different tracker should return different results
+    tracker = Tracker.order(:id).first
+    users_with_tracker = project.assignable_users tracker
+
+    # Should return different relation objects
+    assert_not_same users1, users_with_tracker, 'Different tracker should return separate relations'
+  end
+
+  def test_assignable_users_with_tracker
+    project = projects :projects_001
+    tracker = project.trackers.order(:id).first
+
+    users_all = project.assignable_users
+    users_tracker = project.assignable_users tracker
+
+    # Both should return relations of users
+    assert_kind_of ActiveRecord::Relation, users_all
+    assert_kind_of ActiveRecord::Relation, users_tracker
+
+    # Users should all be User instances
+    users_all.each { |u| assert_kind_of User, u }
+    users_tracker.each { |u| assert_kind_of User, u }
   end
 end

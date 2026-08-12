@@ -4,8 +4,9 @@ plugins:
   - rubocop-minitest
 
 AllCops:
-  TargetRubyVersion: 3.1
-  TargetRailsVersion: 7.2
+  TargetRubyVersion: 3.2
+  TargetRailsVersion: 8.1
+  DisabledByDefault: false
   NewCops: enable
   ActiveSupportExtensionsEnabled: true
 
@@ -60,6 +61,11 @@ Rails/HelperInstanceVariable:
   Enabled: false
 
 Rails/SkipsModelValidations:
+  Enabled: false
+
+# Redmine uses `Model.find params[:id]` throughout core; params.expect is not
+# part of the Redmine convention and its autocorrect breaks rescue-based 404s.
+Rails/StrongParametersExpect:
   Enabled: false
 
 Rails/Output:
@@ -120,6 +126,10 @@ Style/SuperWithArgsParentheses:
 Style/Documentation:
   Enabled: false
 
+Style/OneClassPerFile:
+  Exclude:
+    - 'test/**/*'
+
 Naming/VariableNumber:
   Enabled: true
   Exclude:
@@ -142,6 +152,9 @@ Rails/ActionControllerFlashBeforeRender:
   Enabled: true
   Exclude:
     - app/controllers/dashboards_controller.rb
+
+Naming/PredicateMethod:
+  Enabled: false
 
 Bundler/DuplicatedGroup:
   Enabled: false

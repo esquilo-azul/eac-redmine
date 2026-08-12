@@ -1,142 +1,89 @@
-/* exported setClipboardJS */
-/* global ClipboardJS */
-function setClipboardJS(element) {
-  var clipboard = new ClipboardJS(element);
-  clipboard.on('success', function(e) {
-    $(element).tooltip({
-      content: $(element).data('label-copied')
-    });
-    setTimeout(function() {
-      e.clearSelection();
-      $(element).tooltip({
-        content: $(element).data('label-to-copy')
-      });
-    }, 1000);
-  });
-}
-
 /* exported openExternalUrlsInTab */
 function openExternalUrlsInTab() {
-  $('a.external').attr({
-    'target': '_blank',
-    'rel': 'noopener noreferrer'});
-}
-
-/* exported nativeEmojiSupport */
-function nativeEmojiSupport(emoji_code) {
-  var noEmojis = /\p{Extended_Pictographic}/u;
-  return noEmojis.test(emoji_code);
+  document.querySelectorAll('a.external').forEach(link => {
+    link.setAttribute('target', '_blank');
+    link.setAttribute('rel', 'noopener noreferrer');
+  });
 }
 
 /* exported formatNameWithIcon */
 function formatNameWithIcon(opt) {
-  if (opt.loading) return opt.name;
-  var $opt;
-  if (opt.name_with_icon !== undefined) {
-    $opt = $('<span>' + opt.name_with_icon + '</span>');
-  } else {
-    $opt = $('<span>' + opt.text + '</span>');
+  if (opt.loading) {
+    return opt.name;
   }
-  return $opt;
+
+  const text = opt.name_with_icon !== undefined ? opt.name_with_icon : opt.text;
+  const span = document.createElement('span');
+  span.innerHTML = text;
+  return span;
 }
 
-/* exported formatFontawesomeText */
-function formatFontawesomeText(icon) {
-  var icon_id = icon.id;
-  if (icon_id !== undefined) {
-    var fa = icon.id.split('_');
-    return $('<span><i class="' + fa[0] + ' fa-' + fa[1] + '"></i> ' + icon.text + '</span>');
-  } else {
+/* Render a select2 option for the Tabler icon picker: SVG sprite icon + name.
+   The full sprite href is provided per option via data-href. */
+/* exported formatIconOption */
+function formatIconOption(icon) {
+  if (icon.id === undefined || icon.id === '') {
     return icon.text;
   }
-}
 
-/* exported observeLiveSearchField */
-function observeLiveSearchField(fieldId, targetId, target_url) {
-  $('#'+fieldId).each(function() {
-    var $this = $(this);
-    $this.addClass('livesearch');
-    $this.attr('data-search-was', $this.val());
-    var check = function() {
-      var val = $this.val();
-      if ($this.attr('data-search-was') != val) {
-        $this.attr('data-search-was', val);
-
-        var form = $('#query_form'); // grab the form wrapping the search bar.
-        var formData;
-        var url;
-
-        form.find('[name="c[]"] option').each(function(i, elem) {
-          $(elem).prop('selected', true);
-        });
-
-        if (typeof target_url === 'undefined') {
-          url = form.attr('action');
-          formData = form.serialize();
-        } else {
-          url = target_url;
-          formData = { q: val };
-        }
-
-        form.find('[name="c[]"] option').each(function(i, elem) {
-          $(elem).prop('selected', false);
-        });
-
-        $.ajax({
-          url: url,
-          data: formData,
-          success: function(data) { if(targetId) $('#'+targetId).html(data); },
-          beforeSend: function() { $this.addClass('ajax-loading'); },
-          complete: function() { $this.removeClass('ajax-loading'); }
-        });
-      }
-    };
-
-    /* see https://stackoverflow.com/questions/1909441/how-to-delay-the-keyup-handler-until-the-user-stops-typing */
-    var search_delay = function(callback) {
-      var timer = 0;
-      return function() {
-        var context = this, args = arguments;
-        clearTimeout(timer);
-        timer = setTimeout(function() {
-          callback.apply(context, args);
-        }, 400 || 0);
-      };
-    };
-
-    $this.on('input', search_delay(check));
-  });
+  const href = icon.element && icon.element.dataset ? icon.element.dataset.href : null;
+  const span = document.createElement('span');
+  if (href) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 's18 icon-svg');
+    svg.setAttribute('aria-hidden', 'true');
+    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', href);
+    svg.appendChild(use);
+    span.appendChild(svg);
+    span.appendChild(document.createTextNode(` ${icon.text}`));
+  } else {
+    span.textContent = icon.text;
+  }
+  return span;
 }
 
 /* Use this instead of showTab from Redmine, because on tabs are supported for plugin settings */
 /* exported showPluginSettingsTab */
 /* global replaceInHistory */
 function showPluginSettingsTab(name, url) {
-  $('#tab-content-' + name).parent().find('.tab-content').hide();
-  $('#tab-content-' + name).show();
-  $('#tab-' + name).closest('.tabs').find('a').removeClass('selected');
-  $('#tab-' + name).addClass('selected');
+  const tabContent = document.getElementById(`tab-content-${name}`);
+  if (tabContent && tabContent.parentElement) {
+    tabContent.parentElement.querySelectorAll('.tab-content').forEach(el => { el.style.display = 'none'; });
+    tabContent.style.display = '';
+  }
+
+  const tab = document.getElementById(`tab-${name}`);
+  if (tab) {
+    const tabs = tab.closest('.tabs');
+    if (tabs) {
+      tabs.querySelectorAll('a').forEach(a => a.classList.remove('selected'));
+    }
+    tab.classList.add('selected');
+
+    const form = tab.closest('form');
+    if (form) {
+      addTabToFromAction(form, name);
+    }
+  }
 
   replaceInHistory(url);
-
-  /* only changes to this function */
-  var form = $('#tab-' + name).closest('form');
-  addTabToFromAction(form, name);
-  /* change end */
-
   return false;
 }
 
 function addTabToFromAction(form, name) {
-  form.attr('action', function(i, action) {
-    if (action.includes('tab=')) {
-      return action.replace(/([?&])(tab=)[^&#]*/, '$1$2' + name);
-    } else if (!action.includes('?')) {
-      return action + '?tab=' + name;
-    } else if (!action.includes(name)) {
-      return action + '&tab=' + name;
-    }
-  });
+  let action = form.getAttribute('action');
+  if (!action) {
+    return;
+  }
 
-  /* console.log('hack it for: ' + name + ' with action ' + form.attr('action')); */
+  if (action.includes('tab=')) {
+    action = action.replace(/([?&])(tab=)[^&#]*/, `$1$2${name}`);
+  } else if (!action.includes('?')) {
+    action = `${action}?tab=${name}`;
+  } else if (!action.includes(name)) {
+    action = `${action}&tab=${name}`;
+  }
+
+  form.setAttribute('action', action);
 }

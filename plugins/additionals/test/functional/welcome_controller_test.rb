@@ -21,7 +21,6 @@ end
 class WelcomeControllerTest < Additionals::ControllerTest
   def setup
     Setting.default_language = 'en'
-    User.current = nil
   end
 
   def test_show_with_left_text_block
@@ -38,6 +37,33 @@ class WelcomeControllerTest < Additionals::ControllerTest
 
     assert_response :success
     assert_select 'div#list-right div#block-text__1', text: /example text/
+  end
+
+  def test_empty_full_width_group_skipped_on_locked_dashboard
+    # system_default_welcome is locked (not sortable) and has no bottom blocks:
+    # the empty full-width bottom receiver must be skipped (GitHub #112), while
+    # the populated top and column groups stay present.
+    @request.session[:user_id] = 4
+    get :index
+
+    assert_response :success
+    assert_select 'div#list-top'
+    assert_select 'div#list-left'
+    assert_select 'div#list-bottom', count: 0
+  end
+
+  def test_empty_column_groups_skipped_when_both_empty_on_locked_dashboard
+    # top_only_welcome is locked and has content only in the top group: with both
+    # 50% columns empty there is no sibling to stretch, so left/right (and the
+    # empty bottom) are skipped while the populated top stays present (GitHub #112).
+    @request.session[:user_id] = 4
+    get :index, params: { dashboard_id: dashboards(:top_only_welcome) }
+
+    assert_response :success
+    assert_select 'div#list-top'
+    assert_select 'div#list-left', count: 0
+    assert_select 'div#list-right', count: 0
+    assert_select 'div#list-bottom', count: 0
   end
 
   def test_show_with_hook_view_welcome_index_top
@@ -79,7 +105,7 @@ class WelcomeControllerTest < Additionals::ControllerTest
       @request.session[:user_id] = 1
       get :index
 
-      assert_select 'div#top-menu a.help'
+      assert_top_menu 'a.help'
     end
   end
 
@@ -90,7 +116,7 @@ class WelcomeControllerTest < Additionals::ControllerTest
       @request.session[:user_id] = 1
       get :index
 
-      assert_select 'div#top-menu a.help', count: 0
+      assert_top_menu 'a.help', count: 0
     end
   end
 

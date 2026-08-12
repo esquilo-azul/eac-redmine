@@ -5,14 +5,14 @@
     = f.text_field :name, size: 255, required: true
 
   p
-    = f.text_area :description, rows: addtionals_textarea_cols(@dashboard.description, min: 4), class: 'wiki-edit'
+    = f.textarea :description, rows: addtionals_textarea_cols(@dashboard.description, min: 4), class: 'wiki-edit'
 
   .splitcontent
     .splitcontentleft
       = hidden_field_tag 'dashboard[dashboard_type]', @dashboard.dashboard_type if @dashboard.new_record?
       - if @project
         = hidden_field_tag 'dashboard[content_project_id]', @project.id
-        - if @allowed_projects.present? && @allowed_projects.count > 1
+        - if @allowed_projects&.many?
           p
             = f.select :project_id,
                       project_tree_options_for_select(@allowed_projects,

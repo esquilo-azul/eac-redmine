@@ -1,0 +1,159 @@
+# frozen_string_literal: true
+
+require File.expand_path '../../../test_helper', __FILE__
+
+# Test stub that exposes a fixed block_definitions hash so we can exercise
+# dashboard_required_libraries without touching plugin patches. Dashboard
+# constantizes `DashboardContent#{dashboard_type.chomp('Dashboard')}` so the
+# class name and TYPE_NAME below have to follow that convention -- which also
+# requires this class to live at the top level, not nested inside the test.
+# Named *Stub (not *Test) so it does not collide with DashboardContentTest in
+# test/unit/dashboard_content_test.rb when the full plugin suite runs.
+class DashboardContentStub < DashboardContent
+  TYPE_NAME = 'StubDashboard'
+
+  class << self
+    attr_accessor :test_blocks
+  end
+
+  def block_definitions
+    self.class.test_blocks || {}
+  end
+end
+
+class DashboardsHelperTest < Additionals::HelperTest
+  include DashboardsHelper
+
+  def test_block_libraries_returns_empty_for_minimal_config
+    assert_equal [], block_libraries({})
+  end
+
+  def test_block_libraries_picks_up_top_level_libraries
+    cfg = { libraries: %i[d3plus] }
+
+    assert_equal %i[d3plus], block_libraries(cfg)
+  end
+
+  def test_block_libraries_picks_up_async_libraries
+    cfg = { async: { partial: 'foo', libraries: %i[d3plus mermaid] } }
+
+    assert_equal %i[d3plus mermaid], block_libraries(cfg)
+  end
+
+  def test_block_libraries_merges_top_level_and_async_libraries
+    cfg = { libraries: %i[d3plus], async: { libraries: %i[mermaid] } }
+
+    assert_equal %i[d3plus mermaid], block_libraries(cfg)
+  end
+
+  def test_block_libraries_dedups_across_top_level_and_async
+    cfg = { libraries: %i[chartjs], async: { libraries: %i[chartjs d3plus] } }
+
+    assert_equal %i[chartjs d3plus], block_libraries(cfg)
+  end
+
+  def test_block_libraries_ignores_data_check_class_and_matrix
+    # Library loading is driven exclusively by :libraries. data_check_class
+    # (min-height pre-check) and matrix (matrix-chart routing) must not act
+    # as implicit triggers for asset loading.
+    cfg = { matrix: { matrix_class: 'Foo' },
+            async: { data_check_class: 'SomeChart' } }
+
+    assert_equal [], block_libraries(cfg)
+  end
+
+  def test_dashboard_required_libraries_handles_nil_dashboard
+    assert_equal [], dashboard_required_libraries(nil)
+  end
+
+  def test_dashboard_required_libraries_aggregates_across_layout
+    dashboard = build_test_dashboard layout: { 'top' => %w[block_a block_b],
+                                               'left' => %w[block_a block_c] },
+                                     blocks: { 'block_a' => { libraries: %i[d3plus] },
+                                               'block_b' => { async: { libraries: %i[chartjs_meta] } },
+                                               'block_c' => { libraries: %i[mermaid] } }
+    result = dashboard_required_libraries dashboard
+
+    assert_includes result, :d3plus
+    assert_includes result, :chartjs_meta
+    assert_includes result, :mermaid
+    assert_equal result.size, result.uniq.size
+  end
+
+  def test_dashboard_required_libraries_skips_unknown_blocks
+    dashboard = build_test_dashboard layout: { 'top' => %w[ghost_block] },
+                                     blocks: {}
+
+    assert_equal [], dashboard_required_libraries(dashboard)
+  end
+
+  def test_render_dashboard_groups_skips_all_empty_groups_when_not_sortable
+    dashboard = build_test_dashboard layout: {}, blocks: {}
+
+    assert_predicate render_dashboard_groups(dashboard, can_sort: false), :blank?
+  end
+
+  def test_render_dashboard_groups_renders_all_empty_groups_when_sortable
+    dashboard = build_test_dashboard layout: {}, blocks: {}
+    result = render_dashboard_groups dashboard, can_sort: true
+
+    assert_includes result, 'id="list-top"'
+    assert_includes result, 'id="list-left"'
+    assert_includes result, 'id="list-right"'
+    assert_includes result, 'id="list-bottom"'
+  end
+
+  def test_news_block_entries_excludes_subproject_news_by_default
+    User.current = users :users_001
+    sub_news = create_subproject_news
+    dashboard = build_test_dashboard layout: {}, blocks: {}
+    dashboard.content_project = projects :projects_001
+
+    entries = news_block_entries dashboard, 10
+
+    assert_not_includes entries, sub_news
+  end
+
+  def test_news_block_entries_includes_subproject_news_when_enabled
+    User.current = users :users_001
+    sub_news = create_subproject_news
+    dashboard = build_test_dashboard layout: {}, blocks: {}
+    dashboard.content_project = projects :projects_001
+
+    entries = news_block_entries dashboard, 10, with_subprojects: true
+
+    assert_includes entries, sub_news
+  end
+
+  def test_block_select_tag_submits_through_stimulus
+    # jQuery's .submit() calls the native form.submit(), which emits no submit
+    # event and therefore bypasses the remote-form controller -- the block would
+    # then be added through a full page reload instead of AJAX
+    User.current = users :users_001
+    select = parse_html dashboard_block_select_tag(build_test_dashboard(layout: {}, blocks: {})), 'select#block-select'
+
+    assert_equal 'change->remote-form#submit', select['data-action']
+    assert_nil select['onchange']
+  end
+
+  private
+
+  def parse_html(html, selector)
+    Nokogiri::HTML::DocumentFragment.parse(html).at_css selector
+  end
+
+  def create_subproject_news
+    subproject = projects :projects_003
+    subproject.enable_module! :news
+    News.create! project: subproject,
+                 title: 'Subproject news',
+                 description: 'News from a subproject',
+                 author: User.current
+  end
+
+  def build_test_dashboard(layout:, blocks:)
+    DashboardContentStub.test_blocks = blocks
+    Dashboard.new(name: 'Test', dashboard_type: DashboardContentStub::TYPE_NAME,
+                  author_id: User.current.id).tap { |d| d.layout = layout }
+  end
+end

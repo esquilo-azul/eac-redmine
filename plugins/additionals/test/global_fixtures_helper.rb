@@ -10,9 +10,23 @@ module Additionals
       return super if table_names.first == :all
 
       dir = plugin_fixture_path
-      table_names.each do |x|
-        ActiveRecord::FixtureSet.create_fixtures dir, x if File.exist? File.join(dir, "#{x}.yml")
-      end
+      files_to_load = table_names.select { |x| File.exist? File.join(dir, "#{x}.yml") }
+
+      # Pre-load plugin fixtures into the connection pool's fixture cache.
+      # Rails skips loading core's same-named fixture file when the name is
+      # already cached (see ActiveRecord::FixtureSet.fixture_is_cached?), so
+      # this gives us full-file override semantics: a plugin's queries.yml
+      # replaces Redmine core's queries.yml entirely, no merge.
+      # Rails' parallelize_setup hook calls our block with the worker number
+      # (see ActiveSupport::Testing::Parallelization::Worker#after_fork). Accept
+      # and ignore it via splat so direct .call (no args) also works.
+      load_plugin_fixtures = ->(*) { files_to_load.each { |x| ActiveRecord::FixtureSet.create_fixtures dir, x } }
+      load_plugin_fixtures.call
+
+      # Rails parallel test workers each get their own database, connection
+      # pool and fixture cache. Replay the pre-load in every worker's setup
+      # so the override still wins there.
+      parallelize_setup(&load_plugin_fixtures) if respond_to? :parallelize_setup
 
       super
     end

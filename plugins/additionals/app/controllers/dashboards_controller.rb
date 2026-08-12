@@ -41,14 +41,14 @@ class DashboardsController < ApplicationController
                        .to_a
 
     respond_to do |format|
-      format.html { render_error status: 406 }
+      format.html { redirect_to home_path }
       format.api
     end
   end
 
   def show
     respond_to do |format|
-      format.html { head :not_acceptable }
+      format.html { redirect_to dashboard_link_path(@dashboard.project, @dashboard) }
       format.js if request.xhr?
       format.api
     end
@@ -58,6 +58,13 @@ class DashboardsController < ApplicationController
     @dashboard = Dashboard.new project: @project,
                                author: User.current
     @dashboard.dashboard_type = assign_dashboard_type
+    if params[:copy].present?
+      @copy_from = Dashboard.visible.find_by id: params[:copy]
+      # Security: Only allow copying from dashboards the user can edit
+      # because block settings may contain sensitive data (credentials, API keys)
+      @copy_from = nil unless @copy_from&.editable?
+      @dashboard.copy_from @copy_from
+    end
     @allowed_projects = @dashboard.allowed_target_projects
   end
 
@@ -77,6 +84,17 @@ class DashboardsController < ApplicationController
     @dashboard.safe_attributes = params[:dashboard]
     @dashboard.dashboard_type = assign_dashboard_type
     @dashboard.role_ids = params[:dashboard][:role_ids] if params[:dashboard].present?
+
+    # Copy layout and settings from source dashboard if copying
+    # Security: Only allow copying from dashboards the user can edit
+    # because block settings may contain sensitive data (credentials, API keys)
+    if params[:copy].present?
+      copy_from = Dashboard.visible.find_by id: params[:copy]
+      if copy_from&.editable?
+        @dashboard.layout = copy_from.layout.deep_dup
+        @dashboard.layout_settings = copy_from.layout_settings.deep_dup
+      end
+    end
 
     @allowed_projects = @dashboard.allowed_target_projects
 
@@ -125,7 +143,7 @@ class DashboardsController < ApplicationController
     return render_403 unless @dashboard.deletable?
 
     begin
-      @dashboard.destroy
+      @dashboard.destroy!
       flash[:notice] = flash_msg :delete
       respond_to do |format|
         format.html { redirect_to @project.nil? ? home_path : project_path(@project) }
@@ -137,13 +155,29 @@ class DashboardsController < ApplicationController
     end
   end
 
+  def lock
+    return render_403 unless @dashboard.editable?
+
+    @dashboard.update! locked: true
+    flash[:notice] = l :notice_successful_update
+    redirect_to dashboard_link_path(@project, @dashboard)
+  end
+
+  def unlock
+    return render_403 unless @dashboard.editable?
+
+    @dashboard.update! locked: false
+    flash[:notice] = l :notice_successful_update
+    redirect_to dashboard_link_path(@project, @dashboard)
+  end
+
   def update_layout_setting
     block_settings = params[:settings] || {}
 
     block_settings.each do |block, settings|
       @dashboard.update_block_settings block, settings.to_unsafe_hash
     end
-    @dashboard.save
+    @dashboard.save!
     @updated_blocks = block_settings.keys
   end
 
@@ -152,10 +186,11 @@ class DashboardsController < ApplicationController
   def add_block
     @block = params[:block]
     if @dashboard.add_block @block
-      @dashboard.save
+      @dashboard.save!
       respond_to do |format|
-        format.html { redirect_to dashboard_link_path(@project, @dashboard) }
-        format.js
+        format.html do
+          request.xhr? ? render : redirect_to(dashboard_link_path(@project, @dashboard))
+        end
       end
     else
       render_error status: 422
@@ -166,10 +201,11 @@ class DashboardsController < ApplicationController
   def remove_block
     @block = params[:block]
     @dashboard.remove_block @block
-    @dashboard.save
+    @dashboard.save!
     respond_to do |format|
-      format.html { redirect_to dashboard_link_path(@project, @dashboard) }
-      format.js
+      format.html do
+        request.xhr? ? render : redirect_to(dashboard_link_path(@project, @dashboard))
+      end
     end
   end
 
@@ -178,7 +214,7 @@ class DashboardsController < ApplicationController
   # params[:blocks] : array of block ids of the group
   def order_blocks
     @dashboard.order_blocks params[:group], params[:blocks]
-    @dashboard.save
+    @dashboard.save!
     head :ok
   end
 
@@ -201,11 +237,14 @@ class DashboardsController < ApplicationController
     raise ::Unauthorized unless @dashboard.visible?
 
     if @dashboard.dashboard_type == DashboardContentProject::TYPE_NAME && @dashboard.project.nil?
-      @dashboard.content_project = if params[:dashboard].present? && params[:dashboard][:content_project_id].present?
-                                     find_project params[:dashboard][:content_project_id]
-                                   else
-                                     find_project_by_project_id
-                                   end
+      # find_project* set @project as a side effect; their return value is not
+      # guaranteed to be the project, so read @project afterwards.
+      if params[:dashboard].present? && params[:dashboard][:content_project_id].present?
+        find_project params[:dashboard][:content_project_id]
+      else
+        find_project_by_project_id
+      end
+      @dashboard.content_project = @project
     else
       @project = @dashboard.project
     end

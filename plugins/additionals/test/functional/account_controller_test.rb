@@ -5,7 +5,6 @@ require File.expand_path '../../test_helper', __FILE__
 class AccountControllerTest < Additionals::ControllerTest
   def setup
     Setting.default_language = 'en'
-    User.current = nil
   end
 
   def test_get_login_with_welcome_text
@@ -44,7 +43,7 @@ class AccountControllerTest < Additionals::ControllerTest
 
         assert_redirected_to '/my/account'
       end
-      user = User.last
+      user = User.order(:id).last
 
       assert_equal 'register', user.login
       assert_equal 'John', user.firstname

@@ -7,6 +7,28 @@ module DashboardsHelper
           skip_digest: true, &)
   end
 
+  # Returns the unique list of additionals_library_load keys required by all
+  # blocks in the dashboard's current layout. Each block declares what it
+  # needs explicitly via `:libraries` (top-level or under `:async`).
+  def dashboard_required_libraries(dashboard)
+    return [] unless dashboard
+
+    block_ids = dashboard.layout.values.flatten
+    block_ids.uniq!
+    libs = block_ids.flat_map do |id|
+      cfg = dashboard.content.find_block id
+      cfg ? block_libraries(cfg) : []
+    end
+    libs.uniq!
+    libs
+  end
+
+  def block_libraries(cfg)
+    libs = Array cfg[:libraries]
+    libs |= Array cfg.dig :async, :libraries
+    libs
+  end
+
   def dashboard_sidebar?(dashboard, params)
     if params['enable_sidebar'].blank?
       if dashboard.blank?
@@ -189,10 +211,16 @@ module DashboardsHelper
       options[:data] = { confirm: l(:text_are_you_sure) }
     end
 
-    link_to sprite_icon('del', l(:button_dashboard_delete)), url, options
+    link_to sprite_icon('del', entity_headline(object_name: :label_dashboard, type: :delete)), url, options
   end
 
   # Returns the select tag used to add or remove a block
+  #
+  # The change is routed straight to the surrounding form's `remote-form`
+  # controller. A jQuery `$('#block-form').submit()` would not work here: jQuery
+  # triggers its own handlers and then calls the native `form.submit()`, which
+  # never emits a submit event, so the Stimulus action would be skipped and the
+  # block would be added through a full page reload instead of AJAX.
   def dashboard_block_select_tag(dashboard)
     blocks_in_use = dashboard.layout.values.flatten
     options = tag.option "<< #{l :label_add_dashboard_block} >>", value: ''
@@ -203,7 +231,30 @@ module DashboardsHelper
                options,
                id: 'block-select',
                class: 'dashboard-block-select',
-               onchange: "$('#block-form').submit();"
+               data: { action: 'change->remote-form#submit' }
+  end
+
+  # Renders all dashboard groups as block-receivers. Empty groups are skipped
+  # in read-only layouts (not sortable) to avoid whitespace: full-width groups
+  # (top/bottom) individually, and the 50% columns (left/right) only when BOTH
+  # are empty, so a lone column never stretches to full width. While sortable,
+  # nothing is skipped because drag & drop needs the receivers as drop targets.
+  # See GitHub #112.
+  def render_dashboard_groups(dashboard, can_sort:)
+    rendered = dashboard.available_groups.index_with do |group|
+      render_dashboard_blocks dashboard.layout[group], dashboard
+    end
+    columns_blank = dashboard.content.column_groups.all? { |group| rendered[group].blank? }
+
+    groups = dashboard.available_groups.filter_map do |group|
+      blocks_html = rendered[group]
+      next if blocks_html.blank? && !can_sort &&
+              (dashboard.content.full_width_group?(group) || columns_blank)
+
+      tag.div blocks_html, id: "list-#{group}", class: "block-receiver splitcontent#{group}"
+    end
+
+    safe_join groups
   end
 
   # Renders the blocks
@@ -222,7 +273,7 @@ module DashboardsHelper
   def render_dashboard_block(block, dashboard, overwritten_settings = {})
     block_definition = dashboard.content.find_block block
     unless block_definition
-      Rails.logger.info "Unknown block \"#{block}\" found in #{dashboard.name} (id=#{dashboard.id})"
+      Rails.logger.debug { "Unknown block \"#{block}\" found in #{dashboard.name} (id=#{dashboard.id})" }
       return
     end
 
@@ -246,11 +297,10 @@ module DashboardsHelper
                               wrapper_title: dashboard_block_sync_info(block_definition))
       end
       icons << tag.span(sprite_icon('reorder', ''), class: 'icon-only icon-sort-handle sort-handle', title: l(:button_move))
-      icons << delete_link(_remove_block_dashboard_path(@project, dashboard, block:),
-                           method: :post,
-                           remote: true,
-                           class: 'icon-only icon-close',
-                           title: l(:button_delete))
+      icons << remote_delete_link(_remove_block_dashboard_path(@project, dashboard, block:),
+                                  method: :post,
+                                  class: 'icon-only icon-close',
+                                  title: l(:button_delete))
 
       content = tag.div(safe_join(icons), class: 'contextual') + content
     end
@@ -270,7 +320,9 @@ module DashboardsHelper
       partial_locals[:klass] = block_definition[:query_block][:class]
       partial_locals[:async] = { required_settings: %i[query_id],
                                  exposed_params: %i[sort],
-                                 partial: 'dashboards/blocks/query_list' }
+                                 partial: 'dashboards/blocks/query_list',
+                                 query_block: block_definition[:query_block],
+                                 lazy: true }
       partial_locals[:async][:unique_params] = [Redmine::Utils.random_hex(16)] if params[:refresh].present?
       partial_locals[:async] = partial_locals[:async].merge block_definition[:async] if block_definition[:async]
     elsif block_definition[:async]
@@ -286,7 +338,78 @@ module DashboardsHelper
       options[:interval] = (async[:cache_expires_in] || DashboardContent::RENDER_ASYNC_CACHE_EXPIRES_IN) * 1000
     end
 
+    min_height = resolve_async_min_height settings, async
+    options[:min_height] = min_height if min_height
+
+    # Lazy is opt-in per block, NOT default-on for all async blocks. Reasons
+    # (so future-you does not flip this to true thinking it is a free win):
+    #
+    # 1. Polling blocks (with :interval) need to fetch immediately and keep
+    #    polling regardless of viewport -- lazy would defeat auto-refresh.
+    # 2. Toggle blocks (with :toggle) load on a click trigger, lazy would
+    #    short-circuit that interaction.
+    # 3. Lazy needs a meaningful min-height on the skeleton, otherwise the
+    #    ~96 px placeholders stack inside the IntersectionObserver's 200 px
+    #    rootMargin and all blocks trigger at initial load -- lazy gains
+    #    nothing. min-height in turn needs a :data_check_class for the cheap
+    #    EXISTS pre-check, and not every block has one.
+    # 4. Print mode (Cmd+P): lazy blocks outside the viewport are missing
+    #    from the print output. A beforeprint hook to force-load them is a
+    #    follow-up, until then lazy is print-hostile.
+    # 5. UX trade-off: lazy saves initial requests but costs visible loading
+    #    when the user scrolls. Worth it on long data dashboards, friction
+    #    on compact overview dashboards -- per-block decision.
+    #
+    # Query blocks are the explicit exception (set in build_dashboard_partial_locals)
+    # because they typically render the largest data sets.
+    options[:lazy] = true if async[:lazy]
+
     options
+  end
+
+  # Determines a min-height (px) for the async placeholder so the lazy
+  # observer can see the final layout before content loads.
+  # Returns nil when no data is expected — the placeholder stays small
+  # and rendering follows the natural content height (e.g. "no data" text).
+  def resolve_async_min_height(settings, async)
+    return AdditionalsChart::CHART_HEADER_HEIGHT + AdditionalsChart::CHART_DEFAULT_HEIGHT if data_check_present? async
+
+    query_min_height = query_block_min_height settings, async
+    return query_min_height if query_min_height
+
+    case async[:min_height]
+    when Integer
+      async[:min_height]
+    when Proc
+      async[:min_height].call @project, settings
+    end
+  end
+
+  # `data_check_class` may be declared as a Class (when reachable at patch
+  # load time) or as a String (when reachable only at render time via a soft
+  # plugin dependency). Constantize lazily so neither side has to know.
+  # Soft-dependency block definitions are already gated by their `:if`
+  # predicate -- if we still land in the rescue, it's almost certainly a
+  # typo or missing plugin install. Warn instead of swallowing silently.
+  def data_check_present?(async)
+    klass = async[:data_check_class]
+    klass = klass.constantize if klass.is_a? String
+    klass.respond_to?(:chart_data_present?) && klass.chart_data_present?(project: @project)
+  rescue NameError => e
+    Rails.logger.warn { "[additionals] data_check_class could not be resolved: #{async[:data_check_class].inspect} (#{e.message})" }
+    false
+  end
+
+  def query_block_min_height(settings, async)
+    qb = async[:query_block]
+    return unless qb && settings[:query_id].present?
+
+    query = qb[:class].visible.find_by id: settings[:query_id]
+    return unless query
+
+    query.project = @project if qb[:with_project] && @project
+    count = query.send qb[:count_method] || 'query_count'
+    250 if count.to_i.positive?
   end
 
   def dashboard_async_required_settings?(settings, async)
@@ -363,19 +486,28 @@ module DashboardsHelper
 
   def render_news_block(block, _block_definition, settings, dashboard)
     max_entries = settings[:max_entries] || DashboardContent::DEFAULT_MAX_ENTRIES
+    with_subprojects = RedminePluginKit.true? settings[:with_subprojects]
+    news = news_block_entries dashboard, max_entries, with_subprojects: with_subprojects
 
-    news = if dashboard.content_project.nil?
-             News.latest User.current, max_entries
-           else
-             dashboard.content_project
-                      .news
-                      .limit(max_entries)
-                      .includes(:author, :project)
-                      .reorder(created_on: :desc)
-                      .to_a
-           end
+    render 'dashboards/blocks/news', block:, max_entries:, news:,
+                                     with_subprojects: with_subprojects,
+                                     content_project_id: dashboard.content_project&.id
+  end
 
-    render 'dashboards/blocks/news', block:, max_entries:, news:
+  def news_block_entries(dashboard, max_entries, with_subprojects: false)
+    return News.latest User.current, max_entries if dashboard.content_project.nil?
+
+    project = dashboard.content_project
+    scope = if with_subprojects && !project.leaf?
+              News.visible.where project_id: project.self_and_descendants.ids
+            else
+              project.news
+            end
+
+    scope.limit(max_entries)
+         .includes(:author, :project)
+         .reorder(created_on: :desc)
+         .to_a
   end
 
   def render_my_spent_time_block(block, block_definition, settings, dashboard)
@@ -386,7 +518,7 @@ module DashboardsHelper
     scope = scope.where project_id: dashboard.content_project.id unless dashboard.content_project.nil?
 
     entries_today = scope.where spent_on: User.current.today
-    entries_days = scope.where spent_on: User.current.today - (days - 1)..User.current.today
+    entries_days = scope.where spent_on: (User.current.today - (days - 1))..User.current.today
 
     render('dashboards/blocks/my_spent_time',
            block:,
@@ -501,6 +633,6 @@ module DashboardsHelper
       user.pref.recently_used_dashboards[dashboard_type] = dashboard.id
     end
 
-    user.pref.save
+    user.pref.save!
   end
 end

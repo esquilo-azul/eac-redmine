@@ -19,6 +19,7 @@ class DashboardAsyncBlocksController < ApplicationController
   # support for redmine_contacts_helpdesk plugin
   if AdditionalsPlugin.active_contacts_helpdesk?
     include HelpdeskHelper
+
     helper :helpdesk
   end
 
@@ -30,9 +31,8 @@ class DashboardAsyncBlocksController < ApplicationController
     partial_locals = build_dashboard_partial_locals @block, @block_definition, @settings, @dashboard
 
     respond_to do |format|
-      format.js do
+      format.html do
         render partial: partial_locals[:async][:partial],
-               content_type: 'text/html',
                locals: partial_locals
       end
     end

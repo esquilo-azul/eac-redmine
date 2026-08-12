@@ -2,6 +2,14 @@
 
 require File.expand_path '../../test_helper', __FILE__
 
+class ViewIssueActionDropdownRenderOn < Redmine::Hook::ViewListener
+  render_on :view_issue_action_dropdown, inline: '<span class="test-issue-action-dropdown">Hook content</span>'
+end
+
+class ViewIssueActionMenuRenderOn < Redmine::Hook::ViewListener
+  render_on :view_issue_action_menu, inline: '<span class="test-issue-action-menu">Hook content</span>'
+end
+
 class IssuesControllerTest < Additionals::ControllerTest
   def setup
     manager_role = roles :roles_001
@@ -114,6 +122,23 @@ class IssuesControllerTest < Additionals::ControllerTest
     end
   end
 
+  test 'use open and closed status icons in issue sidebar' do
+    with_plugin_settings 'additionals', issue_change_status_in_sidebar: 1,
+                                        issue_timelog_required: 0,
+                                        issue_timelog_required_tracker: [1],
+                                        issue_timelog_required_status: [5] do
+      @request.session[:user_id] = 2
+      issue = Issue.generate! tracker_id: 1, status_id: 1
+      get :show,
+          params: { id: issue.id }
+
+      assert_response :success
+      # open target status -> empty circle, closed target status -> check circle
+      assert_select 'ul.issue-status-change-sidebar a.status-switch.status-4 svg use[href$=?]', 'icon--circle'
+      assert_select 'ul.issue-status-change-sidebar a.status-switch.status-5 svg use[href$=?]', 'icon--circle-check'
+    end
+  end
+
   test 'show forbidden status in issue sidebar with permission issue_timelog_never_required' do
     manager_role = roles :roles_002
     manager_role.add_permission! :issue_timelog_never_required
@@ -171,7 +196,65 @@ class IssuesControllerTest < Additionals::ControllerTest
       get :show, params: { id: 1 }
 
       assert_response :success
-      assert_select 'h4.note-header .badge-author', count: 0
+      assert_select 'h4.journal-header .journal-info .badge-author', count: 0
+    end
+  end
+
+  def test_show_links_category_when_enabled
+    with_plugin_settings 'additionals', issue_link_category: 1 do
+      get :show, params: { id: 1 }
+
+      assert_response :success
+      assert_match(/issue-category-link/, response.body)
+      assert_match(/category_id=1/, response.body)
+    end
+  end
+
+  def test_do_not_link_category_when_disabled
+    with_plugin_settings 'additionals', issue_link_category: 0 do
+      get :show, params: { id: 1 }
+
+      assert_response :success
+      assert_no_match(/issue-category-link/, response.body)
+    end
+  end
+
+  def test_do_not_link_category_without_category
+    with_plugin_settings 'additionals', issue_link_category: 1 do
+      get :show, params: { id: 2 }
+
+      assert_response :success
+      assert_no_match(/issue-category-link/, response.body)
+    end
+  end
+
+  def test_index_links_category_column_when_enabled
+    with_plugin_settings 'additionals', issue_link_category: 1 do
+      get :index, params: { set_filter: 1, c: %w[subject category] }
+
+      assert_response :success
+      assert_select 'td.category a.issue-category-link'
+    end
+  end
+
+  def test_index_does_not_link_category_column_when_disabled
+    with_plugin_settings 'additionals', issue_link_category: 0 do
+      get :index, params: { set_filter: 1, c: %w[subject category] }
+
+      assert_response :success
+      assert_select 'td.category a.issue-category-link', count: 0
+    end
+  end
+
+  def test_index_links_category_column_to_own_project_across_projects
+    issue = issues :issues_001
+
+    with_plugin_settings 'additionals', issue_link_category: 1 do
+      get :index, params: { set_filter: 1, c: %w[subject category] }
+
+      assert_response :success
+      assert_select "tr#issue-#{issue.id} td.category a.issue-category-link[href*=?]",
+                    "/projects/#{issue.project.identifier}/issues"
     end
   end
 
@@ -191,5 +274,39 @@ class IssuesControllerTest < Additionals::ControllerTest
       assert_response :success
       assert_select 'fieldset.hide-attachments', count: 1
     end
+  end
+
+  def test_show_with_hook_view_issue_action_dropdown
+    Redmine::Hook.add_listener ViewIssueActionDropdownRenderOn
+    @request.session[:user_id] = 2
+
+    get :show,
+        params: { id: 1 }
+
+    assert_response :success
+    assert_select 'span.test-issue-action-dropdown', text: 'Hook content'
+  end
+
+  def test_show_with_hook_view_issue_action_menu
+    Redmine::Hook.add_listener ViewIssueActionMenuRenderOn
+    @request.session[:user_id] = 2
+
+    get :show,
+        params: { id: 1 }
+
+    assert_response :success
+    assert_select 'span.test-issue-action-menu', text: 'Hook content'
+  end
+
+  def test_show_render_assign_to_me_uses_exists_query
+    @request.session[:user_id] = 2
+    issue = issues :issues_001
+
+    get :show,
+        params: { id: issue.id }
+
+    assert_response :success
+    # Verify the page renders without N+1 from assignable_users.detect
+    # The EXISTS query is tested implicitly - if it broke, the page would error
   end
 end

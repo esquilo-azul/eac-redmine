@@ -8,6 +8,8 @@ if ENV['COVERAGE']
   end
 end
 
+$VERBOSE = nil if ENV['SUPPRESS_WARNINGS']
+
 require 'minitest/reporters'
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new, Minitest::Reporters::JUnitReporter.new]
 
@@ -49,6 +51,7 @@ module Additionals
     def plugin_fixtures_list
       custom = %i[dashboards dashboard_roles]
       custom += %i[hrm_user_types hrm_working_calendars] if AdditionalsPlugin.active_hrm?
+      custom += %i[contacts contacts_projects] if AdditionalsPlugin.active_servicedesk?
       custom
     end
   end
@@ -56,30 +59,35 @@ module Additionals
   class HelperTest < Redmine::HelperTest
     include Additionals::TestHelper
     extend PluginFixturesLoader
+
     fixtures(*fixtures_list)
   end
 
   class ControllerTest < Redmine::ControllerTest
     include Additionals::TestHelper
     extend PluginFixturesLoader
+
     fixtures(*fixtures_list)
   end
 
   class TestCase < ActiveSupport::TestCase
     include Additionals::TestHelper
     extend PluginFixturesLoader
+
     fixtures(*fixtures_list)
   end
 
   class IntegrationTest < Redmine::IntegrationTest
     include Additionals::TestHelper
     extend PluginFixturesLoader
+
     fixtures(*fixtures_list)
   end
 
   class ApiTest < Redmine::ApiTest::Base
     include Additionals::TestHelper
     extend PluginFixturesLoader
+
     fixtures(*fixtures_list)
   end
 end

@@ -1,6 +1,40 @@
 # frozen_string_literal: true
 
+# Reset process-global state before every test so test order does not affect
+# outcomes when tests run in the same parallel worker. I18n part mirrors
+# Redmine core's own fix in commit a01ff5a5a (#44116). User.current is an
+# established plugin-test convention (hundreds of explicit per-test resets in
+# our plugin family) that we centralize here.
+#
+# Implemented as a setup block on ActiveSupport::TestCase (not as an instance
+# method on the GlobalTestHelper mixin) so the reset fires via Rails callbacks
+# regardless of whether subclasses define their own `def setup` without
+# calling super - which is common across our plugin tests.
+ActiveSupport::TestCase.setup do
+  I18n.locale = I18n.default_locale # rubocop:disable Rails/I18nLocaleAssignment
+  User.current = nil
+end
+
 module Additionals
+  # Defines the two standard I18n tests (test_valid_languages and
+  # test_locales_validness) on the given test class. Plugins use this in their
+  # i18n_test.rb to avoid duplicating identical boilerplate; only the
+  # plugin-specific metadata stays in the plugin's test file.
+  def self.define_i18n_tests(test_class, plugin:, control_string:, control_english:)
+    test_class.class_eval do
+      include Redmine::I18n unless include? Redmine::I18n
+
+      define_method :test_valid_languages do
+        assert_kind_of Array, valid_languages
+        assert_kind_of Symbol, valid_languages.first
+      end
+
+      define_method :test_locales_validness do
+        assert_locales_validness plugin:, control_string:, control_english:
+      end
+    end
+  end
+
   module GlobalTestHelper
     def after_setup
       return super unless defined?(Bullet) && Bullet.enable?
@@ -90,6 +124,19 @@ module Additionals
       assert_select spec
     end
 
+    # Assert against the top menu, matching both the Redmine 6.x (#top-menu) and
+    # the Redmine master (nav.top-menu) layout.
+    def assert_top_menu(selector, *, &)
+      assert_select("#top-menu #{selector}, nav.top-menu #{selector}", *, &)
+    end
+
+    # Dasherized names (last css class) of the main top-menu items, excluding the
+    # account menu, in document order. Works for both top-menu layouts.
+    def top_menu_item_names
+      css_select('#top-menu > ul > li > a, nav.top-menu .top-menu__links:not(#account) > ul > li > a')
+        .map { |a| a['class'].to_s.split.last }
+    end
+
     def assert_select_totalable_columns(columns)
       assert_select 'p.query-totals' do
         columns.each do |column_name|
@@ -173,31 +220,71 @@ module Additionals
       assert_select "table.list.#{table_css}.sort-by-#{column_css}.sort-desc"
     end
 
-    def assert_locales_validness(plugin:, file_cnt:, locales:, control_string:, control_english:)
-      lang_files_count = Rails.root.glob("plugins/#{plugin}/config/locales/*.yml").size
+    # Verify locale files of a plugin are complete, consistent and actually
+    # translated. Powered by i18n-tasks: detects missing keys, inconsistent
+    # interpolation variables and locales that fall back to English. The
+    # locale list is auto-detected from config/locales/*.yml in the plugin.
+    def assert_locales_validness(plugin:, control_string:, control_english:)
+      require 'i18n/tasks'
 
-      assert_equal file_cnt, lang_files_count
-      valid_languages.each do |lang|
-        assert set_language_if_valid(lang)
-        if lang.to_s == 'en'
-          assert_equal control_english, l(control_string)
-        elsif locales.include? lang.to_s
-          assert_not l(control_string) == control_english, lang
+      task = I18n::Tasks::BaseTask.new(
+        base_locale: 'en',
+        # %{locale} is i18n-tasks placeholder syntax, not Ruby string formatting
+        data: { read: ["plugins/#{plugin}/config/locales/%{locale}.yml"] }, # rubocop:disable Style/FormatStringToken
+        search: { paths: ["plugins/#{plugin}/lib"] }
+      )
+
+      assert_not_empty task.locales, "Plugin #{plugin} has no locale files"
+      assert_includes task.locales, 'en', "Plugin #{plugin} must have config/locales/en.yml"
+
+      task.locales.each do |lang|
+        assert set_language_if_valid(lang), "Locale '#{lang}' is not in Redmine valid_languages"
+        if lang == 'en'
+          assert_equal control_english, l(control_string),
+                       "control_string :#{control_string} in en.yml must equal #{control_english.inspect}"
+        else
+          assert_not_equal control_english, l(control_string),
+                           "Translation for :#{control_string} in #{lang}.yml equals " \
+                           "English #{control_english.inspect} - locale appears untranslated"
         end
       end
 
+      missing = task.missing_diff_forest task.locales - [task.base_locale], task.base_locale
+
+      assert_empty missing,
+                   "Plugin #{plugin}: missing translation keys per locale:\n#{i18n_format_forest missing}"
+
+      inconsistent = task.inconsistent_interpolations
+
+      assert_empty inconsistent,
+                   "Plugin #{plugin}: inconsistent interpolations:\n#{i18n_format_forest inconsistent}"
+    ensure
       set_language_if_valid 'en'
+    end
+
+    def i18n_format_forest(forest)
+      out = []
+      forest.each do |locale_node|
+        keys = []
+        locale_node.keys { |k, _| keys << k }
+        next if keys.empty?
+
+        out << "  #{locale_node.key}:"
+        keys.each { |k| out << "    #{k}" }
+      end
+      out.join "\n"
     end
 
     def assert_dashboard_query_blocks(blocks = [])
       blocks.each do |block_def|
         block_def[:user_id]
         @request.session[:user_id] = block_def[:user_id].presence || 2
+        @request.headers['Accept'] = 'text/html'
+        @request.headers['X-Requested-With'] = 'XMLHttpRequest'
         get block_def[:action].presence || :show,
             params: { dashboard_id: block_def[:dashboard_id],
                       block: block_def[:block],
-                      project_id: block_def[:project],
-                      format: 'js' }
+                      project_id: block_def[:project] }
 
         assert_response :success, "assert_response for #{block_def[:block]}"
         assert_select "table.list.#{block_def[:entities_class]}"
@@ -207,6 +294,93 @@ module Additionals
     # Return the columns that are displayed in the list
     def columns_in_projects_list
       css_select('table.projects thead th').map(&:text)
+    end
+
+    def count_sql_queries
+      queries = []
+      subscriber = ActiveSupport::Notifications.subscribe 'sql.active_record' do |_name, _started, _finished, _unique_id, data|
+        queries << data[:sql] unless data[:name] == 'SCHEMA'
+      end
+
+      yield
+      queries.size
+    ensure
+      ActiveSupport::Notifications.unsubscribe subscriber if subscriber
+    end
+
+    # Validates that all Deface overrides matching the given pattern have correct hashes.
+    # This simulates Deface's runtime behavior by applying overrides in sequence order,
+    # so it can detect hash conflicts caused by earlier overrides modifying the template.
+    #
+    # @param partial_patterns [Array<String>, String] patterns to match against partial paths
+    #   e.g. 'wiki_guide' matches partials like 'wiki/wiki_guide_edit_link'
+    #
+    # Example usage in plugin test:
+    #   def test_deface_overrides_have_valid_hashes
+    #     assert_deface_overrides_valid partial_patterns: ['wiki_guide', 'wiki/show_update_info']
+    #   end
+    #
+    def assert_deface_overrides_valid(partial_patterns:)
+      patterns = Array partial_patterns
+      invalid_overrides = []
+
+      # rubocop:disable Rails/FindEach -- Deface::Override.all returns a Hash, not ActiveRecord::Relation
+      Deface::Override.all.each do |virtual_path, overrides_hash|
+        # Collect overrides we care about for this template
+        relevant_overrides = overrides_hash.select do |_name, override|
+          next false unless override.respond_to? :args
+          next false if override.args[:original].blank?
+
+          partial = override.args[:partial].to_s
+          patterns.any? { |pattern| partial.include? pattern }
+        end
+
+        next if relevant_overrides.empty?
+
+        template_path = deface_resolve_template_path virtual_path
+        next unless template_path && File.exist?(template_path)
+
+        # Get ALL overrides for this template, sorted by sequence (like Deface does at runtime)
+        all_overrides_sorted = overrides_hash.values.sort_by(&:sequence)
+
+        # Parse template once and reuse the doc object to avoid re-parsing artifacts
+        source = File.read template_path
+        doc = Deface::Parser.convert source
+
+        # Apply overrides in sequence order, validating our overrides as we go
+        all_overrides_sorted.each do |override|
+          elements = doc.css override.selector
+
+          # If this is one of our overrides, validate it
+          if relevant_overrides.value? override
+            if elements.empty?
+              invalid_overrides << "#{override.name}: selector '#{override.selector}' finds no elements"
+            else
+              actual_hash = if override.args[:closing_selector].present?
+                              # Range-based hash: Deface joins all nodes in the range before hashing
+                              # (see Deface::OriginalValidator#validate_original line 11)
+                              range = deface_find_range doc, override
+                              # map(&:to_s) is required: range is a Nokogiri NodeSet, not a plain Array
+                              Digest::SHA1.hexdigest(range.map(&:to_s).join.gsub(/\s/, '')) if range # rubocop:disable Style/MapJoin
+                            else
+                              Digest::SHA1.hexdigest(elements.first.to_s.gsub(/\s/, ''))
+                            end
+              expected_hash = override.args[:original]
+
+              if actual_hash && actual_hash != expected_hash
+                invalid_overrides << "#{override.name}: expected hash '#{expected_hash}', got '#{actual_hash}'"
+              end
+            end
+          end
+
+          # Simulate applying this override by modifying the doc in place
+          deface_simulate_override_in_place doc, override if elements.any?
+        end
+      end
+      # rubocop:enable Rails/FindEach
+
+      assert_empty invalid_overrides,
+                   "Deface overrides with invalid hashes:\n#{invalid_overrides.join "\n"}"
     end
 
     def WikiPage.generate(**options)
@@ -223,6 +397,88 @@ module Additionals
     def WikiPage.generate!(**options)
       WikiPage.find_by(title: options[:title])&.delete if options[:title]
       WikiPage.generate(**options).tap(&:save!)
+    end
+
+    private
+
+    # Simulates applying a Deface override by modifying the doc in place.
+    # Uses actual source_element content to match runtime hash calculations.
+    def deface_simulate_override_in_place(doc, override)
+      target = doc.css(override.selector).first
+      return unless target
+
+      action = override.action.to_sym
+
+      # Range-based actions with closing_selector (see Deface::Actions::Replace/ReplaceContents)
+      if override.args[:closing_selector].present? && %i[replace replace_contents].include?(action)
+        range = deface_find_range doc, override
+        return unless range
+
+        case action
+        when :replace
+          range.first.before override.source_element.to_s
+          range.each(&:remove)
+        when :replace_contents
+          if range.length == 1
+            range.first.children.remove
+            range.first.add_child override.source_element.to_s
+          else
+            range[1..-2].each(&:remove)
+            range.first.after override.source_element.to_s
+          end
+        end
+        return
+      end
+
+      case action
+      when :insert_bottom
+        target.add_child override.source_element.to_s
+      when :insert_top
+        target.prepend_child override.source_element.to_s
+      when :insert_after
+        target.after override.source_element.to_s
+      when :insert_before
+        target.before override.source_element.to_s
+      when :replace
+        target.replace override.source_element.to_s
+      when :replace_contents
+        target.inner_html = override.source_element.to_s
+      when :remove
+        target.remove
+      when :set_attributes, :add_to_attributes, :remove_from_attributes
+        # Attribute actions don't affect element content/hash, skip
+        nil
+      end
+    end
+
+    # Finds all nodes in a range from start selector to closing_selector,
+    # replicating Deface::Matchers::Range#select_endpoints and #select_range
+    def deface_find_range(doc, override)
+      start_el = doc.css(override.selector).first
+      return unless start_el
+
+      end_css = "#{override.selector} ~ #{override.args[:closing_selector]}"
+      end_el = start_el.parent ? start_el.parent.css(end_css).first : doc.css(end_css).first
+      return unless end_el
+
+      range = []
+      node = start_el
+      while node
+        range << node
+        break if node == end_el
+
+        node = node.next
+      end
+      range
+    end
+
+    def deface_resolve_template_path(virtual_path)
+      possible_paths = [
+        Rails.root.join('app', 'views', "#{virtual_path}.html.erb"),
+        Rails.root.join('app', 'views', "#{virtual_path}.html.slim")
+      ]
+
+      possible_paths.find { |path| File.exist? path }
     end
   end
 end

@@ -7,9 +7,8 @@ module Additionals
 
       included do
         include InstanceMethods
-        safe_attributes 'recently_used_dashboards'
 
-        UserPreference::AUTO_WATCH_ON_OPTIONS << 'issue_assigned'
+        safe_attributes 'recently_used_dashboards'
       end
 
       module InstanceMethods

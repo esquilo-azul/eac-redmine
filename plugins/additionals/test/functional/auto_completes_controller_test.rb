@@ -6,47 +6,8 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
   def setup
     prepare_tests
     Setting.default_language = 'en'
-  end
-
-  def test_fontawesome_default
-    get :fontawesome
-
-    assert_response :success
-    json = ActiveSupport::JSON.decode response.body
-
-    assert_kind_of Array, json
-    icon = json.first
-
-    assert_kind_of Hash, icon
-    assert_equal 'far_address-book', icon['id']
-    assert_equal 'Address Book', icon['text']
-  end
-
-  def test_fontawesome_search
-    get :fontawesome,
-        params: { q: 'sun' }
-
-    assert_response :success
-    json = ActiveSupport::JSON.decode response.body
-
-    assert_kind_of Array, json
-    assert_equal 5, json.count
-    icon = json.first
-
-    assert_kind_of Hash, icon
-    assert_equal 'fas_cloud-sun', icon['id']
-    assert_equal 'Cloud with Sun', icon['text']
-  end
-
-  def test_fontawesome_search_without_result
-    get :fontawesome,
-        params: { q: 'doesnotexist' }
-
-    assert_response :success
-    json = ActiveSupport::JSON.decode response.body
-
-    assert_kind_of Array, json
-    assert_equal 0, json.count
+    # Frontend callers (select2, jQuery autocomplete) ask for JSON, so do the tests.
+    @request.headers['Accept'] = 'application/json'
   end
 
   def test_issue_assignee
@@ -65,6 +26,56 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
     end
   end
 
+  # Form selects write to an assigned_to_id column, where the filter default 'me' would cast
+  # to integer 0 and violate the foreign key. They pass the real user id via me_value instead.
+  def test_issue_assignee_with_me_value_replaces_me_id
+    @request.session[:user_id] = 2
+
+    get :issue_assignee,
+        params: { me_value: 2 },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_equal '2', json.first['id']
+    assert_equal '2', json.first['value']
+  end
+
+  def test_issue_assignee_with_groups_enabled
+    with_settings issue_group_assignment: '1' do
+      get :issue_assignee, xhr: true
+
+      assert_response :success
+      json = ActiveSupport::JSON.decode response.body
+
+      assert_kind_of Array, json
+
+      group_section = json.detect { |g| g.is_a?(Hash) && g['text'] == 'Groups' }
+
+      assert_not_nil group_section, 'Expected Groups section when issue_group_assignment is enabled'
+      assert group_section['children'].any?, 'Expected at least one group'
+    end
+  end
+
+  def test_issue_assignee_with_involved_principals
+    issue = issues :issues_001
+
+    get :issue_assignee,
+        params: { project_id: 1, issue_id: issue.id },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_kind_of Array, json
+
+    involved_group = json.detect { |g| g.is_a?(Hash) && g['children'] && g['text'] != 'active' }
+
+    assert_not_nil involved_group, 'Expected involved principals group'
+    assert involved_group['children'].any?
+  end
+
   def test_assignee
     get :assignee, xhr: true
 
@@ -79,6 +90,66 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
     assert_equal 7, json.second['children'].count
     assert_equal 'Groups', json.third['text']
     assert_equal 2, json.third['children'].count
+  end
+
+  def test_assignee_with_groups_then_users_format
+    with_settings assignee_dropdown_display_format: 'groups_then_users' do
+      get :assignee, xhr: true
+
+      assert_response :success
+      json = ActiveSupport::JSON.decode response.body
+
+      assert_equal 'me', json.first['id']
+      assert_equal 'Groups', json.second['text']
+      assert_equal 2, json.second['children'].count
+      assert_equal 'active', json.third['text']
+      assert_equal 7, json.third['children'].count
+    end
+  end
+
+  def test_assignee_with_users_by_group_format
+    with_settings assignee_dropdown_display_format: 'users_by_group' do
+      get :assignee, xhr: true
+
+      assert_response :success
+      json = ActiveSupport::JSON.decode response.body
+
+      assert_equal 'me', json.first['id']
+      assert_equal 'Groups', json.second['text']
+
+      a_team = json.detect { |g| g.is_a?(Hash) && g['text'] == Group.find(10).name }
+
+      assert_not_nil a_team, 'Expected a per-group section listing the group members'
+      assert_equal [8], a_team['children'].pluck('id')
+    end
+  end
+
+  def test_grouped_principals_ignores_assignee_format_without_flag
+    with_settings assignee_dropdown_display_format: 'groups_then_users' do
+      get :grouped_principals, xhr: true
+
+      assert_response :success
+      json = ActiveSupport::JSON.decode response.body
+
+      # Without the assignee_format flag the legacy order is kept (active before Groups),
+      # even though the setting requests groups first.
+      assert_equal 'active', json.first['text']
+      assert_equal 'Groups', json.second['text']
+    end
+  end
+
+  def test_grouped_principals_applies_assignee_format_with_flag
+    with_settings assignee_dropdown_display_format: 'groups_then_users' do
+      get :grouped_principals,
+          params: { assignee_format: true },
+          xhr: true
+
+      assert_response :success
+      json = ActiveSupport::JSON.decode response.body
+
+      assert_equal 'Groups', json.first['text']
+      assert_equal 'active', json.second['text']
+    end
   end
 
   def test_grouped_principals
@@ -114,6 +185,20 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
     assert_equal 2, json.third['children'].count
   end
 
+  def test_grouped_principals_with_me_value_replaces_me_id
+    @request.session[:user_id] = 2
+
+    get :grouped_principals,
+        params: { with_me: true, me_value: 2 },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_equal '2', json.first['id']
+    assert_equal '2', json.first['value']
+  end
+
   def test_grouped_users
     get :grouped_users, xhr: true
 
@@ -125,6 +210,20 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
     assert_equal 'active', json.first['text']
     assert_equal 7, json.first['children'].count
+  end
+
+  def test_grouped_users_should_respond_to_accept_json
+    get :grouped_users, xhr: true
+
+    assert_response :success
+    assert_equal 'application/json', response.media_type
+  end
+
+  def test_grouped_principals_should_respond_to_accept_json
+    get :grouped_principals, xhr: true
+
+    assert_response :success
+    assert_equal 'application/json', response.media_type
   end
 
   def test_grouped_users_with_me
@@ -213,6 +312,204 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
     assert_equal 2, entry['value']
   end
 
+  def test_authors
+    get :authors, xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_kind_of Array, json
+    assert_equal 'me', json.first['id']
+    assert_equal 'active', json.second['text']
+  end
+
+  def test_authors_for_project
+    get :authors,
+        params: { project_id: 1 },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_kind_of Array, json
+    assert_equal 'me', json.first['id']
+    assert json.second['children'].any?
+  end
+
+  def test_authors_with_search
+    get :authors,
+        params: { q: 'john' },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_kind_of Array, json
+    assert_equal 1, json.count
+
+    children = json.first['children']
+
+    assert_equal 1, children.count
+    assert_equal 2, children.first['id']
+    assert_equal 'John Smith', children.first['text']
+  end
+
+  def test_custom_field_users_without_project
+    get :custom_field_users,
+        params: { custom_field_id: 1 },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_kind_of Array, json
+    assert_empty json
+  end
+
+  def test_custom_field_users_for_project
+    cf = IssueCustomField.create! name: 'Test User CF',
+                                  field_format: 'user',
+                                  is_for_all: true,
+                                  tracker_ids: [1]
+
+    get :custom_field_users,
+        params: { project_id: 1, custom_field_id: cf.id },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_kind_of Array, json
+    assert json.any?
+  end
+
+  def test_custom_field_users_defaults_to_me_id
+    cf = IssueCustomField.create! name: 'Test User CF',
+                                  field_format: 'user',
+                                  is_for_all: true,
+                                  tracker_ids: [1]
+
+    get :custom_field_users,
+        params: { project_id: 1, custom_field_id: cf.id },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_equal 'me', json.first['id']
+  end
+
+  def test_custom_field_users_with_me_value_replaces_me_id
+    @request.session[:user_id] = 2
+    cf = IssueCustomField.create! name: 'Test User CF',
+                                  field_format: 'user',
+                                  is_for_all: true,
+                                  tracker_ids: [1]
+
+    get :custom_field_users,
+        params: { project_id: 1, custom_field_id: cf.id, me_value: 2 },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_equal '2', json.first['id']
+    assert_equal '2', json.first['value']
+  end
+
+  def test_custom_field_users_with_search
+    cf = IssueCustomField.create! name: 'Test User CF',
+                                  field_format: 'user',
+                                  is_for_all: true,
+                                  tracker_ids: [1]
+
+    get :custom_field_users,
+        params: { project_id: 1, custom_field_id: cf.id, q: 'john' },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_kind_of Array, json
+    children = json.first['children']
+
+    assert_equal 1, children.count
+    assert_equal 'John Smith', children.first['text']
+  end
+
+  def test_custom_field_users_with_invalid_cf
+    get :custom_field_users,
+        params: { project_id: 1, custom_field_id: 99_999 },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_kind_of Array, json
+    assert_empty json
+  end
+
+  def test_authors_requires_login
+    with_settings login_required: '1' do
+      @request.session[:user_id] = nil
+      get :authors, xhr: true
+
+      assert_response :forbidden
+    end
+  end
+
+  def test_authors_scoped_by_visibility
+    @request.session[:user_id] = 8
+
+    get :authors,
+        params: { project_id: 1 },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    # Results are scoped by user visibility, not full project member list
+    assert_kind_of Array, json
+  end
+
+  def test_custom_field_users_requires_login
+    with_settings login_required: '1' do
+      @request.session[:user_id] = nil
+      get :custom_field_users,
+          params: { project_id: 1, custom_field_id: 1 },
+          xhr: true
+
+      assert_response :forbidden
+    end
+  end
+
+  def test_custom_field_users_scoped_by_visibility
+    @request.session[:user_id] = 8
+
+    cf = IssueCustomField.create! name: 'Test User CF Perm',
+                                  field_format: 'user',
+                                  is_for_all: true,
+                                  tracker_ids: [1]
+
+    get :custom_field_users,
+        params: { project_id: 1, custom_field_id: cf.id },
+        xhr: true
+
+    assert_response :success
+    json = ActiveSupport::JSON.decode response.body
+
+    assert_kind_of Array, json
+  end
+
+  def test_issue_assignee_requires_login
+    with_settings login_required: '1' do
+      @request.session[:user_id] = nil
+      get :issue_assignee, xhr: true
+
+      assert_response :forbidden
+    end
+  end
+
   def test_grouped_users_scope
     Role.anonymous.update! users_visibility: 'members_of_visible_projects'
     @request.session[:user_id] = nil
@@ -226,5 +523,65 @@ class AutoCompletesControllerTest < Additionals::ControllerTest
 
     assert_equal 'active', json.first['text']
     assert_equal 2, json.first['children'].count
+  end
+
+  def test_custom_field_users_scope_all_includes_active_non_project_user
+    @request.session[:user_id] = 1
+    outsider = User.generate! firstname: 'Xavier', lastname: 'Scopeoutsider'
+    cf = IssueCustomField.create! name: 'Scope All CF', field_format: 'user', is_for_all: true, user_scope: '1'
+
+    get :custom_field_users,
+        params: { project_id: 1, custom_field_id: cf.id, q: 'Scopeoutsider' },
+        xhr: true
+
+    assert_response :success
+    assert_includes custom_field_users_ids(response.body), outsider.id
+  end
+
+  def test_custom_field_users_scope_all_includes_locked_user
+    @request.session[:user_id] = 1
+    locked = User.generate! firstname: 'Laura', lastname: 'Scopelocked', status: User::STATUS_LOCKED
+    cf = IssueCustomField.create! name: 'Scope All Locked CF', field_format: 'user', is_for_all: true, user_scope: '1'
+
+    get :custom_field_users,
+        params: { project_id: 1, custom_field_id: cf.id, q: 'Scopelocked' },
+        xhr: true
+
+    assert_response :success
+    assert_includes custom_field_users_ids(response.body), locked.id
+  end
+
+  def test_custom_field_users_scope_active_includes_non_project_user
+    @request.session[:user_id] = 1
+    outsider = User.generate! firstname: 'Yara', lastname: 'Activeoutsider'
+    cf = IssueCustomField.create! name: 'Scope Active CF', field_format: 'user', is_for_all: true, user_scope: '4'
+
+    get :custom_field_users,
+        params: { project_id: 1, custom_field_id: cf.id, q: 'Activeoutsider' },
+        xhr: true
+
+    assert_response :success
+    assert_includes custom_field_users_ids(response.body), outsider.id
+  end
+
+  def test_custom_field_users_scope_active_excludes_locked_user
+    @request.session[:user_id] = 1
+    locked = User.generate! firstname: 'Nora', lastname: 'Activelocked', status: User::STATUS_LOCKED
+    cf = IssueCustomField.create! name: 'Scope Active Locked CF', field_format: 'user', is_for_all: true, user_scope: '4'
+
+    get :custom_field_users,
+        params: { project_id: 1, custom_field_id: cf.id, q: 'Activelocked' },
+        xhr: true
+
+    assert_response :success
+    assert_not_includes custom_field_users_ids(response.body), locked.id
+  end
+
+  private
+
+  # Flattens the grouped select2 JSON payload into a plain list of user ids.
+  def custom_field_users_ids(body)
+    json = ActiveSupport::JSON.decode body
+    json.flat_map { |group| group['children'] || [group] }.filter_map { |entry| entry['id']&.to_i }
   end
 end

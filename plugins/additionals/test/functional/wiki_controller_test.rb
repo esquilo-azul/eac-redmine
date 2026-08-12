@@ -2,12 +2,124 @@
 
 require File.expand_path '../../test_helper', __FILE__
 
+class ViewWikiShowActionDropdownRenderOn < Redmine::Hook::ViewListener
+  render_on :view_wiki_show_action_dropdown, inline: '<span class="test-action-dropdown">Hook content</span>'
+end
+
+class ViewWikiShowBottomRenderOn < Redmine::Hook::ViewListener
+  render_on :view_wiki_show_bottom, inline: '<div class="test-wiki-bottom">Hook content</div>'
+end
+
+class ViewWikiFormBottomRenderOn < Redmine::Hook::ViewListener
+  render_on :view_wiki_form_bottom, inline: '<div class="test-wiki-form-bottom">Hook content</div>'
+end
+
+class ViewWikiIndexBottomRenderOn < Redmine::Hook::ViewListener
+  render_on :view_wiki_index_bottom, inline: '<div class="test-wiki-index-bottom">Hook content</div>'
+end
+
+class ViewWikiDateIndexBottomRenderOn < Redmine::Hook::ViewListener
+  render_on :view_wiki_date_index_bottom, inline: '<div class="test-wiki-date-index-bottom">Hook content</div>'
+end
+
 class WikiControllerTest < Additionals::ControllerTest
   WIKI_MACRO_USER_ID = 2
 
   def setup
     prepare_tests
     EnabledModule.create project_id: 1, name: 'wiki'
+  end
+
+  def test_show_with_hook_view_wiki_show_action_dropdown
+    Redmine::Hook.add_listener ViewWikiShowActionDropdownRenderOn
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'span.test-action-dropdown', text: 'Hook content'
+  end
+
+  def test_show_with_hook_view_wiki_show_bottom
+    Redmine::Hook.add_listener ViewWikiShowBottomRenderOn
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div.test-wiki-bottom', text: 'Hook content'
+  end
+
+  def test_edit_with_hook_view_wiki_form_bottom
+    Redmine::Hook.add_listener ViewWikiFormBottomRenderOn
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! title: __method__.to_s
+
+    get :edit,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div.test-wiki-form-bottom', text: 'Hook content'
+  end
+
+  def test_index_with_hook_view_wiki_index_bottom
+    Redmine::Hook.add_listener ViewWikiIndexBottomRenderOn
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+
+    get :index,
+        params: { project_id: 1 }
+
+    assert_response :success
+    assert_select 'div.test-wiki-index-bottom', text: 'Hook content'
+  end
+
+  def test_date_index_with_hook_view_wiki_date_index_bottom
+    Redmine::Hook.add_listener ViewWikiDateIndexBottomRenderOn
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+
+    get :date_index,
+        params: { project_id: 1 }
+
+    assert_response :success
+    assert_select 'div.test-wiki-date-index-bottom', text: 'Hook content'
+  end
+
+  def test_show_inline_attachment_image_with_emoji_support
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = wiki_pages :wiki_pages_004
+    attachment = attachments :attachments_003
+
+    page.content.update! text: '![](logo.gif)'
+
+    with_plugin_settings 'additionals', legacy_smiley_support: 0,
+                                        emoji_support: 1 do
+      get :show,
+          params: { project_id: 1, id: page.title }
+
+      assert_response :success
+      assert_select 'img[src*=?]', "/attachments/download/#{attachment.id}/logo.gif"
+    end
+  end
+
+  def test_show_inline_attachment_image_with_smiley_support
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = wiki_pages :wiki_pages_004
+    attachment = attachments :attachments_003
+
+    page.content.update! text: '![](logo.gif)'
+
+    with_plugin_settings 'additionals', legacy_smiley_support: 1,
+                                        emoji_support: 0 do
+      get :show,
+          params: { project_id: 1, id: page.title }
+
+      assert_response :success
+      assert_select 'img[src*=?]', "/attachments/download/#{attachment.id}/logo.gif"
+    end
   end
 
   def test_show_with_youtube_macro
@@ -177,6 +289,9 @@ class WikiControllerTest < Additionals::ControllerTest
     assert_select 'a[href=?]', '/projects/ecookbook/activity'
   end
 
+  # The macro output is looked up inside the content on purpose: a plugin may render
+  # the same markup elsewhere on the page, so an unanchored selector would match
+  # more than once.
   def test_show_recently_updated_macro
     @request.session[:user_id] = WIKI_MACRO_USER_ID
     page = WikiPage.generate! content: '{{recently_updated}}',
@@ -186,7 +301,110 @@ class WikiControllerTest < Additionals::ControllerTest
         params: { project_id: 1, id: page.title }
 
     assert_response :success
-    assert_select 'div.recently-updated'
+    assert_select 'div#content div.recently-updated' do
+      assert_select 'h3', /Updated pages/
+    end
+  end
+
+  def test_show_recently_updated_macro_with_custom_title
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{recently_updated(7, title=Recent Changes)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div#content div.recently-updated' do
+      assert_select 'h3', /Recent Changes/
+    end
+  end
+
+  def test_show_recently_updated_macro_without_title_false
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{recently_updated(7, title=false)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div#content div.recently-updated' do
+      assert_select 'h3', count: 0
+    end
+  end
+
+  def test_show_recently_updated_macro_with_limit
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{recently_updated(7, limit=1)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div#content div.recently-updated' do
+      assert_select 'ul.wiki-flat li', count: 1
+    end
+  end
+
+  def test_show_recently_updated_macro_without_limit
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    WikiPage.generate! content: 'another page', title: "#{__method__}_other"
+    page = WikiPage.generate! content: '{{recently_updated}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div#content div.recently-updated' do
+      assert_select 'ul.wiki-flat li', minimum: 2
+    end
+  end
+
+  def test_show_recently_updated_macro_without_title_none
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{recently_updated(7, title=none)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div#content div.recently-updated' do
+      assert_select 'h3', count: 0
+    end
+  end
+
+  def test_show_recently_updated_macro_without_title_off
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{recently_updated(7, title=off)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div#content div.recently-updated' do
+      assert_select 'h3', count: 0
+    end
+  end
+
+  def test_show_recently_updated_macro_with_no_pages
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{recently_updated(1)}}',
+                              title: __method__.to_s
+
+    # Travel far into the future so no pages are in the "recently updated" range
+    travel_to 100.years.from_now do
+      get :show,
+          params: { project_id: 1, id: page.title }
+
+      assert_response :success
+      # When no pages are found, the macro should not render anything (no div.recently-updated)
+      assert_select 'div#content div.recently-updated', count: 0
+    end
   end
 
   def test_show_with_members_macro
@@ -237,16 +455,96 @@ class WikiControllerTest < Additionals::ControllerTest
     assert_select 'div.wiki div.additionals-projects tr.project'
   end
 
-  def test_show_with_fa_macro
+  def test_show_with_tabler_macro
     @request.session[:user_id] = WIKI_MACRO_USER_ID
-    page = WikiPage.generate! content: '{{fa(adjust)}}',
+    page = WikiPage.generate! content: '{{tabler(car)}}',
                               title: __method__.to_s
 
     get :show,
         params: { project_id: 1, id: page.title }
 
     assert_response :success
-    assert_select 'i.fas.fa-adjust'
+    assert_select 'svg.icon-svg.additionals-macro-icon use[href*=?]', 'icon--car'
+  end
+
+  def test_show_with_fa_macro
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{fa(fas_car)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'svg.icon-svg.additionals-macro-icon use[href*=?]', 'icon--car'
+  end
+
+  def test_show_with_tabler_macro_and_repeat
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{tabler(star-filled, repeat=3)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div.wiki svg.additionals-macro-icon use[href*=?]', 'icon--star-filled', count: 3
+  end
+
+  def test_show_with_tabler_macro_and_repeat_above_the_limit
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{tabler(star-filled, repeat=100)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div.wiki svg.additionals-macro-icon use[href*=?]', 'icon--star-filled',
+                  count: Additionals::WikiMacros::FaMacro::MAX_REPEAT
+  end
+
+  def test_show_with_tabler_macro_and_invalid_repeat
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{tabler(star-filled, repeat=nonsense)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div.wiki svg.additionals-macro-icon use[href*=?]', 'icon--star-filled', count: 1
+  end
+
+  # Text and link belong to the group of icons, not to each single one.
+  def test_show_with_tabler_macro_and_repeat_with_text_and_link
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{tabler(star-filled, repeat=3, text=3 of 5, link=https://www.redmine.org)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'div.wiki a[href=?]', 'https://www.redmine.org', count: 1 do
+      assert_select 'svg.additionals-macro-icon use[href*=?]', 'icon--star-filled', count: 3
+      assert_select 'a', text: /3 of 5/
+    end
+  end
+
+  def test_show_with_fa_macro_options
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{fa(car, color=#ff0000, text=Drive, link=https://www.redmine.org)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    assert_select 'a[href=?][style*=?]', 'https://www.redmine.org', 'color: #ff0000' do
+      assert_select 'svg.icon-svg.additionals-macro-icon use[href*=?]', 'icon--car'
+      assert_select 'a', text: /Drive/
+    end
   end
 
   def test_show_with_redmine_issue_macro
@@ -320,6 +618,20 @@ class WikiControllerTest < Additionals::ControllerTest
     assert_response :success
     assert_select 'div.wiki div.cryptocompare',
                   text: %r{https://widgets\.cryptocompare\.com/serve/v3/coin/header\?fsyms=BTC,ETH&tsyms=EUR}
+  end
+
+  def test_show_with_cryptocompare_macro_escapes_option_values
+    @request.session[:user_id] = WIKI_MACRO_USER_ID
+    page = WikiPage.generate! content: '{{cryptocompare(fsym=BTC";alert(1)//)}}',
+                              title: __method__.to_s
+
+    get :show,
+        params: { project_id: 1, id: page.title }
+
+    assert_response :success
+    # the injected quote must stay inside the JS string literal (escaped), not break out
+    assert_not_includes response.body, 'BTC";alert'
+    assert_includes response.body, 'BTC\";alert'
   end
 
   def test_show_with_date_macro

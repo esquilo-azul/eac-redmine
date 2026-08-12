@@ -18,6 +18,17 @@ module WikiFormatting
       end
     end
 
+    def test_smileys_not_in_code_blocks
+      input = '<pre><code>:)</code></pre>'
+      with_plugin_settings 'additionals', legacy_smiley_support: 1,
+                                          emoji_support: 0 do
+        result = smiley_filter input
+
+        assert_not_includes result, 'icon--smiley-smiley'
+        assert_includes result, ':)'
+      end
+    end
+
     def test_emojis
       input = <<~HTML
         :heart:
@@ -42,14 +53,92 @@ module WikiFormatting
       end
     end
 
+    def test_emojis_not_in_code_blocks
+      input = '<pre><code>:heart:</code></pre>'
+      with_plugin_settings 'additionals', legacy_smiley_support: 0,
+                                          emoji_support: 1 do
+        result = emoji_filter input
+
+        assert_not_includes result, '<additionals-emoji'
+        assert_includes result, ':heart:'
+      end
+    end
+
+    def test_emojis_not_in_links
+      input = '<a href="https://example.com/:heart:/g/x">https://example.com/:heart:/g/x</a>'
+      with_plugin_settings 'additionals', legacy_smiley_support: 0,
+                                          emoji_support: 1 do
+        result = emoji_filter input
+
+        assert_not_includes result, '<additionals-emoji'
+        assert_includes result, ':heart:'
+      end
+    end
+
+    def test_unicode_emojis_not_in_links
+      input = '<a href="https://example.com/x">https://example.com/✌️/x</a>'
+      with_plugin_settings 'additionals', legacy_smiley_support: 0,
+                                          emoji_support: 1 do
+        result = emoji_filter input
+
+        assert_not_includes result, '<additionals-emoji'
+      end
+    end
+
+    def test_emojis_still_render_next_to_links
+      input = ':heart: <a href="https://example.com/">link</a>'
+      with_plugin_settings 'additionals', legacy_smiley_support: 0,
+                                          emoji_support: 1 do
+        result = emoji_filter input
+
+        assert_includes result, '<additionals-emoji'
+        assert_not_includes result, ':heart:'
+      end
+    end
+
+    def test_emojis_still_render_outside_code_and_links
+      input = ':heart:'
+      with_plugin_settings 'additionals', legacy_smiley_support: 0,
+                                          emoji_support: 1 do
+        result = emoji_filter input
+
+        assert_includes result, '<additionals-emoji'
+        assert_not_includes result, ':heart:'
+      end
+    end
+
+    def test_scrubbers_are_defined
+      assert defined?(Additionals::WikiFormatting::CommonMark::EmojiScrubber),
+             'EmojiScrubber should be defined'
+      assert defined?(Additionals::WikiFormatting::CommonMark::SmileyScrubber),
+             'SmileyScrubber should be defined'
+    end
+
+    def test_formatter_uses_correct_implementation
+      text = 'Test with emoji :heart: and smiley :)'
+
+      with_plugin_settings 'additionals', legacy_smiley_support: 1,
+                                          emoji_support: 1 do
+        formatter = Redmine::WikiFormatting::CommonMark::Formatter.new text
+        result = formatter.to_html
+
+        assert_includes result, emoji_heart_tag, 'Should process emoji'
+        assert_includes result, '#icon--smiley-smiley', 'Should process smiley'
+      end
+    end
+
     private
 
     def smiley_filter(html)
-      Additionals::WikiFormatting::CommonMark::SmileyFilter.to_html html, @options
+      fragment = Redmine::WikiFormatting::HtmlParser.parse html
+      fragment.scrub! Additionals::WikiFormatting::CommonMark::SmileyScrubber.new
+      fragment.to_s
     end
 
     def emoji_filter(html)
-      Additionals::WikiFormatting::CommonMark::EmojiFilter.to_html html, @options
+      fragment = Redmine::WikiFormatting::HtmlParser.parse html
+      fragment.scrub! Additionals::WikiFormatting::CommonMark::EmojiScrubber.new
+      fragment.to_s
     end
   end
 end

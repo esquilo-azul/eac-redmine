@@ -18,6 +18,20 @@ module Additionals
       end
 
       class_methods do
+        # Canonical scope for project listings that intentionally bypass
+        # `Project.visible` -- typical callers are admin-only optimizations
+        # that read every project regardless of role permissions, or ID-based
+        # lookups (bookmarks, custom-field references, ...) that join their
+        # own visibility logic on top.
+        #
+        # Default: equivalent to `all`. Plugins that need to subtract certain
+        # project kinds from every such listing override the scope via
+        # `prepend`, and callers automatically pick up the narrower scope
+        # without having to know which plugins are installed.
+        def listable
+          all
+        end
+
         def usable_status_ids
           USABLE_STATUSES.keys
         end
@@ -43,21 +57,20 @@ module Additionals
 
       module InstanceOverwriteMethods
         def assignable_users(tracker = nil)
-          super
-          return @assignable_users[tracker] if @assignable_users[tracker].blank?
-          return @assignable_users[tracker] unless consider_hidden_roles?
+          # NOTE: For backward compatibility with dependent plugins, we CANNOT cache ActiveRecord::Relations
+          # because they need to be fresh for chaining with .where(), .order(), etc.
+          # We sacrifice some performance for full compatibility.
 
-          a_u = Arel::Table.new :users
-          a_m = Arel::Table.new :members
-
-          users = @assignable_users[tracker]
-          subquery = Member.joins(:roles)
-                           .where(members: { project_id: id },
-                                  roles: { hide: false })
-                           .where(a_u[:id].eq(a_m[:user_id]))
-
-          @assignable_users[tracker] = users.where "EXISTS(#{subquery.to_sql})"
+          # Use optimized implementation that returns ActiveRecord::Relation (not Array!)
+          # This ensures backward compatibility with dependent plugins using .where() etc.
+          if tracker
+            ::Additionals::AssignableUsersOptimizer.issue_assignable_users_relation self, tracker: tracker
+          else
+            ::Additionals::AssignableUsersOptimizer.project_assignable_users_relation self
+          end
         end
+
+        # NOTE: Caching removed for ActiveRecord::Relation compatibility
 
         def principals_by_role
           return super unless consider_hidden_roles?
@@ -112,12 +125,18 @@ module Additionals
         #
         # - always with groups and users
         # - no tracker support -> cannot be used with issues
+        #
+        # Wraps the JOIN-with-DISTINCT in a subquery so the outer `.sorted`
+        # ORDER BY does not conflict with PostgreSQL's strict
+        # SELECT-DISTINCT-must-include-ORDER-BY-columns rule. MySQL tolerates
+        # the original .distinct.sorted chain, PG raises
+        # PG::InvalidColumnReference.
         def assignable_principals
-          Principal.assignable
-                   .joins(members: :roles)
-                   .where(members: { project_id: id },
-                          roles: { assignable: true })
-                   .distinct
+          Principal.where(id: Principal.assignable
+                                       .joins(members: :roles)
+                                       .where(members: { project_id: id },
+                                              roles: { assignable: true })
+                                       .select(:id))
                    .sorted
         end
 

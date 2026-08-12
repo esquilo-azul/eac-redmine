@@ -14,6 +14,8 @@ Rails.application.routes.draw do
       post :add_block
       post :remove_block
       post :order_blocks
+      put :lock
+      put :unlock
     end
   end
 
@@ -24,21 +26,27 @@ Rails.application.routes.draw do
         post :add_block
         post :remove_block
         post :order_blocks
+        put :lock
+        put :unlock
       end
     end
     resource :dashboard_async_blocks, only: %i[show create]
+  end
+
+  resource :global_search, only: [], controller: 'global_search' do
+    get :search, on: :collection
   end
 
   resource :additionals_macros, only: :show, path: '/help/macros'
 
   resources :auto_completes, only: [] do
     collection do
-      get :fontawesome
       get :issue_assignee
       get :assignee
       get :authors
       get :grouped_principals
       get :grouped_users
+      get :custom_field_users
     end
   end
 end
