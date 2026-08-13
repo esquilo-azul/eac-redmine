@@ -15,11 +15,11 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,installer,lib}/**/*', 'init.rb']
   s.required_ruby_version = '>= 3.2' # rubocop:disable Gemspec/RequiredRubyVersion
 
-  s.add_dependency 'avm', '~> 0.102', '>= 0.102.3'
-  s.add_dependency 'eac_rails_utils', '~> 0.29', '>= 0.29.5'
-  s.add_dependency 'eac_ruby_utils', '~> 0.132'
+  s.add_dependency 'avm', '~> 0.102', '>= 0.102.4'
+  s.add_dependency 'eac_rails_utils', '~> 0.31'
+  s.add_dependency 'eac_ruby_utils', '~> 0.133'
   s.add_dependency 'redcarpet'
   s.add_dependency 'sidekiq'
 
-  s.add_development_dependency 'eac_rails_gem_support', '~> 0.13', '>= 0.13.2'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.15'
 end
