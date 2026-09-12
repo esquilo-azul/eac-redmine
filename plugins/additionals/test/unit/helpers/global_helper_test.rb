@@ -11,6 +11,28 @@ class GlobalHelperTest < Additionals::HelperTest
   include Redmine::I18n
   include ERB::Util
 
+  # Variable cheat-sheets of any plugin are revealed by this link (#15778)
+  def test_link_to_show_variables_renders_link
+    html = link_to_show_variables
+
+    assert_include 'class="show-variables"', html
+    assert_include 'href="#"', html
+    assert_not_include 'data-show-target', html
+  end
+
+  def test_link_to_show_variables_with_target_adds_data_attribute
+    html = link_to_show_variables target: 'my_vars_list'
+
+    assert_include 'class="show-variables"', html
+    assert_include 'data-show-target="my_vars_list"', html
+  end
+
+  def test_link_to_show_variables_without_target_adds_no_data_attribute
+    html = link_to_show_variables target: nil
+
+    assert_not_include 'data-show-target', html
+  end
+
   def test_custom_field_value_with_single_value
     field = IssueCustomField.generate! name: 'Height'
     value = CustomFieldValue.new
@@ -86,6 +108,37 @@ class GlobalHelperTest < Additionals::HelperTest
     assert_include 'Redmine Admin', html
   end
 
+  # A gravatar carries no width or height, so without the size class it collapses
+  # whenever the image does not arrive (#10179)
+  def test_avatar_gravatar_carries_size_class
+    with_settings gravatar_enabled: '1' do
+      assert_include 'class="s32 gravatar avatar"', avatar(users(:users_002), size: 32)
+    end
+  end
+
+  def test_avatar_gravatar_keeps_the_size_class_once_when_it_is_already_set
+    with_settings gravatar_enabled: '1' do
+      html = avatar users(:users_002), size: 32, class: 's32'
+
+      assert_equal 1, html.scan(/\bs32\b/).size
+    end
+  end
+
+  def test_avatar_gravatar_falls_back_to_the_default_size_class
+    with_settings gravatar_enabled: '1' do
+      assert_include "s#{GravatarHelper::DEFAULT_OPTIONS[:size]} ", avatar(users(:users_002))
+    end
+  end
+
+  def test_avatar_initials_carries_the_size_class_only_once
+    with_settings gravatar_enabled: '0' do
+      html = avatar users(:users_002), size: 32
+
+      assert_include 'role="img"', html
+      assert_equal 1, html.scan(/\bs32\b/).size
+    end
+  end
+
   def test_link_to_url
     assert_equal 'redmine.org/test', Nokogiri::HTML.parse(link_to_url('http://redmine.org/test')).xpath('//a').first.text
     assert_equal 'redmine.org/test', Nokogiri::HTML.parse(link_to_url('https://redmine.org/test')).xpath('//a').first.text
@@ -112,6 +165,18 @@ class GlobalHelperTest < Additionals::HelperTest
 
     assert_match(/<input[^>]*type="hidden"[^>]*name="foo\[\]"/, html)
     assert_no_match(/name="foo\[\]\[\]"/, html)
+  end
+
+  # The select2 ajax url is interpolated into a JS string literal. HTML escaping
+  # would turn the "&" between query parameters into "&amp;", so everything
+  # behind the first parameter would arrive as part of its value.
+  def test_autocomplete_select_entries_keeps_ampersand_in_ajax_url
+    html = autocomplete_select_entries 'foo', 'assignee_auto_completes', nil,
+                                       multiple: false,
+                                       ajax_params: { with_me: true, active_only: true }
+
+    assert_match(/url: "[^"]*active_only=true&with_me=true/, html)
+    assert_no_match(/url: "[^"]*&amp;/, html)
   end
 
   def test_render_label_sum_keeps_html_safe_label_intact

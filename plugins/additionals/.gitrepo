@@ -1,7 +1,7 @@
 [subrepo]
   cmdver = 0.4.9
-  commit = 1c9a01f6ce14df0ca772a098aa70eb23f8da71d9
+  commit = 2e896b154cda01b6b259a321925bb662ba2046f5
   method = merge
-  parent = 89471e6ce12ad4e4282260addc4ea9173b030465
-  branch = main
-  remote = https://github.com/AlphaNodes/additionals.git
+  parent = 0a75e73136df7119a8575d79bb32abd48da33251
+  branch = 2e896b154cda01b6b259a321925bb662ba2046f5
+  remote = https://github.com/alphanodes/additionals.git

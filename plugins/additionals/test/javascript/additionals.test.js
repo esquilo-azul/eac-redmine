@@ -8,6 +8,11 @@ const scriptContent = readFileSync(scriptPath, 'utf-8');
 
 // Mock Redmine Core globals
 globalThis.replaceInHistory = vi.fn();
+globalThis.ADDITIONALS_ICON_SPRITES = {
+  core: '/assets/icons-abc123.svg',
+  additionals: '/assets/plugin_assets/additionals/icons-def456.svg',
+  additionals_custom: '/assets/plugin_assets/additionals/icons_custom-789abc.svg',
+};
 
 // Use indirect eval to execute in global scope (direct eval runs in module scope)
 const globalEval = eval; // eslint-disable-line no-eval
@@ -61,6 +66,56 @@ describe('additionals.js', () => {
 
       expect(result.tagName).toBe('SPAN');
       expect(result.innerHTML).toBe('Plain text');
+    });
+  });
+
+  describe('spriteIcon', () => {
+    it('builds an icon from the core sprite by default', () => {
+      const result = spriteIcon('email');
+
+      expect(result).toContain('/assets/icons-abc123.svg#icon--email');
+      expect(result).toContain('class="s18 icon-svg"');
+      expect(result).toContain('aria-hidden="true"');
+    });
+
+    it('builds an icon from the additionals sprite', () => {
+      const result = spriteIcon('heading', { sprite: 'additionals' });
+
+      expect(result).toContain('/assets/plugin_assets/additionals/icons-def456.svg#icon--heading');
+    });
+
+    it('applies size and css class', () => {
+      const result = spriteIcon('email', { size: 24, cssClass: 'symbol' });
+
+      expect(result).toContain('class="s24 icon-svg symbol"');
+    });
+
+    it('renders a title element instead of aria-hidden', () => {
+      const result = spriteIcon('email', { title: 'Send mail' });
+
+      expect(result).toContain('<title>Send mail</title>');
+      expect(result).not.toContain('aria-hidden');
+    });
+
+    it('escapes a title with markup', () => {
+      const result = spriteIcon('email', { title: '<b>x</b>' });
+
+      expect(result).toContain('&lt;b&gt;x&lt;/b&gt;');
+    });
+
+    it('strips characters that are not part of a sprite name', () => {
+      const result = spriteIcon('email"><script>');
+
+      expect(result).toContain('#icon--emailscript');
+      expect(result).not.toContain('<script>');
+    });
+
+    it('returns an empty string for an unknown sprite', () => {
+      expect(spriteIcon('email', { sprite: 'nope' })).toBe('');
+    });
+
+    it('returns an empty string for a blank name', () => {
+      expect(spriteIcon('')).toBe('');
     });
   });
 
@@ -141,6 +196,93 @@ describe('additionals.js', () => {
       const result = showPluginSettingsTab('advanced', '/url');
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe('variable cheat-sheets', () => {
+    // markup as link_to_show_variables and the variable list render it
+    function setupDom({ target = null, focusField = false } = {}) {
+      const insertTarget = target ? ` data-insert-target="${target}"` : '';
+      document.body.innerHTML = `
+        <p>
+          <input id="my_field" value="">
+          <textarea id="other_field" class="variable-value"></textarea>
+          <em class="info"><a href="#" class="show-variables">Show variables</a></em>
+          <em class="info available-variables toggle-variables"${insertTarget}>
+            <a href="#" class="var">{%name%}</a>
+          </em>
+        </p>
+      `;
+
+      if (focusField) {
+        document.getElementById('other_field').dispatchEvent(new FocusEvent('focus'));
+      }
+    }
+
+    function click(selector) {
+      document.querySelector(selector)
+        .dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    }
+
+    it('reveals the list and hides the link', () => {
+      setupDom();
+
+      click('a.show-variables');
+
+      expect(document.querySelector('em.available-variables').classList.contains('toggle-variables')).toBe(false);
+      expect(document.querySelector('a.show-variables').style.display).toBe('none');
+    });
+
+    it('reveals the list named by data-show-target', () => {
+      document.body.innerHTML = `
+        <p>
+          <em class="info"><a href="#" class="show-variables" data-show-target="second_list">Show</a></em>
+          <em class="info available-variables toggle-variables" id="first_list"></em>
+          <em class="info available-variables toggle-variables" id="second_list"></em>
+        </p>
+      `;
+
+      click('a.show-variables');
+
+      expect(document.getElementById('second_list').classList.contains('toggle-variables')).toBe(false);
+      expect(document.getElementById('first_list').classList.contains('toggle-variables')).toBe(true);
+    });
+
+    it('inserts a variable into the field named by data-insert-target', () => {
+      setupDom({ target: 'my_field' });
+
+      click('a.var');
+
+      expect(document.getElementById('my_field').value).toBe('{%name%}');
+    });
+
+    it('inserts a variable at the cursor position', () => {
+      setupDom({ target: 'my_field' });
+      const field = document.getElementById('my_field');
+      field.value = 'ab';
+      field.selectionStart = 1;
+      field.selectionEnd = 1;
+
+      click('a.var');
+
+      expect(field.value).toBe('a{%name%}b');
+    });
+
+    it('inserts into the last focused field when no target is named', () => {
+      setupDom({ focusField: true });
+
+      click('a.var');
+
+      expect(document.getElementById('other_field').value).toBe('{%name%}');
+    });
+
+    it('leaves the fields alone when nothing was focused', () => {
+      setupDom();
+
+      click('a.var');
+
+      expect(document.getElementById('my_field').value).toBe('');
+      expect(document.getElementById('other_field').value).toBe('');
     });
   });
 });

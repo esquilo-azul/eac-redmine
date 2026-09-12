@@ -18,6 +18,54 @@ function formatNameWithIcon(opt) {
   return span;
 }
 
+/* Tabler sprite helpers for javascript generated markup.
+
+   The sprite paths carry an asset digest, so they cannot be built in
+   javascript. ADDITIONALS_ICON_SPRITES is provided by the html head partial
+   and maps a sprite key ('core', 'additionals', 'additionals_custom') to its
+   asset path. */
+/* global ADDITIONALS_ICON_SPRITES */
+/* exported spriteIconPath */
+function spriteIconPath(sprite) {
+  if (typeof ADDITIONALS_ICON_SPRITES === 'undefined') { return ''; }
+
+  return ADDITIONALS_ICON_SPRITES[sprite || 'core'] || '';
+}
+
+/* Build the markup of a sprite icon, as it is rendered by the sprite_icon
+   helper on the server side. Redmine covers the plain cases itself:
+   createSVGIcon builds an icon of the core sprite, updateSVGIcon swaps the icon
+   of a rendered one. Use this where neither fits, so for an icon of another
+   sprite or one that needs its own size, class or tooltip.
+
+   options: sprite ('core' by default), size (18), cssClass, title (rendered as
+   svg title element, which is what shows a tooltip on an svg) */
+/* exported spriteIcon */
+function spriteIcon(name, options) {
+  const opts = options || {};
+  // a sprite name is lowercase and hyphen separated, everything else is
+  // rejected instead of being written into the markup
+  const iconName = String(name).replace(/[^a-z0-9-]/g, '');
+  const path = spriteIconPath(opts.sprite);
+  if (!iconName || !path) { return ''; }
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', `s${opts.size || 18} icon-svg${opts.cssClass ? ` ${opts.cssClass}` : ''}`);
+  if (opts.title) {
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    title.textContent = opts.title;
+    svg.appendChild(title);
+  } else {
+    svg.setAttribute('aria-hidden', 'true');
+  }
+
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttribute('href', `${path}#icon--${iconName}`);
+  svg.appendChild(use);
+
+  return svg.outerHTML;
+}
+
 /* Render a select2 option for the Tabler icon picker: SVG sprite icon + name.
    The full sprite href is provided per option via data-href. */
 /* exported formatIconOption */
@@ -87,3 +135,77 @@ function addTabToFromAction(form, name) {
 
   form.setAttribute('action', action);
 }
+
+// Variable cheat-sheets. A form which advertises {%var%} placeholders renders
+// a "show variables" link next to a hidden list of them:
+//
+//   em.info = link_to_show_variables
+//   em.info.available-variables.toggle-variables data-insert-target='my_field'
+//     ... links with class "var" ...
+//
+// Clicking the link reveals the list, clicking a variable inserts it. The
+// target field is either named by data-insert-target, or - where the fields
+// are dynamic, as in invoice lines or automation actions - it is the field
+// with class "variable-value" the user edited last.
+//
+// Delegated on document, so forms replaced by ajax keep working. Loaded
+// globally through additionals/_html_head, which is why every plugin gets this
+// without an asset of its own.
+
+// Inserts text where the cursor is, keeping the scroll position. Global,
+// because views insert the answer of an ajax request the same way.
+function insertTextAtCaret(field, value) { // eslint-disable-line no-unused-vars
+  if (!field) { return; }
+
+  if (field.selectionStart === undefined) {
+    field.value += value;
+  } else {
+    const start = field.selectionStart;
+    const end = field.selectionEnd;
+    const { scrollTop } = field;
+
+    field.value = field.value.slice(0, start) + value + field.value.slice(end);
+    field.selectionStart = start + value.length;
+    field.selectionEnd = field.selectionStart;
+    field.scrollTop = scrollTop;
+  }
+
+  field.focus();
+}
+
+(() => {
+  let lastVarField = null;
+
+  // focus does not bubble, so it is captured instead of delegated
+  document.addEventListener('focus', (event) => {
+    if (event.target.classList?.contains('variable-value')) { lastVarField = event.target; }
+  }, true);
+
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a.show-variables');
+    if (!link) { return; }
+
+    event.preventDefault();
+    link.style.display = 'none';
+
+    // an explicit target is needed where two lists share a parent
+    const targetId = link.dataset.showTarget;
+    const list = targetId
+      ? document.getElementById(targetId)
+      : link.parentElement?.parentElement?.querySelector('em.available-variables');
+
+    // the list is hidden by the class, so dropping it is what reveals it
+    list?.classList.remove('toggle-variables');
+  });
+
+  document.addEventListener('click', (event) => {
+    const variable = event.target.closest('a.var');
+    if (!variable) { return; }
+
+    event.preventDefault();
+    const targetId = variable.closest('[data-insert-target]')?.dataset.insertTarget;
+    const field = targetId ? document.getElementById(targetId) : lastVarField;
+
+    insertTextAtCaret(field, variable.innerHTML);
+  });
+})();

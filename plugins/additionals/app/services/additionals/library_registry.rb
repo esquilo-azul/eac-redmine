@@ -33,6 +33,7 @@ module Additionals
       mermaid: %i[_mermaid_min _mermaid_load],
       dhtmlxgantt: %i[_dhtmlxgantt_css _dhtmlxgantt_js],
       actioncable: %i[_actioncable_core],
+      codemirror: %i[_codemirror],
       d3plus: %i[_d3plus_min],
       sortable: %i[_sortable_min],
       # Single-atom packages kept for granular use (e.g. blocks that want only
@@ -45,7 +46,7 @@ module Additionals
     # Leaf entries -- one entry per real file include. Underscore-prefixed by
     # convention to mark them internal; block definitions and view templates
     # should reference PACKAGES, not ATOMS.
-    # rubocop: disable Layout/HashAlignment
+    # rubocop:disable-next Layout/HashAlignment
     ATOMS = {
       _chartjs_core_umd:       Asset.new(type: :js,  path: 'vendor/chart.umd'),
       _chartjs_colorschemes:   Asset.new(type: :js,  path: 'vendor/chartjs-plugin-colorschemes.min'),
@@ -56,6 +57,7 @@ module Additionals
       _chartjs_chart_matrix:   Asset.new(type: :js,  path: 'vendor/chartjs-chart-matrix.min'),
       _d3plus_min:             Asset.new(type: :js,  path: 'vendor/d3plus.min'),
       _sortable_min:           Asset.new(type: :js,  path: 'vendor/sortable.min'),
+      _codemirror:             Asset.new(type: :js,  path: 'vendor/codemirror'),
       _actioncable_core:       Asset.new(type: :js,  path: 'actioncable', core: true),
       _mermaid_min:            Asset.new(type: :js,  path: 'vendor/mermaid.min'),
       _mermaid_load:           Asset.new(type: :js,  path: 'mermaid_load'),
@@ -65,7 +67,6 @@ module Additionals
       _select2_css:            Asset.new(type: :css, path: 'select2'),
       _dhtmlxgantt_css:        Asset.new(type: :css, path: 'dhtmlxgantt')
     }.freeze
-    # rubocop: enable Layout/HashAlignment
 
     class << self
       # Registers a package contributed by another plugin so it can be

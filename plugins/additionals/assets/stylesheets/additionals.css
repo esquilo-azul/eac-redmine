@@ -1,7 +1,3 @@
-.top-menu a.top-submenu {
-  padding-bottom: 10px;
-}
-
 .assigned-to.attribute a.icon.assign-to-me {
   margin-left: 5px;
 }
@@ -186,6 +182,69 @@ svg.dashboard-system-default.global {
   text-decoration: none;
 }
 
+/* A table cell carries the name of its column, so `avatar` there means "the
+   avatar column" and never "this element is an avatar" - Redmine builds the cell
+   class from the column name (Query#css_classes), so the collision can appear
+   without anyone writing markup. Core's component rule would take the cell out
+   of the table layout with display: inline-flex, which leaves the row
+   background and the column below it broken off under the avatar. */
+td.avatar,
+th.avatar {
+  display: table-cell;
+  border-radius: 0;
+}
+
+/* Core ships .avatar size classes for 13/16/22/24/40/50 only, so an avatar drawn
+   at any other size has no size at all. An image avatar carries width and height
+   attributes and survives that, but the initials avatar is a bare inline-flex
+   span and collapses to the width of its two letters. 14px is the default of
+   user_with_avatar, 32px is used all over servicedesk, 250px is the avatar
+   upload preview of hrm. */
+.avatar.s14 {
+  block-size: 14px;
+  inline-size: 14px;
+}
+
+span[role='img'].avatar.s14 {
+  font-size: calc(0.875rem * 0.4);
+}
+
+.avatar.s32 {
+  block-size: 32px;
+  inline-size: 32px;
+}
+
+span[role='img'].avatar.s32 {
+  font-size: calc(2rem * 0.4);
+}
+
+.avatar.s250 {
+  block-size: 250px;
+  inline-size: 250px;
+}
+
+span[role='img'].avatar.s250 {
+  font-size: calc(15.625rem * 0.4);
+}
+
+.additionals-avatar { margin-right: 0.25em; }
+
+/* An avatar written next to its name is one unit, the margin above spaces it.
+   A detail page carries core's issue class, and div.issue .avatar floats every
+   avatar below it with the margin of the large author avatar core draws there -
+   that would pull the avatar out of the line and tear the pair apart. */
+div.issue .additionals-avatar {
+  float: none;
+  margin: 0 0.25em 0 0;
+}
+
+/* A linked avatar carries the class on the link, so the float has to go from the
+   image inside it as well - a floated child would leave the link box empty. */
+div.issue .additionals-avatar .avatar {
+  float: none;
+  margin: 0;
+}
+
 /* Warning ring around the account avatar while redmine_sudo admin permission is
    active. redmine_sudo adds the `sudo-active` class to #account. */
 #account.sudo-active .dropdown-trigger .avatar {
@@ -261,8 +320,6 @@ div.clear-both { clear: both; }
 }
 
 .clipboard-text { cursor: pointer; }
-
-.additionals-avatar { margin-right: 0.25em; }
 
 .dashboard-block h3 svg,
 #page-title svg {
@@ -469,6 +526,15 @@ table.table-of-values caption {
 }
 /* stylelint-enable selector-class-pattern */
 
+/* An instance can hold dozens of macros, so the list scrolls instead of running
+   past the window. The stacking order keeps it above the visual editor, whose
+   own popups sit at 1300. */
+ul.additionals-macro-menu {
+  z-index: 1400;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
 div.relation-list-header {
   background: #eee;
   font-weight: bold;
@@ -567,9 +633,13 @@ table.entity-list td.block_column pre {
 
 /* Dashboard block: summary stats */
 
+/* The value is pushed to the right edge of the label, which lines the figures up
+ * in a narrow dashboard column. A block spanning the whole dashboard would tear
+ * the pair a page width apart, so the row itself is capped. */
 .dashboard-block li.summary-stat {
   display: flex;
   align-items: baseline;
+  max-width: 32rem;
   padding: 5px 0;
   border-bottom: 1px solid var(--a-color-border-light);
 }
@@ -608,4 +678,14 @@ table.entity-list td.block_column pre {
 
 @media print {
   .gototop { display: none; }
+}
+
+/* Variable cheat-sheet of a form: the list stays hidden until the user asks
+   for it through the "show variables" link. Handler in additionals.js. */
+.available-variables.toggle-variables {
+  display: none;
+}
+
+.available-variables a.var {
+  white-space: nowrap;
 }
