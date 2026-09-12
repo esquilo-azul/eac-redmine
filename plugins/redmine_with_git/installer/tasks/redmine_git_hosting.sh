@@ -8,5 +8,5 @@ function task_condition {
 }
 
 function task_dependencies {
-  echo gitolite_setup redmine_gitolite_sudoer redmine_git_hosting_settings
+  echo gitolite_setup redmine_gitolite_sudoer redmine_git_hosting_settings rugged_ssh_support
 }
