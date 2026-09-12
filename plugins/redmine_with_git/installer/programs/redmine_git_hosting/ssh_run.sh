@@ -9,6 +9,7 @@ shift
 sudo -u "$(programeiro /rails/user)" \
   ssh -oBatchMode=yes "-oStrictHostKeyChecking=${STRICT_HOST_KEY_CHECKING}" \
   -i "$(programeiro /redmine_git_hosting/ssh_key)" \
+  -p "$(programeiro /redmine_git_hosting/ssh_server_port)" \
   -l "$gitolite_user" \
   "$SSH_SERVER_HOST" \
   "$@"

@@ -5,6 +5,7 @@ set -e
 
 function redmine_git_hosting_setting_template {
   export redmine_git_hosting_ssh_key=$(programeiro /redmine_git_hosting/ssh_key)
+  var_set_by SSH_SERVER_PORT programeiro /redmine_git_hosting/ssh_server_port
   template_apply "${REDMINE_WITH_GIT_TEMPLATE_ROOT}/redmine_git_hosting_setting_value.sql" -
 }
 export -f redmine_git_hosting_setting_template

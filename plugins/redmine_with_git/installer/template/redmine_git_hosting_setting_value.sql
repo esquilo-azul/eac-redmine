@@ -35,7 +35,7 @@ gitolite_resync_all_projects: 'false'
 gitolite_resync_all_ssh_keys: 'false'
 gitolite_scripts_dir: ''
 gitolite_server_host: '%%SSH_SERVER_HOST%%'
-gitolite_server_port: '22'
+gitolite_server_port: '%%SSH_SERVER_PORT%%'
 gitolite_ssh_private_key: "%%redmine_git_hosting_ssh_key%%"
 gitolite_ssh_public_key: "%%redmine_git_hosting_ssh_key%%.pub"
 gitolite_temp_dir: "/tmp/redmine_git_hosting_%%gitolite_user%%/"
