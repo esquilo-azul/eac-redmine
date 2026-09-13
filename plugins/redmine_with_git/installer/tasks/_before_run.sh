@@ -1,3 +1,4 @@
 # Task dependencies
 taskeiro_add_dependency redmine_bundle redmine_with_git_bundle_requirements
+taskeiro_add_dependency redmine_bundle rugged_build_config
 taskeiro_add_dependency redmine_base redmine_git_hosting
