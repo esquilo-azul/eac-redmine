@@ -50,7 +50,7 @@ yarn-error.log
 /config/credentials.*
 /config/credentials/*
 /config/install.sh
-/config/master.key
+/config/*.key
 /config/secrets_key.txt
 /log/**/*
 !/themes/*
