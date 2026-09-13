@@ -76,8 +76,6 @@ PATH
       avm (~> 0.103)
       eac_rails_utils (~> 0.31)
       eac_ruby_utils (~> 0.134)
-      html-pipeline (< 3)
-      redcarpet
       sidekiq
 
 GEM
