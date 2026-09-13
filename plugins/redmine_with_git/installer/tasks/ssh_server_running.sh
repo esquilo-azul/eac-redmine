@@ -3,8 +3,10 @@
 set -u
 set -e
 
+PACKAGE_ARGS=('systemctl' "$SSH_SERVER_SERVICE")
+
 function task_condition {
-  programeiro /linux/service_running "$SSH_SERVER_SERVICE"
+  SUDO=t package_installed "${PACKAGE_ARGS[@]}"
 }
 
 function task_dependencies {
@@ -12,5 +14,5 @@ function task_dependencies {
 }
 
 function task_fix {
-  sudo service "$SSH_SERVER_SERVICE" start
+  SUDO=t package_assert "${PACKAGE_ARGS[@]}"
 }
