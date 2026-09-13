@@ -4,7 +4,7 @@ set -u
 set -e
 
 function task_dependencies {
-  echo gitolite_rc gitolite redmine_git_hosting_ssh_key ssh_server_running
+  echo gitolite_rc gitolite redmine_git_hosting_ssh_key ssh_client_known_hosts ssh_server_running
 }
 
 function task_condition {
