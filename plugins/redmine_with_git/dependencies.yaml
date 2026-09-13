@@ -1,0 +1,9 @@
+---
+additionals:
+  version_or_higher: 2.0.24
+redmine_installer:
+  version_or_higher: 0.21.0
+redmine_git_hosting:
+  version_or_higher: 4.0.1.1
+redmine_nonproject_modules:
+  version_or_higher: 0.3.1
