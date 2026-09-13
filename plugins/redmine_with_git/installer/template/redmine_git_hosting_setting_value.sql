@@ -1,4 +1,4 @@
---- !ruby/hash:ActionController::Parameters
+--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess
 all_projects_use_git: 'false'
 delete_git_repositories: 'true'
 download_revision_enabled: 'true'
