@@ -85,8 +85,3 @@ module RedmineWithGit
     end
   end
 end
-
-EacRubyUtils.patch_module(
-  RedmineGitHosting::GitoliteHook,
-  RedmineWithGit::Patches::RedmineGitHosting::GitoliteHookPatch
-)

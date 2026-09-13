@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-require 'redmine_with_git/patches/redmine_git_hosting/gitolite_hook_patch'
+EacRubyUtils.patch_module(
+  RedmineGitHosting::GitoliteHook,
+  RedmineWithGit::Patches::RedmineGitHosting::GitoliteHookPatch
+)
 
 apply_patches_version_limit = Gem::Version.new('4.0.0')
 redmine_git_hosting_version = Gem::Version.new(
@@ -9,5 +12,10 @@ redmine_git_hosting_version = Gem::Version.new(
 
 return unless redmine_git_hosting_version < apply_patches_version_limit
 
-require 'redmine_with_git/patches/redmine_git_hosting/cache/database'
-require 'redmine_with_git/patches/redmine_git_hosting/commands/git_patch'
+patch = RedmineWithGit::Patches::RedmineGitHosting::Cache::Database
+target = RedmineGitHosting::Cache::Database
+target.send(:include, patch) unless target.include?(patch)
+
+patch = RedmineWithGit::Patches::RedmineGitHosting::Commands::GitPatch
+target = RedmineGitHosting::Commands::Git
+target.send(:include, patch) unless target.include?(patch)

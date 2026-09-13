@@ -22,7 +22,3 @@ module RedmineWithGit
     end
   end
 end
-
-patch = RedmineWithGit::Patches::RedmineGitHosting::Commands::GitPatch
-target = RedmineGitHosting::Commands::Git
-target.send(:include, patch) unless target.include?(patch)

@@ -21,7 +21,3 @@ module RedmineWithGit
     end
   end
 end
-
-patch = RedmineWithGit::Patches::RedmineGitHosting::Cache::Database
-target = RedmineGitHosting::Cache::Database
-target.send(:include, patch) unless target.include?(patch)
