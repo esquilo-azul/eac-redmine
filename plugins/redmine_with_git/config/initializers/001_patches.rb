@@ -9,5 +9,5 @@ redmine_git_hosting_version = Gem::Version.new(
 
 return unless redmine_git_hosting_version < apply_patches_version_limit
 
-require 'redmine_with_git/patches/redmine_git_hosting/cache/database_patch'
+require 'redmine_with_git/patches/redmine_git_hosting/cache/database'
 require 'redmine_with_git/patches/redmine_git_hosting/commands/git/git_patch'
