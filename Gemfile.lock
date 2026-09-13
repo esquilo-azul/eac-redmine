@@ -73,9 +73,9 @@ PATH
   remote: plugins/redmine_with_git
   specs:
     redmine_with_git (0.10.0)
-      avm (~> 0.102, >= 0.102.4)
+      avm (~> 0.103)
       eac_rails_utils (~> 0.31)
-      eac_ruby_utils (~> 0.133)
+      eac_ruby_utils (~> 0.134)
       html-pipeline (< 3)
       redcarpet
       sidekiq
