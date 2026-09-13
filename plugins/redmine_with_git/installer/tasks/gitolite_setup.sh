@@ -8,7 +8,7 @@ function task_dependencies {
 }
 
 function task_condition {
-  programeiro /redmine_git_hosting/ssh_run info
+  programeiro /redmine_git_hosting/ssh_run no info
 }
 
 function task_fix {
