@@ -76,6 +76,7 @@ PATH
       avm (~> 0.103)
       eac_rails_utils (~> 0.31)
       eac_ruby_utils (~> 0.134)
+      rdoc (~> 7.2)
       sidekiq
 
 GEM
@@ -567,6 +568,9 @@ GEM
       actionpack (>= 7.0.0)
       activesupport (>= 7.0.0)
       rack
+    psych (5.5.0)
+      date
+      stringio
     public_suffix (7.0.5)
     puma (8.0.2)
       nio4r (~> 2.0)
@@ -622,14 +626,9 @@ GEM
       htmlentities
       rbpdf-font (~> 1.19.0)
     rbpdf-font (1.19.1)
-    rbs (4.2.0)
-      logger
-      prism (>= 1.6.0)
-      tsort
-    rdoc (8.0.0)
+    rdoc (7.2.0)
       erb
-      prism (>= 1.6.0)
-      rbs (>= 4.0.0)
+      psych (>= 4.0.0)
       tsort
     recordselect (3.10.9)
       rails (>= 4.0.0)
@@ -789,6 +788,7 @@ GEM
     ssrf_filter (1.6.0)
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
+    stringio (3.2.0)
     strings (0.2.1)
       strings-ansi (~> 0.2)
       unicode-display_width (>= 1.5, < 3.0)
