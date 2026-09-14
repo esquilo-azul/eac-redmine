@@ -1,13 +1,5 @@
 en:
   label_backup: Backup
-  eac_ruby_utils:
-    listable:
-      redmine_with_git/dump/base:
-        overwrite:
-          allowed:
-            label: Allowed
-          denied:
-            label: Denied
   field_path: Path
   permission_redmine_with_git:
     backup:
