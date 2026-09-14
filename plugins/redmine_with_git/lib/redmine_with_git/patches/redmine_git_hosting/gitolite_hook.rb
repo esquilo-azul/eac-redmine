@@ -7,7 +7,7 @@ require 'rbconfig'
 module RedmineWithGit
   module Patches
     module RedmineGitHosting
-      module GitoliteHookPatch
+      module GitoliteHook
         def self.included(base)
           base.prepend(InstanceMethods)
         end

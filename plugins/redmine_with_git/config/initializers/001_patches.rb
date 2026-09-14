@@ -2,7 +2,7 @@
 
 EacRubyUtils.patch_module(
   RedmineGitHosting::GitoliteHook,
-  RedmineWithGit::Patches::RedmineGitHosting::GitoliteHookPatch
+  RedmineWithGit::Patches::RedmineGitHosting::GitoliteHook
 )
 
 apply_patches_version_limit = Gem::Version.new('4.0.0')
