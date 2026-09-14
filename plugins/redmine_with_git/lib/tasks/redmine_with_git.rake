@@ -1,15 +1,6 @@
 # frozen_string_literal: true
 
 namespace :redmine_with_git do
-  %w[database files git all].each do |a|
-    namespace :load do
-      desc "Load backup file for \"#{a}\" resource(s)"
-      task a, [:path] => :environment do |_t, args|
-        RedmineWithGit::Load.const_get(a.camelize).new(args.path)
-      end
-    end
-  end
-
   desc 'Executa as operações de "Rescue" da configuração do plugin RedmineGitHosting'
   task rescue: %i[redmine_git_hosting:install_hook_parameters
                   redmine_git_hosting:migration_tools:update_repositories_type
