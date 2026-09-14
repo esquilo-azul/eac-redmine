@@ -11,5 +11,4 @@ pt-BR:
   field_path: Caminho
   permission_redmine_with_git:
     backup:
-      export_description: Permite exportar o pacote de backup.
       import_description: Permite importar um pacote de backup.

@@ -1,33 +1,20 @@
 # frozen_string_literal: true
 
 class BackupController < ApplicationController
-  EXPORT_PERMISSION = 'redmine_with_git.backup.export'
   IMPORT_PERMISSION = 'redmine_with_git.backup.import'
 
-  PERMISSIONS = { or: [EXPORT_PERMISSION, IMPORT_PERMISSION] }.freeze
+  PERMISSIONS = { or: [IMPORT_PERMISSION] }.freeze
 
   layout 'nonproject_modules'
   require_permission PERMISSIONS, only: [:index]
-  require_permission EXPORT_PERMISSION, only: [:export]
   require_permission IMPORT_PERMISSION, only: [:import]
 
-  accept_api_auth :export, :import
+  accept_api_auth :import
 
   helper ::RedmineWithGitHelper
 
   def index
     @load = ::RedmineWithGit::Tableless::Load.new
-  end
-
-  def export
-    Tempfile.open('redmine_export') do |file|
-      ::RedmineWithGit::Dump::All.new(
-        file.path,
-        overwrite: ::RedmineWithGit::Dump::Base::OVERWRITE_ALLOWED
-      )
-      send_file(file.path, filename: export_file_name, type: 'application/x-tar',
-                           size: file.size)
-    end
   end
 
   def import
@@ -47,10 +34,6 @@ class BackupController < ApplicationController
     else
       render :index
     end
-  end
-
-  def export_file_name
-    "redmine-backup_#{Time.zone.now.strftime('%Y-%m-%d_%H-%M-%S')}.tar"
   end
 
   def import_params

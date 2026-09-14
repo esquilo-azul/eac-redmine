@@ -11,5 +11,4 @@ en:
   field_path: Path
   permission_redmine_with_git:
     backup:
-      export_description: Allows to export the backup package.
       import_description: Allows to import a backup package.

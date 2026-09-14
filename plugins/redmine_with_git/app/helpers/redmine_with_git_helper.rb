@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 module RedmineWithGitHelper
-  def export_api_curl_command
-    curl_command("curl -JLO '#{export_backup_url(key: User.current.api_key)}'")
-  end
-
   def import_api_curl_command
     curl_command(<<~IMPORT_CURL)
       curl -X POST \\
