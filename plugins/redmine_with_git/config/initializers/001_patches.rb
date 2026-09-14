@@ -16,6 +16,6 @@ patch = RedmineWithGit::Patches::RedmineGitHosting::Cache::Database
 target = RedmineGitHosting::Cache::Database
 target.send(:include, patch) unless target.include?(patch)
 
-patch = RedmineWithGit::Patches::RedmineGitHosting::Commands::GitPatch
+patch = RedmineWithGit::Patches::RedmineGitHosting::Commands::Git
 target = RedmineGitHosting::Commands::Git
 target.send(:include, patch) unless target.include?(patch)

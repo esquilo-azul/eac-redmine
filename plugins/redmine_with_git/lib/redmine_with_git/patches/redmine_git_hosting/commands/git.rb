@@ -4,7 +4,7 @@ module RedmineWithGit
   module Patches
     module RedmineGitHosting
       module Commands
-        module GitPatch
+        module Git
           def self.included(base)
             base.prepend(InstanceMethods)
           end
