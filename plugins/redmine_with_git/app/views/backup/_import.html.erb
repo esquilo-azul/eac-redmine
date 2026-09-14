@@ -1,9 +1,0 @@
-<%= labelled_form_for @load, url: import_backup_path, method: :post do |f| %>
-  <%= error_messages_for @load %>
-  <div class="box tabular">
-    <p>
-      <%= f.file_field :path %>
-    </p>
-  </div>
-  <%= submit_tag('Import') %>
-<% end %>

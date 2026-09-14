@@ -1,6 +1,3 @@
 en:
   label_backup: Backup
   field_path: Path
-  permission_redmine_with_git:
-    backup:
-      import_description: Allows to import a backup package.
