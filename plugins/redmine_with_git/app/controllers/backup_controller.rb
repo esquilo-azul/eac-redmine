@@ -4,11 +4,7 @@ class BackupController < ApplicationController
   PERMISSIONS = {}.freeze
 
   layout 'nonproject_modules'
-  require_permission PERMISSIONS, only: [:index]
+  require_permission PERMISSIONS, only: []
 
   helper ::RedmineWithGitHelper
-
-  def index
-    @load = ::RedmineWithGit::Tableless::Load.new
-  end
 end
