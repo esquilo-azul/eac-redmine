@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 ruby '>= 3.2.0', '< 4.1.0'
 
-gem 'rails', '8.1.3'
+gem 'rails', '8.1.3.1'
 gem 'rouge', '~> 5.0'
 gem 'mini_mime', '~> 1.1.0'
 gem "actionpack-xml_parser"
@@ -132,11 +132,4 @@ end
 # Load plugins' Gemfiles
 Dir.glob File.expand_path("../plugins/*/{Gemfile,PluginGemfile}", __FILE__) do |file|
   eval_gemfile file
-end
-
-# Subs
-Dir["#{File.join(__dir__, 'sub')}/*"].each do |dir|
-  next unless File.exist?(File.join(dir, "#{File.basename(dir)}.gemspec"))
-
-  gem File.basename(dir), path: dir, require: false
 end
