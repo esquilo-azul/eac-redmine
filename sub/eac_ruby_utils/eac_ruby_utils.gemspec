@@ -1,0 +1,29 @@
+# frozen_string_literal: true
+
+$LOAD_PATH.push File.expand_path('lib', __dir__)
+
+# Maintain your gem's version:
+require 'eac_ruby_utils/version'
+
+# Describe your gem and declare its dependencies:
+Gem::Specification.new do |s|
+  s.name        = 'eac_ruby_utils'
+  s.version     = EacRubyUtils::VERSION
+  s.authors     = ['Esquilo Azul Company']
+  s.summary     = 'Utilities for E.A.C.\'s Ruby projects.'
+  s.license     = 'MIT'
+
+  s.files = Dir['{lib}/**/*', 'MIT-LICENSE', 'README.rdoc']
+  s.required_ruby_version = '>= 3.2' # rubocop:disable Gemspec/RequiredRubyVersion
+
+  s.add_dependency 'activesupport', '>= 6.1.7.10'
+  s.add_dependency 'addressable', '~> 2.9'
+  s.add_dependency 'bundler'
+  s.add_dependency 'json', '< 3' # While "activesupport" does not support "json" '>= 3'
+  s.add_dependency 'memoized', '~> 1.1', '>= 1.1.3'
+  s.add_dependency 'net-ssh', '~> 4.2'
+  s.add_dependency 'ostruct'
+  s.add_dependency 'zeitwerk', '~> 2.8', '>= 2.8.3'
+  s.add_development_dependency 'avm-eac_ubuntu_base0', '~> 0.7', '>= 0.7.2'
+  s.add_development_dependency 'eac_ruby_gem_support', '~> 0.15'
+end
