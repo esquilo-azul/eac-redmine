@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'eac_ruby_utils/patches/module/acts_as_instance_method'
+require 'eac_ruby_utils/patches/class/acts_as_instance_method'
 require 'eac_ruby_utils/patches/object/to_pathname'
 require 'eac_ruby_utils/patches/pathname/basename_sub'
 require 'memoized'
@@ -45,7 +45,7 @@ module EacRubyBase1
 
       # @return [Pathname]
       memoize def target_paths
-        return [absolute_path] if %w[* ?].any? { |e| absolute_path.to_path.include?(e) } # rubocop:disable Style/ArrayIntersect
+        return [absolute_path] if %w[* ?].any? { |e| absolute_path.to_path.include?(e) }
 
         r = []
         r << absolute_path if absolute_path.directory?
