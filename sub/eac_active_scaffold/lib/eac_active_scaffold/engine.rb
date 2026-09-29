@@ -3,7 +3,7 @@
 require 'eac_rails_utils'
 require 'eac_ruby_utils'
 require 'active_scaffold'
-require 'dartsass-sprockets'
+require 'dartsass-sprockets' unless defined?(Propshaft)
 require 'recordselect'
 
 module EacActiveScaffold
