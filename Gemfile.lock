@@ -79,6 +79,22 @@ PATH
       rdoc (~> 7.2)
       sidekiq
 
+PATH
+  remote: sub/eac_rails_gem_support
+  specs:
+    eac_rails_gem_support (0.15.1)
+      avm-eac_ruby_base1 (~> 0.45, >= 0.45.2)
+      capybara (~> 3.40)
+      eac_ruby_base1 (~> 0.1, >= 0.1.1)
+      eac_ruby_gem_support (~> 0.15)
+      eac_templates (~> 0.9)
+      factory_bot_rails (~> 6.5, >= 6.5.1)
+      launchy (~> 2.5, >= 2.5.2)
+      letter_opener (~> 1.10)
+      rails (>= 7.2)
+      rspec-rails (~> 8.0, >= 8.0.4)
+      sqlite3 (~> 2.9, >= 2.9.6)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -357,18 +373,6 @@ GEM
       eac_ruby_base1 (~> 0.1, >= 0.1.1)
       filesize (~> 0.2)
       ruby-filemagic (~> 0.7, >= 0.7.3)
-    eac_rails_gem_support (0.15.1)
-      avm-eac_ruby_base1 (~> 0.45, >= 0.45.2)
-      capybara (~> 3.40)
-      eac_ruby_base1 (~> 0.1, >= 0.1.1)
-      eac_ruby_gem_support (~> 0.15)
-      eac_templates (~> 0.9)
-      factory_bot_rails (~> 6.5, >= 6.5.1)
-      launchy (~> 2.5, >= 2.5.2)
-      letter_opener (~> 1.10)
-      rails (>= 7.2)
-      rspec-rails (~> 8.0, >= 8.0.4)
-      sqlite3 (~> 2.9, >= 2.9.6)
     eac_rails_utils (0.32.0)
       bootstrap-sass (~> 3.4, >= 3.4.1)
       eac_ruby_base1 (~> 0.1, >= 0.1.1)
@@ -934,6 +938,7 @@ DEPENDENCIES
   debug
   doorkeeper (~> 5.8.2)
   doorkeeper-i18n (~> 5.2)
+  eac_rails_gem_support!
   eac_redmine_base0!
   escape_utils
   ffi
