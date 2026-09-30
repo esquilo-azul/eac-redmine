@@ -19,6 +19,7 @@ module EacActiveScaffold
 
     initializer 'eac_active_scaffold.patches' do
       ::ActionDispatch::Routing::Mapper.include(::EacActiveScaffold::Patches::ActionDispatch)
+      ::ActiveScaffold::Assets::CssDepsGenerator.prepend(::EacActiveScaffold::Patches::ActiveScaffold::Assets::CssDepsGenerator)
     end
   end
 end
