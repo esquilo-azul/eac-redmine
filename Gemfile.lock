@@ -95,6 +95,17 @@ PATH
       rspec-rails (~> 8.0, >= 8.0.4)
       sqlite3 (~> 2.9, >= 2.9.6)
 
+PATH
+  remote: sub/eac_rails_utils
+  specs:
+    eac_rails_utils (0.32.0)
+      bootstrap-sass (~> 3.4, >= 3.4.1)
+      eac_ruby_base1 (~> 0.1, >= 0.1.1)
+      nested_form_fields (~> 0.8, >= 0.8.4)
+      rails (>= 7.2)
+      sprockets-rails (~> 3.5, >= 3.5.2)
+      virtus (~> 2.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -373,13 +384,6 @@ GEM
       eac_ruby_base1 (~> 0.1, >= 0.1.1)
       filesize (~> 0.2)
       ruby-filemagic (~> 0.7, >= 0.7.3)
-    eac_rails_utils (0.32.0)
-      bootstrap-sass (~> 3.4, >= 3.4.1)
-      eac_ruby_base1 (~> 0.1, >= 0.1.1)
-      nested_form_fields (~> 0.8, >= 0.8.4)
-      rails (>= 7.2)
-      sprockets-rails (~> 3.5, >= 3.5.2)
-      virtus (~> 2.0)
     eac_ruby_base1 (0.1.1)
       eac_ruby_utils (~> 0.131, >= 0.131.2)
     eac_ruby_gem_support (0.15.0)
@@ -939,6 +943,7 @@ DEPENDENCIES
   doorkeeper (~> 5.8.2)
   doorkeeper-i18n (~> 5.2)
   eac_rails_gem_support!
+  eac_rails_utils!
   eac_redmine_base0!
   escape_utils
   ffi
