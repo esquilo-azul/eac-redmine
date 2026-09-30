@@ -57,11 +57,11 @@ PATH
   remote: plugins/redmine_plugins_helper
   specs:
     redmine_plugins_helper (0.17.3)
-      eac_rails_gem_support (~> 0.15)
-      eac_ruby_utils (~> 0.134)
+      eac_rails_gem_support (~> 0.15, >= 0.15.1)
+      eac_ruby_utils (~> 0.134, >= 0.134.1)
       launchy (~> 2.5, >= 2.5.2)
       sassc-rails (~> 2.1, >= 2.1.2)
-      sprockets (~> 4.4)
+      sprockets (~> 4.4, >= 4.4.1)
 
 PATH
   remote: plugins/redmine_tasks_scheduler
