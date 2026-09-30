@@ -15,9 +15,9 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'active_scaffold', '~> 4.3', '>= 4.3.2'
   s.add_dependency 'dartsass-sprockets', '~> 3.2', '>= 3.2.1'
-  s.add_dependency 'eac_rails_utils', '~> 0.32'
+  s.add_dependency 'eac_rails_utils', '~> 0.33'
   s.add_dependency 'eac_ruby_utils', '~> 0.134', '>= 0.134.1'
   s.add_dependency 'recordselect', '~> 3.10', '>= 3.10.9'
 
-  s.add_development_dependency 'eac_rails_gem_support', '~> 0.15'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.15', '>= 0.15.2'
 end

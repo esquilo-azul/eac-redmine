@@ -85,7 +85,7 @@ PATH
     eac_active_scaffold (0.9.0)
       active_scaffold (~> 4.3, >= 4.3.2)
       dartsass-sprockets (~> 3.2, >= 3.2.1)
-      eac_rails_utils (~> 0.32)
+      eac_rails_utils (~> 0.33)
       eac_ruby_utils (~> 0.134, >= 0.134.1)
       recordselect (~> 3.10, >= 3.10.9)
 
