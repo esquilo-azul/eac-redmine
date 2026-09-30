@@ -10,7 +10,8 @@ Gem::Specification.new do |s|
   s.authors     = ['Put here the authors']
   s.summary     = 'Put here de description.'
 
-  s.files = Dir['{lib,template}/**/*', '.rubocop.yml']
+  s.files = Dir.glob('{lib,template}/**/*', File::FNM_DOTMATCH)
+              .reject { |f| ['.', '..'].include?(File.basename(f)) }
 
   s.required_ruby_version = '>= 3.2' # rubocop:disable Gemspec/RequiredRubyVersion
 
