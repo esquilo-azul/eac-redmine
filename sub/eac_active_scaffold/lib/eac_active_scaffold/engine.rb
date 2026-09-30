@@ -16,7 +16,9 @@ module EacActiveScaffold
       app.config.assets.paths <<
         ::EacActiveScaffold::Assets.output_directory.to_path
     end
+
+    initializer 'eac_active_scaffold.patches' do
+      ::ActionDispatch::Routing::Mapper.include(::EacActiveScaffold::Patches::ActionDispatch)
+    end
   end
 end
-
-require 'eac_active_scaffold/patches'
