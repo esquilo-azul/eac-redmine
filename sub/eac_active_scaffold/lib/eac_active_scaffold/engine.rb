@@ -9,6 +9,13 @@ require 'recordselect'
 module EacActiveScaffold
   class Engine < ::Rails::Engine
     include ::EacRailsUtils::EngineHelper
+
+    initializer 'eac_active_scaffold.assets_output_directory' do |app|
+      next unless defined?(Propshaft)
+
+      app.config.assets.paths <<
+        ::EacActiveScaffold::Assets.output_directory.to_path
+    end
   end
 end
 
