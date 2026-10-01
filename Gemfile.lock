@@ -31,7 +31,6 @@ PATH
       htmlentities (~> 4.4, >= 4.4.2)
       imgkit (~> 1.6, >= 1.6.3)
       telegram-bot-ruby (~> 2.8, >= 2.8.1)
-      wkhtmltoimage-binary (~> 0.12, >= 0.12.5)
 
 PATH
   remote: plugins/redmine_avm
@@ -902,7 +901,6 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    wkhtmltoimage-binary (0.12.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     yard (0.9.45)
