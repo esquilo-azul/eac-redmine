@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.summary     = 'Put here de description.'
 
   s.files = Dir.glob('{lib,template}/**/*', File::FNM_DOTMATCH)
-              .reject { |f| ['.', '..'].include?(File.basename(f)) }
+              .reject { |f| ['.', '..'].include?(File.basename(f)) } + ['.rubocop.yml']
 
   s.required_ruby_version = '>= 3.2' # rubocop:disable Gemspec/RequiredRubyVersion
 
