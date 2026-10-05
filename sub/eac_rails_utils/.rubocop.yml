@@ -1,3 +1,0 @@
----
-inherit_gem:
-  eac_rails_gem_support: ".rubocop.yml"

@@ -1,7 +1,0 @@
-[subrepo]
-  cmdver = 0.4.9
-  commit = 0ea00983dfcfd441715792a27680454e8b56d65a
-  method = merge
-  parent = fd4e191dea26485c3da7b041eede673bcd0e35aa
-  branch = master
-  remote = https://github.com/esquilo-azul/eac_rails_utils.git
