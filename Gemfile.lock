@@ -81,7 +81,7 @@ PATH
 PATH
   remote: sub/eac_rails_gem_support
   specs:
-    eac_rails_gem_support (0.15.2)
+    eac_rails_gem_support (0.15.3)
       avm-eac_ruby_base1 (~> 0.45, >= 0.45.2)
       capybara (~> 3.40)
       eac_ruby_base1 (~> 0.1, >= 0.1.1)
