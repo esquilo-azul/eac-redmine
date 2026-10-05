@@ -1,7 +1,0 @@
----
-en:
-  activerecord:
-    models:
-      person:
-        one: Person
-        other: People
