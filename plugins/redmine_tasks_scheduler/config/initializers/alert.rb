@@ -6,5 +6,7 @@ GroupPermission.add_permission(TasksSchedulerDaemonController::PERMISSIONS)
 Redmine::MenuManager.map :top_menu do |menu|
   menu.push :tasks_scheduler_alert,
             { controller: 'tasks_scheduler_daemon', action: 'index', id: nil },
-            caption: '', icon: 'warning', last: true, if: proc { TasksSchedulerDaemonController::PERMISSIONS }
+            caption: '', icon: 'warning', last: true, if: proc {
+              GroupPermission.permission?(TasksSchedulerDaemonController::PERMISSIONS)
+            }
 end
