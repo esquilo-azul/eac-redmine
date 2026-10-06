@@ -2,7 +2,7 @@
 
 class IssueStatusAssignsController < ApplicationController
   before_action :require_admin, :active_scaffold_set_dynamic_options
-  layout 'admin'
+  layout 'nonproject_modules'
 
   active_scaffold :issue_status_assign do |conf|
     conf.columns[:issue_status].form_ui = :select
