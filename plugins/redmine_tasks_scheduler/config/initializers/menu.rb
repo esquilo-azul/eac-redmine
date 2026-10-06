@@ -2,6 +2,7 @@
 
 GroupPermission.add_permission(RedmineTasksScheduler::Permissions::WRITE)
 Redmine::Plugin.by_path(__FILE__).nonprojects_menu do |menu|
+  menu.push_plugin_settings
   {
     tasks_scheduler_daemon: { controller: 'tasks_scheduler_daemon', action: 'index', id: nil },
     scheduled_task_statuses: { controller: 'scheduled_task_statuses', action: 'index', id: nil },
