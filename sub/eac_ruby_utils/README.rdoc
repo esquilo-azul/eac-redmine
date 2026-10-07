@@ -1,3 +1,0 @@
-= E.A.C. Ruby Utilities
-
-Utilities for E.A.C.'s Ruby projects.
