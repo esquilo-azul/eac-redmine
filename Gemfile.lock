@@ -79,12 +79,6 @@ PATH
       sidekiq
 
 PATH
-  remote: sub/eac_ruby_base1
-  specs:
-    eac_ruby_base1 (0.1.2)
-      eac_ruby_utils (~> 0.135)
-
-PATH
   remote: sub/eac_ruby_utils
   specs:
     eac_ruby_utils (0.135.0)
@@ -395,6 +389,8 @@ GEM
       rails (>= 7.2)
       sprockets-rails (~> 3.5, >= 3.5.2)
       virtus (~> 2.0)
+    eac_ruby_base1 (0.1.2)
+      eac_ruby_utils (~> 0.135)
     eac_ruby_gem_support (0.15.0)
       eac_ruby_base1 (~> 0.1, >= 0.1.1)
       rspec (~> 3.13, >= 3.13.2)
@@ -939,7 +935,6 @@ DEPENDENCIES
   doorkeeper (~> 5.8.2)
   doorkeeper-i18n (~> 5.2)
   eac_redmine_base0!
-  eac_ruby_base1!
   eac_ruby_utils!
   escape_utils
   ffi
