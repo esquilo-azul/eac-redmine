@@ -12,7 +12,7 @@ class IssueStatusAssignsController < ApplicationController
   private
 
   def active_scaffold_set_dynamic_options
-    active_scaffold_config.columns[:issue_field].options =
+    active_scaffold_config.columns.override(:issue_field).options =
       { options: issue_field_options }
   end
 
