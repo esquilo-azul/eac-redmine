@@ -16,10 +16,10 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 3.2' # rubocop:disable Gemspec/RequiredRubyVersion
 
   s.add_dependency 'avm', '~> 0.103'
-  s.add_dependency 'eac_rails_utils', '~> 0.31'
+  s.add_dependency 'eac_rails_utils', '~> 0.33'
   s.add_dependency 'eac_ruby_utils', '~> 0.134'
   s.add_dependency 'rdoc', '~> 7.2'
   s.add_dependency 'sidekiq'
 
-  s.add_development_dependency 'eac_rails_gem_support', '~> 0.15'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.15', '>= 0.15.3'
 end
