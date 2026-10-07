@@ -2,8 +2,8 @@
 additionals:
   version_or_higher: '4.6.0'
 redmine_installer:
-  version_or_higher: 0.27.0
+  version_or_higher: 0.27.1
 redmine_git_hosting:
   version_or_higher: '6.0.1'
 redmine_nonproject_modules:
-  version_or_higher: 0.6.5
+  version_or_higher: 0.7.0
