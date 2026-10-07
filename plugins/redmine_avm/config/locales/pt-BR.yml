@@ -1,4 +1,9 @@
 pt-BR:
+  activerecord:
+    models:
+      issue_status_assign:
+        one: Atribuição por situação de tarefa
+        other: Atribuições por situação de tarefa
   issue_assign_message: |
     Atribuído para *%{user}* porque:
 

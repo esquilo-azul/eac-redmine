@@ -1,4 +1,9 @@
 en:
+  activerecord:
+    models:
+      issue_status_assign:
+        one: Issue status assign
+        other: Issue status assigns
   issue_assign_message: |
     Assigned to *%{user}* because:
 
