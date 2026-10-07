@@ -1,7 +1,0 @@
-[subrepo]
-  cmdver = 0.4.9
-  commit = c398df0bfe8ed404b892842dea2f5d0fd1c14a52
-  method = merge
-  parent = 9599bed09ec243da53d89a35240208554190db34
-  branch = master
-  remote = https://github.com/esquilo-azul/eac_rails_gem_support.git
