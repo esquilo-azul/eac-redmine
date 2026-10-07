@@ -57,7 +57,7 @@ PATH
   specs:
     redmine_plugins_helper (0.18.0)
       dartsass-sprockets (~> 3.2, >= 3.2.1)
-      eac_rails_gem_support (~> 0.15, >= 0.15.1)
+      eac_rails_gem_support (~> 0.15, >= 0.15.3)
       eac_ruby_utils (~> 0.134, >= 0.134.1)
       launchy (~> 2.5, >= 2.5.2)
       sprockets (~> 4.4, >= 4.4.1)
