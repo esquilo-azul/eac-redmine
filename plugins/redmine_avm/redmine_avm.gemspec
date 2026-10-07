@@ -16,5 +16,5 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,db,lib}/**/*', 'init.rb']
   s.required_ruby_version = '>= 3.2' # rubocop:disable Gemspec/RequiredRubyVersion
 
-  s.add_development_dependency 'eac_rails_gem_support', '~> 0.13', '>= 0.13.2'
+  s.add_development_dependency 'eac_rails_gem_support', '~> 0.15', '>= 0.15.3'
 end
