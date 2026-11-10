@@ -112,6 +112,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Issues a new session token after the session tokens of the current user
+  # were deleted, so that the current session stays valid.
+  # API requests do not use the session and thus do not need a token.
+  def renew_session_token
+    session[:tk] = User.current.generate_session_token unless api_request?
+  end
+
   def user_setup
     # Check the settings cache for each request
     Setting.check_cache
@@ -148,7 +155,7 @@ class ApplicationController < ActionController::Base
         # Oauth
         if access_token.accessible?
           user = User.active.find_by_id(access_token.resource_owner_id)
-          user.oauth_scope = access_token.scopes.all.map(&:to_sym)
+          user&.oauth_scope = access_token.scopes.all.map(&:to_sym)
         else
           doorkeeper_render_error
         end
@@ -520,7 +527,7 @@ class ApplicationController < ActionController::Base
   # Returns a validated URL string if back_url is a valid url for redirection,
   # otherwise false
   def validate_back_url(back_url)
-    return false if back_url.blank?
+    return false if back_url.blank? || !back_url.is_a?(String)
 
     if CGI.unescape(back_url).include?('..')
       return false
@@ -540,6 +547,12 @@ class ApplicationController < ActionController::Base
     end
 
     path = uri.to_s
+    # Browsers treat a backslash like a slash and remove ASCII tab and newline
+    # characters, so that a path like "/\example.com" points to another host
+    if /[\\\x00-\x1f]/.match?(path)
+      return false
+    end
+
     # Ensure that the remaining URL starts with a slash, followed by a
     # non-slash character or the end
     unless %r{\A/([^/]|\z)}.match?(path)

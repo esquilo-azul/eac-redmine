@@ -119,7 +119,7 @@ class User < Principal
   attr_accessor :password, :password_confirmation, :generate_password
   attr_accessor :last_before_login_on
   attr_accessor :remote_ip
-  attr_writer   :oauth_scope
+  attr_accessor :oauth_scope
 
   LOGIN_LENGTH_LIMIT = 60
   MAIL_LENGTH_LIMIT = 254
@@ -480,6 +480,11 @@ class User < Principal
 
   def delete_autologin_token(value)
     Token.where(:user_id => id, :action => 'autologin', :value => value).delete_all
+  end
+
+  # Deletes all tokens that could be used to log in
+  def delete_login_tokens
+    Token.where(:user_id => id, :action => ['recovery', 'autologin', 'session']).delete_all
   end
 
   def twofa_totp_key
@@ -984,8 +989,7 @@ class User < Principal
   # was compromised.
   def destroy_tokens
     if saved_change_to_hashed_password? || (saved_change_to_status? && !active?) || (saved_change_to_twofa_scheme? && twofa_scheme.present?)
-      tokens = ['recovery', 'autologin', 'session']
-      Token.where(:user_id => id, :action => tokens).delete_all
+      delete_login_tokens
     end
   end
 
